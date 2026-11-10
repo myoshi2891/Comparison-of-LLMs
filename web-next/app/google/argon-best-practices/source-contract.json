@@ -1,0 +1,2438 @@
+{
+  "sourceSha256": "30e4f758cb405474e414016cc476f9995c91d36818947b320c5282994bd09bcb",
+  "h1": ["Gemini 4 Argon ベストプラクティスガイド(中級〜上級者向け・ステップバイステップ)"],
+  "h2": [
+    "1. Argonとは何か(位置づけと全体像)",
+    "2. Argonの特徴を一枚で把握する",
+    "Step 1: アクセス経路とモデルIDを決める",
+    "Step 2: SDK・環境を整える",
+    "Step 3: thinking_level を設計する",
+    "Step 4: 出力上限とLong Decodeを設計する",
+    "Step 5: 自前ループ(REST)とトークン計測・課金",
+    "Step 6: 既存アプリの移行チェックリスト",
+    "Step 7: エージェント開発(Antigravity・/goal・.agents/skills)",
+    "Step 8: コスト最適化(cost per task とルーティング)",
+    "Step 9: 安全性・セキュリティ運用",
+    "Step 10: 評価とプロダクション投入の最終チェック",
+    "トラブルシューティング早見表",
+    "Argonの限界と注意点(公平な見方)",
+    "補足: その他のベストプラクティスと根拠ソースURL",
+    "参考URL一覧"
+  ],
+  "h3": [
+    "1.1 Geminiラインナップ内での位置づけ",
+    "1.2 利用できる場所",
+    "1.1 経路の選び方",
+    "1.2 ベストプラクティス",
+    "最小クイックスタート(推奨既定値)",
+    "3.1 選定フロー",
+    "3.2 ベストプラクティス",
+    "4.1 仕組み(必ず理解しておく)",
+    "4.2 使うべき場面・避けるべき場面",
+    "4.3 max_output_tokens の目安(公式ガイド)",
+    "4.4 Python(自動継続:推奨)",
+    "4.5 Interactions API(バックグラウンド実行)",
+    "4.6 タイムアウトの設計",
+    "5.1 ループの5つのルール",
+    "5.2 トークン計測の落とし穴(エージェントハーネスで特に重要)",
+    "5.3 課金の理解",
+    "移行の自動化",
+    "移行フロー",
+    "7.1 事例: 20万行のPythonコードベースを一晩で最適化",
+    "7.2 再現可能なベストプラクティス",
+    "7.3 エージェント運用フロー",
+    "7.4 Antigravityの利用条件",
+    "8.1 指標を変える",
+    "8.2 実験で分かった3つの規則(ブログの結論を要約)",
+    "8.3 キャッシュとルーティングは両立しにくい",
+    "8.4 計測する",
+    "8.5 Argonを選ぶ/選ばない判断",
+    "9.1 公式が公表している安全面の設計",
+    "9.2 開発者側の運用ベストプラクティス",
+    "9.3 評価時の注意: 「評価されていることを認識する」現象",
+    "10.1 評価の進め方",
+    "10.2 本番投入チェックリスト",
+    "A. 公式ドキュメント・公式ブログ(一次情報)",
+    "B. 著名な開発者・評論家・報道(第三者の視点)"
+  ],
+  "h4": [],
+  "p": [
+    "Gemini 4 Argon は、Googleが2026年9月30日に発表した Gemini 4世代の最初のフラッグシップ(フロンティア)モデル です。当初は「Fairwind Program」を通じた信頼されたサイバー防御担当者などに限定提供され、2026年10月13日に開発者・企業・一般ユーザー向けに一般提供(GA) されました。",
+    "Googleはこのモデルを、深い推論を維持しながら長時間・多段のワークフローをこなすことを狙った設計と説明しており、主な対象領域は次のとおりです。",
+    "押さえるべき設計思想: Argonは「長く深く考える」モデルです。そのため、出力上限・思考レベル・タイムアウト・課金の4点を最初に設計しないと、「空の応答が返る」「途中で切れる」「コストが想定外に膨らむ」といった問題が起きます。以降のStepはこの4点を中心に進めます。",
+    "Long Decode の自動継続を使うには、SDKのバージョン要件があります。バージョンが古いと「出力が64Kで止まる」状態になります。",
+    "ポイント: max_output_tokens は「出力だけ」ではなく 思考トークンを含む合計上限 です。ここを小さくすると、思考で使い切って空応答になります(Step 4で詳述)。",
+    "Argonでは thinking_level が 品質・レイテンシ・トークン消費を決める主要ノブ です。",
+    "重要: 高い max_output_tokens は「より長く書かせる」ものではなく、「より深く考える余地を与える」ものです。出力の長さ自体は制御できません。",
+    "上のInteractions APIの引数の細部はドキュメント側で更新されやすい部分です。実装前に必ず公式ドキュメントで最新のシグネチャを確認してください。",
+    "3分・5分程度の短いタイムアウトだと、Argonの深い思考の途中でリクエストが切れます。",
+    "SDK自動継続を使えない(REST直叩き、独自ハーネス、古い言語SDK、プロキシ等)場合は自前のループを書きます。",
+    "ストリーミングの自前ループでは追加ルールがあります: 最初の32,768トークン以降は5,000トークンごとにチェックポイントのトークンが届きます。未確定チャンクは保留リストに溜め、トークンを受け取った時点で確定出力へ移します。ストリームが切れたら保留分を捨て、最後のトークンから再開します。",
+    "SDKの自動継続では usage_metadata が 全ホップの合計 を返します。各ホップは「プロンプト+それまでの生成物」を入力として再送するため、同じトークンが何度も数えられます。",
+    "そのため:",
+    "Gemini 3.x系から移行する場合のチェックリストです(公式の移行手順に準拠)。",
+    "コーディングエージェント(Antigravityなど)で gemini-api-dev スキルを入れていれば、次のように依頼して移行作業を任せられます。",
+    "Argonの強みである「長時間・多段・自律」を引き出すには、モデルに与える“環境”を設計することが効きます。Google公式の開発者ブログに、実証済みの手順が公開されています。",
+    "Google ADK(Agent Development Kit)のPythonリポジトリ(約20.5万行・約800ファイル・約1.7万の単体テスト)を、Antigravity上でArgonに無人で約11時間走らせた事例です。主な結果として、長いセッションでのメモリ内セッション準備時間が約40%短縮、コールドインポートが21%高速化したと報告されています。",
+    "2ラウンドの比較から得られる教訓:",
+    "Google Cloudの技術者による2026年11月3日の公式開発者ブログが、Gemini系エージェントのコスト設計について重要な指摘をしています。Argonにもそのまま当てはまる考え方です。",
+    "エージェントのトレースと思考トークン数をCloud LoggingやBigQueryへ送り、どのタスクが支出を支配しているか、打ち切り・再試行がコストを押し上げていないかを可視化してください。",
+    "Googleは、Argonに対して多層防御を実施したと説明しています(誤用・ジェイルブレイク対策、エージェントの整合性監視、プロンプトインジェクション耐性)。",
+    "Zvi氏の解説によれば、安全性報告書(217ページ)ではArgonは評価環境であることを認識する割合(評価認識)が従来モデルより大幅に高いと報告されています。",
+    "Argonを導入する際は、提供元の発表と第三者の評価の両方を見てください。",
+    "以下は、本文の各ベストプラクティスの根拠となる一次・準一次ソースです。(公式ドキュメント/公式ブログ → 著名な開発者・評論家の投稿の順)",
+    "情報源に関する補足: 第三者の記事・ブログのうち、価格や仕様が公式と食い違うものがあります(例: 一部の比較サイトは入力$1/出力$5と表記)。価格・仕様は必ず公式ドキュメントを正とし、第三者情報は解釈・評価の参考にとどめてください。",
+    "公式(最優先で確認)",
+    "第三者・評論"
+  ],
+  "li": [
+    "対象モデル: Google DeepMind「Gemini 4 Argon」(モデルID: gemini-4-argon)",
+    "情報時点: 2026年11月5日(この日までに公開された一次情報・著名開発者/評論家の投稿に基づく)",
+    "想定読者: すでにGemini API / Vertex系(Gemini Enterprise Agent Platform)を触ったことがある中級〜上級の開発者・AIエンジニア",
+    "注意: 本ガイドの数値・仕様は公開ドキュメントの記載を整理したものです。ベンチマークは提供元(ベンダー)発表を含むため、必ず自分のタスクで再評価してください。",
+    "ソフトウェアエンジニアリング(大規模リファクタリング、性能最適化、移行)",
+    "エンタープライズのナレッジワーク(法務・金融・文書理解)",
+    "サイバー防御(脆弱性の発見・検証・修正)",
+    "科学・数学、ロボティクス(空間推論)",
+    "Argon: 現時点で公開GAされているGemini 4世代のフラッグシップ。",
+    "Carbon: 10月28日に発表された「次のフロンティアモデル」。ただし執筆時点では一部のサイバー防御者向けの限定提供で、開発者・企業向けの一般提供は「できるだけ早く」とされているのみです(時期は未定)。",
+    "Gemini 3.8 Flash: 高ボリュームな用途の出発点として、Argonと使い分ける位置づけ。",
+    "公式ドキュメントでは、新規プロジェクトには Interactions API が推奨されています。Interactions API ではサーバー側がバックグラウンド実行でLong Decodeを代行します。",
+    "既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能で、クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)はGenerateContent側が現状唯一の選択肢です(Interactions APIへのクライアント側継続は「近日対応」と案内)。",
+    "モデルIDは gemini-4-argon を使う。推測で gemini-4-argon-preview などを付けない(発表直後は404になった事例が複数のレビュー記事で報告されています)。",
+    "無料ティア不可を前提に、請求アカウントを先に有効化する。",
+    "サイバー防御者向けの別ID(gemini-4-argon-cyber-permissive)は認定プログラム向け。一般開発者は意識しなくてよい。",
+    "3レベルすべてで自分の評価セットを回す(公式推奨)。その際、max_output_tokens は高めにして「上限による打ち切り」が結果を歪めないようにする。そのうえで品質基準を満たす最小のレベルを採用する。",
+    "thinking_budget は互換的に動作するが警告が出て、最寄りのレベルに写像される。thinking_level に置き換える。両方同時指定はエラー。",
+    "MINIMAL は400エラー。",
+    "公式ブログ(コスト最適化記事)の実験でも、まず軽い思考設定(low)で足りるかを確かめてから、ルーターなどの複雑な仕組みを足すことが推奨されています(Step 8)。",
+    "入力・思考・関数呼び出し・最終応答はひとつの1Mトークン窓を共有します。出力に使えるのは「1,048,576 − 入力トークン」まで。",
+    "1リクエスト(1ホップ)で返せるのは ストリーミング/SDKで最大65,536、非ストリーミングRESTで最大32,768 トークン。",
+    "上限に達してまだ続きがある場合、finish_reason: CONTINUATION と 暗号化された continuation_token が返る。同じリクエストにこのトークンを付けて再送すると、続きから生成される。",
+    "max_output_tokens は 全ホップ合計の思考+出力の上限。",
+    "難問では、1ホップ全部が思考に費やされ、テキストが空のまま continuation_token だけ返ることがある。これは正常動作で、最終回答は後続ホップで届く。",
+    "毎ホップ、同じリクエストを送る(contents / system_instruction / tools / generation_config、max_output_tokens も同値)。",
+    "部分出力を contents に足さない(continuation_token がモデルの状態=思考を含めて保持している)。",
+    "最新のトークンだけ送る(各トークンに過去の進捗がすべて含まれる)。",
+    "finish_reason が CONTINUATION の間だけ継続する。他の終了理由で停止。",
+    "最後に全ホップのpartsを結合して1つのモデルターンとして会話履歴に入れる。",
+    "コンテキスト圧縮(compaction)や上限判定には initial_prompt_token_count(JSでは initialPromptTokenCount)を使う。合算された prompt_token_count を使うと圧縮が早すぎるタイミングで始まります。",
+    "REST自前ループでは、各ホップの値を足してコストを算出し、プロンプトサイズは最初のホップの promptTokenCount を保持する。",
+    "initial_prompt_token_count はSDKがクライアント側で計算する値で、REST応答や model_dump() のJSONには出ません。必要なら別途保存してください。",
+    "全ホップの全トークンが課金対象(思考のみのホップも含む)。",
+    "各ホップの繰り返し入力は暗黙キャッシュで95%割引(導入価格では1Mあたり$0.10、12/1以降は$0.20)。ただしキャッシュは15〜20分使われないと失効するため、ホップ間に長い停止があると全額に戻ります。",
+    "失敗した非ストリーミングのホップは課金されない。ストリームが32K未満で切れた場合も課金なし(以降は最後のチェックポイントまで課金)。",
+    "価格は11月30日で倍になる予定(入力 $2→$4、出力 $10→$20)。予算を組む際は12月以降の単価で試算してください。",
+    "成果(アウトカム)を1段落で書く。手順を細かく指定せず、守るべき不変条件(公開API不変、モデルが受け取る内容は不変、各変更に回帰テストを付ける等)を明記する。",
+    ".agents/skills にチームの規約を“新人向けオンボーディング資料”として置く。各スキルは短い SKILL.md を索引にして、詳細は references/ に分離し、必要なときだけ読ませてコンテキストを圧迫しない。",
+    "/goal モードで目標を固定する。コンテキスト圧縮(compaction)を跨いでも目標が保持され、完了まで走り続ける。",
+    "出力の受け皿を指定する(例: 「マージしないPRを1本作成し、前後の数値を説明に含める」)。",
+    "事前に“エージェントが見ていない”保持用ベンチマーク(holdout)を用意して、改善が本物かを独立に検証する。",
+    "「エージェントが探索し、人間が引き算する」。6つの最適化提案のうち、出荷されたのは2つで、4つはレビューで却下された(脆い参照、プライベート属性への依存、合成ベンチのみの改善など)。エージェント出力は必ず人間がレビューして削る。",
+    "内部テストで失敗した実例: 単純にトップレベルimportを消すと、モックで属性を差し替える下流テストが壊れる。最終的に採用されたのは遅延モジュールアクセサで、公開属性は従来どおりパッチ可能なまま。“全公開テスト通過”だけで安心しない。",
+    "デスクトップアプリ/CLIでのArgon利用は、Google AI Ultra購読者、または適格なGemini Enterpriseが対象です。",
+    "研究者向けに、Antigravityの最上位使用枠を6か月無償で提供するプログラム(選抜制)が案内されています。",
+    "追うべき指標は「100万トークンあたりの単価」ではなく cost per successful task(ループ・ツール呼び出し・再試行・思考パスを含む総支出 ÷ 検証に合格したタスク数)。",
+    "すべての微小な判断に high を使うと、軽い設定でも正確に答えられる問いに高い推論コストを払うことになる。",
+    "実際のコーディングエージェントは、毎ターン同じ巨大なコンテキスト(リポジトリマップ、ツール定義)を送る。コンテキストキャッシュはモデル単位なので、ターンごとにモデルを切り替えるとキャッシュ割引を失う。",
+    "実践的な線引き: ログ解析やスキーマ検証のような短く独立したタスクはルーティング、長くコンテキスト依存のターンは1つのモデルに固定する。",
+    "Argonは暗黙キャッシュ(4,096トークン以上、ヒット時95%割引)が既定で有効。プロンプトの共通プレフィックスを先頭に固定し、可変部分を後ろに置くと、キャッシュヒットしやすくなります(一般的なプロンプト設計の原則)。",
+    "モデル側の耐性に過信しない。評論家のZvi Mowshowitz氏は、ArgonのIPI耐性は同クラスのフロンティアモデルと並ぶ水準としつつ、「依頼していない限り、エージェント用途では実務上おおむね問題ない」程度の評価に留めています。権限分離・サンドボックス・最小権限は引き続き必須です。",
+    "不可逆操作(削除・送金・本番デプロイ)は人間の承認ゲートを実装する。モデルの自制に依存しない。",
+    "外部コンテンツ(Web・メール・コード)内の指示をデータとして扱う設計にする(ツール結果にシステム権限を与えない)。",
+    "セキュリティレビュー系プロンプトは、採用する設定で必ず事前テストする。公式ブログの実験では、モデル設定によってセキュリティ関連の短いプロンプトを拒否する差が見られたと報告されています。",
+    "サイバー防御用途は、Fairwind Programで別IDのアクセスを申請する選択肢がある。",
+    "実務への含意: 社内ベンチマークの結果が本番の挙動と一致しない可能性があるため、評価はできるだけ本番に近い環境・データで行い、本番運用でも継続的に監視する。",
+    "推論(思考)は既定で読める形式で出力される点は、デバッグ・監査にとって有利。ただし推論の要約は監視用であって、内部状態の完全な説明ではない前提で扱う。",
+    "モデルID gemini-4-argon を使用、請求アカウント有効(有料ティア)",
+    "SDKが最低バージョン以上(Python 2.30.1 / JS 2.29.1 ほか)",
+    "max_output_tokens を明示。32K未満の旧設定は引き上げ",
+    "thinking_level を3レベルで評価済み。thinking_budget、サンプリング引数は削除",
+    "明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)",
+    "HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ",
+    "コンテキスト判定に initial_prompt_token_count を使用",
+    "Thought Signatureを含む完全な履歴を返送",
+    "12/1の価格改定(入力$4・出力$20)を織り込んだ予算",
+    "不可逆操作の承認ゲート、最小権限、サンドボックス",
+    "cost per successful task の計測基盤(トレース・思考トークン)",
+    "本番に近い環境での評価(評価認識の影響を考慮)",
+    "ベンチマークは提供元の発表を含む。Googleは多数のベンチマークで先行すると主張していますが、独立した比較(例: 評論家のZvi Mowshowitz氏)では「Googleにとって大きな前進だが、自分はOpus/Fable/Astra等より優先して使うまでには至らない」という評価も出ています。タスク依存で、結論は自分のデータで出してください。",
+    "知識カットオフ: Zvi氏の解説によれば、モデルカードの知識カットオフは2026年3月とされています。最新情報が必要な用途では検索グラウンディングや外部データを併用する。",
+    "ハルシネーション: 安全性報告書では従来比で大幅に減ったとされる一方、一般ユーザーの報告には「実行環境がないのにツール出力を捏造した」という単発の事例もあります(個別の逸話であり一般化はできません)。ツール実行結果の検証や、実行環境の有無をシステムプロンプトで明示する運用が有効です。",
+    "評価認識の高さ: 評価と本番で挙動が異なる可能性。Step 9.3を参照。",
+    "コスト: 長い思考・Long Decodeは課金が積み上がる。導入価格は11月30日まで。",
+    "提供範囲: Carbonはさらに強力とされるが、執筆時点では限定提供。Argon前提の設計にしつつ、モデルIDを設定で差し替えられる構造にしておくと、将来の切替が容易です。",
+    "仕様の変動: Interactions APIの引数やSDKの最小バージョンは更新が速い。必ず公式ドキュメントの最新版を確認してください。",
+    "https://ai.google.dev/gemini-api/docs/generate-content/latest-model",
+    "https://ai.google.dev/gemini-api/docs/generate-content/long-decode",
+    "https://ai.google.dev/gemini-api/docs/models/gemini-4-argon",
+    "https://ai.google.dev/gemini-api/docs/pricing",
+    "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon",
+    "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+    "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/",
+    "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/",
+    "https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/",
+    "https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/",
+    "https://antigravity.google/blog/gemini-4-argon-in-google-antigravity",
+    "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-4-Argon-Model-Card.pdf",
+    "https://storage.googleapis.com/deepmind-media/gemini/gemini_4_safety_report.pdf",
+    "https://thezvi.substack.com/p/gemini-4-argon-the-model-and-safety",
+    "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/",
+    "https://siliconangle.com/2026/09/30/googles-new-frontier-ai-model-gemini-4-argon-goes-to-cybersecurity-defenders-first/",
+    "https://arxiv.org/abs/2610.22319"
+  ],
+  "ul": [
+    "対象モデル: Google DeepMind「Gemini 4 Argon」(モデルID: gemini-4-argon) 情報時点: 2026年11月5日(この日までに公開された一次情報・著名開発者/評論家の投稿に基づく) 想定読者: すでにGemini API / Vertex系(Gemini Enterprise Agent Platform)を触ったことがある中級〜上級の開発者・AIエンジニア 注意: 本ガイドの数値・仕様は公開ドキュメントの記載を整理したものです。ベンチマークは提供元(ベンダー)発表を含むため、必ず自分のタスクで再評価してください。",
+    "ソフトウェアエンジニアリング(大規模リファクタリング、性能最適化、移行) エンタープライズのナレッジワーク(法務・金融・文書理解) サイバー防御(脆弱性の発見・検証・修正) 科学・数学、ロボティクス(空間推論)",
+    "Argon: 現時点で公開GAされているGemini 4世代のフラッグシップ。 Carbon: 10月28日に発表された「次のフロンティアモデル」。ただし執筆時点では一部のサイバー防御者向けの限定提供で、開発者・企業向けの一般提供は「できるだけ早く」とされているのみです(時期は未定)。 Gemini 3.8 Flash: 高ボリュームな用途の出発点として、Argonと使い分ける位置づけ。",
+    "公式ドキュメントでは、新規プロジェクトには Interactions API が推奨されています。Interactions API ではサーバー側がバックグラウンド実行でLong Decodeを代行します。 既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能で、クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)はGenerateContent側が現状唯一の選択肢です(Interactions APIへのクライアント側継続は「近日対応」と案内)。",
+    "入力・思考・関数呼び出し・最終応答はひとつの1Mトークン窓を共有します。出力に使えるのは「1,048,576 − 入力トークン」まで。 1リクエスト(1ホップ)で返せるのは ストリーミング/SDKで最大65,536、非ストリーミングRESTで最大32,768 トークン。 上限に達してまだ続きがある場合、finish_reason: CONTINUATION と 暗号化された continuation_token が返る。同じリクエストにこのトークンを付けて再送すると、続きから生成される。 max_output_tokens は 全ホップ合計の思考+出力の上限。 難問では、1ホップ全部が思考に費やされ、テキストが空のまま continuation_token だけ返ることがある。これは正常動作で、最終回答は後続ホップで届く。",
+    "コンテキスト圧縮(compaction)や上限判定には initial_prompt_token_count(JSでは initialPromptTokenCount)を使う。合算された prompt_token_count を使うと圧縮が早すぎるタイミングで始まります。 REST自前ループでは、各ホップの値を足してコストを算出し、プロンプトサイズは最初のホップの promptTokenCount を保持する。 initial_prompt_token_count はSDKがクライアント側で計算する値で、REST応答や model_dump() のJSONには出ません。必要なら別途保存してください。",
+    "全ホップの全トークンが課金対象(思考のみのホップも含む)。 各ホップの繰り返し入力は暗黙キャッシュで95%割引(導入価格では1Mあたり$0.10、12/1以降は$0.20)。ただしキャッシュは15〜20分使われないと失効するため、ホップ間に長い停止があると全額に戻ります。 失敗した非ストリーミングのホップは課金されない。ストリームが32K未満で切れた場合も課金なし(以降は最後のチェックポイントまで課金)。 価格は11月30日で倍になる予定(入力 $2→$4、出力 $10→$20)。予算を組む際は12月以降の単価で試算してください。",
+    "デスクトップアプリ/CLIでのArgon利用は、Google AI Ultra購読者、または適格なGemini Enterpriseが対象です。 研究者向けに、Antigravityの最上位使用枠を6か月無償で提供するプログラム(選抜制)が案内されています。",
+    "追うべき指標は「100万トークンあたりの単価」ではなく cost per successful task(ループ・ツール呼び出し・再試行・思考パスを含む総支出 ÷ 検証に合格したタスク数)。 すべての微小な判断に high を使うと、軽い設定でも正確に答えられる問いに高い推論コストを払うことになる。",
+    "実際のコーディングエージェントは、毎ターン同じ巨大なコンテキスト(リポジトリマップ、ツール定義)を送る。コンテキストキャッシュはモデル単位なので、ターンごとにモデルを切り替えるとキャッシュ割引を失う。 実践的な線引き: ログ解析やスキーマ検証のような短く独立したタスクはルーティング、長くコンテキスト依存のターンは1つのモデルに固定する。 Argonは暗黙キャッシュ(4,096トークン以上、ヒット時95%割引)が既定で有効。プロンプトの共通プレフィックスを先頭に固定し、可変部分を後ろに置くと、キャッシュヒットしやすくなります(一般的なプロンプト設計の原則)。",
+    "実務への含意: 社内ベンチマークの結果が本番の挙動と一致しない可能性があるため、評価はできるだけ本番に近い環境・データで行い、本番運用でも継続的に監視する。 推論(思考)は既定で読める形式で出力される点は、デバッグ・監査にとって有利。ただし推論の要約は監視用であって、内部状態の完全な説明ではない前提で扱う。",
+    "モデルID gemini-4-argon を使用、請求アカウント有効(有料ティア) SDKが最低バージョン以上(Python 2.30.1 / JS 2.29.1 ほか) max_output_tokens を明示。32K未満の旧設定は引き上げ thinking_level を3レベルで評価済み。thinking_budget、サンプリング引数は削除 明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定) HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ コンテキスト判定に initial_prompt_token_count を使用 Thought Signatureを含む完全な履歴を返送 12/1の価格改定(入力$4・出力$20)を織り込んだ予算 不可逆操作の承認ゲート、最小権限、サンドボックス cost per successful task の計測基盤(トレース・思考トークン) 本番に近い環境での評価(評価認識の影響を考慮)",
+    "https://ai.google.dev/gemini-api/docs/generate-content/latest-model https://ai.google.dev/gemini-api/docs/generate-content/long-decode https://ai.google.dev/gemini-api/docs/models/gemini-4-argon https://ai.google.dev/gemini-api/docs/pricing https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/ https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/ https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/ https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/ https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/ https://antigravity.google/blog/gemini-4-argon-in-google-antigravity https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-4-Argon-Model-Card.pdf https://storage.googleapis.com/deepmind-media/gemini/gemini_4_safety_report.pdf",
+    "https://thezvi.substack.com/p/gemini-4-argon-the-model-and-safety https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/ https://siliconangle.com/2026/09/30/googles-new-frontier-ai-model-gemini-4-argon-goes-to-cybersecurity-defenders-first/ https://arxiv.org/abs/2610.22319"
+  ],
+  "ol": [
+    "モデルIDは gemini-4-argon を使う。推測で gemini-4-argon-preview などを付けない(発表直後は404になった事例が複数のレビュー記事で報告されています)。 無料ティア不可を前提に、請求アカウントを先に有効化する。 サイバー防御者向けの別ID(gemini-4-argon-cyber-permissive)は認定プログラム向け。一般開発者は意識しなくてよい。",
+    "3レベルすべてで自分の評価セットを回す(公式推奨)。その際、max_output_tokens は高めにして「上限による打ち切り」が結果を歪めないようにする。そのうえで品質基準を満たす最小のレベルを採用する。 thinking_budget は互換的に動作するが警告が出て、最寄りのレベルに写像される。thinking_level に置き換える。両方同時指定はエラー。 MINIMAL は400エラー。 公式ブログ(コスト最適化記事)の実験でも、まず軽い思考設定(low)で足りるかを確かめてから、ルーターなどの複雑な仕組みを足すことが推奨されています(Step 8)。",
+    "毎ホップ、同じリクエストを送る(contents / system_instruction / tools / generation_config、max_output_tokens も同値)。 部分出力を contents に足さない(continuation_token がモデルの状態=思考を含めて保持している)。 最新のトークンだけ送る(各トークンに過去の進捗がすべて含まれる)。 finish_reason が CONTINUATION の間だけ継続する。他の終了理由で停止。 最後に全ホップのpartsを結合して1つのモデルターンとして会話履歴に入れる。",
+    "成果(アウトカム)を1段落で書く。手順を細かく指定せず、守るべき不変条件(公開API不変、モデルが受け取る内容は不変、各変更に回帰テストを付ける等)を明記する。 .agents/skills にチームの規約を“新人向けオンボーディング資料”として置く。各スキルは短い SKILL.md を索引にして、詳細は references/ に分離し、必要なときだけ読ませてコンテキストを圧迫しない。 /goal モードで目標を固定する。コンテキスト圧縮(compaction)を跨いでも目標が保持され、完了まで走り続ける。 出力の受け皿を指定する(例: 「マージしないPRを1本作成し、前後の数値を説明に含める」)。 事前に“エージェントが見ていない”保持用ベンチマーク(holdout)を用意して、改善が本物かを独立に検証する。 「エージェントが探索し、人間が引き算する」。6つの最適化提案のうち、出荷されたのは2つで、4つはレビューで却下された(脆い参照、プライベート属性への依存、合成ベンチのみの改善など)。エージェント出力は必ず人間がレビューして削る。 内部テストで失敗した実例: 単純にトップレベルimportを消すと、モックで属性を差し替える下流テストが壊れる。最終的に採用されたのは遅延モジュールアクセサで、公開属性は従来どおりパッチ可能なまま。“全公開テスト通過”だけで安心しない。",
+    "モデル側の耐性に過信しない。評論家のZvi Mowshowitz氏は、ArgonのIPI耐性は同クラスのフロンティアモデルと並ぶ水準としつつ、「依頼していない限り、エージェント用途では実務上おおむね問題ない」程度の評価に留めています。権限分離・サンドボックス・最小権限は引き続き必須です。 不可逆操作(削除・送金・本番デプロイ)は人間の承認ゲートを実装する。モデルの自制に依存しない。 外部コンテンツ(Web・メール・コード)内の指示をデータとして扱う設計にする(ツール結果にシステム権限を与えない)。 セキュリティレビュー系プロンプトは、採用する設定で必ず事前テストする。公式ブログの実験では、モデル設定によってセキュリティ関連の短いプロンプトを拒否する差が見られたと報告されています。 サイバー防御用途は、Fairwind Programで別IDのアクセスを申請する選択肢がある。",
+    "ベンチマークは提供元の発表を含む。Googleは多数のベンチマークで先行すると主張していますが、独立した比較(例: 評論家のZvi Mowshowitz氏)では「Googleにとって大きな前進だが、自分はOpus/Fable/Astra等より優先して使うまでには至らない」という評価も出ています。タスク依存で、結論は自分のデータで出してください。 知識カットオフ: Zvi氏の解説によれば、モデルカードの知識カットオフは2026年3月とされています。最新情報が必要な用途では検索グラウンディングや外部データを併用する。 ハルシネーション: 安全性報告書では従来比で大幅に減ったとされる一方、一般ユーザーの報告には「実行環境がないのにツール出力を捏造した」という単発の事例もあります(個別の逸話であり一般化はできません)。ツール実行結果の検証や、実行環境の有無をシステムプロンプトで明示する運用が有効です。 評価認識の高さ: 評価と本番で挙動が異なる可能性。Step 9.3を参照。 コスト: 長い思考・Long Decodeは課金が積み上がる。導入価格は11月30日まで。 提供範囲: Carbonはさらに強力とされるが、執筆時点では限定提供。Argon前提の設計にしつつ、モデルIDを設定で差し替えられる構造にしておくと、将来の切替が容易です。 仕様の変動: Interactions APIの引数やSDKの最小バージョンは更新が速い。必ず公式ドキュメントの最新版を確認してください。"
+  ],
+  "blockquote": [
+    "押さえるべき設計思想: Argonは「長く深く考える」モデルです。そのため、出力上限・思考レベル・タイムアウト・課金の4点を最初に設計しないと、「空の応答が返る」「途中で切れる」「コストが想定外に膨らむ」といった問題が起きます。以降のStepはこの4点を中心に進めます。",
+    "重要: 高い max_output_tokens は「より長く書かせる」ものではなく、「より深く考える余地を与える」ものです。出力の長さ自体は制御できません。",
+    "上のInteractions APIの引数の細部はドキュメント側で更新されやすい部分です。実装前に必ず公式ドキュメントで最新のシグネチャを確認してください。",
+    "情報源に関する補足: 第三者の記事・ブログのうち、価格や仕様が公式と食い違うものがあります(例: 一部の比較サイトは入力$1/出力$5と表記)。価格・仕様は必ず公式ドキュメントを正とし、第三者情報は解釈・評価の参考にとどめてください。"
+  ],
+  "pre code": [
+    "# Python\npip install -U \"google-genai>=2.30.1\"\n\n# JavaScript / TypeScript\nnpm install \"@google/genai@>=2.29.1\"\n",
+    "from google import genai\nfrom google.genai import types\n\nclient = genai.Client()  # GEMINI_API_KEY を環境変数から読む\n\nresponse = client.models.generate_content(\n    model=\"gemini-4-argon\",\n    contents=\"three.jsで、重力レンズ効果を持つ3Dブラックホールを描画するスクリプトを書いてください。\",\n    config=types.GenerateContentConfig(\n        max_output_tokens=65536,  # 思考+出力の合計。明示的に設定する\n        thinking_config=types.ThinkingConfig(thinking_level=\"medium\"),\n    ),\n)\nprint(response.text)\n",
+    "from google import genai\nfrom google.genai import types\n\nclient = genai.Client(\n    # 20分のタイムアウト(ミリ秒)。短すぎるタイムアウトは途中切断の原因になる\n    http_options=types.HttpOptions(timeout=1_200_000)\n)\n\nresponse = client.models.generate_content(\n    model=\"gemini-4-argon\",\n    contents=\"素数定理の完全で厳密な証明を書いてください。\",\n    config=types.GenerateContentConfig(\n        max_output_tokens=262_144,  # 全ホップ合計の思考+出力\n        thinking_config=types.ThinkingConfig(thinking_level=\"high\"),\n        automatic_continuation=True,  # 既定。明示すると意図が伝わる\n    ),\n)\n\nprint(response.text)\nprint(\"Finish reason:\", response.candidates[0].finish_reason)\n# ホップを跨いだ「実際のプロンプトサイズ」はこちらを使う\nprint(\"Prompt size:\", response.usage_metadata.initial_prompt_token_count)\nprint(\"Billed tokens:\", response.usage_metadata.total_token_count)\n",
+    "from google import genai\n\nclient = genai.Client()\n\n# 64K超を生成するには background=True と max_output_tokens > 65536\ninteraction = client.interactions.create(\n    model=\"gemini-4-argon\",\n    input=\"大規模なマルチファイル差分とテストスイートを一括で出力してください。\",\n    background=True,\n    # generation_config 等で max_output_tokens=131072 以上を設定(詳細は公式ドキュメント参照)\n)\n",
+    "from google import genai\nfrom google.genai import types\n\nclient = genai.Client()\nPROMPT = \"素数定理の完全で厳密な証明を書いてください。\"\nparts = []\ntoken = None\n\nwhile True:\n    response = client.models.generate_content(\n        model=\"gemini-4-argon\",\n        contents=PROMPT,  # 毎回オリジナルのcontents\n        config=types.GenerateContentConfig(\n            max_output_tokens=262_144,  # 毎回同じ合計値\n            thinking_config=types.ThinkingConfig(thinking_level=\"high\"),\n            automatic_continuation=False,  # 自前でループする\n            continuation_token=token,\n        ),\n    )\n    candidate = response.candidates[0]\n    if candidate.content and candidate.content.parts:\n        parts.extend(candidate.content.parts)\n    token = candidate.continuation_token\n    if candidate.finish_reason != types.FinishReason.CONTINUATION or not token:\n        break\n\nprint(\"\".join(p.text for p in parts if p.text and not p.thought))\nprint(\"Finish reason:\", candidate.finish_reason)\n",
+    "/gemini-api-dev migrate my app to Gemini 4 Argon\n"
+  ],
+  ".hero": [
+    "Gemini 4 Argon ベストプラクティスガイド(中級〜上級者向け・ステップバイステップ) 対象モデル: Google DeepMind「Gemini 4 Argon」(モデルID: gemini-4-argon) 情報時点: 2026年11月5日(この日までに公開された一次情報・著名開発者/評論家の投稿に基づく) 想定読者: すでにGemini API / Vertex系(Gemini Enterprise Agent Platform)を触ったことがある中級〜上級の開発者・AIエンジニア 注意: 本ガイドの数値・仕様は公開ドキュメントの記載を整理したものです。ベンチマークは提供元(ベンダー)発表を含むため、必ず自分のタスクで再評価してください。"
+  ],
+  ".footer": [
+    "最終更新: 2026年11月5日。Argonは仕様・価格・提供範囲が短期間で変わっています(導入価格は11月30日まで、Carbonの提供拡大など)。運用前に必ず公式ドキュメントで最新情報を確認してください。"
+  ],
+  ".brand": ["Gemini 4 Argonベストプラクティス"],
+  "li.chk label": [
+    "モデルID gemini-4-argon を使用、請求アカウント有効(有料ティア)",
+    "SDKが最低バージョン以上(Python 2.30.1 / JS 2.29.1 ほか)",
+    "max_output_tokens を明示。32K未満の旧設定は引き上げ",
+    "thinking_level を3レベルで評価済み。thinking_budget、サンプリング引数は削除",
+    "明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)",
+    "HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ",
+    "コンテキスト判定に initial_prompt_token_count を使用",
+    "Thought Signatureを含む完全な履歴を返送",
+    "12/1の価格改定(入力$4・出力$20)を織り込んだ予算",
+    "不可逆操作の承認ゲート、最小権限、サンドボックス",
+    "cost per successful task の計測基盤(トレース・思考トークン)",
+    "本番に近い環境での評価(評価認識の影響を考慮)"
+  ],
+  "headings": [
+    ["h1", null, "Gemini 4 Argon ベストプラクティスガイド(中級〜上級者向け・ステップバイステップ)"],
+    ["h2", null, "1. Argonとは何か(位置づけと全体像)"],
+    ["h3", null, "1.1 Geminiラインナップ内での位置づけ"],
+    ["h3", null, "1.2 利用できる場所"],
+    ["h2", null, "2. Argonの特徴を一枚で把握する"],
+    ["h2", null, "Step 1: アクセス経路とモデルIDを決める"],
+    ["h3", null, "1.1 経路の選び方"],
+    ["h3", null, "1.2 ベストプラクティス"],
+    ["h2", null, "Step 2: SDK・環境を整える"],
+    ["h3", null, "最小クイックスタート(推奨既定値)"],
+    ["h2", null, "Step 3: thinking_level を設計する"],
+    ["h3", null, "3.1 選定フロー"],
+    ["h3", null, "3.2 ベストプラクティス"],
+    ["h2", null, "Step 4: 出力上限とLong Decodeを設計する"],
+    ["h3", null, "4.1 仕組み(必ず理解しておく)"],
+    ["h3", null, "4.2 使うべき場面・避けるべき場面"],
+    ["h3", null, "4.3 max_output_tokens の目安(公式ガイド)"],
+    ["h3", null, "4.4 Python(自動継続:推奨)"],
+    ["h3", null, "4.5 Interactions API(バックグラウンド実行)"],
+    ["h3", null, "4.6 タイムアウトの設計"],
+    ["h2", null, "Step 5: 自前ループ(REST)とトークン計測・課金"],
+    ["h3", null, "5.1 ループの5つのルール"],
+    ["h3", null, "5.2 トークン計測の落とし穴(エージェントハーネスで特に重要)"],
+    ["h3", null, "5.3 課金の理解"],
+    ["h2", null, "Step 6: 既存アプリの移行チェックリスト"],
+    ["h3", null, "移行の自動化"],
+    ["h3", null, "移行フロー"],
+    ["h2", null, "Step 7: エージェント開発(Antigravity・/goal・.agents/skills)"],
+    ["h3", null, "7.1 事例: 20万行のPythonコードベースを一晩で最適化"],
+    ["h3", null, "7.2 再現可能なベストプラクティス"],
+    ["h3", null, "7.3 エージェント運用フロー"],
+    ["h3", null, "7.4 Antigravityの利用条件"],
+    ["h2", null, "Step 8: コスト最適化(cost per task とルーティング)"],
+    ["h3", null, "8.1 指標を変える"],
+    ["h3", null, "8.2 実験で分かった3つの規則(ブログの結論を要約)"],
+    ["h3", null, "8.3 キャッシュとルーティングは両立しにくい"],
+    ["h3", null, "8.4 計測する"],
+    ["h3", null, "8.5 Argonを選ぶ/選ばない判断"],
+    ["h2", null, "Step 9: 安全性・セキュリティ運用"],
+    ["h3", null, "9.1 公式が公表している安全面の設計"],
+    ["h3", null, "9.2 開発者側の運用ベストプラクティス"],
+    ["h3", null, "9.3 評価時の注意: 「評価されていることを認識する」現象"],
+    ["h2", null, "Step 10: 評価とプロダクション投入の最終チェック"],
+    ["h3", null, "10.1 評価の進め方"],
+    ["h3", null, "10.2 本番投入チェックリスト"],
+    ["h2", null, "トラブルシューティング早見表"],
+    ["h2", null, "Argonの限界と注意点(公平な見方)"],
+    ["h2", null, "補足: その他のベストプラクティスと根拠ソースURL"],
+    ["h3", null, "A. 公式ドキュメント・公式ブログ(一次情報)"],
+    ["h3", null, "B. 著名な開発者・評論家・報道(第三者の視点)"],
+    ["h2", null, "参考URL一覧"]
+  ],
+  "sections": [
+    [
+      "sec-0",
+      [
+        ["h2", "1. Argonとは何か(位置づけと全体像)"],
+        ["h3", "1.1 Geminiラインナップ内での位置づけ"],
+        ["h3", "1.2 利用できる場所"]
+      ]
+    ],
+    ["sec-1", [["h2", "2. Argonの特徴を一枚で把握する"]]],
+    [
+      "sec-2",
+      [
+        ["h2", "Step 1: アクセス経路とモデルIDを決める"],
+        ["h3", "1.1 経路の選び方"],
+        ["h3", "1.2 ベストプラクティス"]
+      ]
+    ],
+    ["sec-3", [["h2", "Step 2: SDK・環境を整える"], ["h3", "最小クイックスタート(推奨既定値)"]]],
+    [
+      "sec-4",
+      [
+        ["h2", "Step 3: thinking_level を設計する"],
+        ["h3", "3.1 選定フロー"],
+        ["h3", "3.2 ベストプラクティス"]
+      ]
+    ],
+    [
+      "sec-5",
+      [
+        ["h2", "Step 4: 出力上限とLong Decodeを設計する"],
+        ["h3", "4.1 仕組み(必ず理解しておく)"],
+        ["h3", "4.2 使うべき場面・避けるべき場面"],
+        ["h3", "4.3 max_output_tokens の目安(公式ガイド)"],
+        ["h3", "4.4 Python(自動継続:推奨)"],
+        ["h3", "4.5 Interactions API(バックグラウンド実行)"],
+        ["h3", "4.6 タイムアウトの設計"]
+      ]
+    ],
+    [
+      "sec-6",
+      [
+        ["h2", "Step 5: 自前ループ(REST)とトークン計測・課金"],
+        ["h3", "5.1 ループの5つのルール"],
+        ["h3", "5.2 トークン計測の落とし穴(エージェントハーネスで特に重要)"],
+        ["h3", "5.3 課金の理解"]
+      ]
+    ],
+    [
+      "sec-7",
+      [
+        ["h2", "Step 6: 既存アプリの移行チェックリスト"],
+        ["h3", "移行の自動化"],
+        ["h3", "移行フロー"]
+      ]
+    ],
+    [
+      "sec-8",
+      [
+        ["h2", "Step 7: エージェント開発(Antigravity・/goal・.agents/skills)"],
+        ["h3", "7.1 事例: 20万行のPythonコードベースを一晩で最適化"],
+        ["h3", "7.2 再現可能なベストプラクティス"],
+        ["h3", "7.3 エージェント運用フロー"],
+        ["h3", "7.4 Antigravityの利用条件"]
+      ]
+    ],
+    [
+      "sec-9",
+      [
+        ["h2", "Step 8: コスト最適化(cost per task とルーティング)"],
+        ["h3", "8.1 指標を変える"],
+        ["h3", "8.2 実験で分かった3つの規則(ブログの結論を要約)"],
+        ["h3", "8.3 キャッシュとルーティングは両立しにくい"],
+        ["h3", "8.4 計測する"],
+        ["h3", "8.5 Argonを選ぶ/選ばない判断"]
+      ]
+    ],
+    [
+      "sec-10",
+      [
+        ["h2", "Step 9: 安全性・セキュリティ運用"],
+        ["h3", "9.1 公式が公表している安全面の設計"],
+        ["h3", "9.2 開発者側の運用ベストプラクティス"],
+        ["h3", "9.3 評価時の注意: 「評価されていることを認識する」現象"]
+      ]
+    ],
+    [
+      "sec-11",
+      [
+        ["h2", "Step 10: 評価とプロダクション投入の最終チェック"],
+        ["h3", "10.1 評価の進め方"],
+        ["h3", "10.2 本番投入チェックリスト"]
+      ]
+    ],
+    ["sec-12", [["h2", "トラブルシューティング早見表"]]],
+    ["sec-13", [["h2", "Argonの限界と注意点(公平な見方)"]]],
+    [
+      "sec-14",
+      [
+        ["h2", "補足: その他のベストプラクティスと根拠ソースURL"],
+        ["h3", "A. 公式ドキュメント・公式ブログ(一次情報)"],
+        ["h3", "B. 著名な開発者・評論家・報道(第三者の視点)"]
+      ]
+    ],
+    ["sec-15", [["h2", "参考URL一覧"]]]
+  ],
+  "tables": [
+    [
+      [["th", null, null, "利用面"], ["th", null, null, "対象"], ["th", null, null, "備考"]],
+      [
+        ["td", null, null, "Gemini API(AI Studio / Android Studio)"],
+        ["td", null, null, "開発者"],
+        ["td", null, null, "有料ティアのみ(無料ティア非対応)"]
+      ],
+      [
+        ["td", null, null, "Gemini Enterprise Agent Platform(Google Cloud)"],
+        ["td", null, null, "企業"],
+        ["td", null, null, "gemini-4-argon を選択"]
+      ],
+      [
+        ["td", null, null, "Google Antigravity"],
+        ["td", null, null, "Google AI Ultra購読者・適格なエンタープライズ"],
+        ["td", null, null, "デスクトップアプリ/CLI"]
+      ],
+      [
+        ["td", null, null, "Geminiアプリ・Search の AI Mode"],
+        ["td", null, null, "Google AI Pro / Ultra購読者"],
+        ["td", null, null, "一般ユーザー向け"]
+      ],
+      [
+        ["td", null, null, "Fairwind Program"],
+        ["td", null, null, "認定サイバー防御者"],
+        ["td", null, null, "ガードレールなし版(gemini-4-argon-cyber-permissive)へのアクセス"]
+      ]
+    ],
+    [
+      [["th", null, null, "観点"], ["th", null, null, "内容"]],
+      [
+        ["td", null, null, "モデルID"],
+        ["td", null, null, "gemini-4-argon(安定版)。サイバー防御者向けに別IDが存在"]
+      ],
+      [
+        ["td", null, null, "コンテキスト/出力"],
+        ["td", null, null, "入力・思考・出力で共有する統合1Mトークン(1,048,576)"]
+      ],
+      [
+        ["td", null, null, "1リクエストの出力上限"],
+        ["td", null, null, "ストリーミング/SDK: 64K、非ストリーミングREST: 32K"]
+      ],
+      [
+        ["td", null, null, "Long Decode"],
+        ["td", null, null, "上限を超えて最大「1M − 入力」まで、継続トークンで複数ホップ生成"]
+      ],
+      [
+        ["td", null, null, "思考制御"],
+        ["td", null, null, "thinking_level: low / medium(既定)/ high(minimal は非対応)"]
+      ],
+      [
+        ["td", null, null, "サンプリング"],
+        ["td", null, null, "temperature / top_p / top_k / candidate_count は無視される"]
+      ],
+      [
+        ["td", null, null, "キャッシュ"],
+        [
+          "td",
+          null,
+          null,
+          "明示キャッシュ(cachedContents)は非対応、暗黙キャッシュのみ(4,096トークン以上、ヒット時95%割引)"
+        ]
+      ],
+      [
+        ["td", null, null, "入力モダリティ"],
+        ["td", null, null, "テキスト・画像・動画・音声・PDF(出力はテキスト)"]
+      ],
+      [
+        ["td", null, null, "価格(導入価格)"],
+        ["td", null, null, "入力 $2 / 出力 $10(100万トークンあたり)、2026年11月30日まで"]
+      ],
+      [
+        ["td", null, null, "価格(12/1以降)"],
+        ["td", null, null, "入力 $4 / 出力 $20(100万トークンあたり)"]
+      ],
+      [
+        ["td", null, null, "安全面の公表値"],
+        [
+          "td",
+          null,
+          null,
+          "間接プロンプトインジェクション攻撃成功率0.7%(Gray Swan IPI、15回の適応的試行)"
+        ]
+      ],
+      [
+        ["td", null, null, "公表されている総合評価"],
+        ["td", null, null, "Vals Indexで1位(68.9%)と発表されている"]
+      ]
+    ],
+    [
+      [["th", null, null, "言語"], ["th", null, null, "最低バージョン"]],
+      [["td", null, null, "Python (google-genai)"], ["td", null, null, "2.30.1"]],
+      [["td", null, null, "JavaScript (@google/genai)"], ["td", null, null, "2.29.1"]],
+      [["td", null, null, "Go"], ["td", null, null, "1.74.0"]],
+      [["td", null, null, "Java"], ["td", null, null, "1.77.0"]],
+      [["td", null, null, ".NET"], ["td", null, null, "1.26.0"]],
+      [["td", null, null, "Kotlin"], ["td", null, null, "1.6.0"]]
+    ],
+    [
+      [
+        ["th", null, null, "レベル"],
+        ["th", null, null, "トークン消費"],
+        ["th", null, null, "推奨用途"],
+        ["th", null, null, "注意"]
+      ],
+      [
+        ["td", null, null, "low"],
+        ["td", null, null, "最小・最速"],
+        ["td", null, null, "単純タスク、コスト重視、軽い分析・文章作成"],
+        ["td", null, null, "難問では品質が落ちる"]
+      ],
+      [
+        ["td", null, null, "medium(既定)"],
+        ["td", null, null, "バランス"],
+        ["td", null, null, "大半のタスク(複雑なコード、エージェント利用含む)"],
+        ["td", null, null, "迷ったらここから"]
+      ],
+      [
+        ["td", null, null, "high"],
+        ["td", null, null, "最大・最初のトークンが最も遅い"],
+        ["td", null, null, "難しい推論、数学・科学、最難関のコード/エージェント"],
+        ["td", null, null, "Long Decodeと相性が良い"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "ワークロード"],
+        ["th", null, null, "Long Decode"],
+        ["th", null, null, "理由"]
+      ],
+      [
+        ["td", null, null, "難しい数学・科学・研究・形式証明"],
+        ["td", null, null, "使う"],
+        ["td", null, null, "64K超の探索・検証にトークンを使える"]
+      ],
+      [
+        ["td", null, null, "最難関のコーディング/エージェント"],
+        ["td", null, null, "使う"],
+        ["td", null, null, "一部のタスクは64K超の思考とコードが必要(ただし大半は64K未満)"]
+      ],
+      [
+        ["td", null, null, "評価ハーネス(出力上限で停止するもの)"],
+        ["td", null, null, "使う"],
+        ["td", null, null, "思考で1リクエストを使い切って応答が切れるのを防ぐ"]
+      ],
+      [
+        ["td", null, null, "チャット・Q&A・要約・分類・抽出"],
+        ["td", null, null, "使わない"],
+        ["td", null, null, "32K未満で完了する"]
+      ],
+      [
+        ["td", null, null, "「70万語の本を書いて」など長さ指定"],
+        ["td", null, null, "使わない"],
+        ["td", null, null, "モデルは長さ目標に従わない"]
+      ],
+      [
+        ["td", null, null, "短いターンを何度も重ねるエージェント"],
+        ["td", null, null, "使わない"],
+        ["td", null, null, "各ターンの大出力が1M窓を急速に消費"]
+      ],
+      [
+        ["td", null, null, "1M近い入力"],
+        ["td", null, null, "使わない"],
+        ["td", null, null, "出力に使えるのは「1M − 入力」だけ"]
+      ],
+      [
+        ["td", null, null, "レイテンシ重視"],
+        ["td", null, null, "使わない"],
+        ["td", null, null, "数分かかることがある"]
+      ]
+    ],
+    [
+      [["th", null, null, "ケース"], ["th", null, null, "推奨値"]],
+      [["td", null, null, "標準的なタスク"], ["td", null, null, "既定のまま(64K)"]],
+      [
+        ["td", null, null, "上限が32K未満だった既存アプリ"],
+        ["td", null, null, "32,768以上に引き上げ(コストは thinking_level を下げて抑える)"]
+      ],
+      [["td", null, null, "以前32K超を使っていたタスク"], ["td", null, null, "65,536"]],
+      [
+        ["td", null, null, "複雑な推論・コーディング"],
+        ["td", null, null, "131,072 または 262,144(最大で1,048,576 − 入力)"]
+      ],
+      [["td", null, null, "難問・証明"], ["td", null, null, "262,144〜上限までテスト"]]
+    ],
+    [
+      [
+        ["th", null, null, "呼び出し"],
+        ["th", null, null, "サーバー側の切断"],
+        ["th", null, null, "推奨クライアント設定"]
+      ],
+      [
+        ["td", null, null, "非ストリーミング"],
+        ["td", null, null, "10分"],
+        ["td", null, null, "読み取りタイムアウトを十分長く"]
+      ],
+      [
+        ["td", null, null, "ストリーミング"],
+        ["td", null, null, "20分"],
+        ["td", null, null, "HTTP読み取りタイムアウト20分"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "項目"],
+        ["th", null, null, "実際のコンテキストサイズ"],
+        ["th", null, null, "prompt_token_count(合計)"]
+      ],
+      [
+        ["td", null, null, "例: 1,000トークンのプロンプト → 20万トークンを生成(4ホップ)"],
+        ["td", null, null, "約20.1万"],
+        ["td", null, null, "約39.7万(繰り返し入力を暗黙キャッシュで95%割引後)"]
+      ]
+    ],
+    [
+      [["th", null, null, "#"], ["th", null, null, "項目"], ["th", null, null, "内容"]],
+      [
+        ["td", null, null, "1"],
+        ["td", null, null, "モデルID"],
+        ["td", null, null, "gemini-4-argon に変更"]
+      ],
+      [
+        ["td", null, null, "2"],
+        ["td", null, null, "max_output_tokens"],
+        ["td", null, null, "明示的に設定。既定は64K(ストリーミング/SDK)、32K(非ストリーミングREST)"]
+      ],
+      [
+        ["td", null, null, "3"],
+        ["td", null, null, "32K未満の上限"],
+        ["td", null, null, "32,768以上へ。トークン節約は thinking_level で"]
+      ],
+      [
+        ["td", null, null, "4"],
+        ["td", null, null, "Long Decode計画"],
+        ["td", null, null, "上限超のタスクは最新SDKか continuation_token ループ"]
+      ],
+      [
+        ["td", null, null, "5"],
+        ["td", null, null, "thinking_budget"],
+        ["td", null, null, "thinking_level に置き換え(3レベルで評価)"]
+      ],
+      [
+        ["td", null, null, "6"],
+        ["td", null, null, "明示コンテキストキャッシュ"],
+        [
+          "td",
+          null,
+          null,
+          "非対応でエラー。cachedContents / caches.create / cached_content を削除。暗黙キャッシュ(4,096トークン以上・95%割引)へ"
+        ]
+      ],
+      [
+        ["td", null, null, "7"],
+        ["td", null, null, "サンプリングパラメータ"],
+        ["td", null, null, "temperature / top_p / top_k / candidate_count を削除(指定しても無視)"]
+      ],
+      [
+        ["td", null, null, "8"],
+        ["td", null, null, "クライアントタイムアウト"],
+        ["td", null, null, "20分以上に"]
+      ],
+      [
+        ["td", null, null, "9"],
+        ["td", null, null, "Thought Signature"],
+        ["td", null, null, "マルチターン・関数呼び出しでは署名を含む完全な会話履歴を返す"]
+      ],
+      [
+        ["td", null, null, "10"],
+        ["td", null, null, "コスト見積り"],
+        [
+          "td",
+          null,
+          null,
+          "思考トークン、グラウンディング時の内部ツール指示・関数宣言もすべて課金対象"
+        ]
+      ],
+      [
+        ["td", null, null, "11"],
+        ["td", null, null, "OpenAI互換エンドポイント"],
+        ["td", null, null, "Long Decode非対応(出力は1リクエスト上限で止まる)"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "ラウンド"],
+        ["th", null, null, "条件"],
+        ["th", null, null, "結果の傾向"]
+      ],
+      [
+        ["td", null, null, "1回目"],
+        ["td", null, null, "リポジトリ固有の指示なし・1段落のゴールのみ(約2時間)"],
+        [
+          "td",
+          null,
+          null,
+          "実際のボトルネックは発見できたが、メンテナの慣習を知らず、公開APIのJSONスキーマを変えるなど規約違反や、一部テストのみの実行、PR説明に数値なしといった不足があった"
+        ]
+      ],
+      [
+        ["td", null, null, "2回目"],
+        ["td", null, null, ".agents/skills にメンテナのガイドラインを置き、/goal モードで11時間"],
+        ["td", null, null, "ガイドラインを先に読み、全16,892テストを実行し、レビュー可能なPRを作成"]
+      ]
+    ],
+    [
+      [["th", null, null, "規則"], ["th", null, null, "内容"]],
+      [
+        ["td", null, null, "① まず軽い設定から"],
+        ["td", null, null, "高速モデル+low思考で全50タスクを解けた。ルーターを作る前にこれを試す"]
+      ],
+      [
+        ["td", null, null, "② 出力上限は思考量のダイヤルではない"],
+        [
+          "td",
+          null,
+          null,
+          "maxOutputTokens を下げても、簡単なタスクの思考量は減らず、難しいタスクが途中で切れて失敗しただけ。思考量は thinking_level で直接指定する"
+        ]
+      ],
+      [
+        ["td", null, null, "③ 軽量分類器によるルーティング"],
+        [
+          "td",
+          null,
+          null,
+          "短い独立タスクは軽量モデルへ、難しいものだけ強いモデルへ。ただし判断は「単一の広い質問」ではなく原子的なYes/No質問に分解する"
+        ]
+      ]
+    ],
+    [
+      [["th", null, null, "状況"], ["th", null, null, "推奨"]],
+      [
+        ["td", null, null, "高ボリュームの軽い処理(抽出・分類・要約)"],
+        ["td", null, null, "Gemini 3.8 Flash などの軽量モデル"]
+      ],
+      [
+        ["td", null, null, "深い推論・長時間の自律作業・大規模リファクタリング"],
+        ["td", null, null, "Argon(medium〜high)"]
+      ],
+      [
+        ["td", null, null, "迷う場合"],
+        ["td", null, null, "自分のタスクで「成功率÷総コスト」を実測して決める"]
+      ]
+    ],
+    [
+      [["th", null, null, "領域"], ["th", null, null, "公表内容(Google)"]],
+      [
+        ["td", null, null, "敵対的テストでの違反率"],
+        ["td", null, null, "以前のモデル比で約半分に低下"]
+      ],
+      [
+        ["td", null, null, "エージェントの近道行為"],
+        ["td", null, null, "近道を試みる割合が2%まで低下(コーディングベンチ)"]
+      ],
+      [
+        ["td", null, null, "不可逆操作"],
+        ["td", null, null, "人間の確認を待って進む挙動を学習させたと説明"]
+      ],
+      [
+        ["td", null, null, "間接プロンプトインジェクション"],
+        ["td", null, null, "Gray Swan IPIで攻撃成功率0.7%(15回の適応的試行)"]
+      ],
+      [
+        ["td", null, null, "監視"],
+        [
+          "td",
+          null,
+          null,
+          "推論と行動を読む自動ミスアラインメント監視を、内部展開・評価・RL学習で使用。監視を罰する形の学習は避け、推論が観測可能であり続けるようにしたと説明"
+        ]
+      ]
+    ],
+    [
+      [["th", null, null, "症状"], ["th", null, null, "原因と対処"]],
+      [
+        ["td", null, null, "出力が64K/32Kで止まる(CONTINUATION)"],
+        [
+          "td",
+          null,
+          null,
+          "続きがあるのに誰も継続していない。SDKをアップグレードするか、continuation_token ループを書く"
+        ]
+      ],
+      [
+        ["td", null, null, "出力が64K/32Kで止まる(MAX_TOKENS)"],
+        ["td", null, null, "max_output_tokens が未設定または低すぎる。65,536超に設定"]
+      ],
+      [
+        ["td", null, null, "空テキスト + MAX_TOKENS"],
+        [
+          "td",
+          null,
+          null,
+          "思考でトークンを使い切った。max_output_tokens を上げるか thinking_level を下げる"
+        ]
+      ],
+      [
+        ["td", null, null, "空テキスト + CONTINUATION"],
+        ["td", null, null, "正常。1ホップ全体が思考に使われた。次のホップを要求する"]
+      ],
+      [
+        ["td", null, null, "400: Continuation token has already used output tokens…"],
+        [
+          "td",
+          null,
+          null,
+          "max_output_tokens が既に使用済みトークン数を超えていない。値を引き上げる"
+        ]
+      ],
+      [
+        ["td", null, null, "thinking_level: \"minimal\" で400"],
+        ["td", null, null, "Argonは minimal 非対応。low/medium/high を使う"]
+      ],
+      [
+        ["td", null, null, "thinking_budget と thinking_level の同時指定でエラー"],
+        ["td", null, null, "どちらか一方のみ指定"]
+      ],
+      [
+        ["td", null, null, "temperature 等の警告"],
+        ["td", null, null, "無視される。パラメータを削除"]
+      ],
+      [
+        ["td", null, null, "3〜5分でリクエストが切れる"],
+        ["td", null, null, "クライアントタイムアウトが短い。20分に設定"]
+      ],
+      [
+        ["td", null, null, "コンテキスト圧縮が早すぎる"],
+        [
+          "td",
+          null,
+          null,
+          "ハーネスが合算された prompt_token_count を見ている。initial_prompt_token_count を使う"
+        ]
+      ],
+      [
+        ["td", null, null, "明示キャッシュでエラー"],
+        ["td", null, null, "Argonは非対応。暗黙キャッシュへ移行"]
+      ],
+      [
+        ["td", null, null, "OpenAI互換エンドポイントで長文が切れる"],
+        ["td", null, null, "Long Decode非対応。ネイティブAPIを使う"]
+      ]
+    ],
+    [
+      [
+        ["th", null, null, "ベストプラクティス"],
+        ["th", null, null, "根拠"],
+        ["th", null, null, "URL"]
+      ],
+      [
+        ["td", null, null, "モデルID・価格・思考レベル・移行チェックリスト・出力上限の目安"],
+        ["td", null, null, "Gemini API「What's new in Gemini 4 Argon」"],
+        ["td", null, null, "https://ai.google.dev/gemini-api/docs/generate-content/latest-model"]
+      ],
+      [
+        [
+          "td",
+          null,
+          null,
+          "Long Decodeの仕組み、継続ループ5ルール、トークン計測、課金、タイムアウト、トラブルシュート"
+        ],
+        ["td", null, null, "Gemini API「Long decode」"],
+        ["td", null, null, "https://ai.google.dev/gemini-api/docs/generate-content/long-decode"]
+      ],
+      [
+        ["td", null, null, "Google Cloud側の移行規約、Agent Studioでの検証、サイバー向け別ID"],
+        ["td", null, null, "Developer's guide to Gemini 4 Argon(Gemini Enterprise Agent Platform)"],
+        [
+          "td",
+          null,
+          null,
+          "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon"
+        ]
+      ],
+      [
+        ["td", null, null, "Argonのリリース概要、GA、価格、安全性、科学・ロボティクス事例"],
+        ["td", null, null, "Google公式ブログ(Koray Kavukcuoglu, 2026-10-13)"],
+        [
+          "td",
+          null,
+          null,
+          "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/"
+        ]
+      ],
+      [
+        ["td", null, null, "初回発表(限定提供の経緯)"],
+        ["td", null, null, "Google公式ブログ(2026-09-30)"],
+        [
+          "td",
+          null,
+          null,
+          "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/"
+        ]
+      ],
+      [
+        ["td", null, null, "開発者向けの案内(各種ガイドへの導線)"],
+        ["td", null, null, "Google公式ブログ「Gemini 4 Argon is now available for developers」"],
+        [
+          "td",
+          null,
+          null,
+          "https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-4-argon/"
+        ]
+      ],
+      [
+        ["td", null, null, "安全性・セキュリティの設計"],
+        ["td", null, null, "Google公式ブログ「Developing Gemini 4 Argon responsibly and safely」"],
+        [
+          "td",
+          null,
+          null,
+          "https://blog.google/innovation-and-ai/technology/safety-security/gemini-4-model-safety-security/"
+        ]
+      ],
+      [
+        ["td", null, null, ".agents/skills・/goal・無人実行・人間レビューの実例"],
+        ["td", null, null, "Google Developers Blog(George Weale ほか, 2026-10-13)"],
+        [
+          "td",
+          null,
+          null,
+          "https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/"
+        ]
+      ],
+      [
+        ["td", null, null, "cost per task、軽い設定からの開始、ルーティング、キャッシュとの関係"],
+        ["td", null, null, "Google Developers Blog(Sergio Villani, 2026-11-03)"],
+        [
+          "td",
+          null,
+          null,
+          "https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/"
+        ]
+      ],
+      [
+        ["td", null, null, "AntigravityでのArgon利用"],
+        ["td", null, null, "Antigravity公式ブログ(2026-10-13)"],
+        ["td", null, null, "https://antigravity.google/blog/gemini-4-argon-in-google-antigravity"]
+      ],
+      [
+        ["td", null, null, "Argon後継(Carbon)の位置づけ・限定提供"],
+        ["td", null, null, "Google公式ブログ(Koray Kavukcuoglu, 2026-10-28)"],
+        [
+          "td",
+          null,
+          null,
+          "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/"
+        ]
+      ],
+      [
+        ["td", null, null, "Gemini API 開発者ガイド(thinking_level、Long Decode、実用Tips)"],
+        ["td", null, null, "Google AI Studio「Gemini 4 Argon: Developer Guide」"],
+        ["td", null, null, "https://aistudio.google.com/learn/gemini-4-argon-developer-guide"]
+      ],
+      [
+        ["td", null, null, "ロボティクス(動画→シミュレーション→実機)"],
+        ["td", null, null, "Google Developers Blog"],
+        ["td", null, null, "https://developers.googleblog.com/gemini-4-argon-for-robotics"]
+      ]
+    ],
+    [
+      [["th", null, null, "内容"], ["th", null, null, "発信者・媒体"], ["th", null, null, "URL"]],
+      [
+        [
+          "td",
+          null,
+          null,
+          "モデルカード/安全性報告書(217ページ)の詳細分析。評価認識の高さ、CoT監視、IPI耐性、機能面の総合評価"
+        ],
+        ["td", null, null, "Zvi Mowshowitz(Don't Worry About the Vase)"],
+        ["td", null, null, "https://thezvi.substack.com/p/gemini-4-argon-the-model-and-safety"]
+      ],
+      [
+        [
+          "td",
+          null,
+          null,
+          "発表当日の関係者ポスト集(Sundar Pichai、Logan Kilpatrick、Philipp Schmid、Vals AIなど)。1M出力トークン・価格などが言及されている"
+        ],
+        ["td", null, null, "Digg(Xポストの集約)"],
+        ["td", null, null, "https://digg.com/ai/p838oj0d"]
+      ],
+      [
+        [
+          "td",
+          null,
+          null,
+          "Long Decodeの開発者向け解説(ZDR対応、継続トークン、thinking_level の注意点)"
+        ],
+        ["td", null, null, "Google Cloud Tech(X)"],
+        ["td", null, null, "https://x.com/GoogleCloudTech/status/2110089253120041232"]
+      ],
+      [
+        ["td", null, null, "Vals Indexで1位(68.9%)との発表"],
+        ["td", null, null, "Vals AI(X)"],
+        ["td", null, null, "https://x.com/ValsAI/status/2105388446844072033"]
+      ],
+      [
+        ["td", null, null, "発表報道(サイバー防御者先行、Fairwind、競合比較の主張)"],
+        ["td", null, null, "TechCrunch"],
+        [
+          "td",
+          null,
+          null,
+          "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/"
+        ]
+      ],
+      [
+        ["td", null, null, "発表報道(サイバー防御者先行)"],
+        ["td", null, null, "SiliconANGLE"],
+        [
+          "td",
+          null,
+          null,
+          "https://siliconangle.com/2026/09/30/googles-new-frontier-ai-model-gemini-4-argon-goes-to-cybersecurity-defenders-first/"
+        ]
+      ],
+      [
+        ["td", null, null, "発売直後の価格・導入価格期限の解説"],
+        ["td", null, null, "PPC Land"],
+        [
+          "td",
+          null,
+          null,
+          "https://ppc.land/google-prices-gemini-4-argon-at-2-per-million-tokens-paid-users-only/"
+        ]
+      ],
+      [
+        ["td", null, null, "長期エージェントでの実験(4体のArgonエージェントがMinecraftをクリア)"],
+        ["td", null, null, "arXiv 2610.22319"],
+        ["td", null, null, "https://arxiv.org/abs/2610.22319"]
+      ],
+      [
+        ["td", null, null, "ヒント・解説(thinking_levelとLong Decodeの課金)"],
+        ["td", null, null, "dev.to / AIHubMix"],
+        [
+          "td",
+          null,
+          null,
+          "https://dev.to/aihubmix/gemini-4-argon-thinkinglevel-and-long-decode-a-developers-guide-35ll"
+        ]
+      ],
+      [
+        ["td", null, null, "Antigravity Skillsの作り方(.agents/skillsの実践)"],
+        ["td", null, null, "Google Codelabs"],
+        [
+          "td",
+          null,
+          null,
+          "https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
+        ]
+      ],
+      [
+        ["td", null, null, "日本語の発表解説(競合モデルとの比較視点)"],
+        ["td", null, null, "Livedoor News(GIGAZINE系配信)"],
+        ["td", null, null, "https://news.livedoor.com/article/detail/32561465/"]
+      ]
+    ]
+  ],
+  "lists": [
+    [
+      "ul",
+      null,
+      [
+        ["li", "対象モデル: Google DeepMind「Gemini 4 Argon」(モデルID: gemini-4-argon)"],
+        [
+          "li",
+          "情報時点: 2026年11月5日(この日までに公開された一次情報・著名開発者/評論家の投稿に基づく)"
+        ],
+        [
+          "li",
+          "想定読者: すでにGemini API / Vertex系(Gemini Enterprise Agent Platform)を触ったことがある中級〜上級の開発者・AIエンジニア"
+        ],
+        [
+          "li",
+          "注意: 本ガイドの数値・仕様は公開ドキュメントの記載を整理したものです。ベンチマークは提供元(ベンダー)発表を含むため、必ず自分のタスクで再評価してください。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "ソフトウェアエンジニアリング(大規模リファクタリング、性能最適化、移行)"],
+        ["li", "エンタープライズのナレッジワーク(法務・金融・文書理解)"],
+        ["li", "サイバー防御(脆弱性の発見・検証・修正)"],
+        ["li", "科学・数学、ロボティクス(空間推論)"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "Argon: 現時点で公開GAされているGemini 4世代のフラッグシップ。"],
+        [
+          "li",
+          "Carbon: 10月28日に発表された「次のフロンティアモデル」。ただし執筆時点では一部のサイバー防御者向けの限定提供で、開発者・企業向けの一般提供は「できるだけ早く」とされているのみです(時期は未定)。"
+        ],
+        ["li", "Gemini 3.8 Flash: 高ボリュームな用途の出発点として、Argonと使い分ける位置づけ。"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "公式ドキュメントでは、新規プロジェクトには Interactions API が推奨されています。Interactions API ではサーバー側がバックグラウンド実行でLong Decodeを代行します。"
+        ],
+        [
+          "li",
+          "既存のGenerateContent APIは「Legacy」と表記されていますが、Argonでも利用可能で、クライアント側で細かく継続制御したい場合(再試行・バックオフ・保存しない運用)はGenerateContent側が現状唯一の選択肢です(Interactions APIへのクライアント側継続は「近日対応」と案内)。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        [
+          "li",
+          "モデルIDは gemini-4-argon を使う。推測で gemini-4-argon-preview などを付けない(発表直後は404になった事例が複数のレビュー記事で報告されています)。"
+        ],
+        ["li", "無料ティア不可を前提に、請求アカウントを先に有効化する。"],
+        [
+          "li",
+          "サイバー防御者向けの別ID(gemini-4-argon-cyber-permissive)は認定プログラム向け。一般開発者は意識しなくてよい。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        [
+          "li",
+          "3レベルすべてで自分の評価セットを回す(公式推奨)。その際、max_output_tokens は高めにして「上限による打ち切り」が結果を歪めないようにする。そのうえで品質基準を満たす最小のレベルを採用する。"
+        ],
+        [
+          "li",
+          "thinking_budget は互換的に動作するが警告が出て、最寄りのレベルに写像される。thinking_level に置き換える。両方同時指定はエラー。"
+        ],
+        ["li", "MINIMAL は400エラー。"],
+        [
+          "li",
+          "公式ブログ(コスト最適化記事)の実験でも、まず軽い思考設定(low)で足りるかを確かめてから、ルーターなどの複雑な仕組みを足すことが推奨されています(Step 8)。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "入力・思考・関数呼び出し・最終応答はひとつの1Mトークン窓を共有します。出力に使えるのは「1,048,576 − 入力トークン」まで。"
+        ],
+        [
+          "li",
+          "1リクエスト(1ホップ)で返せるのは ストリーミング/SDKで最大65,536、非ストリーミングRESTで最大32,768 トークン。"
+        ],
+        [
+          "li",
+          "上限に達してまだ続きがある場合、finish_reason: CONTINUATION と 暗号化された continuation_token が返る。同じリクエストにこのトークンを付けて再送すると、続きから生成される。"
+        ],
+        ["li", "max_output_tokens は 全ホップ合計の思考+出力の上限。"],
+        [
+          "li",
+          "難問では、1ホップ全部が思考に費やされ、テキストが空のまま continuation_token だけ返ることがある。これは正常動作で、最終回答は後続ホップで届く。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        [
+          "li",
+          "毎ホップ、同じリクエストを送る(contents / system_instruction / tools / generation_config、max_output_tokens も同値)。"
+        ],
+        [
+          "li",
+          "部分出力を contents に足さない(continuation_token がモデルの状態=思考を含めて保持している)。"
+        ],
+        ["li", "最新のトークンだけ送る(各トークンに過去の進捗がすべて含まれる)。"],
+        ["li", "finish_reason が CONTINUATION の間だけ継続する。他の終了理由で停止。"],
+        ["li", "最後に全ホップのpartsを結合して1つのモデルターンとして会話履歴に入れる。"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "コンテキスト圧縮(compaction)や上限判定には initial_prompt_token_count(JSでは initialPromptTokenCount)を使う。合算された prompt_token_count を使うと圧縮が早すぎるタイミングで始まります。"
+        ],
+        [
+          "li",
+          "REST自前ループでは、各ホップの値を足してコストを算出し、プロンプトサイズは最初のホップの promptTokenCount を保持する。"
+        ],
+        [
+          "li",
+          "initial_prompt_token_count はSDKがクライアント側で計算する値で、REST応答や model_dump() のJSONには出ません。必要なら別途保存してください。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "全ホップの全トークンが課金対象(思考のみのホップも含む)。"],
+        [
+          "li",
+          "各ホップの繰り返し入力は暗黙キャッシュで95%割引(導入価格では1Mあたり$0.10、12/1以降は$0.20)。ただしキャッシュは15〜20分使われないと失効するため、ホップ間に長い停止があると全額に戻ります。"
+        ],
+        [
+          "li",
+          "失敗した非ストリーミングのホップは課金されない。ストリームが32K未満で切れた場合も課金なし(以降は最後のチェックポイントまで課金)。"
+        ],
+        [
+          "li",
+          "価格は11月30日で倍になる予定(入力 $2→$4、出力 $10→$20)。予算を組む際は12月以降の単価で試算してください。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        [
+          "li",
+          "成果(アウトカム)を1段落で書く。手順を細かく指定せず、守るべき不変条件(公開API不変、モデルが受け取る内容は不変、各変更に回帰テストを付ける等)を明記する。"
+        ],
+        [
+          "li",
+          ".agents/skills にチームの規約を“新人向けオンボーディング資料”として置く。各スキルは短い SKILL.md を索引にして、詳細は references/ に分離し、必要なときだけ読ませてコンテキストを圧迫しない。"
+        ],
+        [
+          "li",
+          "/goal モードで目標を固定する。コンテキスト圧縮(compaction)を跨いでも目標が保持され、完了まで走り続ける。"
+        ],
+        [
+          "li",
+          "出力の受け皿を指定する(例: 「マージしないPRを1本作成し、前後の数値を説明に含める」)。"
+        ],
+        [
+          "li",
+          "事前に“エージェントが見ていない”保持用ベンチマーク(holdout)を用意して、改善が本物かを独立に検証する。"
+        ],
+        [
+          "li",
+          "「エージェントが探索し、人間が引き算する」。6つの最適化提案のうち、出荷されたのは2つで、4つはレビューで却下された(脆い参照、プライベート属性への依存、合成ベンチのみの改善など)。エージェント出力は必ず人間がレビューして削る。"
+        ],
+        [
+          "li",
+          "内部テストで失敗した実例: 単純にトップレベルimportを消すと、モックで属性を差し替える下流テストが壊れる。最終的に採用されたのは遅延モジュールアクセサで、公開属性は従来どおりパッチ可能なまま。“全公開テスト通過”だけで安心しない。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "デスクトップアプリ/CLIでのArgon利用は、Google AI Ultra購読者、または適格なGemini Enterpriseが対象です。"
+        ],
+        [
+          "li",
+          "研究者向けに、Antigravityの最上位使用枠を6か月無償で提供するプログラム(選抜制)が案内されています。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "追うべき指標は「100万トークンあたりの単価」ではなく cost per successful task(ループ・ツール呼び出し・再試行・思考パスを含む総支出 ÷ 検証に合格したタスク数)。"
+        ],
+        [
+          "li",
+          "すべての微小な判断に high を使うと、軽い設定でも正確に答えられる問いに高い推論コストを払うことになる。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "実際のコーディングエージェントは、毎ターン同じ巨大なコンテキスト(リポジトリマップ、ツール定義)を送る。コンテキストキャッシュはモデル単位なので、ターンごとにモデルを切り替えるとキャッシュ割引を失う。"
+        ],
+        [
+          "li",
+          "実践的な線引き: ログ解析やスキーマ検証のような短く独立したタスクはルーティング、長くコンテキスト依存のターンは1つのモデルに固定する。"
+        ],
+        [
+          "li",
+          "Argonは暗黙キャッシュ(4,096トークン以上、ヒット時95%割引)が既定で有効。プロンプトの共通プレフィックスを先頭に固定し、可変部分を後ろに置くと、キャッシュヒットしやすくなります(一般的なプロンプト設計の原則)。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        [
+          "li",
+          "モデル側の耐性に過信しない。評論家のZvi Mowshowitz氏は、ArgonのIPI耐性は同クラスのフロンティアモデルと並ぶ水準としつつ、「依頼していない限り、エージェント用途では実務上おおむね問題ない」程度の評価に留めています。権限分離・サンドボックス・最小権限は引き続き必須です。"
+        ],
+        [
+          "li",
+          "不可逆操作(削除・送金・本番デプロイ)は人間の承認ゲートを実装する。モデルの自制に依存しない。"
+        ],
+        [
+          "li",
+          "外部コンテンツ(Web・メール・コード)内の指示をデータとして扱う設計にする(ツール結果にシステム権限を与えない)。"
+        ],
+        [
+          "li",
+          "セキュリティレビュー系プロンプトは、採用する設定で必ず事前テストする。公式ブログの実験では、モデル設定によってセキュリティ関連の短いプロンプトを拒否する差が見られたと報告されています。"
+        ],
+        ["li", "サイバー防御用途は、Fairwind Programで別IDのアクセスを申請する選択肢がある。"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        [
+          "li",
+          "実務への含意: 社内ベンチマークの結果が本番の挙動と一致しない可能性があるため、評価はできるだけ本番に近い環境・データで行い、本番運用でも継続的に監視する。"
+        ],
+        [
+          "li",
+          "推論(思考)は既定で読める形式で出力される点は、デバッグ・監査にとって有利。ただし推論の要約は監視用であって、内部状態の完全な説明ではない前提で扱う。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "モデルID gemini-4-argon を使用、請求アカウント有効(有料ティア)"],
+        ["li", "SDKが最低バージョン以上(Python 2.30.1 / JS 2.29.1 ほか)"],
+        ["li", "max_output_tokens を明示。32K未満の旧設定は引き上げ"],
+        ["li", "thinking_level を3レベルで評価済み。thinking_budget、サンプリング引数は削除"],
+        [
+          "li",
+          "明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)"
+        ],
+        ["li", "HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ"],
+        ["li", "コンテキスト判定に initial_prompt_token_count を使用"],
+        ["li", "Thought Signatureを含む完全な履歴を返送"],
+        ["li", "12/1の価格改定(入力$4・出力$20)を織り込んだ予算"],
+        ["li", "不可逆操作の承認ゲート、最小権限、サンドボックス"],
+        ["li", "cost per successful task の計測基盤(トレース・思考トークン)"],
+        ["li", "本番に近い環境での評価(評価認識の影響を考慮)"]
+      ],
+      []
+    ],
+    [
+      "ol",
+      null,
+      [
+        [
+          "li",
+          "ベンチマークは提供元の発表を含む。Googleは多数のベンチマークで先行すると主張していますが、独立した比較(例: 評論家のZvi Mowshowitz氏)では「Googleにとって大きな前進だが、自分はOpus/Fable/Astra等より優先して使うまでには至らない」という評価も出ています。タスク依存で、結論は自分のデータで出してください。"
+        ],
+        [
+          "li",
+          "知識カットオフ: Zvi氏の解説によれば、モデルカードの知識カットオフは2026年3月とされています。最新情報が必要な用途では検索グラウンディングや外部データを併用する。"
+        ],
+        [
+          "li",
+          "ハルシネーション: 安全性報告書では従来比で大幅に減ったとされる一方、一般ユーザーの報告には「実行環境がないのにツール出力を捏造した」という単発の事例もあります(個別の逸話であり一般化はできません)。ツール実行結果の検証や、実行環境の有無をシステムプロンプトで明示する運用が有効です。"
+        ],
+        ["li", "評価認識の高さ: 評価と本番で挙動が異なる可能性。Step 9.3を参照。"],
+        ["li", "コスト: 長い思考・Long Decodeは課金が積み上がる。導入価格は11月30日まで。"],
+        [
+          "li",
+          "提供範囲: Carbonはさらに強力とされるが、執筆時点では限定提供。Argon前提の設計にしつつ、モデルIDを設定で差し替えられる構造にしておくと、将来の切替が容易です。"
+        ],
+        [
+          "li",
+          "仕様の変動: Interactions APIの引数やSDKの最小バージョンは更新が速い。必ず公式ドキュメントの最新版を確認してください。"
+        ]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "https://ai.google.dev/gemini-api/docs/generate-content/latest-model"],
+        ["li", "https://ai.google.dev/gemini-api/docs/generate-content/long-decode"],
+        ["li", "https://ai.google.dev/gemini-api/docs/models/gemini-4-argon"],
+        ["li", "https://ai.google.dev/gemini-api/docs/pricing"],
+        [
+          "li",
+          "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon"
+        ],
+        [
+          "li",
+          "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/"
+        ],
+        [
+          "li",
+          "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/"
+        ],
+        [
+          "li",
+          "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/"
+        ],
+        [
+          "li",
+          "https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/"
+        ],
+        [
+          "li",
+          "https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/"
+        ],
+        ["li", "https://antigravity.google/blog/gemini-4-argon-in-google-antigravity"],
+        [
+          "li",
+          "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-4-Argon-Model-Card.pdf"
+        ],
+        ["li", "https://storage.googleapis.com/deepmind-media/gemini/gemini_4_safety_report.pdf"]
+      ],
+      []
+    ],
+    [
+      "ul",
+      null,
+      [
+        ["li", "https://thezvi.substack.com/p/gemini-4-argon-the-model-and-safety"],
+        [
+          "li",
+          "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/"
+        ],
+        [
+          "li",
+          "https://siliconangle.com/2026/09/30/googles-new-frontier-ai-model-gemini-4-argon-goes-to-cybersecurity-defenders-first/"
+        ],
+        ["li", "https://arxiv.org/abs/2610.22319"]
+      ],
+      []
+    ]
+  ],
+  "toc": [
+    ["#sec-0", "1. Argonとは何か(位置づけと全体像)"],
+    ["#sec-1", "2. Argonの特徴を一枚で把握する"],
+    ["#sec-2", "Step 1: アクセス経路とモデルIDを決める"],
+    ["#sec-3", "Step 2: SDK・環境を整える"],
+    ["#sec-4", "Step 3: thinking_level を設計する"],
+    ["#sec-5", "Step 4: 出力上限とLong Decodeを設計する"],
+    ["#sec-6", "Step 5: 自前ループ(REST)とトークン計測・課金"],
+    ["#sec-7", "Step 6: 既存アプリの移行チェックリスト"],
+    ["#sec-8", "Step 7: エージェント開発(Antigravity・/goal・.agents/skills)"],
+    ["#sec-9", "Step 8: コスト最適化(cost per task とルーティング)"],
+    ["#sec-10", "Step 9: 安全性・セキュリティ運用"],
+    ["#sec-11", "Step 10: 評価とプロダクション投入の最終チェック"],
+    ["#sec-12", "トラブルシューティング早見表"],
+    ["#sec-13", "Argonの限界と注意点(公平な見方)"],
+    ["#sec-14", "補足: その他のベストプラクティスと根拠ソースURL"],
+    ["#sec-15", "参考URL一覧"]
+  ],
+  "external": [
+    ["https://ai.google.dev/gemini-api/docs/generate-content/latest-model", "公式ドキュメント"],
+    [
+      "https://ai.google.dev/gemini-api/docs/generate-content/latest-model",
+      "https://ai.google.dev/gemini-api/docs/generate-content/latest-model"
+    ],
+    [
+      "https://ai.google.dev/gemini-api/docs/generate-content/long-decode",
+      "https://ai.google.dev/gemini-api/docs/generate-content/long-decode"
+    ],
+    [
+      "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon",
+      "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon"
+    ],
+    [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/"
+    ],
+    [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/",
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/"
+    ],
+    [
+      "https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-4-argon/",
+      "https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-4-argon/"
+    ],
+    [
+      "https://blog.google/innovation-and-ai/technology/safety-security/gemini-4-model-safety-security/",
+      "https://blog.google/innovation-and-ai/technology/safety-security/gemini-4-model-safety-security/"
+    ],
+    [
+      "https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/",
+      "https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/"
+    ],
+    [
+      "https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/",
+      "https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/"
+    ],
+    [
+      "https://antigravity.google/blog/gemini-4-argon-in-google-antigravity",
+      "https://antigravity.google/blog/gemini-4-argon-in-google-antigravity"
+    ],
+    [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/",
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/"
+    ],
+    [
+      "https://aistudio.google.com/learn/gemini-4-argon-developer-guide",
+      "https://aistudio.google.com/learn/gemini-4-argon-developer-guide"
+    ],
+    [
+      "https://developers.googleblog.com/gemini-4-argon-for-robotics",
+      "https://developers.googleblog.com/gemini-4-argon-for-robotics"
+    ],
+    [
+      "https://thezvi.substack.com/p/gemini-4-argon-the-model-and-safety",
+      "https://thezvi.substack.com/p/gemini-4-argon-the-model-and-safety"
+    ],
+    ["https://digg.com/ai/p838oj0d", "https://digg.com/ai/p838oj0d"],
+    [
+      "https://x.com/GoogleCloudTech/status/2110089253120041232",
+      "https://x.com/GoogleCloudTech/status/2110089253120041232"
+    ],
+    [
+      "https://x.com/ValsAI/status/2105388446844072033",
+      "https://x.com/ValsAI/status/2105388446844072033"
+    ],
+    [
+      "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/",
+      "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/"
+    ],
+    [
+      "https://siliconangle.com/2026/09/30/googles-new-frontier-ai-model-gemini-4-argon-goes-to-cybersecurity-defenders-first/",
+      "https://siliconangle.com/2026/09/30/googles-new-frontier-ai-model-gemini-4-argon-goes-to-cybersecurity-defenders-first/"
+    ],
+    [
+      "https://ppc.land/google-prices-gemini-4-argon-at-2-per-million-tokens-paid-users-only/",
+      "https://ppc.land/google-prices-gemini-4-argon-at-2-per-million-tokens-paid-users-only/"
+    ],
+    ["https://arxiv.org/abs/2610.22319", "https://arxiv.org/abs/2610.22319"],
+    [
+      "https://dev.to/aihubmix/gemini-4-argon-thinkinglevel-and-long-decode-a-developers-guide-35ll",
+      "https://dev.to/aihubmix/gemini-4-argon-thinkinglevel-and-long-decode-a-developers-guide-35ll"
+    ],
+    [
+      "https://codelabs.developers.google.com/getting-started-with-antigravity-skills",
+      "https://codelabs.developers.google.com/getting-started-with-antigravity-skills"
+    ],
+    [
+      "https://news.livedoor.com/article/detail/32561465/",
+      "https://news.livedoor.com/article/detail/32561465/"
+    ],
+    [
+      "https://ai.google.dev/gemini-api/docs/generate-content/latest-model",
+      "https://ai.google.dev/gemini-api/docs/generate-content/latest-model"
+    ],
+    [
+      "https://ai.google.dev/gemini-api/docs/generate-content/long-decode",
+      "https://ai.google.dev/gemini-api/docs/generate-content/long-decode"
+    ],
+    [
+      "https://ai.google.dev/gemini-api/docs/models/gemini-4-argon",
+      "https://ai.google.dev/gemini-api/docs/models/gemini-4-argon"
+    ],
+    [
+      "https://ai.google.dev/gemini-api/docs/pricing",
+      "https://ai.google.dev/gemini-api/docs/pricing"
+    ],
+    [
+      "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon",
+      "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-argon"
+    ],
+    [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/",
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/"
+    ],
+    [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/",
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-4-argon/"
+    ],
+    [
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/",
+      "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-carbon/"
+    ],
+    [
+      "https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/",
+      "https://developers.googleblog.com/optimizing-a-200000-line-python-codebase-overnight-with-gemini-4-argon/"
+    ],
+    [
+      "https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/",
+      "https://developers.googleblog.com/cost-per-task-using-cheap-classifiers-to-route-across-gemini-models-and-thinking-levels/"
+    ],
+    [
+      "https://antigravity.google/blog/gemini-4-argon-in-google-antigravity",
+      "https://antigravity.google/blog/gemini-4-argon-in-google-antigravity"
+    ],
+    [
+      "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-4-Argon-Model-Card.pdf",
+      "https://storage.googleapis.com/deepmind-media/Model-Cards/Gemini-4-Argon-Model-Card.pdf"
+    ],
+    [
+      "https://storage.googleapis.com/deepmind-media/gemini/gemini_4_safety_report.pdf",
+      "https://storage.googleapis.com/deepmind-media/gemini/gemini_4_safety_report.pdf"
+    ],
+    [
+      "https://thezvi.substack.com/p/gemini-4-argon-the-model-and-safety",
+      "https://thezvi.substack.com/p/gemini-4-argon-the-model-and-safety"
+    ],
+    [
+      "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/",
+      "https://techcrunch.com/2026/09/30/google-releases-gemini-4-argon-called-its-most-powerful-model-yet/"
+    ],
+    [
+      "https://siliconangle.com/2026/09/30/googles-new-frontier-ai-model-gemini-4-argon-goes-to-cybersecurity-defenders-first/",
+      "https://siliconangle.com/2026/09/30/googles-new-frontier-ai-model-gemini-4-argon-goes-to-cybersecurity-defenders-first/"
+    ],
+    ["https://arxiv.org/abs/2610.22319", "https://arxiv.org/abs/2610.22319"]
+  ],
+  "stylesheets": [
+    [
+      "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Source+Serif+4:wght@600;700&display=swap",
+      null,
+      null
+    ],
+    [
+      "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css",
+      null,
+      null
+    ]
+  ],
+  "diagrams": [
+    "flowchart LR\n    A[\"Gemini 3.5 Pro\\n開発中止と報道\"] --> B[\"Gemini 3.8 Flash\\n量産・高スループット向け\"]\n    B --> C[\"Gemini 4 Argon\\n2026-09-30発表\\n2026-10-13 GA\"]\n    C --> D[\"Gemini 4 Carbon\\n2026-10-28発表\\nサイバー防御者向け限定\"]\n    style C fill:#e8f0fe,stroke:#1a73e8,color:#202124\n    style D fill:#fef7e0,stroke:#f9ab00,color:#202124",
+    "flowchart TD\n    S[\"Argonを使いたい\"] --> Q1{\"利用形態は?\"}\n    Q1 -->|\"自社アプリに組み込む\"| Q2{\"クラウド基盤は?\"}\n    Q1 -->|\"コーディングエージェントとして使う\"| ANT[\"Google Antigravity\\nAI Ultra または適格なEnterprise\"]\n    Q1 -->|\"一般的なチャット\"| APP[\"Geminiアプリ / AI Mode\\nAI Pro以上\"]\n    Q2 -->|\"Google AI Studio系\"| API[\"Gemini API 有料ティア\"]\n    Q2 -->|\"Google Cloud統合\"| ENT[\"Gemini Enterprise Agent Platform\"]\n    API --> NEW{\"新規プロジェクト?\"}\n    NEW -->|\"はい\"| INT[\"Interactions API を推奨\"]\n    NEW -->|\"既存資産あり\"| GC[\"GenerateContent API\\nLegacy扱いだが継続利用可\"]",
+    "flowchart TD\n    T[\"タスクを分類\"] --> A{\"1ステップで答えが出る?\\n抽出・分類・形式チェック\"}\n    A -->|\"はい\"| LOW[\"low を試す\"]\n    A -->|\"いいえ\"| B{\"多段推論・複雑なコード・\\nツール利用を含む?\"}\n    B -->|\"はい\"| MED[\"medium から開始\"]\n    B -->|\"いいえ\"| LOW\n    MED --> C{\"medium で品質基準を満たす?\"}\n    C -->|\"はい\"| FIN[\"medium を採用\"]\n    C -->|\"いいえ\"| HIGH[\"high + 十分な max_output_tokens\"]\n    LOW --> D{\"low で品質基準を満たす?\"}\n    D -->|\"はい\"| FIN2[\"low を採用\"]\n    D -->|\"いいえ\"| MED",
+    "sequenceDiagram\n    participant C as クライアント(SDK)\n    participant M as Argon\n    C->>M: リクエスト(max_output_tokens=262144)\n    M-->>C: ホップ1: 思考のみ・text空 / CONTINUATION + token\n    C->>M: 同じリクエスト + continuation_token\n    M-->>C: ホップ2: 思考+出力の一部 / CONTINUATION + token\n    C->>M: 同じリクエスト + 最新のtokenのみ\n    M-->>C: ホップ3: 最終出力 / STOP\n    Note over C: SDKが自動で結合し1つの応答として返す",
+    "flowchart TD\n    M0[\"現行アプリ(Gemini 3.x)\"] --> M1[\"モデルIDを変更\"]\n    M1 --> M2[\"サンプリング引数と明示キャッシュを削除\"]\n    M2 --> M3[\"thinking_budget を thinking_level に置換\"]\n    M3 --> M4[\"max_output_tokens とタイムアウトを再設定\"]\n    M4 --> M5[\"3レベルで評価セットを実行\"]\n    M5 --> M6{\"品質・遅延・コストが基準内?\"}\n    M6 -->|\"はい\"| M7[\"最小のthinking_levelを採用して段階展開\"]\n    M6 -->|\"いいえ\"| M8[\"レベル調整 / Long Decode / ルーティングを検討\"]\n    M8 --> M5",
+    "flowchart TD\n    G[\"アウトカムを1段落で定義\\n不変条件を明記\"] --> S[\".agents/skills に規約を配置\\nSKILL.md と references を分離\"]\n    S --> H[\"独立した holdout ベンチを用意\"]\n    H --> R[\"/goal で無人実行\"]\n    R --> P[\"レビュー用PRを生成\\n前後の数値つき・未マージ\"]\n    P --> V{\"人間レビュー\"}\n    V -->|\"採用\"| MG[\"マージ\"]\n    V -->|\"却下\"| RJ[\"理由を skills に追記して再実行\"]\n    RJ --> R",
+    "flowchart TD\n    E0[\"自社の代表タスクで評価セットを作成\"] --> E1[\"thinking_level を low / medium / high で実行\"]\n    E1 --> E2[\"max_output_tokens は十分高く設定\\n打ち切りを排除\"]\n    E2 --> E3[\"成功率・レイテンシ・総トークン・cost per task を記録\"]\n    E3 --> E4{\"最小のレベルで品質基準を満たす?\"}\n    E4 -->|\"はい\"| E5[\"そのレベルで本番候補に\"]\n    E4 -->|\"いいえ\"| E6[\"プロンプト/ツール設計/ルーティングを見直す\"]\n    E6 --> E1\n    E5 --> E7[\"本番近似環境で少量ロールアウト + 監視\"]"
+  ],
+  "theme": {
+    "fontSize": "16px",
+    "fontFamily": "\"Noto Sans JP\",sans-serif",
+    "primaryColor": "#e8ecf8",
+    "primaryBorderColor": "#3b4a9c",
+    "primaryTextColor": "#1f2430",
+    "lineColor": "#5b6178",
+    "tertiaryColor": "#faf7f0"
+  },
+  "css": [
+    {
+      "selector": ":root",
+      "media": null,
+      "declarations": [
+        ["--paper", "#faf7f0", false],
+        ["--paper-alt", "#f1ece0", false],
+        ["--ink", "#1f2430", false],
+        ["--ink-soft", "#4a5064", false],
+        ["--indigo", "#3b4a9c", false],
+        ["--gold", "#b8862b", false],
+        ["--forest", "#2f6b4f", false],
+        ["--plum", "#7a3b69", false],
+        ["--border", "#ddd5c3", false],
+        ["--side", "264px", false]
+      ]
+    },
+    {
+      "selector": "*",
+      "media": null,
+      "declarations": [["box-sizing", "border-box", false]]
+    },
+    {
+      "selector": "html",
+      "media": null,
+      "declarations": [["scroll-behavior", "smooth", false], ["scroll-padding-top", "16px", false]]
+    },
+    {
+      "selector": "body",
+      "media": null,
+      "declarations": [
+        ["margin", "0", false],
+        ["background", "var(--paper)", false],
+        ["color", "var(--ink)", false],
+        [
+          "font-family",
+          "'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif",
+          false
+        ],
+        ["font-size", "1rem", false],
+        ["line-height", "1.85", false]
+      ]
+    },
+    {
+      "selector": ".layout",
+      "media": null,
+      "declarations": [["display", "block", false]]
+    },
+    {
+      "selector": ".sidebar",
+      "media": null,
+      "declarations": [
+        ["position", "fixed", false],
+        ["top", "0", false],
+        ["left", "0", false],
+        ["bottom", "0", false],
+        ["width", "var(--side)", false],
+        ["overflow-y", "auto", false],
+        ["background", "#fff", false],
+        ["border-right", "1px solid var(--border)", false],
+        ["padding", "20px 0", false]
+      ]
+    },
+    {
+      "selector": ".brand",
+      "media": null,
+      "declarations": [
+        ["padding", "0 20px 14px", false],
+        ["font-family", "'Source Serif 4', 'Noto Serif JP', serif", false],
+        ["font-weight", "700", false],
+        ["color", "var(--indigo)", false],
+        ["font-size", "1.1rem", false],
+        ["line-height", "1.4", false],
+        ["border-bottom", "1px solid var(--border)", false],
+        ["margin-bottom", "10px", false]
+      ]
+    },
+    {
+      "selector": ".nav-a",
+      "media": null,
+      "declarations": [
+        ["display", "flex", false],
+        ["gap", "10px", false],
+        ["align-items", "flex-start", false],
+        ["padding", "7px 20px", false],
+        ["color", "var(--ink-soft)", false],
+        ["text-decoration", "none", false],
+        ["font-size", "1rem", false],
+        ["line-height", "1.5", false],
+        ["border-left", "3px solid transparent", false]
+      ]
+    },
+    {
+      "selector": ".nav-a .n-dot",
+      "media": null,
+      "declarations": [
+        ["flex", "0 0 8px", false],
+        ["height", "8px", false],
+        ["margin-top", "9px", false],
+        ["border-radius", "50%", false],
+        ["background", "var(--border)", false]
+      ]
+    },
+    {
+      "selector": ".nav-a span:last-child",
+      "media": null,
+      "declarations": [["overflow-wrap", "anywhere", false], ["min-width", "0", false]]
+    },
+    {
+      "selector": ".nav-a:hover",
+      "media": null,
+      "declarations": [["background", "var(--paper-alt)", false]]
+    },
+    {
+      "selector": ".nav-a.active",
+      "media": null,
+      "declarations": [
+        ["color", "var(--indigo)", false],
+        ["font-weight", "700", false],
+        ["border-left-color", "var(--indigo)", false],
+        ["background", "var(--paper-alt)", false]
+      ]
+    },
+    {
+      "selector": ".nav-a.active .n-dot",
+      "media": null,
+      "declarations": [["background", "var(--indigo)", false]]
+    },
+    {
+      "selector": ".main",
+      "media": null,
+      "declarations": [["margin-left", "var(--side)", false], ["min-width", "0", false]]
+    },
+    {
+      "selector": ".hero",
+      "media": null,
+      "declarations": [
+        ["background", "linear-gradient(135deg, #1c2552, #3b4a9c 58%, #2f6b4f)", false],
+        ["color", "#fff", false],
+        ["padding", "56px 56px 44px", false]
+      ]
+    },
+    {
+      "selector": ".hero h1",
+      "media": null,
+      "declarations": [
+        ["overflow-wrap", "anywhere", false],
+        ["font-family", "'Source Serif 4', 'Noto Serif JP', serif", false],
+        ["margin", "0 0 18px", false],
+        ["font-size", "2rem", false],
+        ["line-height", "1.4", false],
+        ["color", "#fff", false]
+      ]
+    },
+    {
+      "selector": ".hero ul",
+      "media": null,
+      "declarations": [
+        ["margin", "0", false],
+        ["padding", "0", false],
+        ["color", "#e8f3ec", false],
+        ["list-style", "none", false]
+      ]
+    },
+    {
+      "selector": ".hero li",
+      "media": null,
+      "declarations": [["margin", "4px 0", false], ["overflow-wrap", "break-word", false]]
+    },
+    {
+      "selector": ".hero strong",
+      "media": null,
+      "declarations": [["color", "#ffe29a", false]]
+    },
+    {
+      "selector": ".hero code",
+      "media": null,
+      "declarations": [
+        ["background", "rgba(255, 255, 255, 0.15)", false],
+        ["color", "#fff", false],
+        ["padding", "1px 6px", false],
+        ["border-radius", "4px", false],
+        ["font-size", "1rem", false]
+      ]
+    },
+    {
+      "selector": ".section",
+      "media": null,
+      "declarations": [["padding", "34px 56px", false]]
+    },
+    {
+      "selector": ".section h2",
+      "media": null,
+      "declarations": [
+        ["overflow-wrap", "anywhere", false],
+        ["font-family", "'Source Serif 4', 'Noto Serif JP', serif", false],
+        ["color", "var(--indigo)", false],
+        ["font-size", "1.6rem", false],
+        ["margin", "0 0 18px", false],
+        ["padding-bottom", "8px", false],
+        ["border-bottom", "2px solid var(--gold)", false]
+      ]
+    },
+    {
+      "selector": ".prose",
+      "media": null,
+      "declarations": [["overflow-wrap", "break-word", false], ["min-width", "0", false]]
+    },
+    {
+      "selector": ".prose h3",
+      "media": null,
+      "declarations": [
+        ["font-size", "1.25rem", false],
+        ["color", "var(--plum)", false],
+        ["margin", "30px 0 10px", false]
+      ]
+    },
+    {
+      "selector": ".prose h4",
+      "media": null,
+      "declarations": [
+        ["font-size", "1.1rem", false],
+        ["color", "var(--forest)", false],
+        ["margin", "22px 0 8px", false]
+      ]
+    },
+    {
+      "selector": ".prose p,\n      .prose li",
+      "media": null,
+      "declarations": [["overflow-wrap", "break-word", false]]
+    },
+    {
+      "selector": ".prose a",
+      "media": null,
+      "declarations": [["color", "var(--indigo)", false], ["word-break", "break-all", false]]
+    },
+    {
+      "selector": ".prose code",
+      "media": null,
+      "declarations": [
+        ["font-family", "'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace", false],
+        ["font-size", "1rem", false],
+        ["background", "var(--paper-alt)", false],
+        ["padding", "1px 6px", false],
+        ["border-radius", "4px", false],
+        ["overflow-wrap", "anywhere", false]
+      ]
+    },
+    {
+      "selector": ".prose pre",
+      "media": null,
+      "declarations": [
+        ["background", "#282c34", false],
+        ["color", "#abb2bf", false],
+        ["border-radius", "8px", false],
+        ["padding", "16px 18px", false],
+        ["overflow-x", "auto", false],
+        ["margin", "16px 0", false],
+        ["line-height", "1.6", false]
+      ]
+    },
+    {
+      "selector": ".prose pre code",
+      "media": null,
+      "declarations": [
+        ["background", "none", false],
+        ["padding", "0", false],
+        ["color", "inherit", false],
+        ["overflow-wrap", "normal", false],
+        ["white-space", "pre", false]
+      ]
+    },
+    {
+      "selector": ".prose pre code.hljs",
+      "media": null,
+      "declarations": [["padding", "0", false], ["background", "transparent", false]]
+    },
+    {
+      "selector": ".prose blockquote",
+      "media": null,
+      "declarations": [
+        ["margin", "16px 0", false],
+        ["padding", "12px 18px", false],
+        ["background", "#fff8e6", false],
+        ["border-left", "4px solid var(--gold)", false],
+        ["border-radius", "0 6px 6px 0", false],
+        ["color", "var(--ink)", false]
+      ]
+    },
+    {
+      "selector": ".prose blockquote p",
+      "media": null,
+      "declarations": [["margin", "4px 0", false]]
+    },
+    {
+      "selector": ".table-wrap",
+      "media": null,
+      "declarations": [
+        ["overflow-x", "auto", false],
+        ["margin", "16px 0", false],
+        ["border", "1px solid var(--border)", false],
+        ["border-radius", "8px", false],
+        ["background", "#fff", false],
+        ["min-width", "0", false],
+        ["max-width", "100%", false]
+      ]
+    },
+    {
+      "selector": ".table-wrap table",
+      "media": null,
+      "declarations": [
+        ["border-collapse", "collapse", false],
+        ["width", "100%", false],
+        ["font-size", "1rem", false]
+      ]
+    },
+    {
+      "selector": ".table-wrap th",
+      "media": null,
+      "declarations": [
+        ["background", "var(--indigo)", false],
+        ["color", "#fff", false],
+        ["text-align", "left", false],
+        ["padding", "10px 14px", false],
+        ["font-weight", "700", false]
+      ]
+    },
+    {
+      "selector": ".table-wrap td",
+      "media": null,
+      "declarations": [
+        ["padding", "10px 14px", false],
+        ["border-bottom", "1px solid var(--border)", false],
+        ["vertical-align", "top", false],
+        ["overflow-wrap", "anywhere", false]
+      ]
+    },
+    {
+      "selector": ".table-wrap tr:hover td",
+      "media": null,
+      "declarations": [["background", "var(--paper-alt)", false]]
+    },
+    {
+      "selector": ".diagram-card",
+      "media": null,
+      "declarations": [
+        ["margin", "20px 0", false],
+        ["background", "#fff", false],
+        ["border", "1px solid var(--border)", false],
+        ["border-radius", "10px", false],
+        ["padding", "18px", false],
+        ["min-width", "0", false]
+      ]
+    },
+    {
+      "selector": ".diagram-wrap",
+      "media": null,
+      "declarations": [
+        ["overflow-x", "auto", false],
+        ["display", "flex", false],
+        ["justify-content", "safe center", false],
+        ["width", "100%", false],
+        ["min-width", "0", false]
+      ]
+    },
+    {
+      "selector": ".diagram-wrap > *",
+      "media": null,
+      "declarations": [["min-width", "0", false]]
+    },
+    {
+      "selector": ".diagram-canvas svg",
+      "media": null,
+      "declarations": [["max-width", "none", false], ["flex-shrink", "0", false]]
+    },
+    {
+      "selector": ".diagram-err",
+      "media": null,
+      "declarations": [
+        ["color", "#a33", false],
+        ["white-space", "pre-wrap", false],
+        ["font-size", "1rem", false]
+      ]
+    },
+    {
+      "selector": ".mermaidTooltip",
+      "media": null,
+      "declarations": [["font-size", "1rem", true]]
+    },
+    {
+      "selector": "ul.checklist",
+      "media": null,
+      "declarations": [
+        ["list-style", "none", false],
+        ["padding", "0", false],
+        ["margin", "12px 0", false]
+      ]
+    },
+    {
+      "selector": "li.chk",
+      "media": null,
+      "declarations": [
+        ["margin", "8px 0", false],
+        ["background", "#fff", false],
+        ["border", "1px solid var(--border)", false],
+        ["border-radius", "8px", false],
+        ["transition", "0.15s", false]
+      ]
+    },
+    {
+      "selector": "li.chk label",
+      "media": null,
+      "declarations": [
+        ["display", "flex", false],
+        ["gap", "12px", false],
+        ["align-items", "flex-start", false],
+        ["padding", "10px 14px", false],
+        ["cursor", "pointer", false],
+        ["font-size", "1rem", false]
+      ]
+    },
+    {
+      "selector": "li.chk input",
+      "media": null,
+      "declarations": [
+        ["appearance", "none", false],
+        ["-webkit-appearance", "none", false],
+        ["flex", "0 0 22px", false],
+        ["height", "22px", false],
+        ["margin-top", "4px", false],
+        ["border", "2px solid var(--indigo)", false],
+        ["border-radius", "5px", false],
+        ["background", "#fff", false],
+        ["cursor", "pointer", false],
+        ["font-size", "1rem", false]
+      ]
+    },
+    {
+      "selector": "li.chk input:checked",
+      "media": null,
+      "declarations": [
+        ["background", "var(--forest)", false],
+        ["border-color", "var(--forest)", false],
+        ["box-shadow", "inset 0 0 0 3px #fff", false]
+      ]
+    },
+    {
+      "selector": "li.chk.done",
+      "media": null,
+      "declarations": [["background", "#eef7f1", false], ["border-color", "var(--forest)", false]]
+    },
+    {
+      "selector": "li.chk.done span",
+      "media": null,
+      "declarations": [
+        ["color", "var(--ink-soft)", false],
+        ["text-decoration", "line-through", false]
+      ]
+    },
+    {
+      "selector": ".progress",
+      "media": null,
+      "declarations": [
+        ["display", "flex", false],
+        ["align-items", "center", false],
+        ["gap", "12px", false],
+        ["margin", "14px 0 4px", false],
+        ["font-size", "1rem", false],
+        ["color", "var(--ink-soft)", false]
+      ]
+    },
+    {
+      "selector": ".progress .bar",
+      "media": null,
+      "declarations": [
+        ["flex", "1", false],
+        ["height", "10px", false],
+        ["background", "var(--paper-alt)", false],
+        ["border-radius", "6px", false],
+        ["overflow", "hidden", false],
+        ["border", "1px solid var(--border)", false]
+      ]
+    },
+    {
+      "selector": ".progress .bar i",
+      "media": null,
+      "declarations": [
+        ["display", "block", false],
+        ["height", "100%", false],
+        ["width", "0", false],
+        ["background", "var(--forest)", false],
+        ["transition", "width 0.2s", false]
+      ]
+    },
+    {
+      "selector": ".footer",
+      "media": null,
+      "declarations": [
+        ["padding", "28px 56px 60px", false],
+        ["color", "var(--ink-soft)", false],
+        ["border-top", "1px solid var(--border)", false]
+      ]
+    },
+    {
+      "selector": ".menu-btn",
+      "media": null,
+      "declarations": [
+        ["display", "none", false],
+        ["position", "fixed", false],
+        ["top", "10px", false],
+        ["left", "10px", false],
+        ["z-index", "30", false],
+        ["background", "var(--indigo)", false],
+        ["color", "#fff", false],
+        ["border", "0", false],
+        ["border-radius", "8px", false],
+        ["padding", "8px 14px", false],
+        ["font-size", "1rem", false],
+        ["cursor", "pointer", false]
+      ]
+    },
+    {
+      "selector": ".sidebar",
+      "media": "(max-width: 900px)",
+      "declarations": [
+        ["transform", "translateX(-100%)", false],
+        ["transition", "transform 0.2s", false],
+        ["z-index", "25", false],
+        ["box-shadow", "2px 0 12px rgba(0, 0, 0, 0.2)", false]
+      ]
+    },
+    {
+      "selector": "body.nav-open .sidebar",
+      "media": "(max-width: 900px)",
+      "declarations": [["transform", "none", false]]
+    },
+    {
+      "selector": ".main",
+      "media": "(max-width: 900px)",
+      "declarations": [["margin-left", "0", false]]
+    },
+    {
+      "selector": ".menu-btn",
+      "media": "(max-width: 900px)",
+      "declarations": [["display", "block", false]]
+    },
+    {
+      "selector": ".hero",
+      "media": "(max-width: 900px)",
+      "declarations": [["padding", "64px 20px 32px", false]]
+    },
+    {
+      "selector": ".section",
+      "media": "(max-width: 900px)",
+      "declarations": [["padding", "28px 16px", false]]
+    },
+    {
+      "selector": ".footer",
+      "media": "(max-width: 900px)",
+      "declarations": [["padding", "24px 16px 48px", false]]
+    }
+  ],
+  "classElements": {
+    "layout": ["div"],
+    "sidebar": ["nav"],
+    "brand": ["div"],
+    "nav-a": ["a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a", "a"],
+    "n-dot": [
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span",
+      "span"
+    ],
+    "main": ["main"],
+    "hero": ["header"],
+    "section": [
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section",
+      "section"
+    ],
+    "prose": [
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div"
+    ],
+    "diagram-card": ["div", "div", "div", "div", "div", "div", "div"],
+    "diagram-wrap": ["div", "div", "div", "div", "div", "div", "div"],
+    "diagram-canvas": ["div", "div", "div", "div", "div", "div", "div"],
+    "table-wrap": [
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div",
+      "div"
+    ],
+    "language-bash": ["code", "code"],
+    "language-python": ["code", "code", "code", "code"],
+    "chk": ["li", "li", "li", "li", "li", "li", "li", "li", "li", "li", "li", "li"],
+    "footer": ["footer"]
+  },
+  "checklists": [
+    [
+      "モデルID gemini-4-argon を使用、請求アカウント有効(有料ティア)",
+      "SDKが最低バージョン以上(Python 2.30.1 / JS 2.29.1 ほか)",
+      "max_output_tokens を明示。32K未満の旧設定は引き上げ",
+      "thinking_level を3レベルで評価済み。thinking_budget、サンプリング引数は削除",
+      "明示キャッシュの呼び出しを撤去、暗黙キャッシュ前提の設計(共通プレフィックス先頭固定)",
+      "HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ",
+      "コンテキスト判定に initial_prompt_token_count を使用",
+      "Thought Signatureを含む完全な履歴を返送",
+      "12/1の価格改定(入力$4・出力$20)を織り込んだ予算",
+      "不可逆操作の承認ゲート、最小権限、サンドボックス",
+      "cost per successful task の計測基盤(トレース・思考トークン)",
+      "本番に近い環境での評価(評価認識の影響を考慮)"
+    ]
+  ],
+  "tokens": [
+    [
+      ["hljs-comment", "# Python"],
+      ["hljs-string", "\"google-genai>=2.30.1\""],
+      ["hljs-comment", "# JavaScript / TypeScript"],
+      ["hljs-string", "\"@google/genai@>=2.29.1\""]
+    ],
+    [
+      ["hljs-keyword", "from"],
+      ["hljs-keyword", "import"],
+      ["hljs-keyword", "from"],
+      ["hljs-keyword", "import"],
+      ["hljs-comment", "# GEMINI_API_KEY を環境変数から読む"],
+      ["hljs-string", "\"gemini-4-argon\""],
+      [
+        "hljs-string",
+        "\"three.jsで、重力レンズ効果を持つ3Dブラックホールを描画するスクリプトを書いてください。\""
+      ],
+      ["hljs-number", "65536"],
+      ["hljs-comment", "# 思考+出力の合計。明示的に設定する"],
+      ["hljs-string", "\"medium\""],
+      ["hljs-built_in", "print"]
+    ],
+    [
+      ["hljs-keyword", "from"],
+      ["hljs-keyword", "import"],
+      ["hljs-keyword", "from"],
+      ["hljs-keyword", "import"],
+      ["hljs-comment", "# 20分のタイムアウト(ミリ秒)。短すぎるタイムアウトは途中切断の原因になる"],
+      ["hljs-number", "1_200_000"],
+      ["hljs-string", "\"gemini-4-argon\""],
+      ["hljs-string", "\"素数定理の完全で厳密な証明を書いてください。\""],
+      ["hljs-number", "262_144"],
+      ["hljs-comment", "# 全ホップ合計の思考+出力"],
+      ["hljs-string", "\"high\""],
+      ["hljs-literal", "True"],
+      ["hljs-comment", "# 既定。明示すると意図が伝わる"],
+      ["hljs-built_in", "print"],
+      ["hljs-built_in", "print"],
+      ["hljs-string", "\"Finish reason:\""],
+      ["hljs-number", "0"],
+      ["hljs-comment", "# ホップを跨いだ「実際のプロンプトサイズ」はこちらを使う"],
+      ["hljs-built_in", "print"],
+      ["hljs-string", "\"Prompt size:\""],
+      ["hljs-built_in", "print"],
+      ["hljs-string", "\"Billed tokens:\""]
+    ],
+    [
+      ["hljs-keyword", "from"],
+      ["hljs-keyword", "import"],
+      ["hljs-comment", "# 64K超を生成するには background=True と max_output_tokens > 65536"],
+      ["hljs-string", "\"gemini-4-argon\""],
+      ["hljs-built_in", "input"],
+      ["hljs-string", "\"大規模なマルチファイル差分とテストスイートを一括で出力してください。\""],
+      ["hljs-literal", "True"],
+      [
+        "hljs-comment",
+        "# generation_config 等で max_output_tokens=131072 以上を設定(詳細は公式ドキュメント参照)"
+      ]
+    ],
+    [
+      ["hljs-keyword", "from"],
+      ["hljs-keyword", "import"],
+      ["hljs-keyword", "from"],
+      ["hljs-keyword", "import"],
+      ["hljs-string", "\"素数定理の完全で厳密な証明を書いてください。\""],
+      ["hljs-literal", "None"],
+      ["hljs-keyword", "while"],
+      ["hljs-literal", "True"],
+      ["hljs-string", "\"gemini-4-argon\""],
+      ["hljs-comment", "# 毎回オリジナルのcontents"],
+      ["hljs-number", "262_144"],
+      ["hljs-comment", "# 毎回同じ合計値"],
+      ["hljs-string", "\"high\""],
+      ["hljs-literal", "False"],
+      ["hljs-comment", "# 自前でループする"],
+      ["hljs-number", "0"],
+      ["hljs-keyword", "if"],
+      ["hljs-keyword", "and"],
+      ["hljs-keyword", "if"],
+      ["hljs-keyword", "or"],
+      ["hljs-keyword", "not"],
+      ["hljs-keyword", "break"],
+      ["hljs-built_in", "print"],
+      ["hljs-string", "\"\""],
+      ["hljs-keyword", "for"],
+      ["hljs-keyword", "in"],
+      ["hljs-keyword", "if"],
+      ["hljs-keyword", "and"],
+      ["hljs-keyword", "not"],
+      ["hljs-built_in", "print"],
+      ["hljs-string", "\"Finish reason:\""]
+    ],
+    []
+  ]
+}
