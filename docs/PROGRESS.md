@@ -2,9 +2,21 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-10**
+> - 最終更新日: **Updated 2026-11-11**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## Gemini Omni ガイド移行（2026-11-11）
+
+- 状態: **実装・自動検証・分離コミット完了、目視未確認（ユーザー担当）**。`/google/omni-best-practices` を既存Googleカテゴリへ登録し、ナビ・検索・RSS・関連ページをregistryから導出。本文の情報基準日2026-11-05と執筆日2026-11-06を保持。
+- 指定HTMLの全65見出し（H1×1／H2×16／H3×48）、24段落、25リスト項目（8 ul／0 ol）、29表185行、13コード例、7図、4引用、13チェック項目、24外部リンクをPure JSXへ転写。Redで固定したsource-contract.jsonで本文・順序・重複・セクション境界・全装飾クラス・表セル型と結合・リスト型と入れ子・コード空白・highlight.js11.9.0全トークン・63 CSS規則とmedia条件を照合。全要素ツリーの完全一致契約も追加し、件数だけの検証へ置き換えていない。
+- 原本の264px固定目次と900pxモバイル開閉、本文のdisc・heroとチェックのマーカーなし・ブラウザ既定の余白と太字を保持。原本にolはなく、番号付きリストを新設していない。共通リセットに対するdecimal・circle・squareの復元規則も配置。全列左寄せ、コード字下げ、アンカー余白と共有計算機の表書体・nowrap・stickyの打ち消しを検証する。
+- 進捗は原本スクリプトどおり設計3・実装4・品質3・コストと運用3の4リストを独立集計。目次追従・最下部・目次内スクロール・開閉・900px境界・inert・Tab循環・フォーカス復帰・完了クラス・全changeリスナーのcleanupを既存DrawerTocObserverへ委譲し、ページ専用のID・クラスを渡して検証する。
+- 図の配置・サイズ・tooltipとhtmlスクロールは共有実装へ委譲し、該当規則と配置宣言のみCSS契約で明示除外。7図の本文・順序・テーマは原本と完全一致し、既存Mermaid10.9.8で全図の解析に成功。原本のMermaid11.12.0をアプリ依存へ追加していない。日付はregistryからheroへ表示し、共有クローム補正はページ内へ限定。
+- 検証: ページ34契約＋操作35契約＝**69件**、registry・navを含む関連**96件**、全体Vitest **235 files／2863 testsすべて成功**。typecheck、lint **640 files／0 diagnostics**、HTML原本監査exit 0、CSS変数監査、pytest **122件**も成功。操作カバレッジは行／関数100%、分岐89.87%、文99.18%。開始時の全体実行はregistry読込後のページ追加と重なって登録漏れ1件を検出したが、編集完了後の全体再実行で解消。Refactor後も関連96件・型・lint・原本監査が成功。
+- 原本保存: `42d4db7a`でHTML／Markdownをarchive/html/Google/／archive/md/Google/へ内容無変更・100%リネーム。HTML SHA-256 `82e9d16767cdb5540e27fa559950dfd92c879da6b9a3ddd225a8d59570119e22`、Markdown `5742a542aa6b3e33b208866cdf8c9ca7fae08024e27c4f3f0abfc4f17f6f2c12`（移動前後一致）。Markdown監査はexit 1で、目次とモデル仕様等の見出し4件、2 URL、5リスト項目、9コード例、32表行、13段落に差がある。Omni1.2・30秒上限・料金・URI保存・自然言語参照指定等の更新を指定HTMLへ混在させず、そのまま保存する。
+- 分離履歴: Red `e9771f03`（未実装import失敗を実測）→ 原本保存 `42d4db7a` → Green `97bb9af7` → Refactor `39d04b0c`。Refactorは103コード文字列式の改行・先頭空白の明示と単一クラス記述の簡略化のみ。Red固定の本文・構造・CSS・図・進捗の期待値は無変更。
+- CSSキャッシュ退避後、通常devの `http://localhost:3000/google/omni-best-practices` でHTTP 200。ガイド配下84 IDの一意性・3／4／3／3の初期進捗・heroの日付を確認。原本と配信HTMLの各**1242要素**の意味的ツリー（タグ・本文・リスト階層・表結合・リンク先・コード空白・図位置）が一致。npm・ビルド・ブラウザ自動化は未実行。依存・設定・ロックは無変更。目視はユーザー担当。
 
 ## Gemini 4 Argon ガイド移行（2026-11-10）
 
@@ -232,22 +244,23 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `d1fbc7d0`（Gemini 4 Argonガイド。Green `ddb3f553`、分離履歴は冒頭の同名節を参照）。
-- **次の作業**: Argon・Fable・Astraの目視確認（3ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。npm・ビルドは未実行。
+- **最新実装 HEAD**: `39d04b0c`（Gemini Omniガイド。Green `97bb9af7`、分離履歴は冒頭の同名節を参照）。
+- **次の作業**: Omni・Argon・Fable・Astraの目視確認（4ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。npm・ビルドは未実行。
+  - Omni `/google/omni-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点／heroのマーカーなし・29表185行・13コード例・7図・3／4／3／3チェック進捗を確認。
   - Argon `/google/argon-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点と番号／heroのマーカーなし・16表118行・6コード例・7図・12チェック進捗を確認。
   - Fable `/claude/fable-5-1-best-practices`: 264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・8／5／5チェック進捗を確認。
   - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
-- **ルート実数**: `page.tsx` 104件、registry 104エントリ（2026-11-10実測）。
+- **ルート実数**: `page.tsx` 105件、registry 105エントリ（2026-11-11実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-10 実測）
-  - `bun run lint` ✅（Biome check / 634 files / 0 diagnostics。2026-11-10 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-11 実測）
+  - `bun run lint` ✅（Biome check / 640 files / 0 diagnostics。2026-11-11 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **233 files／2794 testsすべて成功**（2026-11-10実測）。Argonの対象68契約・関連95件、型・lint634 files・HTML監査exit 0・7図解析も成功。進捗テストの期待値1行は明示承認後に原本式へ訂正済み。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **235 files／2863 testsすべて成功**（2026-11-11実測）。Omniの対象69契約・関連96件、型・lint640 files・HTML監査exit 0・7図解析も成功。Redで固定した期待値は無変更。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-10実測、UV_CACHE_DIRを一時領域へ指定）。
+  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-11実測、UV_CACHE_DIRを一時領域へ指定）。
 
 ## 最近の追加内容
 
@@ -704,18 +717,19 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: d1fbc7d0（Gemini 4 Argon。Green ddb3f553、分離履歴は冒頭の同名節を参照）。
-次の作業: Argon・Fable・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+最新実装HEAD: 39d04b0c（Gemini Omni。Green 97bb9af7、分離履歴は冒頭の同名節を参照）。
+次の作業: Omni・Argon・Fable・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+Omni: http://localhost:3000/google/omni-best-practices
+264px目次・900pxモバイル開閉・16章・本文の点／heroのマーカーなし・29表185行・13コード例・7図・3／4／3／3チェック進捗を確認。
 Argon: http://localhost:3000/google/argon-best-practices
-264px目次・900pxモバイル開閉・16章・点と番号・16表118行・6コード例・7図・12チェック進捗を確認。
 Fable: http://localhost:3000/claude/fable-5-1-best-practices
 Astra: http://localhost:3000/codex/astra-best-practices
-指定HTMLを正本として51見出し・27段落・94項目・16表118行・6コード例・7図・12チェック・42外部リンクを保持。
-Argon原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。Markdownの後日追記を混在させない。
-原本固定の本文・構造・CSS・図は無変更。進捗テスト期待値1行だけユーザー承認後に原本式へ訂正済み（778bdbd7）。
-全体233 files／2794 tests成功。対象68契約・関連95件、型・lint634 files・HTML監査exit 0・Mermaid7図解析・pytest122件が成功。
-操作の行／関数100%、分岐89.87%。ルートとregistryは104件ずつ。
+指定HTMLを正本として65見出し・24段落・25項目・29表185行・13コード例・7図・13チェック・24外部リンクを保持。
+Omni原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。Markdownのモデル・料金・上限等の更新を混在させない。
+Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。
+全体235 files／2863 tests成功。対象69契約・関連96件、型・lint640 files・HTML監査exit 0・Mermaid7図解析・pytest122件が成功。
+操作の行／関数100%、分岐89.87%。ルートとregistryは105件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 今回の移行依頼ではユーザー指定でnpm・ビルドを実行しない。他環境の通常ビルド確認規約は維持する。
-依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、69 ID一意性・初期進捗・原本と配信HTMLの1092要素の一致を確認。
+依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、84 ID一意性・4組の初期進捗・原本と配信HTMLの1242要素の一致を確認。
 ```
