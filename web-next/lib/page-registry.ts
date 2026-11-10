@@ -64,6 +64,18 @@ export type PageEntry = z.infer<typeof PageEntrySchema>;
 
 const entries: PageEntry[] = [
   {
+    slug: "/codex/astra-best-practices",
+    title: "GPT-6 Astra ベストプラクティス",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
+    topics: ["openai", "astra", "agent", "prompt", "api", "cost", "security"],
+    summary:
+      "GPT-6 Astra のモデル選定、Responses API、推論強度、プロンプト・スキル、ツール利用、安全運用と評価を学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-10",
+    lastReviewed: "2026-11-10",
+  },
+  {
     slug: "/xai/grok-bot-guide",
     title: "Grok Bot 初学者ガイド",
     group: "Providers",
