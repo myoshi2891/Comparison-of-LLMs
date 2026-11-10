@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-05
+Updated 2026-11-10
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+Gemini 4 Argon `/google/argon-best-practices` を追加（2026-11-10）。
+指定HTMLの51見出し・27段落・94リスト項目・16表118行・6コード例・7図・12チェック・42外部リンクをPure JSXへ転写。
+原本固定の本文・構造・63 CSS規則・highlight.js11.9.0全トークンを照合し、HTML監査exit 0。
+全体233 files／2794 tests、対象68契約・関連95件、型・lint634 files・7図解析・pytest122件が成功。
+進捗テスト期待値1行はユーザー承認後に原本式へ訂正済み。本文・構造・CSS・図の固定期待値は無変更。
+264px目次・900pxモバイル開閉・点と番号・表全列左寄せ・コード空白を保持。操作の行／関数100%、分岐89.87%。
+Googleカテゴリのregistryから導線を導出し、日付はhero内へ表示。HTML／Markdownは内容無変更保存。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。履歴はdocs/PROGRESS.md。
+
+GPT-6 Astra `/codex/astra-best-practices` を追加（2026-11-10）。
+指定HTMLの81見出し、50段落、83リスト項目、24表177行、11コード例、12図、22チェックと40外部リンクをPure JSXへ転写。
+原本固定の本文・構造・62 CSS規則・highlight.js11.9.0全トークンを68契約で照合。
+全体Vitest **231 files／2725 tests**、関連95件、型・lint627 files、HTML監査exit 0、Mermaid12図解析、pytest122件が成功。
+原本の264px目次と900pxモバイル開閉、本文の点と番号・heroのマーカーなし、全列左寄せとコード空白を保持。
+8・7・7項目のリスト別進捗・全ID一意性・cleanupを検証。操作の行／関数100%、分岐89.87%。
+registryのCodexカテゴリから導線を導出し、日付はヒーロー内へ表示。本文の情報基準日2026-11-05を保持。
+HTML／Markdownは内容無変更・100%リネームで保存。後日更新されたMarkdownと図7件の差は混在させない。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.md。
+
+Claude Fable 5.1 `/claude/fable-5-1-best-practices` を追加（2026-11-09）。
+指定HTMLの93見出し、48段落、56リスト項目、40表251行、12コード例、10図と18チェックをPure JSXへ転写。
+本文・構造・60 CSS規則・highlight.js11.9.0全トークンを原本固定の67契約で照合する。
+全体Vitest **229 files／2657 tests**、関連94件、型・lint621 files、HTML監査exit 0、Mermaid10図解析、pytest122件が成功。
+原本の264px目次と900pxモバイル開閉、点・番号・入れ子、全列左寄せ、コード空白を保持。
+チェック進捗の誤った一括集計契約はユーザー承認後に訂正し、原本の8・5・5項目のリスト別集計へ修正。
+全ID一意性・各進捗の独立・cleanupを検証。操作の行／関数100%、分岐89.87%。
+registryのClaudeカテゴリから全導線を導出し、日付はヒーロー内へ表示。本文の情報基準日2026-11-05を保持。
+HTML／Markdownは内容無変更・100%リネームで保存。両形式は後日更新内容が異なるため混在させない。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.md。
 
 Grok Bot ガイド `/xai/grok-bot-guide` を追加（2026-11-05）。
 指定HTMLの全77見出し（H1×1／H2×21／H3×55）、49段落、79リスト項目、30表205行、
@@ -568,7 +598,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（227 files / 2588 tests pass、2026-11-05実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（233 files / 2794 tests pass、2026-11-10実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

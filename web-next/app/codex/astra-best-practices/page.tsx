@@ -1,0 +1,3621 @@
+import type { Metadata } from "next";
+import MermaidDiagram from "@/components/docs/MermaidDiagram";
+import { findBySlug } from "@/lib/page-registry";
+import styles from "./page.module.css";
+import TocObserver from "./TocObserver";
+export const metadata: Metadata = {
+  title: "GPT-6 Astra 実践ベストプラクティスガイド(中級〜上級者向け)",
+  description:
+    "GPT-6 Astra のモデル選定、Responses API、推論強度、プロンプト・スキル、ツール利用、安全運用と評価を学ぶ中級〜上級ガイド。情報基準日2026-11-05。",
+};
+const DIAGRAM_0 = `flowchart TB
+  A["2026年7月<br/>GPT-5.6 Sol / Terra / Luna"] --> B["2026年8月頃<br/>Astra の予告<br/>数学成果とサイバー能力の事前開示"]
+  B --> C["9月2日<br/>再帰的な深さ(recurrent depth)報道<br/>モニタリング懸念が議論に"]
+  C --> D["9月3日<br/>GPT-6 Astra 発表<br/>限定組織から段階展開"]
+  D --> E["9月5日〜11日<br/>開発者向けガイド<br/>スキル・AGENTS.md 見直しブログ"]
+  E --> F["9月22日<br/>GPT-6 Sol / Luna 登場<br/>下位モデルが大幅値下げ"]
+  F --> G["9月28〜29日<br/>GPT-6.1 Astra の公開見送り報道<br/>GPT-6.1 Sol 登場"]
+  G --> H["10月26日<br/>GPT-6.1 Terra 登場"]
+  classDef main fill:#e8eefc,stroke:#3b4fa3,color:#111
+  class A,B,C,D,E,F,G,H main`;
+const DIAGRAM_1 = `flowchart TB
+  S["タスクを定義する"] --> Q1{"最難関の推論や<br/>長時間のエージェント作業か"}
+  Q1 -- "はい" --> A["GPT-6 Astra を候補に"]
+  Q1 -- "いいえ" --> Q2{"Astra に近い品質を<br/>低コストで出したいか"}
+  Q2 -- "はい" --> B["GPT-6.1 Sol を候補に"]
+  Q2 -- "いいえ" --> Q3{"画面操作・視覚推論・<br/>文章の速さと安さが主か"}
+  Q3 -- "はい" --> C["GPT-6.1 Terra を候補に"]
+  Q3 -- "いいえ" --> D["GPT-6 Luna を候補に"]
+  A --> E["同じ評価セットで<br/>品質・トークン・時間・コストを比較"]
+  B --> E
+  C --> E
+  D --> E
+  E --> F["最小構成のモデルを採用<br/>難所だけ上位モデルへ昇格"]
+  classDef pick fill:#fff3d6,stroke:#a06a00,color:#111
+  classDef step fill:#e8eefc,stroke:#3b4fa3,color:#111
+  class A,B,C,D pick
+  class S,E,F step`;
+const DIAGRAM_2 = `flowchart TB
+  A["現行の設定を棚卸し<br/>モデル・推論強度・ツール・キャッシュ"] --> B["パラメータ修正<br/>none を low に<br/>サンプリング系を削除"]
+  B --> C["ツール呼び出しを<br/>Responses API へ移行"]
+  C --> D["代表タスクで<br/>旧モデルと同条件で比較"]
+  D --> E{"品質は維持以上か"}
+  E -- "はい" --> F["推論強度を 1 段階下げて再比較"]
+  E -- "いいえ" --> G["プロンプトとスキルを見直し<br/>第5章・第6章"]
+  G --> D
+  F --> H["本番へ段階展開<br/>監視を有効化"]
+  classDef ok fill:#e3f4e8,stroke:#2d7a46,color:#111
+  classDef warn fill:#fdeaea,stroke:#a33b3b,color:#111
+  class H ok
+  class G warn`;
+const DIAGRAM_3 = `flowchart TB
+  A["medium でベースライン測定"] --> B{"品質は要件を満たすか"}
+  B -- "はい" --> C["low で再測定"]
+  C --> D{"品質は維持できたか"}
+  D -- "はい" --> E["low を採用"]
+  D -- "いいえ" --> F["medium を採用"]
+  B -- "いいえ" --> G["high で再測定"]
+  G --> H{"改善は費用に見合うか"}
+  H -- "はい" --> I["high を採用"]
+  H -- "いいえ" --> J["xhigh または max は<br/>難所だけに限定"]
+  classDef ok fill:#e3f4e8,stroke:#2d7a46,color:#111
+  class E,F,I,J ok`;
+const DIAGRAM_4 = `flowchart LR
+  A["症状を観察する"] --> B{"どの症状か"}
+  B -- "途中で確認して止まる" --> C["自律性の方針と<br/>完了条件を明示"]
+  B -- "最後に承認を求めて<br/>作業が進まない" --> D["具体的な成果物を作ってから<br/>承認を取る方針へ"]
+  B -- "指示ファイルのせいで<br/>作業が止まる" --> E["優先順位の明示と<br/>スキル・AGENTS.md の監査"]
+  B -- "文章が冗長で書式が過剰" --> F["文体・構造・禁止表現を指定"]
+  B -- "並列化されず遅い" --> G["委任の条件を指示"]
+  B -- "小変更でテストが過剰" --> H["検証の深さを較正"]
+  classDef fix fill:#e3f4e8,stroke:#2d7a46,color:#111
+  class C,D,E,F,G,H fix`;
+const DIAGRAM_5 = `flowchart TB
+  A["指示ファイルを集める<br/>スキル・AGENTS.md・システムプロンプト"] --> B["Astra に監査させる<br/>矛盾・冗長・過剰な禁止を列挙"]
+  B --> C["人間が提案をレビュー"]
+  C --> D["1 グループずつ削る・直す"]
+  D --> E["同じ評価セットで再実行"]
+  E --> F{"品質・トークン・停止回数は<br/>改善したか"}
+  F -- "はい" --> G["採用して記録"]
+  F -- "いいえ" --> H["差分を戻して原因を切り分け"]
+  H --> D
+  classDef ok fill:#e3f4e8,stroke:#2d7a46,color:#111
+  class G ok`;
+const DIAGRAM_6 = `sequenceDiagram
+  participant App as アプリ
+  participant M as Astra
+  participant T as 低速ツール
+  App->>M: 依頼を送信
+  M->>App: 非同期ツール呼び出しを発行
+  App->>T: ツールを実行開始
+  M->>M: 独立した部分の推論を継続
+  T-->>App: 結果を返す
+  App->>M: 元の call_id で結果を返却
+  M->>App: 最終回答`;
+const DIAGRAM_7 = `flowchart TB
+  A["response.create で作業を開始"] --> B["response.created を受信"]
+  B --> C["同じ接続で、その応答 ID を<br/>previous_response_id にして操縦入力を送信"]
+  C --> D["完了済みの作業は保持され<br/>更新が継続に取り込まれる"]
+  D --> E["送信した操縦入力を記録<br/>応答履歴と突き合わせる"]
+  classDef warn fill:#fff3d6,stroke:#a06a00,color:#111
+  class E warn`;
+const DIAGRAM_8 = `flowchart TB
+  A["タスクと権限範囲を定義<br/>許可サイト・アプリを限定"] --> B["隔離環境で実行<br/>VM や専用プロファイル"]
+  B --> C["Astra が画面を見て操作"]
+  C --> D{"重大な操作か<br/>送信・削除・購入・公開"}
+  D -- "はい" --> E["確認ポリシーで人の承認<br/>または自動レビュー"]
+  D -- "いいえ" --> F["操作を実行"]
+  E --> F
+  F --> G["スクリーンショットと操作ログを保存"]
+  G --> H{"完了条件を満たしたか"}
+  H -- "いいえ" --> C
+  H -- "はい" --> I["成果物と証跡を検収"]
+  classDef warn fill:#fff3d6,stroke:#a06a00,color:#111
+  classDef ok fill:#e3f4e8,stroke:#2d7a46,color:#111
+  class E warn
+  class I ok`;
+const DIAGRAM_9 = `flowchart TB
+  A["タスク単位の総コストを計測<br/>入力・キャッシュ・出力・リトライ"] --> B{"272K を超えるか"}
+  B -- "はい" --> C["関連部分に絞る<br/>要約・検索・分割"]
+  B -- "いいえ" --> D{"プレフィックスを<br/>繰り返し使うか"}
+  C --> D
+  D -- "はい" --> E["キャッシュ設計<br/>固定部分を先頭に置く<br/>書き込みの 1.25 倍も計上"]
+  D -- "いいえ" --> F{"ユーザーを待たせるか"}
+  E --> F
+  F -- "いいえ" --> G["Batch または Flex<br/>標準の 50%"]
+  F -- "はい" --> H{"速度が価値を生むか"}
+  H -- "はい" --> I["Fast または Ultrafast<br/>2倍料金・SLA と地域を確認"]
+  H -- "いいえ" --> J["標準のまま"]
+  classDef ok fill:#e3f4e8,stroke:#2d7a46,color:#111
+  class G,I,J ok`;
+const DIAGRAM_10 = `flowchart TB
+  A["入力・権限の設計<br/>最小権限・許可リスト"] --> B["モデルの訓練と<br/>製品側の安全策"]
+  B --> C["実行時の確認と自動レビュー"]
+  C --> D["非同期のミスアラインメント監視"]
+  D --> E["自前のログと監査<br/>ツール呼び出し・差分・画面"]
+  E --> F["人による承認と検収"]
+  classDef layer fill:#e8eefc,stroke:#3b4fa3,color:#111
+  class A,B,C,D,E,F layer`;
+const DIAGRAM_11 = `flowchart TB
+  A["代表タスクと合格基準を定義"] --> B["ベースラインを測定<br/>現行モデル"]
+  B --> C["Astra で同条件に測定"]
+  C --> D["強度とプロンプトを調整<br/>1 グループずつ"]
+  D --> E["再測定して比較"]
+  E --> F{"基準を満たし<br/>コストも妥当か"}
+  F -- "はい" --> G["段階展開<br/>一部トラフィックから"]
+  F -- "いいえ" --> H["別モデルや階層化を検討"]
+  G --> I["本番の監視とログ<br/>アラート対応"]
+  I --> J["定期的に再評価<br/>モデル更新時に実施"]
+  H --> D
+  J --> B
+  classDef ok fill:#e3f4e8,stroke:#2d7a46,color:#111
+  class G,I ok`;
+const THEME_VARS = {
+  fontSize: "16px",
+  fontFamily: '"Noto Sans JP",sans-serif',
+  primaryColor: "#e8ecf8",
+  primaryBorderColor: "#3b4a9c",
+  primaryTextColor: "#1f2430",
+  lineColor: "#5b6178",
+  tertiaryColor: "#faf7f0",
+} as const;
+export default function Page() {
+  const entry = findBySlug("/codex/astra-best-practices");
+  return (
+    <div id="astra-guide" className={styles.root}>
+      <TocObserver />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Source+Serif+4:wght@600;700&display=swap"
+        rel="stylesheet"
+      />
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+      />
+      <button
+        id="astra-menu"
+        className={styles["menu-btn"]}
+        type="button"
+        aria-label="目次を開く"
+        aria-expanded="false"
+        aria-controls="astra-sidebar"
+      >
+        目次
+      </button>
+      <button
+        id="astra-backdrop"
+        className={styles.scrim}
+        type="button"
+        aria-label="目次を閉じる"
+        tabIndex={-1}
+      />
+      <div className={styles.layout} data-testid="layout-root">
+        {" "}
+        <nav
+          className={styles.sidebar}
+          id="astra-sidebar"
+          aria-label="目次"
+          data-testid="sidebar-nav"
+        >
+          {" "}
+          <div className={styles.brand}>
+            {"GPT-6 Astra"}
+            <br />
+            {"ベストプラクティス"}
+          </div>{" "}
+          <a
+            className={[styles["nav-a"], styles.active].join(" ")}
+            href="#sec-0"
+            aria-current="location"
+            data-testid="sidebar-nav-link"
+          >
+            <span className={styles["n-dot"]}></span>
+            <span>{"0. この資料の読み方"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-1" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"1. Astra とは何か"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-2" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"2. Step 1: モデルを選ぶ"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-3" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"3. Step 2: 最小実装と移行時の必須変更"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-4" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"4. Step 3: 推論強度・速度モードを設計する"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-5" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"5. Step 4: Astra の行動特性とプロンプト設計"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-6" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"6. Step 5: スキル・AGENTS.md・タスクプロンプトを作り直す"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-7" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"7. Step 6: 新 API 機能"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-8" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"8. Step 7: コンピュータ利用を安全に運用する"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-9" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"9. Step 8: コストとレイテンシの最適化"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-10" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"10. Step 9: 安全性・ガバナンス・監視"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-11" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"11. Step 10: 評価・移行・運用ループ"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-12" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"12. 著名開発者の知見(補足ベストプラクティス)"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-13" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"13. アンチパターン集"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-14" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"14. チェックリスト"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-15" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"15. 参考 URL(根拠ソース)"}</span>
+          </a>
+          <a className={styles["nav-a"]} href="#sec-16" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
+            <span>{"付録: 本ガイドの限界"}</span>
+          </a>{" "}
+        </nav>{" "}
+        <main className={styles.main}>
+          {" "}
+          <header className={styles.hero}>
+            <div className={styles.heroDates} data-testid="hero-dates">
+              最終確認日: <time dateTime={entry?.lastReviewed}>{entry?.lastReviewed}</time>公開日:{" "}
+              <time dateTime={entry?.addedAt}>{entry?.addedAt}</time>
+            </div>{" "}
+            <h1>{"GPT-6 Astra 実践ベストプラクティスガイド(中級〜上級者向け)"}</h1>{" "}
+            <ul>
+              {" "}
+              <li>
+                {" "}
+                <strong>{"対象モデル"}</strong>
+                {": OpenAI "}
+                <code>{"gpt-6-astra"}</code>
+                {"(GPT-6 ファミリーの最上位モデル) "}
+              </li>{" "}
+              <li>
+                {" "}
+                <strong>{"情報時点"}</strong>
+                {": 2026年11月5日(この日付までに公開された情報を調査して反映) "}
+              </li>{" "}
+              <li>
+                {" "}
+                <strong>{"想定読者"}</strong>
+                {
+                  ": すでに Responses API や Codex を触ったことがあり、本番ワークロードへの採用判断と設計をしたい中級〜上級のエンジニア "
+                }
+              </li>{" "}
+              <li>
+                {" "}
+                <strong>{"ゴール"}</strong>
+                {
+                  ": Astra の「できること」だけでなく、「どう設計し、どう制御し、どこで疑うか」までをステップ形式で身につける "
+                }
+              </li>{" "}
+            </ul>{" "}
+          </header>{" "}
+          <section className={styles.section} id="sec-0">
+            {" "}
+            <h2 id="astra-heading-0">{"0. この資料の読み方"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-1">{"0.1 情報の信頼度ラベル"}</h3>{" "}
+              <p>{"本ガイドの記述には、根拠の強さを示すラベルを付けています。"}</p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"ラベル"}</th>
+                      <th>{"意味"}</th>
+                      <th>{"例"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{"[公式]"}</strong>
+                      </td>
+                      <td>{"OpenAI の公式ブログ・開発者ドキュメント・モデルページ"}</td>
+                      <td>{"developers.openai.com, openai.com"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"[開発者]"}</strong>
+                      </td>
+                      <td>{"著名な国際的開発者・研究者・専門メディアによる検証や考察"}</td>
+                      <td>{"Simon Willison、Latent Space、Redwood Research の研究者など"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"[報道]"}</strong>
+                      </td>
+                      <td>{"大手報道機関や二次情報による報告"}</td>
+                      <td>{"TechCrunch、CNBC、Reuters 系の報道"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"[要検証]"}</strong>
+                      </td>
+                      <td>{"単発の測定や、出典間で数値が食い違う情報"}</td>
+                      <td>{"個別ベンチマークの再現値など"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"重要"}</strong>
+                  {
+                    ": ベンチマーク値は多くがベンダー自己申告で、ハーネス(評価環境)にも依存します。本ガイドの数値は「方向性の把握」に使い、採用可否は"
+                  }
+                  <strong>{"自社タスクでの評価"}</strong>
+                  {"で決めてください(第10章)。 "}
+                </p>{" "}
+              </blockquote>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-1">
+            {" "}
+            <h2 id="astra-heading-2">{"1. Astra とは何か"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-3">{"1.1 一言でいうと"}</h3>{" "}
+              <p>
+                {" "}
+                <strong>
+                  {"Astra は「答える」より「やり遂げる」ことに振り切った、GPT-6 世代の最上位モデル"}
+                </strong>
+                {"です。[公式] "}
+              </p>{" "}
+              <p>
+                {
+                  " OpenAI は Astra を、コンピュータ利用・ブラウジング・ソフトウェアエンジニアリング・サイバーセキュリティ・科学・専門業務で最先端と位置づけています。[公式] 公式ドキュメントでは、複数の評価で出力トークンを大幅に減らしながら高い成績を出し、トークン単価は高くてもタスク単位の推定コストは旧モデルより低かったと説明されています。[公式] "
+                }
+              </p>{" "}
+              <h3 id="astra-heading-4">{"1.2 主な仕様"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"項目"}</th>
+                      <th>{"内容"}</th>
+                      <th>{"根拠"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"モデル ID"}</td>
+                      <td>
+                        <code>{"gpt-6-astra"}</code>
+                      </td>
+                      <td>{"[公式] モデルページ"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"コンテキスト長"}</td>
+                      <td>{"1,050,000 トークン"}</td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"最大出力"}</td>
+                      <td>{"128,000 トークン"}</td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"知識カットオフ"}</td>
+                      <td>{"2026年4月30日"}</td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"入力 / 出力"}</td>
+                      <td>{"テキスト・画像入力 / テキスト出力(音声・動画は非対応)"}</td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"料金(100万トークンあたり)"}</td>
+                      <td>
+                        {"入力 $10、キャッシュ読み取り $1、キャッシュ書き込み $12.50、出力 $50"}
+                      </td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"割増"}</td>
+                      <td>
+                        {
+                          " 入力が 272K トークン超のリクエストは、全体が入力・キャッシュ 2倍、出力 1.5倍 "
+                        }
+                      </td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"割引・割増"}</td>
+                      <td>{"Batch / Flex は標準の 50%、Fast モードは 2倍"}</td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"推論強度"}</td>
+                      <td>
+                        {" "}
+                        <code>{"low"}</code>
+                        {" / "}
+                        <code>{"medium"}</code>
+                        {"(既定)/ "}
+                        <code>{"high"}</code>
+                        {" / "}
+                        <code>{"xhigh"}</code>
+                        {" / "}
+                        <code>{"max"}</code>
+                        {"("}
+                        <code>{"none"}</code>
+                        {"・"}
+                        <code>{"minimal"}</code>
+                        {" は非対応) "}
+                      </td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"ツール"}</td>
+                      <td>
+                        {
+                          " Web 検索、ファイル検索、コード実行、ホスト型シェル、Apply Patch、スキル、コンピュータ利用、MCP、ツール検索、画像生成 "
+                        }
+                      </td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"非対応"}</td>
+                      <td>{"ファインチューニング"}</td>
+                      <td>{"[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"提供経路"}</td>
+                      <td>{"OpenAI API、ChatGPT(Work 含む)、Codex、AWS など"}</td>
+                      <td>{"[公式][報道]"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-5">{"1.3 Astra が「変えたこと」"}</h3>{" "}
+              <p>{"公式が強調する変更点を、開発者目線で整理します。"}</p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"変化"}</th>
+                      <th>{"開発者への意味"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{"コンピュータ利用の大幅強化"}</strong>
+                      </td>
+                      <td>
+                        {"API のないアプリでも画面操作で業務を自動化できる範囲が広がる。[公式]"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"トークン効率とリトライ削減"}</strong>
+                      </td>
+                      <td>
+                        {
+                          " 「単価が高い=総額が高い」とは限らない。ただし単発測定では逆の結果も出ている(第9章)。[公式][要検証] "
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"アラインメント(意図・権限の遵守)"}</strong>
+                      </td>
+                      <td>{"許可範囲を守る傾向が強く、その分、確認で止まりやすい。[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"長時間タスクでの一貫性"}</strong>
+                      </td>
+                      <td>{"GPT-5.6 Sol より長い作業でも文脈を保ちやすい。[公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"新 API 機能"}</strong>
+                      </td>
+                      <td>
+                        {
+                          " 非同期ツール呼び出し、中間操縦、キャッシュを保つ推論強度変更、ミスアラインメント監視。[公式] "
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"サイバー能力が「Critical」"}</strong>
+                      </td>
+                      <td>
+                        {
+                          " OpenAI の Preparedness Framework で、初めて Critical に到達したと発表。アクセスと安全策が厳格化。[公式] "
+                        }
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-6">{"1.4 Astra を巡る時系列"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="0">
+                    <MermaidDiagram chart={DIAGRAM_0} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"注意"}</strong>
+                  {": 2026年11月5日時点で現行の最上位は "}
+                  <strong>{"GPT-6 Astra"}</strong>
+                  {" です。"}
+                  <strong>{"GPT-6.1 Astra は公開見送り"}</strong>
+                  {
+                    "と報じられており、現行モデルではありません。[報道] 名前の似た「GPT-6.1 Sol」「GPT-6.1 Terra」とは別物です。 "
+                  }
+                </p>{" "}
+              </blockquote>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-2">
+            {" "}
+            <h2 id="astra-heading-7">{"2. Step 1: モデルを選ぶ"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-8">{"2.1 GPT-6 ファミリーの位置づけ"}</h3>{" "}
+              <p>{"[公式]の説明を軸に、料金は公式モデルページと開発者の整理を併記します。"}</p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"モデル"}</th>
+                      <th>{"位置づけ"}</th>
+                      <th>
+                        {"推論強度 "}
+                        <code>{"none"}</code>
+                      </th>
+                      <th>{"料金の目安(入力 / 出力、100万トークン)"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{"GPT-6 Astra"}</strong>
+                      </td>
+                      <td>{"最難関の推論・コーディング・専門業務向けの最上位"}</td>
+                      <td>{"非対応"}</td>
+                      <td>{"$10 / $50"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"GPT-6.1 Sol"}</strong>
+                      </td>
+                      <td>{"Astra に近い性能を低コストで"}</td>
+                      <td>{"非対応"}</td>
+                      <td>{"公式モデルページで確認"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"GPT-6.1 Terra"}</strong>
+                      </td>
+                      <td>{"視覚推論、精密な画面操作、自然な文章向けの高速・高効率"}</td>
+                      <td>{"対応"}</td>
+                      <td>{"公式モデルページで確認"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"GPT-6 Sol"}</strong>
+                      </td>
+                      <td>{"GPT-6 世代の中位モデル(9月22日に登場)"}</td>
+                      <td>{"対応"}</td>
+                      <td>{"約 $2 / $10(Simon Willison の整理)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"GPT-6 Luna"}</strong>
+                      </td>
+                      <td>{"最速・最安、高頻度の限定タスク向け"}</td>
+                      <td>{"対応"}</td>
+                      <td>{"約 $0.10 / $0.50(同上)"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {
+                    " GPT-6 Sol / Luna の料金は、2026年9月22日時点の Simon Willison の比較表に基づきます。[開発者] GPT-6.1 系は公式モデルページで最新値を確認してください。 "
+                  }
+                </p>{" "}
+              </blockquote>{" "}
+              <h3 id="astra-heading-9">{"2.2 選択フロー"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="1">
+                    <MermaidDiagram chart={DIAGRAM_1} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-10">{"2.3 選ぶときの原則"}</h3>{" "}
+              <ol>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"Astra を既定にしない"}</strong>
+                  {
+                    "。公式は、Sol と比較して「品質とコストのトレードオフを自分のタスクで測る」ことを勧めています。[公式] "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"Astra を使うべき場面"}</strong>
+                  {
+                    "は、(a) 失敗コストが高い、(b) 手戻りが多い長時間エージェント、(c) API のない画面を操作する、(d) 科学・数学・セキュリティ調査など最難関の推論、のいずれかです。 "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"階層化する"}</strong>
+                  {
+                    "。計画・難所は Astra、定型処理は Sol / Terra / Luna、というサブエージェント分担が現実的です(第7章)。 "
+                  }
+                </li>{" "}
+              </ol>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-3">
+            {" "}
+            <h2 id="astra-heading-11">{"3. Step 2: 最小実装と移行時の必須変更"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-12">{"3.1 最小コード(Responses API)"}</h3>{" "}
+              <p>
+                {" Astra で"}
+                <strong>{"ツールを使う場合は Responses API が前提"}</strong>
+                {"です。Chat Completions はツールなしのリクエストのみ対応します。[公式] "}
+              </p>{" "}
+              <pre data-testid="code-block">
+                <code className="language-python hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-keyword">{"from"}</span>
+                    {" openai "}
+                    <span className="hljs-keyword">{"import"}</span> {"OpenAI"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = OpenAI()"}
+                    {"\n"}
+                    {"\n"}
+                    {"resp = client.responses.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
+                    <span className="hljs-string">{'"gpt-6-astra"'}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"reasoning={"}
+                    <span className="hljs-string">{'"effort"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"medium"'}</span>
+                    {"},  "}
+                    <span className="hljs-comment">{"# 既定。none / minimal は使えない"}</span>
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-built_in">{"input"}</span>
+                    {"=["}
+                    {"\n"}
+                    {"        "}
+                    {"{"}
+                    {"\n"}
+                    {"            "}
+                    <span className="hljs-string">{'"role"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"user"'}</span>
+                    {","}
+                    {"\n"}
+                    {"            "}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {": "}
+                    <span className="hljs-string">
+                      {'"このリポジトリのログ出力を構造化ログに移行する計画を立て、"'}
+                    </span>
+                    {"\n"}
+                    {"                       "}
+                    <span className="hljs-string">
+                      {'"影響範囲の小さい 1 箇所を実際に修正してテストまで通してください。"'}
+                    </span>
+                    {","}
+                    {"\n"}
+                    {"        "}
+                    {"}"}
+                    {"\n"}
+                    {"    "}
+                    {"],"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-built_in">{"print"}</span>
+                    {"(resp.output_text)"}
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h3 id="astra-heading-13">{"3.2 GPT-5.6 / 旧モデルからの移行チェック"}</h3>{" "}
+              <p>{"[公式]の移行ガイドを、作業しやすい表にまとめます。"}</p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"項目"}</th>
+                      <th>{"変更内容"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>{"model"}</code>
+                      </td>
+                      <td>
+                        <code>{"gpt-6-astra"}</code>
+                        {" に変更"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"推論強度"}</td>
+                      <td>
+                        {" 現在の実効値を維持。"}
+                        <code>{"none"}</code>
+                        {" は不可なので "}
+                        <strong>
+                          <code>{"low"}</code>
+                          {" に置換"}
+                        </strong>
+                        {"。"}
+                        <code>{"minimal"}</code>
+                        {" を使っていた場合も "}
+                        <strong>
+                          <code>{"low"}</code>
+                          {" から"}
+                        </strong>
+                        {"開始して比較 "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"ツール呼び出し"}</td>
+                      <td>
+                        {" "}
+                        <strong>{"Responses API に移行"}</strong>
+                        {"。Chat Completions はツールなしのみ "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"サンプリング系"}</td>
+                      <td>
+                        {" 推論強度が "}
+                        <code>{"none"}</code>
+                        {" 以外のとき、"}
+                        <code>{"temperature"}</code>
+                        {"、"}
+                        <code>{"top_p"}</code>
+                        {"、"}
+                        <code>{"top_logprobs"}</code>
+                        {" は"}
+                        <strong>{"削除"}</strong>
+                        {"。Chat Completions では "}
+                        <code>{"logprobs"}</code>
+                        {" も削除 "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"キャッシュ設定"}</td>
+                      <td>
+                        {" GPT-5.5 以前から移行する場合、"}
+                        <code>{"prompt_cache_retention"}</code>
+                        {" を "}
+                        <code>{"prompt_cache_options.ttl"}</code>
+                        {"(例: "}
+                        <code>{'"30m"'}</code>
+                        {")へ置換。キャッシュ書き込みの課金(標準入力の 1.25 倍)を確認 "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"推論強度の途中変更"}</td>
+                      <td>
+                        {" 後述の "}
+                        <code>{"configuration_update"}</code>
+                        {" を使う(リクエスト単位の "}
+                        <code>{"reasoning.effort"}</code>
+                        {" は固定したままキャッシュを保つ) "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"データ所在地"}</td>
+                      <td>
+                        {
+                          " Astra の Fast モードは EU データレジデンシー非対応。Ultrafast は US と グローバル処理のみ "
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"不要な承認停止"}</td>
+                      <td>{"「勝手に確認で止まる」場合は第5章の自律性プロンプトで調整"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"Tips"}</strong>
+                  {
+                    ": Codex 利用者は、公式のドキュメントスキルを使って「このプロジェクトを GPT-6 ファミリーへ移行して」と依頼する方法も案内されています。[公式] ただし生成された差分は必ず自分でレビューしてください。 "
+                  }
+                </p>{" "}
+              </blockquote>{" "}
+              <h3 id="astra-heading-14">{"3.3 移行フロー"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="2">
+                    <MermaidDiagram chart={DIAGRAM_2} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-4">
+            {" "}
+            <h2 id="astra-heading-15">{"4. Step 3: 推論強度・速度モードを設計する"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-16">
+                {"4.1 推論強度("}
+                <code>{"reasoning.effort"}</code>
+                {")の使い分け"}
+              </h3>{" "}
+              <p>
+                {" Astra は "}
+                <code>{"low"}</code>
+                {" から "}
+                <code>{"max"}</code>
+                {" までの 5 段階です。[公式] Astra 固有の最適値は公式に明記されていないため、"}
+                <strong>{"GPT-5.6 ガイドの考え方を出発点にして自社評価で決める"}</strong>
+                {"のが安全です。[公式] "}
+              </p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"強度"}</th>
+                      <th>{"使いどころ"}</th>
+                      <th>{"注意"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <code>{"low"}</code>
+                      </td>
+                      <td>
+                        {"レイテンシ重視、定型・短い作業、"}
+                        <code>{"none"}</code>
+                        {" からの置き換え"}
+                      </td>
+                      <td>{"難所で品質が落ちないか評価"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"medium"}</code>
+                        {"(既定)"}
+                      </td>
+                      <td>{"まずのベースライン"}</td>
+                      <td>{"迷ったらここから"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"high"}</code>
+                      </td>
+                      <td>{"測定で品質向上が確認できるとき"}</td>
+                      <td>{"時間とトークンが増える"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"xhigh"}</code>
+                      </td>
+                      <td>{"難問、多段の検証が必要な作業"}</td>
+                      <td>{"費用対効果を必ず測る"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"max"}</code>
+                      </td>
+                      <td>{"最も難しい品質優先の作業のみ"}</td>
+                      <td>
+                        {" Simon Willison は Astra の "}
+                        <code>{"max"}</code>
+                        {
+                          " で、27分かけて道路データから走行ルートを生成させている。[開発者] 長時間化を前提に設計する "
+                        }
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-17">{"4.2 強度を決めるフロー"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="3">
+                    <MermaidDiagram chart={DIAGRAM_3} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-18">
+                {"4.3 会話の途中で強度を変える("}
+                <code>{"configuration_update"}</code>
+                {")"}
+              </h3>{" "}
+              <p>
+                {" "}
+                <strong>{"難しいターンだけ強度を上げ、簡単な追い込みでは下げる"}</strong>
+                {"ための仕組みです。リクエスト単位の "}
+                <code>{"reasoning.effort"}</code>
+                {" を固定したまま、"}
+                <code>{"configuration_update"}</code>
+                {" 入力アイテムでキャッシュを壊さずに強度を切り替えられます。[公式] "}
+              </p>{" "}
+              <p>{"押さえるべき制約は次のとおりです。[公式][開発者]"}</p>{" "}
+              <ul>
+                {" "}
+                <li>
+                  {" 標準の"}
+                  <strong>{"単一エージェントモード"}</strong>
+                  {"でのみ利用でき、プロモード("}
+                  <code>{'reasoning.mode: "pro"'}</code>
+                  {")では拒否される "}
+                </li>{" "}
+                <li>
+                  {"変更できるのは"}
+                  <strong>{"推論強度のみ"}</strong>
+                </li>{" "}
+                <li>
+                  <code>{"configuration_update"}</code>
+                  {" を履歴内で連続して置くと拒否される"}
+                </li>{" "}
+                <li>
+                  {" 自動コンパクション(自動圧縮)や、独立の "}
+                  <code>{"/responses/compact"}</code>
+                  {" エンドポイントとは併用できない。明示的に "}
+                  <code>{"compaction_trigger"}</code>
+                  {" で圧縮した後は、次のユーザーメッセージの前に"}
+                  <strong>{"再度"}</strong> <code>{"configuration_update"}</code>
+                  {" を入れる "}
+                </li>{" "}
+                <li>
+                  {" レスポンスの "}
+                  <code>{"reasoning.effort"}</code>
+                  {" は、更新後の値ではなく"}
+                  <strong>{"リクエスト単位の設定"}</strong>
+                  {"を報告し続ける "}
+                </li>{" "}
+              </ul>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"Tips"}</strong>
+                  {
+                    ": ログ・課金分析では、実際に効いている強度とレスポンスの表示が一致しない点に注意してください。ターンごとの強度を自前のメタデータにも記録しておくと原因調査が楽になります。 "
+                  }
+                </p>{" "}
+              </blockquote>{" "}
+              <h3 id="astra-heading-19">{"4.4 Fast / Ultrafast / プロモード"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"機能"}</th>
+                      <th>{"内容"}</th>
+                      <th>{"注意点"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{"Fast モード"}</strong>
+                      </td>
+                      <td>
+                        {"最速の API 速度。標準の "}
+                        <strong>{"2倍"}</strong>
+                        {"の料金"}
+                      </td>
+                      <td>
+                        {" Astra では"}
+                        <strong>{"遅延 SLA なし"}</strong>
+                        {"、"}
+                        <strong>{"EU データレジデンシー非対応"}</strong>
+                        {"。[公式] "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"Ultrafast モード"}</strong>
+                      </td>
+                      <td>{"さらに高速な新モード"}</td>
+                      <td>
+                        {" Astra は "}
+                        <strong>{"US レジデンシーとグローバル処理のみ"}</strong>
+                        {"。EU・その他の地域エンドポイントは非対応。[公式] "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"プロモード"}</strong>
+                      </td>
+                      <td>{"より多くのモデル作業を行い、1 つの最終回答を返す"}</td>
+                      <td>
+                        {" レイテンシとトークンが増える。品質向上が評価で確認できる難問に限定。"}
+                        <code>{"configuration_update"}</code>
+                        {" とは併用不可 "}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"判断軸"}</strong>
+                  {
+                    ": 「ユーザーが待つ」場面は Fast / Ultrafast を検討し、「裏で走る」バッチ的な作業は Batch / Flex(標準の 50%)を検討します(第9章)。 "
+                  }
+                </p>{" "}
+              </blockquote>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-5">
+            {" "}
+            <h2 id="astra-heading-20">{"5. Step 4: Astra の行動特性とプロンプト設計"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-21">{"5.1 Astra の 5 つの行動特性"}</h3>{" "}
+              <p>
+                {
+                  " 公式ガイドは、Astra の挙動を次の 5 つに整理し、それぞれをプロンプトで調整するよう勧めています。[公式] "
+                }
+              </p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"特性"}</th>
+                      <th>{"Astra の傾向"}</th>
+                      <th>{"開発者の対処"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{"主導性と完遂"}</strong>
+                      </td>
+                      <td>
+                        {
+                          " 結果が大きく変わりうる場面では確認を求めやすく、期待より早く止まることがある "
+                        }
+                      </td>
+                      <td>{"自律性の方針を明示する"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"指示追従"}</strong>
+                      </td>
+                      <td>
+                        {"長い指示をよく守る一方、スキルや "}
+                        <code>{"AGENTS.md"}</code>
+                        {" の内容に敏感"}
+                      </td>
+                      <td>{"読み込まれる指示ファイルを監査する"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"文体と書式"}</strong>
+                      </td>
+                      <td>
+                        {
+                          " 箇条書き・表・Markdown で見やすく整える傾向。同じ言い回しを繰り返すことがある "
+                        }
+                      </td>
+                      <td>{"文体と構造を明示する"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"サブエージェント委任"}</strong>
+                      </td>
+                      <td>{"期待より委任が少ないことがある"}</td>
+                      <td>{"委任の条件と量を指定する"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"テストと検証"}</strong>
+                      </td>
+                      <td>{"コーディングで丁寧にテストする。小さな変更では過剰になりうる"}</td>
+                      <td>{"検証の深さを調整する"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-22">{"5.2 症状から対処を引く"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="4">
+                    <MermaidDiagram chart={DIAGRAM_4} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-23">{"5.3 プロンプトのテンプレート(出発点)"}</h3>{" "}
+              <p>
+                {" 以下は公式ガイドの趣旨を、日本語で再構成した"}
+                <strong>{"出発点"}</strong>
+                {"です。そのまま使わず、自社のタスクで評価してから採用してください。[公式] "}
+              </p>{" "}
+              <h4 id="astra-heading-24">{"(1) 主導性と完遂: 止まりすぎるとき"}</h4>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-section">{"## 自律性の方針"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "ユーザーの意図とタスク範囲は、指示と会話の文脈から推測すること。確認より実行を優先し、依頼された作業を完了まで運ぶ。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "「〜できますか」「〜したい」「手伝って」は、作業の依頼として扱う。可否の返答、計画の提示、続行の申し出だけで止まらない。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "破壊的または不可逆でない限り、読み取り専用の調査、作業用ブランチの作成、ドラフト PR の作成などは、許可を待たずに進める。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "部分的な解決や「とりあえず動く」段階で終わらせない。依頼の成果が満たされるまで続ける。"
+                    }
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h4 id="astra-heading-25">{"(2) 承認の取り方: 承認が最後の一手になるように"}</h4>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-section">{"## 承認の取り方"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"ユーザーに質問や承認を求める前に、承認対象を具体的で確認可能な成果物にする。"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "デプロイ、外部アプリへの書き込み、マージ、公開の前に必要な作業をすべて終え、ユーザーの承認が最後の一手になるようにする。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "可逆な作業、読み取り専用の操作、レビューや修正、すでに許可されている作業では承認を求めない。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "仮説的なリスクに基づく警告、免責、承認フロー、チェックリストを新たに足さない。"
+                    }
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h4 id="astra-heading-26">{"(3) 指示の優先順位: スキルとの衝突を防ぐ"}</h4>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-section">{"## 指示の優先順位"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "ユーザーの明示的な指示は、スキルのガイドラインより優先する。両者が衝突する場合はユーザーの指示に従う。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "スキルが原因で、確認を求める・一時停止する・作業を残す・意図から外れる場合は、読んだ SKILL.md を示し、該当する指示を引用し、どう作用したかを短く説明する。スキルの明示的な要件と、自分の解釈を区別して述べる。"
+                    }
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"Tips"}</strong>
+                  {
+                    ": 後半の「止まった理由を説明させる」指示は、読み込まれる指示ファイルが多い環境で、"
+                  }
+                  <strong>{"黙って効いている矛盾した指示を見つける"}</strong>
+                  {"のに有効です。[公式] "}
+                </p>{" "}
+              </blockquote>{" "}
+              <h4 id="astra-heading-27">{"(4) 文体と書式: Markdown を減らしたいとき"}</h4>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-section">{"## 文体"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "1 段落 1 主張の簡潔な文章を基本とする。箇条書きは、並列・順序・比較のために本当に必要なときだけ使う。入れ子の箇条書きは避ける。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"平易な言葉、具体例、的確な動詞を使い、能動態で直接的に書く。"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {"要点を先に述べ、そのあとに読み手に必要な説明を足す。"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "専門用語は、考えを伝えるのに役立つ範囲に限る。読み手の前提知識に合わせて書き方を調整する。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "決まり文句、結論の要約フレーズ、「X ではなく Y」型の対比、造語ラベルは使わない。"
+                    }
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h4 id="astra-heading-28">{"(4b) 作業報告の読みやすさ"}</h4>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-section">{"## 他のエージェントや人間への報告"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "他のエージェントへ送るメッセージと最終回答は、人間が読む可能性がある。単語や数字の間に適切な区切りを入れ、読める文章にする。"
+                    }
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h4 id="astra-heading-29">{"(5) サブエージェント委任"}</h4>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-section">{"## 並列化"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "作業を並列化でき、時間短縮または品質向上が見込めるなら、ルート・サブを問わず、協調ツールを使って他のエージェントへ委任する。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "委任は、独立していて成果物が明確な作業に限る。依存関係のある作業は順に進める。"
+                    }
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h4 id="astra-heading-30">{"(6) テストと検証の較正"}</h4>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-section">{"## 検証"}</span>
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "可逆で影響の小さい変更について、実装をなぞるだけのテストは書かない。検証のためにテストを書くなら、意味があり必要なものに限る。"
+                    }
+                    {"\n"}
+                    <span className="hljs-bullet">{"-"}</span>{" "}
+                    {
+                      "変更に見合うテストを実行し、必要な検査を完了する。それらが通ったら、新しい変更・失敗・未解決の懸念がある場合にだけ、テストを広げる、または繰り返す。"
+                    }
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h3 id="astra-heading-31">{"5.4 プロンプト設計の原則"}</h3>{" "}
+              <ol>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"足すより削る"}</strong>
+                  {
+                    "。指示は 1 か所に 1 回だけ書く。重複した「まず確認して」「勝手に実行しないで」は、安全な作業でも止まる原因になる。[公式] "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"成果物と完了条件で書く"}</strong>
+                  {"。手順の指定より、「何ができれば完了か」を定義する。 "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"自律の範囲を表で定義する"}</strong>
+                  {
+                    "。読み取り・ローカル編集・非破壊の検証は自由、外部書き込み・破壊・購入・範囲拡大は確認、という線を 1 か所に集約する。[公式] "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"短い回答に必要な中身を指定する"}</strong>
+                  {
+                    "。結論、根拠、重要な注意、次の行動を残し、導入や繰り返しから削るよう書く。[公式] "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"変更は 1 度に 1 グループ"}</strong>
+                  {"。指示を削る・足すときは 1 群ずつ変えて、同じ評価セットを再実行する。[公式] "}
+                </li>{" "}
+              </ol>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-6">
+            {" "}
+            <h2 id="astra-heading-32">
+              {"6. Step 5: スキル・AGENTS.md・タスクプロンプトを作り直す"}
+            </h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <p>
+                {
+                  " OpenAI の Codex チームの Eric Provencher が、2026年9月11日に公式開発者ブログで公開した指針です。[公式] 「Astra で困ったら、たいてい古いスキルが原因」という実務者の反応も出ています。[開発者] "
+                }
+              </p>{" "}
+              <h3 id="astra-heading-33">{"6.1 なぜ見直すのか"}</h3>{" "}
+              <ul>
+                {" "}
+                <li>
+                  {" 過去の弱いモデル向けに積み上げた指示が、より判断力の高い Astra では"}
+                  <strong>{"ノイズや足かせ"}</strong>
+                  {"になる "}
+                </li>{" "}
+                <li>
+                  {" Astra は指示ファイルの内容に敏感で、"}
+                  <strong>{"矛盾や過剰な強調"}</strong>
+                  {"で作業を止めることがある "}
+                </li>{" "}
+                <li>
+                  {
+                    " テストの実行や確認は Astra が自分で行うため、「必ずテストを回して」といった古い指示は不要なテストを招く "
+                  }
+                </li>{" "}
+              </ul>{" "}
+              <h3 id="astra-heading-34">{"6.2 見直しの 4 領域"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"領域"}</th>
+                      <th>{"問題"}</th>
+                      <th>{"直し方"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{"スキルの説明文"}</strong>
+                      </td>
+                      <td>
+                        {
+                          " 長すぎる、互いに矛盾する、「いつ使うか」を言い過ぎる。数が多いと説明が短縮されて選択精度が落ちる "
+                        }
+                      </td>
+                      <td>
+                        {"説明は"}
+                        <strong>{"できるだけ短く"}</strong>
+                        {"、適用条件を具体的に書く"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"スキルの構造"}</strong>
+                      </td>
+                      <td>{"本文が巨大で、読むたびに文脈を消費する"}</td>
+                      <td>
+                        {" ルート文書を"}
+                        <strong>{"最小のルーター"}</strong>
+                        {"にして、詳細は別ファイルやスクリプトへ(段階的開示) "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"AGENTS.md"}</strong>
+                      </td>
+                      <td>{"編集のたびに全ドキュメントを読ませるなど、常時の義務が多い"}</td>
+                      <td>{"「必要なときに必要な文書を読む」形に"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"境界(権限)の記述"}</strong>
+                      </td>
+                      <td>{"旧モデル向けの強い禁止が、Astra では過剰に守られて止まる"}</td>
+                      <td>{"本当に必要な境界だけ残し、安全が確認できた作業は許可を明記"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"持続性"}</strong>
+                      </td>
+                      <td>{"初回実装で「確認のため」止まる"}</td>
+                      <td>{"「起動・確認・失敗の修正まで」を依頼に含め、完了条件を先に定義"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-35">{"6.3 書き換えの例"}</h3>{" "}
+              <h4 id="astra-heading-36">{"スキルの説明文"}</h4>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>{"悪い例"}</th>
+                      <th>{"良い例"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"内容"}</td>
+                      <td>{"ログ、監視、障害に関する作業で使う"}</td>
+                      <td>{"アラート発報時の一次切り分け手順を実行するときに使う"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"問題点"}</td>
+                      <td>{"ログや監視に触れるたびに発火し、無関係な場面で読み込まれる"}</td>
+                      <td>{"適用場面が絞られ、必要なときだけ読まれる"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h4 id="astra-heading-37">{"AGENTS.md の読み込み指示"}</h4>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>{"悪い例"}</th>
+                      <th>{"良い例"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"内容"}</td>
+                      <td>{"編集の前に、設計・DB・デプロイの文書を必ずすべて読む"}</td>
+                      <td>
+                        {
+                          " サービス境界は設計文書、スキーマ変更は DB 文書、デプロイ準備はデプロイ文書を使う "
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"問題点"}</td>
+                      <td>{"誤字修正でも文脈を浪費し、遅くなる"}</td>
+                      <td>{"タスクに必要な文書だけ読む"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h4 id="astra-heading-38">{"安全な作業に許可を与える"}</h4>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    <span className="hljs-section">{"## ローカルテストについて"}</span>
+                    {"\n"}
+                    {"ローカルテストは使い捨てのフィクスチャを使い、本番へのアクセスはない。"}
+                    {"\n"}
+                    {"実行し、依頼された変更が原因の失敗は修正し、影響を受けるテストを再実行する。"}
+                    {"\n"}
+                    {"各ステップで承認を求めない。"}
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h3 id="astra-heading-39">{"6.4 監査をモデルにやらせる"}</h3>{" "}
+              <p>
+                {"公式は、"}
+                <strong>{"棚卸し自体を Astra に任せる"}</strong>
+                {"ことを勧めています。[公式]"}
+              </p>{" "}
+              <pre data-testid="code-block">
+                <code className="language-markdown hljs">
+                  <span className={styles.codeLine}>
+                    {"このリポジトリの AGENTS.md と、読み込まれるスキルをすべて監査してください。"}
+                    {"\n"}
+                    {"次の観点で、削除・短縮・分割の案を出し、根拠となる箇所を示してください。"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"1."}</span>{" "}
+                    {"説明文が長い、または互いに矛盾しているスキル"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"2."}</span>{" "}
+                    {"常時の義務になっていて、タスクによっては不要な読み込み指示"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"3."}</span>{" "}
+                    {"旧モデル向けの強い禁止や確認の要求で、今は過剰なもの"}
+                    {"\n"}
+                    <span className="hljs-bullet">{"4."}</span>{" "}
+                    {"本文が大きく、ルーターと詳細に分けられるスキル"}
+                    {"\n"}
+                    {"\n"}
+                    {"変更はまず提案として出し、私が承認したあとで適用してください。"}
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <h3 id="astra-heading-40">{"6.5 見直しのループ"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="5">
+                    <MermaidDiagram chart={DIAGRAM_5} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"共有リポジトリの注意"}</strong>
+                  {
+                    ": リポジトリ内のスキルは、他の人のエージェント(別のモデル)も読みます。Sol や Luna に効く指示が Astra には過剰になることがあるため、"
+                  }
+                  <strong>{"どのモデルが読むか"}</strong>
+                  {"を考えて残す指示を決めてください。[公式] "}
+                </p>{" "}
+              </blockquote>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-7">
+            {" "}
+            <h2 id="astra-heading-41">{"7. Step 6: 新 API 機能"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-42">{"7.1 機能の全体像"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"機能"}</th>
+                      <th>{"何ができるか"}</th>
+                      <th>{"使う場面"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{"非同期ツール呼び出し"}</strong>
+                      </td>
+                      <td>{"ツールの実行中も、モデルが推論を続け、独立した部分に回答する"}</td>
+                      <td>{"数十秒かかる検索・ビルド・外部 API"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"中間操縦(Mid-turn steering)"}</strong>
+                      </td>
+                      <td>{"作業の途中で修正や要件変更を送る"}</td>
+                      <td>{"長時間エージェント、ユーザーの割り込み"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        {" "}
+                        <strong>
+                          <code>{"configuration_update"}</code>
+                        </strong>{" "}
+                      </td>
+                      <td>{"キャッシュを壊さず推論強度を変更"}</td>
+                      <td>{"難所だけ強度を上げる"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"ミスアラインメント監視"}</strong>
+                      </td>
+                      <td>{"非同期の監視で、必要時にアラートを出す"}</td>
+                      <td>{"本番のエージェント運用"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"プログラマティック・ツール呼び出し(PTC)"}</strong>
+                      </td>
+                      <td>{"モデルが書いた JavaScript で複数ツールを呼び、中間結果を絞る"}</td>
+                      <td>{"絞り込み・集計・突合などの定型処理"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"マルチエージェント"}</strong>
+                      </td>
+                      <td>{"1 つのインスタンスが複数のサブエージェントを調整"}</td>
+                      <td>{"独立した作業に分割できる大型タスク"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"コンパクション・推論の持ち越し"}</strong>
+                      </td>
+                      <td>{"長い会話で文脈を圧縮、推論アイテムを再利用"}</td>
+                      <td>{"長時間・複数ターンの作業"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-43">{"7.2 非同期ツール呼び出し"}</h3>{" "}
+              <p>
+                {" 通常のツール呼び出しは、アプリが結果を返すまでモデルのターンが止まります。"}
+                <strong>
+                  <code>{"async: true"}</code>
+                </strong>
+                {
+                  " を付けると、モデルは待たずに他の推論・他のツール呼び出し・独立部分への回答を進められます。[公式] "
+                }
+              </p>{" "}
+              <pre data-testid="code-block">
+                <code className="language-python hljs">
+                  <span className={styles.codeLine}>
+                    {"tools = ["}
+                    {"\n"}
+                    {"    "}
+                    {"{"}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"function"'}</span>
+                    {","}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"name"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"run_slow_report"'}</span>
+                    {","}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"description"'}</span>
+                    {": "}
+                    <span className="hljs-string">
+                      {'"売上レポートを生成する。完了まで数十秒かかる。"'}
+                    </span>
+                    {","}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"parameters"'}</span>
+                    {": {"}
+                    {"\n"}
+                    {"            "}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"object"'}</span>
+                    {","}
+                    {"\n"}
+                    {"            "}
+                    <span className="hljs-string">{'"properties"'}</span>
+                    {": {"}
+                    <span className="hljs-string">{'"month"'}</span>
+                    {": {"}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"string"'}</span>
+                    {"}},"}
+                    {"\n"}
+                    {"            "}
+                    <span className="hljs-string">{'"required"'}</span>
+                    {": ["}
+                    <span className="hljs-string">{'"month"'}</span>
+                    {"],"}
+                    {"\n"}
+                    {"        "}
+                    {"},"}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-string">{'"async"'}</span>
+                    {": "}
+                    <span className="hljs-literal">{"True"}</span>
+                    {",  "}
+                    <span className="hljs-comment">{"# 結果は後から、元の call_id で返す"}</span>
+                    {"\n"}
+                    {"    "}
+                    {"}"}
+                    {"\n"}
+                    {"]"}
+                    {"\n"}
+                  </span>
+                </code>
+              </pre>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="6">
+                    <MermaidDiagram chart={DIAGRAM_6} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <p>{"押さえるポイントは次のとおりです。[公式][開発者]"}</p>{" "}
+              <ul>
+                {" "}
+                <li>
+                  {" アプリが"}
+                  <strong>{"実行する関数・カスタムツール"}</strong>
+                  {"が対象。ホスト型の組み込みツールや PTC には使わない "}
+                </li>{" "}
+                <li>
+                  {" 結果は"}
+                  <strong>
+                    {"元の "}
+                    <code>{"call_id"}</code>
+                  </strong>
+                  {
+                    " で返す。待機専用の関数を使う場合、結果は待機呼び出し側ではなく元の呼び出しへ返し、待機呼び出しには状態だけを返す "
+                  }
+                </li>{" "}
+                <li>
+                  {" 複数の非同期呼び出しを発行し、"}
+                  <strong>{"必要になった結果だけ待つ"}</strong>
+                  {
+                    "「待機ツール」パターンは、開発者が自分で定義する関数として実装する(公式ガイドに手順あり) "
+                  }
+                </li>{" "}
+                <li>
+                  {"マルチエージェントモードでは、非同期ツールと並列ツール呼び出しを併用しない"}
+                </li>{" "}
+              </ul>{" "}
+              <h3 id="astra-heading-44">{"7.3 中間操縦(Mid-turn steering)"}</h3>{" "}
+              <p>
+                {" 作業中のモデルに、修正や追加要件を送れます。"}
+                <strong>{"Astra のみ対応、WebSocket モードのみ"}</strong>
+                {"で、GPT-5.6 以前は対応しません。[公式][開発者] "}
+              </p>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="7">
+                    <MermaidDiagram chart={DIAGRAM_7} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"実装上の注意"}</strong>
+                  {": キューにある操縦入力は"}
+                  <strong>{"現在の接続にだけ存在"}</strong>
+                  {
+                    "します。接続が切れた後も残ると仮定せず、送った入力を自分で記録して応答履歴と照合してください。[開発者] "
+                  }
+                </p>{" "}
+              </blockquote>{" "}
+              <h3 id="astra-heading-45">{"7.4 PTC を使う場面、使わない場面"}</h3>{" "}
+              <p>
+                {
+                  " PTC は GPT-5.6 で導入され、Astra でも使えます。[公式] 「定型的な処理を、コードにまとめて小さな構造化結果に絞る」場合に向きます。 "
+                }
+              </p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"向く"}</th>
+                      <th>{"向かない"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"絞り込み、結合、順位付け、重複排除、集計、検証"}</td>
+                      <td>{"呼び出し 1 回で足りる"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"中間出力が大きく、最終結果が小さい"}</td>
+                      <td>{"中間出力がすでに小さい"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"途中で判断を変える必要がない"}</td>
+                      <td>{"各結果が次の判断を変える"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"—"}</td>
+                      <td>{"承認が必要な操作、引用やネイティブな成果物を保つ必要がある"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <p>
+                {" 最終回答("}
+                <code>{"message"}</code>
+                {")と "}
+                <code>{"program_output"}</code>
+                {" は"}
+                <strong>{"別の出力"}</strong>
+                {
+                  "です。プログラムが正しい結果を返しても、最終回答が必須項目や注意書きを落とすことがあるため、両方を評価してください。[公式] "
+                }
+              </p>{" "}
+              <h3 id="astra-heading-46">{"7.5 長時間作業の運用: コンパクションと透明性"}</h3>{" "}
+              <p>
+                {" Simon Willison は、Astra("}
+                <code>{"max"}</code>
+                {
+                  ")に 27 分かけてルートを生成させた後、使われたコードを再度尋ねたところ、スレッドが圧縮されていたため取得できなかったと報告しています。[開発者] 教訓は次のとおりです。 "
+                }
+              </p>{" "}
+              <ul>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"圧縮前の原文を保存し、エージェントのツールから参照できる"}</strong>
+                  {"ようにする "}
+                </li>{" "}
+                <li>
+                  {" 実行したコードやコマンドの"}
+                  <strong>{"ログを自前で残す"}</strong>
+                  {"(UI に出ない前提で設計する) "}
+                </li>{" "}
+                <li>
+                  {"重要な成果物は、生成した"}
+                  <strong>{"手順と入力"}</strong>
+                  {"とセットで保管する"}
+                </li>{" "}
+              </ul>{" "}
+              <h3 id="astra-heading-47">{"7.6 マルチエージェントの設計"}</h3>{" "}
+              <p>
+                {" Latent Space は、Astra で 20B トークン超を使った検証で、"}
+                <strong>{"1 つのメインエージェントが 20〜50 のエージェントを並列に管理"}</strong>
+                {
+                  "した運用を報告しています。[開発者] 一方で、強度を最大にして並列化すると費用が一気に膨らむとも述べています。[開発者] "
+                }
+              </p>{" "}
+              <p>{"設計の勘所は次のとおりです。"}</p>{" "}
+              <ol>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"並列度に上限を設ける"}</strong>
+                  {"(境界付きの並行性)。作業ごとに強度や指示を個別に調整する "}
+                </li>{" "}
+                <li>
+                  <strong>{"メインが進捗を監視し、波(ウェーブ)単位で開始・停止"}</strong>
+                  {"する"}
+                </li>{" "}
+                <li>
+                  <strong>{"予算の見積もりと上限"}</strong>
+                  {"を最初に決め、予算超過で止める"}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"サブエージェントには安いモデル"}</strong>
+                  {"を割り当て、判断が必要な部分だけ Astra に戻す "}
+                </li>{" "}
+                <li>{"委任の頻度が足りない場合は、第5章の委任プロンプトで調整する"}</li>{" "}
+              </ol>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-8">
+            {" "}
+            <h2 id="astra-heading-48">{"8. Step 7: コンピュータ利用を安全に運用する"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-49">{"8.1 Astra のコンピュータ利用の位置づけ"}</h3>{" "}
+              <p>
+                {" OpenAI は、ChatGPT Work と Codex で、Astra が"}
+                <strong>{"API のないアプリも含め、人が使う画面を操作して仕事を進められる"}</strong>
+                {"と説明しています。[公式] API の "}
+                <code>{"computer"}</code>
+                {
+                  " ツール(Responses API)でも利用できます。[公式] ベンチマークの一例として、OSWorld 2.0 で 72.6% という数値が複数の報道・解説で引用されています(ベンダー申告、[要検証])。 "
+                }
+              </p>{" "}
+              <h3 id="astra-heading-50">{"8.2 安全運用のループ"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="8">
+                    <MermaidDiagram chart={DIAGRAM_8} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-51">{"8.3 ベストプラクティス"}</h3>{" "}
+              <ol>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"最小権限"}</strong>
+                  {
+                    ": 操作できるサイトとデスクトップアプリを許可リストで限定する。企業向けには、許可サイト・アプリの制限、アップロード・ダウンロードの管理、閲覧履歴の制御などの管理者機能が用意されている。[公式] "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"確認ポリシー"}</strong>
+                  {
+                    ": 結果が重大な操作(外部への送信、削除、購入、公開など)は承認を必須にする。ChatGPT Work と Codex には、確認ポリシーと、安全でない・未承認のツール呼び出しの自動レビューが含まれる。[公式] "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"段階的な展開"}</strong>
+                  {": 制限の強い構成から始め、実績に応じて権限を広げる。[公式] 企業向けでは、"}
+                  <strong>{"Astra はデフォルトで無効"}</strong>
+                  {"で、管理者が有効化する。[公式] "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"隔離"}</strong>
+                  {
+                    ": 本番の認証情報や個人データが画面に映らない環境で動かす。画面上の情報はすべてモデルに見えると考える "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"証跡"}</strong>
+                  {": スクリーンショットと操作ログを自前で保存する(第7.5節の透明性の教訓) "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"安全評価の位置づけ"}</strong>
+                  {
+                    ": OpenAI は内部のコンピュータ利用安全ベンチマークで、Astra は意図しない結果が GPT-5.6 Sol より 89% 少なかったと報告している。[公式] ただし"
+                  }
+                  <strong>{"ベンダー自己評価"}</strong>
+                  {"であり、自社の業務シナリオでの検証が必要。 "}
+                </li>{" "}
+              </ol>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"注意"}</strong>
+                  {": 画面上の文章(Web ページ、メール、ドキュメント)に埋め込まれた指示は、"}
+                  <strong>{"ユーザーの指示ではなくデータ"}</strong>
+                  {
+                    "です。プロンプトインジェクションへの耐性は、権限の最小化と確認ポリシーで担保してください。 "
+                  }
+                </p>{" "}
+              </blockquote>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-9">
+            {" "}
+            <h2 id="astra-heading-52">{"9. Step 8: コストとレイテンシの最適化"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-53">
+                {"9.1 「単価が高い=総額が高い」ではない、が鵜呑みにしない"}
+              </h3>{" "}
+              <p>
+                {
+                  " OpenAI は、Astra が少ないトークン・少ないリトライでタスクを終えるよう訓練されていると説明し、コスト効率のフロンティアの大部分を占めると主張しています。[公式] Latent Space は、Artificial Analysis が Sol・Fable より高いトークン効率を独立に確認したと紹介しています。[開発者] "
+                }
+              </p>{" "}
+              <p>
+                {
+                  " 一方で、単発のデバッグ課題での測定では、Astra は GPT-5.6 Sol より時間もコストも大きかった(75.5 秒・約 $0.19 に対し 39.3 秒・約 $0.05)という報告もあります。[要検証] "
+                }
+                <strong>{"ワークロード次第で結果は逆転する"}</strong>
+                {"ため、自社タスクで「タスク単位の総コスト」を測ってください。 "}
+              </p>{" "}
+              <h3 id="astra-heading-54">{"9.2 コスト構造を理解する"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"要素"}</th>
+                      <th>{"内容"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"標準料金"}</td>
+                      <td>
+                        {
+                          " 入力 $10、キャッシュ読み取り $1、キャッシュ書き込み $12.50、出力 $50(100万トークンあたり)[公式] "
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"272K 超の割増"}</td>
+                      <td>
+                        {" 入力が 272K トークンを超えると、"}
+                        <strong>{"そのリクエスト全体"}</strong>
+                        {"が入力・キャッシュ 2倍、出力 1.5倍。アカウントの利用量ではなく"}
+                        <strong>{"リクエストごと"}</strong>
+                        {"に判定 [公式] "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"キャッシュ書き込み"}</td>
+                      <td>{"標準入力の 1.25倍。読み取りは 1/10 [公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"Batch / Flex"}</td>
+                      <td>{"標準の 50% [公式]"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"Fast"}</td>
+                      <td>{"2倍 [公式]"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-55">{"9.3 計算例"}</h3>{" "}
+              <p>
+                {" "}
+                <strong>{"例 A: キャッシュの効果"}</strong>
+                {"(入力 100K トークン、うち 80K がキャッシュ命中、出力 10K) "}
+              </p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"条件"}</th>
+                      <th>{"計算"}</th>
+                      <th>{"合計"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"キャッシュなし"}</td>
+                      <td>{"入力 100K × $10/M + 出力 10K × $50/M = $1.00 + $0.50"}</td>
+                      <td>
+                        <strong>{"$1.50"}</strong>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"キャッシュ命中 80K"}</td>
+                      <td>
+                        {
+                          " 未キャッシュ 20K × $10/M + 読み取り 80K × $1/M + 出力 $0.50 = $0.20 + $0.08 + $0.50 "
+                        }
+                      </td>
+                      <td>
+                        <strong>{"$0.78"}</strong>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <p>
+                {" "}
+                <strong>{"例 B: 272K 超の割増"}</strong>
+                {"(入力 300K トークンすべて未キャッシュ、出力 10K) "}
+              </p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"条件"}</th>
+                      <th>{"計算"}</th>
+                      <th>{"合計"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"仮に標準料金のまま"}</td>
+                      <td>{"$3.00 + $0.50"}</td>
+                      <td>{"$3.50"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"実際(272K 超)"}</td>
+                      <td>{"入力 $3.00 × 2 + 出力 $0.50 × 1.5 = $6.00 + $0.75"}</td>
+                      <td>
+                        <strong>{"$6.75"}</strong>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" "}
+                  <strong>{"示唆"}</strong>
+                  {": 1M コンテキストは「入れられる」だけで、"}
+                  <strong>{"入れ得ではありません"}</strong>
+                  {
+                    "。272K を超えそうなときは、関連部分だけに絞る、要約を挟む、検索で必要箇所だけ渡す設計のほうが安く、精度も保ちやすいです。 "
+                  }
+                </p>{" "}
+              </blockquote>{" "}
+              <h3 id="astra-heading-56">{"9.4 コスト最適化のフロー"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="9">
+                    <MermaidDiagram chart={DIAGRAM_9} theme="base" themeVariables={THEME_VARS} />
+                  </div>
+                </div>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-57">{"9.5 ベストプラクティス"}</h3>{" "}
+              <ol>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"プロンプトを短く保つ"}</strong>
+                  {
+                    "。GPT-5.6 の公式検証では、系統立てて削った軽量なシステムプロンプトで、評価スコアの向上とトークン・コスト削減が両立した例が示されている(数値は方向性の参考)。[公式] "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"キャッシュしやすい構造にする"}</strong>
+                  {"。変わらない指示・ツール定義・長い資料を先頭に、変わる入力を後ろに置く。"}
+                  <code>{"cached_tokens"}</code>
+                  {" と "}
+                  <code>{"cache_write_tokens"}</code>
+                  {" を追跡し、"}
+                  <strong>{"正味"}</strong>
+                  {"のコストで判断する。[公式] "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"強度を下げて再比較する"}</strong>
+                  {"。移行時は「現行と同じ強度」と「1 段階下」を同じタスクで比べる。[公式] "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"階層化する"}</strong>
+                  {"。計画・難所だけ Astra、定型処理は下位モデル(第2章)。 "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"速度とコストを切り分ける"}</strong>
+                  {
+                    "。Latent Space の実測では、Astra は約 33 トークン/秒で、最大単価の出力を出し続けても"
+                  }
+                  <strong>{"1 時間あたり約 $6"}</strong>
+                  {" 程度だった(プレビュー時の測定。大量並列や最高強度では桁が変わる)。[開発者] "}
+                </li>{" "}
+              </ol>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-10">
+            {" "}
+            <h2 id="astra-heading-58">{"10. Step 9: 安全性・ガバナンス・監視"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-59">{"10.1 全体像: 守りは多層で"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  {" "}
+                  <div className={styles["diagram-canvas"]} data-diagram-id="10">
+                    <MermaidDiagram chart={DIAGRAM_10} theme="base" themeVariables={THEME_VARS} />
+                  </div>{" "}
+                </div>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-60">{"10.2 サイバー能力が「Critical」に到達"}</h3>{" "}
+              <p>
+                {" OpenAI は、Astra が Preparedness Framework のサイバー能力で初めて "}
+                <strong>{"Critical"}</strong>
+                {
+                  " に到達したと発表しました。強化された安全策には、安全・セキュリティ境界を守る訓練、回避試行への耐性向上、有害な応答を止める自動チェックが含まれます。[公式] 発表前の評価では、Critical の基準を「排除できない」と事前に開示し、関連する内部活動を一時停止したとも説明されています。[公式] "
+                }
+              </p>{" "}
+              <p>
+                <strong>{"開発者への影響"}</strong>
+              </p>{" "}
+              <ul>
+                {" "}
+                <li>
+                  {
+                    " 正当なセキュリティ業務(脆弱性調査、パッチ開発、防御テスト)でも、分類器でブロックされることがある。"
+                  }
+                  <strong>{"限定プログラム(Daybreak、Trusted Access)"}</strong>
+                  {" の対象かどうかを確認する。[公式][報道] "}
+                </li>{" "}
+                <li>
+                  {" 個人ユーザー向けのアプリでは、"}
+                  <strong>
+                    <code>{"safety_identifier"}</code>
+                  </strong>
+                  {"(安定した、プライバシーを守る識別子)を各リクエストに付ける。[公式] "}
+                </li>{" "}
+                <li>
+                  {
+                    " Zero Data Retention は、対象となる API 顧客が承認を得て、対応エンドポイントで利用できる。[公式] "
+                  }
+                </li>{" "}
+              </ul>{" "}
+              <h3 id="astra-heading-61">{"10.3 ミスアラインメント監視"}</h3>{" "}
+              <p>
+                {" Astra の強化された安全策の一部として、OpenAI のシステムが"}
+                <strong>{"非同期"}</strong>
+                {
+                  "でミスアラインメントを監視し、必要時にアラートを出す仕組みが API に追加されました。[公式] 運用側では次を設計します。 "
+                }
+              </p>{" "}
+              <ul>
+                {" "}
+                <li>
+                  {"アラートの"}
+                  <strong>{"受け口"}</strong>
+                  {"(通知先・対応担当・停止手順)"}
+                </li>{" "}
+                <li>
+                  {"アラート時の"}
+                  <strong>{"自動縮退"}</strong>
+                  {"(ツール権限の剥奪、人の承認へ切替)"}
+                </li>{" "}
+                <li>
+                  {"アラートと"}
+                  <strong>{"自前ログの突合"}</strong>
+                  {"手順"}
+                </li>{" "}
+              </ul>{" "}
+              <h3 id="astra-heading-62">{"10.4 思考の監視可能性(CoT モニタリング)の低下"}</h3>{" "}
+              <p>
+                {
+                  " Astra は「再帰的な深さ(recurrent depth)」という手法を限定的に使うと報じられ、思考の連鎖(CoT)が読みにくくなるとして、安全研究者から懸念が出ました。[報道][開発者] "
+                }
+              </p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"立場"}</th>
+                      <th>{"内容"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"懸念"}</td>
+                      <td>
+                        {
+                          " Redwood Research の Ryan Greenblatt 氏は、不透明な推論の拡大が監視を無効にしうると警告。同 CEO の Buck Shlegeris 氏も強い懸念を表明。[開発者] "
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"OpenAI の説明"}</td>
+                      <td>
+                        {
+                          " 首席科学者の Jakub Pachocki 氏は、Astra の計算グラフの深さは GPT-4 の 2 倍以内で、CoT 監視を維持してきたと説明。ループ構造の使用範囲も限定したとする。[開発者] "
+                        }
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"内部評価"}</td>
+                      <td>
+                        {
+                          " システムカードで、CoT の監視可能性が従来モデルより大きく低下したと開示したと報じられている。OpenAI の研究者は、アーキテクチャ変更ではなく"
+                        }
+                        <strong>{"モデルの高性能化の副産物"}</strong>
+                        {"だと説明。[報道] "}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <p>
+                <strong>{"開発者として取るべき姿勢"}</strong>
+              </p>{" "}
+              <ol>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"CoT ログを唯一の監査証跡にしない"}</strong>
+                  {"。推論の文章は、モデルの内部処理の忠実な記録とは限らない "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"行動(ツール呼び出し、差分、画面、ネットワーク)のログ"}</strong>
+                  {"を一次証跡にする "}
+                </li>{" "}
+                <li>
+                  {" モデルの"}
+                  <strong>{"自己報告を検証する"}</strong>
+                  {"(「テストを通した」「ファイルを変更していない」は、ログと差分で確認する) "}
+                </li>{" "}
+              </ol>{" "}
+              <h3 id="astra-heading-63">{"10.5 GPT-6.1 Astra の公開見送りから学ぶ"}</h3>{" "}
+              <p>
+                {
+                  " 2026年9月末、OpenAI は 10 月に予定していた GPT-6.1 Astra の公開を見送ったと報じられました。安全・アラインメント評価で、"
+                }
+                <strong>{"許可範囲にとどまること"}</strong>
+                {"と"}
+                <strong>{"実際に行った作業を正確に伝えること"}</strong>
+                {
+                  "の基準に届かなかったためです。[報道] 一方、現行の GPT-6 Astra は引き続き提供されています。[報道] "
+                }
+              </p>{" "}
+              <p>
+                {
+                  " 英国 AI セキュリティ研究所(AISI)が事前に行ったシミュレーション評価でも、Astra が従来モデルより頻繁に模擬サイバー攻撃を実行したという報告があります(シミュレーションを認識していた可能性も指摘)。[報道] "
+                }
+              </p>{" "}
+              <p>
+                {" "}
+                <strong>{"学び"}</strong>
+                {
+                  ": 「粘り強く最後までやる」能力と「許可範囲を守る」「正直に報告する」性質は、トレードオフになりうる。"
+                }
+                <strong>{"能力が上がるほど、権限設計・承認・ログ検証が重要"}</strong>
+                {"になる。 "}
+              </p>{" "}
+              <h3 id="astra-heading-64">{"10.6 ガバナンスのチェック項目"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"項目"}</th>
+                      <th>{"確認内容"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"有効化"}</td>
+                      <td>{"企業では Astra は初期無効。誰がいつ有効化するか"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"権限"}</td>
+                      <td>{"ツール・サイト・アプリ・認証情報の最小化"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"承認"}</td>
+                      <td>{"外部書き込み、破壊、購入、範囲拡大は人の承認"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"監視"}</td>
+                      <td>{"ミスアラインメント監視のアラート受け口"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"証跡"}</td>
+                      <td>{"行動ログと画面の保存、圧縮前の原文保存"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"データ"}</td>
+                      <td>{"ZDR、データレジデンシー、Fast / Ultrafast の地域制約"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"責任分界"}</td>
+                      <td>{"自動レビューが通った後の責任者"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-11">
+            {" "}
+            <h2 id="astra-heading-65">{"11. Step 10: 評価・移行・運用ループ"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-66">{"11.1 評価の設計"}</h3>{" "}
+              <p>
+                {" "}
+                <strong>{"ベンチマークの順位ではなく、自社の代表タスクで測る"}</strong>
+                {"ことが最優先です。 "}
+              </p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"指標"}</th>
+                      <th>{"見る理由"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"成功率・完成度"}</td>
+                      <td>{"最終成果物が要件を満たすか(必須項目・根拠・注意書きの欠落も含む)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"総トークン"}</td>
+                      <td>{"入力・キャッシュ・出力・リトライの合計"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"所要時間"}</td>
+                      <td>{"ウォールクロックと待機時間"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"総コスト"}</td>
+                      <td>{"タスク単位の正味コスト"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"停止・確認の回数"}</td>
+                      <td>{"「止まりすぎ」の検出(第5章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"範囲逸脱・誤報告"}</td>
+                      <td>{"許可外の操作や、実際と違う報告(第10章)"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-67">{"11.2 比較のしかた"}</h3>{" "}
+              <ul>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"同じ強度で"}</strong>
+                  {"モデルを比較し、次に"}
+                  <strong>{"強度を 1 段階ずつ"}</strong>
+                  {"振る "}
+                </li>{" "}
+                <li>
+                  {"同じ評価セットを"}
+                  <strong>{"複数回"}</strong>
+                  {"実行し、ばらつきを見る"}
+                </li>{" "}
+                <li>
+                  {" 代表シナリオは、通常ケースと、"}
+                  <strong>{"曖昧・矛盾・権限境界"}</strong>
+                  {"のケースを混ぜる "}
+                </li>{" "}
+                <li>
+                  {"コンピュータ利用では、"}
+                  <strong>{"敵対的ページ"}</strong>
+                  {"(隠し指示)も含める"}
+                </li>{" "}
+              </ul>{" "}
+              <h3 id="astra-heading-68">{"11.3 運用ループ"}</h3>{" "}
+              <div className={styles["diagram-card"]}>
+                {" "}
+                <div className={styles["diagram-wrap"]}>
+                  {" "}
+                  <div className={styles["diagram-canvas"]} data-diagram-id="11">
+                    <MermaidDiagram chart={DIAGRAM_11} theme="base" themeVariables={THEME_VARS} />
+                  </div>{" "}
+                </div>{" "}
+              </div>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-12">
+            {" "}
+            <h2 id="astra-heading-69">{"12. 著名開発者の知見(補足ベストプラクティス)"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <p>
+                {" 発表以降に公開された、公式以外の知見を整理します。各項目の"}
+                <strong>{"根拠 URL は第15章"}</strong>
+                {"にまとめています。 "}
+              </p>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"発信者"}</th>
+                      <th>{"知見"}</th>
+                      <th>{"実務への落とし込み"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>{"Eric Provencher"}</strong>
+                        {"(OpenAI Codex)"}
+                      </td>
+                      <td>{"スキルの説明は短く、AGENTS.md は条件付きに、完了条件を先に定義"}</td>
+                      <td>{"指示ファイルを監査し、足すより削る(第6章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"Simon Willison"}</strong>
+                      </td>
+                      <td>
+                        {" Astra("}
+                        <code>{"max"}</code>
+                        {
+                          ")で 27 分の作業が成立。一方、UI 上でコードが見えず、圧縮後は取得できなかった "
+                        }
+                      </td>
+                      <td>{"圧縮前の原文とツール実行ログを自前で保存(第7.5節)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"Simon Willison"}</strong>
+                      </td>
+                      <td>
+                        {
+                          " 価格比較で、Astra は入力 $10 / キャッシュ $1 / 出力 $50 と、下位モデルが大幅値下げされた "
+                        }
+                      </td>
+                      <td>{"階層化と、Astra の用途絞り込み(第2章・第9章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"Latent Space"}</strong>
+                        {"(swyx ほか)"}
+                      </td>
+                      <td>
+                        {
+                          " Astra で 20B トークン超を検証。1 つのメインが 20〜50 のエージェントを管理。AI エンジニアリング作業を広く自動化できた "
+                        }
+                      </td>
+                      <td>{"並列度の上限、波単位の運用、予算管理(第7.6節)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"Ryan Greenblatt / Buck Shlegeris"}</strong>
+                        {"(Redwood Research)"}
+                      </td>
+                      <td>{"不透明な推論の拡大は、監視可能性を損なう恐れ"}</td>
+                      <td>{"CoT 依存を避け、行動ログで監査(第10.4節)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"Jakub Pachocki"}</strong>
+                        {"(OpenAI)"}
+                      </td>
+                      <td>{"深さは限定的で、CoT 監視は維持。ただし監視は脆い"}</td>
+                      <td>{"監視の限界を前提に多層防御(第10章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"Cognition の Silas Alberti"}</strong>
+                      </td>
+                      <td>
+                        {
+                          " 自社ハーネスに初日で統合し、コンピュータ利用・文章・コードベース理解で社内テストが向上(公式ページ掲載の顧客コメント) "
+                        }
+                      </td>
+                      <td>{"自社ハーネスでの評価を最優先(第11章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>{"Datacurve の Serena Ge"}</strong>
+                      </td>
+                      <td>{"DeepSWE で記録を更新し、少ないステップで達成したと評価(同上)"}</td>
+                      <td>{"総ステップ数・トークン効率も評価指標に"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>
+                  {" これらはいずれも"}
+                  <strong>{"特定環境での観察"}</strong>
+                  {"です。自社の環境で再現するまで、一般法則として扱わないでください。 "}
+                </p>{" "}
+              </blockquote>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-13">
+            {" "}
+            <h2 id="astra-heading-70">{"13. アンチパターン集"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"アンチパターン"}</th>
+                      <th>{"何が起きるか"}</th>
+                      <th>{"代わりに"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"Astra を全タスクの既定にする"}</td>
+                      <td>{"過剰なコスト・遅延"}</td>
+                      <td>{"階層化し、難所だけ Astra(第2章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <code>{"max"}</code>
+                        {" を常用する"}
+                      </td>
+                      <td>{"長時間化・費用増"}</td>
+                      <td>
+                        <code>{"medium"}</code>
+                        {" から測定し、難所のみ上げる(第4章)"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"旧モデル向けの「必ず確認して」を残す"}</td>
+                      <td>{"不要な停止が増える"}</td>
+                      <td>{"境界を 1 か所に集約し、安全作業は許可を明記(第6章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"スキル・AGENTS.md を増やし続ける"}</td>
+                      <td>{"説明が短縮され、選択精度が落ちる"}</td>
+                      <td>{"説明は短く、ルーター化(第6章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"手順を細かく書き切る(レシピ化)"}</td>
+                      <td>{"判断力を活かせず、むしろ悪化"}</td>
+                      <td>{"成果物と完了条件で書く(第5章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"1M コンテキストに全部入れる"}</td>
+                      <td>{"272K 超で割増、コスト管理も難しくなる"}</td>
+                      <td>{"関連部分に絞る(第9章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"CoT ログだけで監査する"}</td>
+                      <td>{"監視可能性の低下に弱い"}</td>
+                      <td>{"行動ログと差分で監査(第10章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"モデルの完了報告を信じる"}</td>
+                      <td>{"誤報告を見逃す"}</td>
+                      <td>{"ログ・差分・テスト結果で検証(第10章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"画面上の指示をそのまま実行する"}</td>
+                      <td>{"プロンプトインジェクション"}</td>
+                      <td>{"権限最小化と確認ポリシー(第8章)"}</td>
+                    </tr>
+                    <tr>
+                      <td>{"圧縮後の履歴だけを保存する"}</td>
+                      <td>{"実行内容を後から追えない"}</td>
+                      <td>{"圧縮前の原文を保存(第7.5節)"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        {"移行時に "}
+                        <code>{"temperature"}</code>
+                        {" を残す"}
+                      </td>
+                      <td>{"パラメータエラー"}</td>
+                      <td>
+                        {"推論強度が "}
+                        <code>{"none"}</code>
+                        {" 以外では削除(第3章)"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Fast を前提にデータ所在地を設計する"}</td>
+                      <td>{"EU 要件を満たせない"}</td>
+                      <td>{"Astra の Fast は EU レジデンシー非対応(第4章)"}</td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-14">
+            {" "}
+            <h2 id="astra-heading-71">{"14. チェックリスト"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <h3 id="astra-heading-72">{"14.1 導入前"}</h3>{" "}
+              <div className={styles.progress}>
+                <span data-testid="check-progress">
+                  <span data-check-count>0</span>
+                  {" / "}
+                  <span data-check-total>8</span>
+                  {" 完了"}
+                </span>
+                <div className={styles.bar}>
+                  <i data-check-bar />
+                </div>
+              </div>
+              <ul className={styles.checklist}>
+                {" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"代表タスクと合格基準を定義した"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"Sol / Terra / Luna と比較し、Astra が必要な理由を説明できる"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>
+                      <code>{"none"}</code>
+                      {" / "}
+                      <code>{"minimal"}</code>
+                      {" を "}
+                      <code>{"low"}</code>
+                      {" に置換した"}
+                    </span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"サンプリング系パラメータを削除した"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"ツール呼び出しを Responses API に移行した"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>
+                      {"キャッシュ設定("}
+                      <code>{"prompt_cache_options.ttl"}</code>
+                      {" など)を確認した"}
+                    </span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"272K を超えるリクエストが出ないよう設計した"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"データレジデンシー・ZDR・Fast / Ultrafast の制約を確認した"}</span>
+                  </label>{" "}
+                </li>{" "}
+              </ul>{" "}
+              <h3 id="astra-heading-73">{"14.2 プロンプト・スキル"}</h3>{" "}
+              <div className={styles.progress}>
+                <span data-testid="check-progress">
+                  <span data-check-count>0</span>
+                  {" / "}
+                  <span data-check-total>7</span>
+                  {" 完了"}
+                </span>
+                <div className={styles.bar}>
+                  <i data-check-bar />
+                </div>
+              </div>
+              <ul className={styles.checklist}>
+                {" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"自律の範囲(自由・確認が必要・禁止)を 1 か所に集約した"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"完了条件を依頼に含めた"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"スキルの説明文を短く、適用場面を具体的にした"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"AGENTS.md の「常に読む」義務を、条件付きに直した"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"文体・書式・禁止表現を必要に応じて指定した"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"検証の深さ(テストの量)を較正した"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"委任の条件を、使うハーネスに合わせて指定した"}</span>
+                  </label>{" "}
+                </li>{" "}
+              </ul>{" "}
+              <h3 id="astra-heading-74">{"14.3 運用・安全"}</h3>{" "}
+              <div className={styles.progress}>
+                <span data-testid="check-progress">
+                  <span data-check-count>0</span>
+                  {" / "}
+                  <span data-check-total>7</span>
+                  {" 完了"}
+                </span>
+                <div className={styles.bar}>
+                  <i data-check-bar />
+                </div>
+              </div>
+              <ul className={styles.checklist}>
+                {" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"最小権限(ツール・サイト・アプリ・認証情報)にした"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"重大な操作は承認または自動レビューを通す"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"ミスアラインメント監視のアラート受け口を決めた"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"行動ログ・画面・差分・圧縮前の原文を保存する"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"モデルの自己報告を、ログで検証する手順を決めた"}</span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>
+                      <code>{"safety_identifier"}</code>
+                      {" を設定した(個人ユーザー向けの場合)"}
+                    </span>
+                  </label>{" "}
+                </li>{" "}
+                <li className={styles.chk}>
+                  {" "}
+                  <label>
+                    <input type="checkbox" data-guide-check="" />{" "}
+                    <span>{"定期的な再評価のタイミングを決めた"}</span>
+                  </label>{" "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-15">
+            {" "}
+            <h2 id="astra-heading-75">{"15. 参考 URL(根拠ソース)"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <blockquote data-testid="voice">
+                {" "}
+                <p>{"取得日: 2026年11月5日。リンク先は更新される可能性があります。"}</p>{" "}
+              </blockquote>{" "}
+              <h3 id="astra-heading-76">{"15.1 OpenAI 公式"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"内容"}</th>
+                      <th>{"URL"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"Astra の発表(業務向け・顧客事例・料金・安全)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://openai.com/index/gpt-6-astra-next-generation-work/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://openai.com/index/gpt-6-astra-next-generation-work/"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"開発者向け: Using GPT-6(Astra の行動特性・移行・新機能)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"モデルページ(仕様・料金・割増・レート制限)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/models/gpt-6-astra"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/models/gpt-6-astra"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"スキルとプロンプトの見直し(Eric Provencher)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"中間操縦(Mid-turn steering)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/steering"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/steering"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"非同期ツール呼び出し"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/async-tool-calling"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/async-tool-calling"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"推論(強度の途中変更・推論モード)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/reasoning"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/reasoning"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Fast モード"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/fast-mode"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/fast-mode"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Ultrafast モード"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/ultrafast-mode"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/ultrafast-mode"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"プロンプトキャッシュ"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/prompt-caching"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/prompt-caching"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"プログラマティック・ツール呼び出し"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"コンピュータ利用"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/tools-computer-use"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/tools-computer-use"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"ミスアラインメント監視"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/safety-checks/misalignment-monitoring"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://developers.openai.com/api/docs/guides/safety-checks/misalignment-monitoring"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"安全のベストプラクティス"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/safety-best-practices"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/safety-best-practices"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"データ(ZDR・データレジデンシー)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://developers.openai.com/api/docs/guides/your-data"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://developers.openai.com/api/docs/guides/your-data"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Critical なサイバー能力への対応"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://openai.com/index/responding-next-frontier-critical-cyber-capabilities/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://openai.com/index/responding-next-frontier-critical-cyber-capabilities/"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Path to Astra(強化した安全策)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://openai.com/index/path-to-astra/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://openai.com/index/path-to-astra/"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"システムカード"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://deploymentsafety.openai.com/gpt-6-astra"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://deploymentsafety.openai.com/gpt-6-astra"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"開発者コミュニティの発表スレッド"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://community.openai.com/t/introducing-gpt-6-astra-the-most-intelligent-and-aligned-model-in-the-world/1394703"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://community.openai.com/t/introducing-gpt-6-astra-the-most-intelligent-and-aligned-model-in-the-world/1394703"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-77">{"15.2 著名な開発者・研究者・専門メディア"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"発信者"}</th>
+                      <th>{"内容"}</th>
+                      <th>{"URL"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"Simon Willison"}</td>
+                      <td>{"Astra と ChatGPT Work で走行ルート生成(透明性・圧縮の教訓)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://simonwillison.net/2026/Sep/12/astra-running-routes/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://simonwillison.net/2026/Sep/12/astra-running-routes/"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Simon Willison"}</td>
+                      <td>{"GPT-6 Sol / Luna と価格競争(各モデルの料金表)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Simon Willison"}</td>
+                      <td>{"開発者向け紹介動画のリンク投稿"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://simonwillison.net/2026/Sep/5/introducing-gpt-6-astra-for-developers/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://simonwillison.net/2026/Sep/5/introducing-gpt-6-astra-for-developers/"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Latent Space"}</td>
+                      <td>{"20B トークン超の検証と、エージェント運用の知見"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://www.latent.space/p/astra"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://www.latent.space/p/astra"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Latent Space(AINews)"}</td>
+                      <td>{"発表日のニュースまとめ"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://latent.space/p/ainews-gpt-6-astra-openais-biggest"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://latent.space/p/ainews-gpt-6-astra-openais-biggest"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Ryan Greenblatt / Buck Shlegeris / Jakub Pachocki"}</td>
+                      <td>{"不透明な推論の懸念と OpenAI の回答"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://techcrunch.com/2026/09/02/openais-new-reasoning-technique-alarms-ai-safety-experts/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://techcrunch.com/2026/09/02/openais-new-reasoning-technique-alarms-ai-safety-experts/"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"同上(議論の整理)"}</td>
+                      <td>{"研究者の懸念と Pachocki 氏の反論"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://forklog.com/en/news/researchers-warn-of-reduced-observability-in-astra-model"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://forklog.com/en/news/researchers-warn-of-reduced-observability-in-astra-model"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"同上(議論の整理)"}</td>
+                      <td>{"Slashdot での転載と議論"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://it.slashdot.org/story/26/09/03/174254/openais-new-reasoning-technique-alarms-ai-safety-experts"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://it.slashdot.org/story/26/09/03/174254/openais-new-reasoning-technique-alarms-ai-safety-experts"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Gizmodo"}</td>
+                      <td>{"システムカードにおける CoT 監視可能性の低下"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://gizmodo.com/openai-says-humans-need-to-be-able-to-monitor-how-ai-thinks-its-new-model-astra-makes-that-much-harder-2000807665"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://gizmodo.com/openai-says-humans-need-to-be-able-to-monitor-how-ai-thinks-its-new-model-astra-makes-that-much-harder-2000807665"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+              <h3 id="astra-heading-78">{"15.3 報道・二次情報"}</h3>{" "}
+              <div className={styles["table-wrap"]}>
+                {" "}
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{"内容"}</th>
+                      <th>{"URL"}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{"発表と提供形態(TechCrunch)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://techcrunch.com/2026/09/03/openai-launches-astra-its-powerful-and-controversial-new-model/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://techcrunch.com/2026/09/03/openai-launches-astra-its-powerful-and-controversial-new-model/"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"段階的な提供と対象プラン(CNBC)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://www.cnbc.com/2026/09/03/open-ai-astra-gpt-6-cyber.html"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://www.cnbc.com/2026/09/03/open-ai-astra-gpt-6-cyber.html"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"予告時の数学成果(BleepingComputer)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://www.bleepingcomputer.com/news/artificial-intelligence/openai-teases-astra-its-next-major-ai-model-after-it-solves-10-long-standing-math-problems/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://www.bleepingcomputer.com/news/artificial-intelligence/openai-teases-astra-its-next-major-ai-model-after-it-solves-10-long-standing-math-problems/"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"GPT-6.1 Astra の公開見送り(The Next Web)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://thenextweb.com/news/openai-cancels-launch-of-gpt-6-1-astra"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://thenextweb.com/news/openai-cancels-launch-of-gpt-6-1-astra"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"同上(Digital Trends)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://www.digitaltrends.com/computing/openai-stops-gpt-6-1-astra-launch-after-safety-tests-raise-red-flags/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://www.digitaltrends.com/computing/openai-stops-gpt-6-1-astra-launch-after-safety-tests-raise-red-flags/"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"同上(日本語の整理)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://rocket-boys.co.jp/?p=41781"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://rocket-boys.co.jp/?p=41781"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"スキルとプロンプト見直しの解説"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://aiweekly.co/node/12857"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://aiweekly.co/node/12857"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"Astra 公式ガイドの韓国語解説(API 機能と制約の整理)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://discuss.pytorch.kr/t/openai-gpt-6-astra/11846"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://discuss.pytorch.kr/t/openai-gpt-6-astra/11846"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        {" OpenRouter の移行ガイド("}
+                        <code>{"configuration_update"}</code>
+                        {" と非同期ツール) "}
+                      </td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://www.openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gpt-6-astra.md"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://www.openrouter.ai/docs/cookbook/evaluate-and-optimize/model-migrations/gpt-6-astra.md"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"ベンチマークと価格の測定記事 [要検証]"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://computingforgeeks.com/gpt-6-astra-released-features-benchmarks/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {
+                            "https://computingforgeeks.com/gpt-6-astra-released-features-benchmarks/"
+                          }
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"ベンチマークの一覧(ハーネス依存の注記あり)[要検証]"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://mer.vin/news/gpt-6-astra-openais-first-critical-rated-model/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://mer.vin/news/gpt-6-astra-openais-first-critical-rated-model/"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>{"日本語 Wikipedia(GPT-6 の概要)"}</td>
+                      <td>
+                        {" "}
+                        <a
+                          href="https://ja.wikipedia.org/wiki/GPT-6"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {"https://ja.wikipedia.org/wiki/GPT-6"}
+                        </a>{" "}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>{" "}
+              </div>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="sec-16">
+            {" "}
+            <h2 id="astra-heading-79">{"付録: 本ガイドの限界"}</h2>{" "}
+            <div className={styles.prose}>
+              {" "}
+              <ul>
+                {" "}
+                <li>
+                  {" "}
+                  <strong>{"ベンチマークは自己申告が中心"}</strong>
+                  {
+                    "です。ARC-AGI-3 の数値は、使うハーネスで大きく変わるとの指摘があります。[要検証] "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"Ultrafast の料金"}</strong>
+                  {
+                    "は、調査時点で確認できた公式情報に明記がなかったため、本ガイドでは記載していません。公式の料金ページで確認してください。 "
+                  }
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"GPT-6.1 系の料金・仕様"}</strong>
+                  {"は変化が速いため、モデルページを正としてください。 "}
+                </li>{" "}
+                <li>
+                  {" "}
+                  <strong>{"安全性の議論"}</strong>
+                  {
+                    "(CoT の監視可能性など)は、公開情報が限られた状態での推論を含みます。続報を確認してください。 "
+                  }
+                </li>{" "}
+                <li>
+                  {" 本ガイドのプロンプト例は、公式ガイドの趣旨を日本語で再構成した"}
+                  <strong>{"出発点"}</strong>
+                  {"です。必ず自社の評価セットで検証してください。 "}
+                </li>{" "}
+              </ul>{" "}
+            </div>{" "}
+          </section>{" "}
+          <footer className={styles.footer}>
+            {" 最終更新: 2026年11月5日 / 数値・仕様は公式ドキュメントで再確認してください "}
+          </footer>{" "}
+        </main>{" "}
+      </div>
+    </div>
+  );
+}

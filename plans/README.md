@@ -1,6 +1,6 @@
 # Plans — プラットフォーム拡張検討ドキュメント
 
-Updated 2026-11-05
+Updated 2026-11-10
 
 `.agent/skills/improve/SKILL.md` により生成・維持している方向性ドキュメント群。
 対象は web-next（Next.js 16 SSG）の「AI 最新情報キャッチアップ・プラットフォーム」化。
@@ -11,6 +11,25 @@ Updated 2026-11-05
 - 照合 v2: 2026-07-12（004〜006, commit `45940fd`）— 154 コミットのドリフトを 004 で照合済み
 
 基準コミット（drift 検出用）: `45940fd`
+
+保守同期（2026-11-10）: `/google/argon-best-practices` の実装・自動検証・分離コミットが完了。
+Googleカテゴリのregistryから導線を導出。進捗テスト期待値1行はユーザー承認後に原本式へ訂正済み。
+全体233 files／2794 tests、対象68契約・関連95件、型・lint634 files・HTML監査exit 0・7図解析・pytest122件が成功。
+原本2形式は内容無変更保存。007〜009のDONE状態を維持。npm・ビルド未実行。
+次はユーザーによる目視確認（Argon・Fable・Astraは個別に未確認を維持）。履歴はdocs/PROGRESS.mdを参照。
+
+保守同期（2026-11-10）: `/codex/astra-best-practices` を既存Codexカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作68契約、関連95件、
+全体Vitest **231 files／2725 tests**、型・lint627 files、HTML監査exit 0、Mermaid12図解析、pytest122件が成功。
+8・7・7項目のリスト別進捗と原本2形式の内容無変更保存を検証。npm・ビルド未実行。
+次はユーザーの目視確認（localhost:3000）。分離履歴と再開手順は `docs/PROGRESS.md` を参照。
+
+保守同期（2026-11-09）: `/claude/fable-5-1-best-practices` を既存Claudeカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作67契約、関連94件、
+全体Vitest **229 files／2657 tests**、型・lint621 files、HTML監査exit 0、Mermaid10図解析、pytest122件が成功。
+チェック進捗契約の訂正はユーザー承認済み。原本どおりの8・5・5項目のリスト別集計を検証。
+原本2形式は内容無変更で保存。npm・ビルド未実行。次はユーザーの目視確認（localhost:3000）。
+分離履歴と再開手順は `docs/PROGRESS.md` を参照。
 
 保守同期（2026-11-05）: `/xai/grok-bot-guide` を既存xAIカテゴリへ登録。
 007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作62契約、

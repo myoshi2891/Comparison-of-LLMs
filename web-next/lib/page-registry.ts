@@ -64,6 +64,18 @@ export type PageEntry = z.infer<typeof PageEntrySchema>;
 
 const entries: PageEntry[] = [
   {
+    slug: "/codex/astra-best-practices",
+    title: "GPT-6 Astra ベストプラクティス",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
+    topics: ["openai", "astra", "agent", "prompt", "api", "cost", "security"],
+    summary:
+      "GPT-6 Astra のモデル選定、Responses API、推論強度、プロンプト・スキル、ツール利用、安全運用と評価を学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-10",
+    lastReviewed: "2026-11-10",
+  },
+  {
     slug: "/xai/grok-bot-guide",
     title: "Grok Bot 初学者ガイド",
     group: "Providers",
@@ -418,6 +430,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-22",
   },
   {
+    slug: "/claude/fable-5-1-best-practices",
+    title: "Claude Fable 5.1 ベストプラクティス",
+    group: "Providers",
+    category: "Claude",
+    provider: "claude",
+    topics: ["claude", "agent", "prompt", "api", "cost", "security"],
+    summary:
+      "Claude Fable 5.1 のモデル選定、API移行、effort、履歴・キャッシュ、エージェント運用と評価を学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-09",
+    lastReviewed: "2026-11-09",
+  },
+  {
     slug: "/claude/fable-5-best-practices",
     title: "Fable 5 Best Practices",
     group: "Providers",
@@ -707,6 +731,18 @@ const entries: PageEntry[] = [
       "バイブコーディング脱却からマルチエージェント検証、EARS記法、GitHub Spec Kit・AWS Kiro・BMAD実践まで網羅した、中級・上級エンジニア向け仕様駆動開発の実践ガイド。",
     addedAt: "2026-07-26",
     lastReviewed: "2026-07-26",
+  },
+  {
+    slug: "/google/argon-best-practices",
+    title: "Gemini 4 Argon ベストプラクティス",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "gemini", "argon", "agent", "api", "cost", "security"],
+    summary:
+      "Gemini 4 Argon の導入、SDK、thinking_level、Long Decode、移行、エージェント運用、コスト・安全性・評価を学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-10",
+    lastReviewed: "2026-11-10",
   },
   {
     slug: "/google/models-best-practices",
