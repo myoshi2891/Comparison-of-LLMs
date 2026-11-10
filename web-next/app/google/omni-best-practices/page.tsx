@@ -546,7 +546,8 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-bash hljs">
                   <span className={styles.codeLine}>
-                    {"pip install -U google-genai\n"}
+                    {"pip install -U google-genai"}
+                    {"\n"}
                     <span className={"hljs-built_in"}>{"export"}</span>
                     {" GEMINI_API_KEY="}
                     <span className={"hljs-string"}>{'"YOUR_API_KEY"'}</span>
@@ -558,14 +559,20 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" base64\n"}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"base64"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"from"}</span>
                     {" google "}
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" genai\n\nclient = genai.Client()\nMODEL = "}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"genai"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client()"}
+                    {"\n"}
+                    {"MODEL = "}
                     <span className={"hljs-string"}>{'"gemini-omni-1.1-flash"'}</span>
-                    {"\n\n\n"}
+                    {"\n"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"def"}</span>{" "}
                     <span className={["hljs-title", "function_"].join(" ")}>{"save_video"}</span>
                     {"("}
@@ -575,38 +582,61 @@ export default function Page() {
                     </span>
                     {") -> "}
                     <span className={"hljs-literal"}>{"None"}</span>
-                    {":\n    "}
+                    {":"}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-string"}>
                       {'"""SDK 専用の便利フィールド output_video から mp4 を保存する。"""'}
                     </span>
-                    {"\n    "}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-keyword"}>{"with"}</span>{" "}
                     <span className={"hljs-built_in"}>{"open"}</span>
                     {"(path, "}
                     <span className={"hljs-string"}>{'"wb"'}</span>
                     {") "}
-                    <span className={"hljs-keyword"}>{"as"}</span>
-                    {
-                      " f:\n        f.write(base64.b64decode(interaction.output_video.data))\n\n\ninteraction = client.interactions.create(\n    model=MODEL,\n    "
-                    }
+                    <span className={"hljs-keyword"}>{"as"}</span> {"f:"}
+                    {"\n"}
+                    {"        "}
+                    {"f.write(base64.b64decode(interaction.output_video.data))"}
+                    {"\n"}
+                    {"\n"}
+                    {"\n"}
+                    {"interaction = client.interactions.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model=MODEL,"}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-built_in"}>{"input"}</span>
-                    {"=(\n        "}
+                    {"=("}
+                    {"\n"}
+                    {"        "}
                     <span className={"hljs-string"}>
                       {
                         '"Continuous, unbroken handheld shot of a tabby cat on a sunny windowsill, "'
                       }
                     </span>
-                    {"\n        "}
+                    {"\n"}
+                    {"        "}
                     <span className={"hljs-string"}>
                       {
                         '"looking into a leafy garden. Sound design: gentle breeze, distant birds. "'
                       }
                     </span>
-                    {"\n        "}
+                    {"\n"}
+                    {"        "}
                     <span className={"hljs-string"}>{'"No dialogue."'}</span>
-                    {"\n    ),\n)\nsave_video(interaction, "}
+                    {"\n"}
+                    {"    "}
+                    {"),"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"save_video(interaction, "}
                     <span className={"hljs-string"}>{'"cat.mp4"'}</span>
-                    {")\n"}
+                    {")"}
+                    {"\n"}
                     <span className={"hljs-built_in"}>{"print"}</span>
                     {"("}
                     <span className={"hljs-string"}>{'"interaction id:"'}</span>
@@ -640,11 +670,13 @@ export default function Page() {
                 <code className="language-json hljs">
                   <span className={styles.codeLine}>
                     <span className={"hljs-punctuation"}>{"{"}</span>
-                    {"\n  "}
+                    {"\n"}
+                    {"  "}
                     <span className={"hljs-attr"}>{'"steps"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
                     <span className={"hljs-punctuation"}>{"["}</span>
-                    {"\n    "}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-punctuation"}>{"{"}</span>{" "}
                     <span className={"hljs-attr"}>{'"type"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
@@ -665,7 +697,8 @@ export default function Page() {
                     <span className={"hljs-punctuation"}>{"]"}</span>{" "}
                     <span className={"hljs-punctuation"}>{"}"}</span>
                     <span className={"hljs-punctuation"}>{","}</span>
-                    {"\n    "}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-punctuation"}>{"{"}</span>{" "}
                     <span className={"hljs-attr"}>{'"type"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
@@ -686,14 +719,17 @@ export default function Page() {
                     <span className={"hljs-punctuation"}>{"]"}</span>{" "}
                     <span className={"hljs-punctuation"}>{"}"}</span>
                     <span className={"hljs-punctuation"}>{","}</span>
-                    {"\n    "}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-punctuation"}>{"{"}</span>
-                    {"\n      "}
+                    {"\n"}
+                    {"      "}
                     <span className={"hljs-attr"}>{'"type"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
                     <span className={"hljs-string"}>{'"model_output"'}</span>
                     <span className={"hljs-punctuation"}>{","}</span>
-                    {"\n      "}
+                    {"\n"}
+                    {"      "}
                     <span className={"hljs-attr"}>{'"content"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
                     <span className={"hljs-punctuation"}>{"["}</span>
@@ -711,27 +747,33 @@ export default function Page() {
                     <span className={"hljs-string"}>{'"<base64>"'}</span>{" "}
                     <span className={"hljs-punctuation"}>{"}"}</span>
                     <span className={"hljs-punctuation"}>{"]"}</span>
-                    {"\n    "}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-punctuation"}>{"}"}</span>
-                    {"\n  "}
+                    {"\n"}
+                    {"  "}
                     <span className={"hljs-punctuation"}>{"]"}</span>
                     <span className={"hljs-punctuation"}>{","}</span>
-                    {"\n  "}
+                    {"\n"}
+                    {"  "}
                     <span className={"hljs-attr"}>{'"id"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
                     <span className={"hljs-string"}>{'"v1_..."'}</span>
                     <span className={"hljs-punctuation"}>{","}</span>
-                    {"\n  "}
+                    {"\n"}
+                    {"  "}
                     <span className={"hljs-attr"}>{'"status"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
                     <span className={"hljs-string"}>{'"completed"'}</span>
                     <span className={"hljs-punctuation"}>{","}</span>
-                    {"\n  "}
+                    {"\n"}
+                    {"  "}
                     <span className={"hljs-attr"}>{'"model"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
                     <span className={"hljs-string"}>{'"gemini-omni-1.1-flash"'}</span>
                     <span className={"hljs-punctuation"}>{","}</span>
-                    {"\n  "}
+                    {"\n"}
+                    {"  "}
                     <span className={"hljs-attr"}>{'"object"'}</span>
                     <span className={"hljs-punctuation"}>{":"}</span>{" "}
                     <span className={"hljs-string"}>{'"interaction"'}</span>
@@ -844,25 +886,45 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    {"interaction = client.interactions.create(\n    model=MODEL,\n    "}
+                    {"interaction = client.interactions.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model=MODEL,"}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-built_in"}>{"input"}</span>
                     {"="}
                     <span className={"hljs-string"}>
                       {'"A futuristic city with neon lights and flying cars, cyberpunk style"'}
                     </span>
-                    {",\n    response_format={\n        "}
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"response_format={"}
+                    {"\n"}
+                    {"        "}
                     <span className={"hljs-string"}>{'"type"'}</span>
                     {": "}
                     <span className={"hljs-string"}>{'"video"'}</span>
-                    {",\n        "}
+                    {","}
+                    {"\n"}
+                    {"        "}
                     <span className={"hljs-string"}>{'"aspect_ratio"'}</span>
                     {": "}
                     <span className={"hljs-string"}>{'"9:16"'}</span>
-                    {",\n        "}
+                    {","}
+                    {"\n"}
+                    {"        "}
                     <span className={"hljs-string"}>{'"resolution"'}</span>
                     {": "}
                     <span className={"hljs-string"}>{'"1080p"'}</span>
-                    {",\n    },\n)\n"}
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"},"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -880,22 +942,33 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" time\n"}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"time"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"from"}</span>
                     {" google "}
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {
-                      " genai\n\nclient = genai.Client()\n\ninteraction = client.interactions.create(\n    model="
-                    }
+                    <span className={"hljs-keyword"}>{"import"}</span> {"genai"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client()"}
+                    {"\n"}
+                    {"\n"}
+                    {"interaction = client.interactions.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
                     <span className={"hljs-string"}>{'"gemini-omni-1.1-flash"'}</span>
-                    {",\n    "}
+                    {","}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-built_in"}>{"input"}</span>
                     {"="}
                     <span className={"hljs-string"}>
                       {'"A beautiful sunset over a calm ocean."'}
                     </span>
-                    {",\n    response_format={"}
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"response_format={"}
                     <span className={"hljs-string"}>{'"type"'}</span>
                     {": "}
                     <span className={"hljs-string"}>{'"video"'}</span>
@@ -903,40 +976,64 @@ export default function Page() {
                     <span className={"hljs-string"}>{'"delivery"'}</span>
                     {": "}
                     <span className={"hljs-string"}>{'"uri"'}</span>
-                    {
-                      "},\n)\n\nvideo_output = interaction.output_video\nfile_name = video_output.uri.split("
-                    }
+                    {"},"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
+                    {"video_output = interaction.output_video"}
+                    {"\n"}
+                    {"file_name = video_output.uri.split("}
                     <span className={"hljs-string"}>{'"/"'}</span>
                     {")[-"}
                     <span className={"hljs-number"}>{"1"}</span>
-                    {"]\n\n"}
+                    {"]"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"while"}</span>{" "}
                     <span className={"hljs-literal"}>{"True"}</span>
-                    {":\n    info = client.files.get(name="}
+                    {":"}
+                    {"\n"}
+                    {"    "}
+                    {"info = client.files.get(name="}
                     <span className={"hljs-string"}>
                       {'f"files/'}
                       <span className={"hljs-subst"}>{"{file_name}"}</span>
                       {'"'}
                     </span>
-                    {")\n    "}
+                    {")"}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-keyword"}>{"if"}</span>
                     {" info.state.name == "}
                     <span className={"hljs-string"}>{'"ACTIVE"'}</span>
-                    {":\n        "}
+                    {":"}
+                    {"\n"}
+                    {"        "}
                     <span className={"hljs-keyword"}>{"break"}</span>
-                    {"\n    "}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-keyword"}>{"if"}</span>
                     {" info.state.name == "}
                     <span className={"hljs-string"}>{'"FAILED"'}</span>
-                    {":\n        "}
+                    {":"}
+                    {"\n"}
+                    {"        "}
                     <span className={"hljs-keyword"}>{"raise"}</span>
                     {" RuntimeError("}
                     <span className={"hljs-string"}>{'"Generation failed."'}</span>
-                    {")\n    time.sleep("}
+                    {")"}
+                    {"\n"}
+                    {"    "}
+                    {"time.sleep("}
                     <span className={"hljs-number"}>{"5"}</span>
-                    {")\n\nclient.files.download(file=video_output.uri, destination="}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
+                    {"client.files.download(file=video_output.uri, destination="}
                     <span className={"hljs-string"}>{'"output.mp4"'}</span>
-                    {")\n"}
+                    {")"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -1198,9 +1295,14 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-markdown hljs">
                   <span className={styles.codeLine}>
-                    {
-                      "[0-3s] A person is walking along a rainy street at night\n[3-6s] They stop and turn toward the camera\n[6-10s] They start running, camera tracking from behind\nAudio: Rain ambience, low synth drone. No dialogue.\n"
-                    }
+                    {"[0-3s] A person is walking along a rainy street at night"}
+                    {"\n"}
+                    {"[3-6s] They stop and turn toward the camera"}
+                    {"\n"}
+                    {"[6-10s] They start running, camera tracking from behind"}
+                    {"\n"}
+                    {"Audio: Rain ambience, low synth drone. No dialogue."}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -1208,19 +1310,24 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    {"prompt = (\n    "}
+                    {"prompt = ("}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-string"}>
                       {
                         "'One word on screen at a time: \"did, you, know, that, Omni, can, do, text?\" '"
                       }
                     </span>
-                    {"\n    "}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-string"}>
                       {
                         '"Each word appears for 1 second with a different animated style. No dialogue."'
                       }
                     </span>
-                    {"\n)\n"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -1404,17 +1511,22 @@ export default function Page() {
                         {">"}
                       </span>
                     </span>
-                    {"@Image2]\nA woman "}
+                    {"@Image2]"}
+                    {"\n"}
+                    {"A woman "}
                     <span className={"language-xml"}>
                       <span className={"hljs-tag"}>
                         {"<"}
                         <span className={"hljs-name"}>{"IMAGE_REF_0"}</span>
                         {">"}
                       </span>
-                    </span>
+                    </span>{" "}
+                    {"is walking along a beach at sunset."}
+                    {"\n"}
                     {
-                      " is walking along a beach at sunset.\nUse Image1 as the starting frame. Use Image2 as a reference for the video generation.\n"
+                      "Use Image1 as the starting frame. Use Image2 as a reference for the video generation."
                     }
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -1506,32 +1618,51 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" base64\n"}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"base64"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"from"}</span>
                     {" google "}
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" genai\n\nclient = genai.Client()\nMODEL = "}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"genai"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client()"}
+                    {"\n"}
+                    {"MODEL = "}
                     <span className={"hljs-string"}>{'"gemini-omni-1.1-flash"'}</span>
-                    {"\n\n"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-comment"}>{"# Turn 1: 生成(保存を有効にしておく)"}</span>
-                    {"\nres1 = client.interactions.create(model=MODEL, "}
+                    {"\n"}
+                    {"res1 = client.interactions.create(model=MODEL, "}
                     <span className={"hljs-built_in"}>{"input"}</span>
                     {"="}
                     <span className={"hljs-string"}>{'"A woman playing violin outdoors."'}</span>
-                    {")\n\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-comment"}>{"# Turn 2: 直前の動画を編集"}</span>
-                    {
-                      "\nres2 = client.interactions.create(\n    model=MODEL,\n    previous_interaction_id=res1."
-                    }
+                    {"\n"}
+                    {"res2 = client.interactions.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model=MODEL,"}
+                    {"\n"}
+                    {"    "}
+                    {"previous_interaction_id=res1."}
                     <span className={"hljs-built_in"}>{"id"}</span>
-                    {",\n    "}
+                    {","}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-built_in"}>{"input"}</span>
                     {"="}
                     <span className={"hljs-string"}>
                       {'"Make the violin invisible. Keep everything else the same."'}
                     </span>
-                    {",\n)\n\n"}
+                    {","}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"with"}</span>{" "}
                     <span className={"hljs-built_in"}>{"open"}</span>
                     {"("}
@@ -1539,8 +1670,11 @@ export default function Page() {
                     {", "}
                     <span className={"hljs-string"}>{'"wb"'}</span>
                     {") "}
-                    <span className={"hljs-keyword"}>{"as"}</span>
-                    {" f:\n    f.write(base64.b64decode(res2.output_video.data))\n"}
+                    <span className={"hljs-keyword"}>{"as"}</span> {"f:"}
+                    {"\n"}
+                    {"    "}
+                    {"f.write(base64.b64decode(res2.output_video.data))"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -1624,40 +1758,68 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" base64\n"}
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" time\n"}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"base64"}
+                    {"\n"}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"time"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"from"}</span>
                     {" google "}
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" genai\n\nclient = genai.Client()\n\nvideo_file = client.files.upload(file="}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"genai"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client()"}
+                    {"\n"}
+                    {"\n"}
+                    {"video_file = client.files.upload(file="}
                     <span className={"hljs-string"}>{'"Video.mp4"'}</span>
-                    {")\n"}
+                    {")"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"while"}</span>
                     {" video_file.state == "}
                     <span className={"hljs-string"}>{'"PROCESSING"'}</span>
-                    {":\n    time.sleep("}
+                    {":"}
+                    {"\n"}
+                    {"    "}
+                    {"time.sleep("}
                     <span className={"hljs-number"}>{"10"}</span>
-                    {")\n    video_file = client.files.get(name=video_file.name)\n\n"}
+                    {")"}
+                    {"\n"}
+                    {"    "}
+                    {"video_file = client.files.get(name=video_file.name)"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"if"}</span>
                     {" video_file.state == "}
                     <span className={"hljs-string"}>{'"FAILED"'}</span>
-                    {":\n    "}
-                    <span className={"hljs-keyword"}>{"raise"}</span>
-                    {
-                      " ValueError(video_file.state)\n\ninteraction = client.interactions.create(\n    model="
-                    }
+                    {":"}
+                    {"\n"}
+                    {"    "}
+                    <span className={"hljs-keyword"}>{"raise"}</span>{" "}
+                    {"ValueError(video_file.state)"}
+                    {"\n"}
+                    {"\n"}
+                    {"interaction = client.interactions.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
                     <span className={"hljs-string"}>{'"gemini-omni-1.1-flash"'}</span>
-                    {",\n    "}
+                    {","}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-built_in"}>{"input"}</span>
-                    {"=[\n        {"}
+                    {"=["}
+                    {"\n"}
+                    {"        "}
+                    {"{"}
                     <span className={"hljs-string"}>{'"type"'}</span>
                     {": "}
                     <span className={"hljs-string"}>{'"video"'}</span>
                     {", "}
                     <span className={"hljs-string"}>{'"uri"'}</span>
-                    {": video_file.uri},\n        {"}
+                    {": video_file.uri},"}
+                    {"\n"}
+                    {"        "}
+                    {"{"}
                     <span className={"hljs-string"}>{'"type"'}</span>
                     {": "}
                     <span className={"hljs-string"}>{'"text"'}</span>
@@ -1667,7 +1829,14 @@ export default function Page() {
                     <span className={"hljs-string"}>
                       {'"Change the lighting to be more dramatic. Keep everything else the same."'}
                     </span>
-                    {"},\n    ],\n)\n\n"}
+                    {"},"}
+                    {"\n"}
+                    {"    "}
+                    {"],"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"with"}</span>{" "}
                     <span className={"hljs-built_in"}>{"open"}</span>
                     {"("}
@@ -1675,8 +1844,11 @@ export default function Page() {
                     {", "}
                     <span className={"hljs-string"}>{'"wb"'}</span>
                     {") "}
-                    <span className={"hljs-keyword"}>{"as"}</span>
-                    {" f:\n    f.write(base64.b64decode(interaction.output_video.data))\n"}
+                    <span className={"hljs-keyword"}>{"as"}</span> {"f:"}
+                    {"\n"}
+                    {"    "}
+                    {"f.write(base64.b64decode(interaction.output_video.data))"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -1754,28 +1926,43 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" base64\n"}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"base64"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"from"}</span>
                     {" google "}
-                    <span className={"hljs-keyword"}>{"import"}</span>
-                    {" genai\n\nclient = genai.Client()\nMODEL = "}
+                    <span className={"hljs-keyword"}>{"import"}</span> {"genai"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client()"}
+                    {"\n"}
+                    {"MODEL = "}
                     <span className={"hljs-string"}>{'"gemini-omni-1.1-flash"'}</span>
-                    {"\n\nfirst = client.interactions.create(model=MODEL, "}
+                    {"\n"}
+                    {"\n"}
+                    {"first = client.interactions.create(model=MODEL, "}
                     <span className={"hljs-built_in"}>{"input"}</span>
                     {"="}
                     <span className={"hljs-string"}>
                       {'"A fox runs across a snowy field at dawn."'}
                     </span>
-                    {")\n\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-comment"}>
                       {"# モデル生成動画の続きを作る(多ターン)"}
                     </span>
-                    {
-                      "\nsecond = client.interactions.create(\n    model=MODEL,\n    previous_interaction_id=first."
-                    }
+                    {"\n"}
+                    {"second = client.interactions.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model=MODEL,"}
+                    {"\n"}
+                    {"    "}
+                    {"previous_interaction_id=first."}
                     <span className={"hljs-built_in"}>{"id"}</span>
-                    {",\n    "}
+                    {","}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-built_in"}>{"input"}</span>
                     {"=[{"}
                     <span className={"hljs-string"}>{'"type"'}</span>
@@ -1787,13 +1974,19 @@ export default function Page() {
                     <span className={"hljs-string"}>
                       {'"Continue the scene. The music builds."'}
                     </span>
-                    {"}],\n    response_format={"}
+                    {"}],"}
+                    {"\n"}
+                    {"    "}
+                    {"response_format={"}
                     <span className={"hljs-string"}>{'"resolution"'}</span>
                     {": "}
                     <span className={"hljs-string"}>{'"360p"'}</span>
                     {"},  "}
                     <span className={"hljs-comment"}>{"# まずドラフトで確認する"}</span>
-                    {"\n)\n\n"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"with"}</span>{" "}
                     <span className={"hljs-built_in"}>{"open"}</span>
                     {"("}
@@ -1801,8 +1994,11 @@ export default function Page() {
                     {", "}
                     <span className={"hljs-string"}>{'"wb"'}</span>
                     {") "}
-                    <span className={"hljs-keyword"}>{"as"}</span>
-                    {" f:\n    f.write(base64.b64decode(second.output_video.data))\n"}
+                    <span className={"hljs-keyword"}>{"as"}</span> {"f:"}
+                    {"\n"}
+                    {"    "}
+                    {"f.write(base64.b64decode(second.output_video.data))"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -1978,7 +2174,8 @@ export default function Page() {
                     <span className={"hljs-number"}>{"17.50"}</span>
                     {"   "}
                     <span className={"hljs-comment"}>{"# 公式料金ページ"}</span>
-                    {"\nTOKENS_PER_SEC_720P = "}
+                    {"\n"}
+                    {"TOKENS_PER_SEC_720P = "}
                     <span className={"hljs-number"}>{"5792"}</span>
                     {"       "}
                     <span className={"hljs-comment"}>{"# 公式料金ページ"}</span>
@@ -1988,7 +2185,8 @@ export default function Page() {
                         "# 360p は Google が約 1/3 と公表。1080p / 4K は報道・再販価格からの逆算(要確認)"
                       }
                     </span>
-                    {"\nRES_MULTIPLIER = {"}
+                    {"\n"}
+                    {"RES_MULTIPLIER = {"}
                     <span className={"hljs-string"}>{'"360p"'}</span>
                     {": "}
                     <span className={"hljs-number"}>{"1"}</span>
@@ -2006,7 +2204,10 @@ export default function Page() {
                     <span className={"hljs-string"}>{'"4k"'}</span>
                     {": "}
                     <span className={"hljs-number"}>{"3.0"}</span>
-                    {"}\n\n\n"}
+                    {"}"}
+                    {"\n"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-keyword"}>{"def"}</span>{" "}
                     <span className={["hljs-title", "function_"].join(" ")}>{"estimate_cost"}</span>
                     {"("}
@@ -2024,15 +2225,23 @@ export default function Page() {
                     </span>
                     {") -> "}
                     <span className={"hljs-built_in"}>{"float"}</span>
-                    {":\n    "}
+                    {":"}
+                    {"\n"}
+                    {"    "}
                     <span className={"hljs-string"}>
                       {'"""出力動画の概算コスト(USD)。attempts は採用までの試行回数。"""'}
                     </span>
-                    {"\n    per_sec = TOKENS_PER_SEC_720P * USD_PER_M_VIDEO_TOKENS / "}
+                    {"\n"}
+                    {"    "}
+                    {"per_sec = TOKENS_PER_SEC_720P * USD_PER_M_VIDEO_TOKENS / "}
                     <span className={"hljs-number"}>{"1_000_000"}</span>
-                    {"\n    "}
-                    <span className={"hljs-keyword"}>{"return"}</span>
-                    {" seconds * per_sec * RES_MULTIPLIER[resolution] * attempts\n\n\n"}
+                    {"\n"}
+                    {"    "}
+                    <span className={"hljs-keyword"}>{"return"}</span>{" "}
+                    {"seconds * per_sec * RES_MULTIPLIER[resolution] * attempts"}
+                    {"\n"}
+                    {"\n"}
+                    {"\n"}
                     <span className={"hljs-built_in"}>{"print"}</span>
                     {"("}
                     <span className={"hljs-string"}>
@@ -2046,7 +2255,8 @@ export default function Page() {
                       </span>
                       {'"'}
                     </span>
-                    {")\n"}
+                    {")"}
+                    {"\n"}
                     <span className={"hljs-built_in"}>{"print"}</span>
                     {"("}
                     <span className={"hljs-string"}>
@@ -2068,7 +2278,8 @@ export default function Page() {
                       </span>
                       {'"'}
                     </span>
-                    {")\n"}
+                    {")"}
+                    {"\n"}
                     <span className={"hljs-built_in"}>{"print"}</span>
                     {"("}
                     <span className={"hljs-string"}>
@@ -2086,7 +2297,8 @@ export default function Page() {
                       </span>
                       {'"'}
                     </span>
-                    {")\n"}
+                    {")"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
