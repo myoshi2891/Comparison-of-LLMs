@@ -733,6 +733,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-07-26",
   },
   {
+    slug: "/google/argon-best-practices",
+    title: "Gemini 4 Argon ベストプラクティス",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "gemini", "argon", "agent", "api", "cost", "security"],
+    summary:
+      "Gemini 4 Argon の導入、SDK、thinking_level、Long Decode、移行、エージェント運用、コスト・安全性・評価を学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-10",
+    lastReviewed: "2026-11-10",
+  },
+  {
     slug: "/google/models-best-practices",
     title: "Gemini 最新モデル ベストプラクティス",
     group: "Providers",
