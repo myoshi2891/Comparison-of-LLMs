@@ -64,13 +64,13 @@ export default function Page() {
       <div className={styles.layout} data-testid="layout-root">
         {" "}
         <nav
-          className={[styles.sidebar].join(" ")}
+          className={styles.sidebar}
           id="argon-sidebar"
           aria-label="目次"
           data-testid="sidebar-nav"
         >
           {" "}
-          <div className={[styles.brand].join(" ")}>
+          <div className={styles.brand}>
             {"Gemini 4 Argon"}
             <br />
             {"ベストプラクティス"}
@@ -81,73 +81,73 @@ export default function Page() {
             aria-current="location"
             data-testid="sidebar-nav-link"
           >
-            <span className={[styles["n-dot"]].join(" ")}></span>
+            <span className={styles["n-dot"]}></span>
             <span>{"1. Argonとは何か(位置づけと全体像)"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-1" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-1" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"2. Argonの特徴を一枚で把握する"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-2" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-2" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 1: アクセス経路とモデルIDを決める"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-3" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-3" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 2: SDK・環境を整える"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-4" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-4" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 3: thinking_level を設計する"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-5" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-5" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 4: 出力上限とLong Decodeを設計する"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-6" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-6" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 5: 自前ループ(REST)とトークン計測・課金"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-7" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-7" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 6: 既存アプリの移行チェックリスト"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-8" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-8" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 7: エージェント開発(Antigravity・/goal・.agents/skills)"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-9" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-9" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 8: コスト最適化(cost per task とルーティング)"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-10" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-10" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 9: 安全性・セキュリティ運用"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-11" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-11" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Step 10: 評価とプロダクション投入の最終チェック"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-12" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-12" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"トラブルシューティング早見表"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-13" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-13" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"Argonの限界と注意点(公平な見方)"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-14" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-14" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"補足: その他のベストプラクティスと根拠ソースURL"}</span>
           </a>
-          <a className={[styles["nav-a"]].join(" ")} href="#sec-15" data-testid="sidebar-nav-link">
-            <span className={[styles["n-dot"]].join(" ")}></span>
+          <a className={styles["nav-a"]} href="#sec-15" data-testid="sidebar-nav-link">
+            <span className={styles["n-dot"]}></span>
             <span>{"参考URL一覧"}</span>
           </a>{" "}
         </nav>{" "}
-        <main className={[styles.main].join(" ")}>
+        <main className={styles.main}>
           {" "}
-          <header className={[styles.hero].join(" ")}>
+          <header className={styles.hero}>
             <div className={styles.heroDates} data-testid="hero-dates">
               最終確認日: <time dateTime={entry?.lastReviewed}>{entry?.lastReviewed}</time>公開日:{" "}
               <time dateTime={entry?.addedAt}>{entry?.addedAt}</time>
@@ -187,10 +187,10 @@ export default function Page() {
               </li>{" "}
             </ul>{" "}
           </header>{" "}
-          <section className={[styles.section].join(" ")} id="sec-0">
+          <section className={styles.section} id="sec-0">
             {" "}
             <h2 id="argon-heading-0">{"1. Argonとは何か(位置づけと全体像)"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>
                 {" Gemini 4 Argon は、Googleが2026年9月30日に発表した "}
@@ -214,10 +214,10 @@ export default function Page() {
                 <li>{"科学・数学、ロボティクス(空間推論)"}</li>{" "}
               </ul>{" "}
               <h3 id="argon-heading-1">{"1.1 Geminiラインナップ内での位置づけ"}</h3>{" "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {" "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="0">
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="0">
                     <MermaidDiagram chart={DIAGRAM_0} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>{" "}
@@ -245,7 +245,7 @@ export default function Page() {
                 </li>{" "}
               </ul>{" "}
               <h3 id="argon-heading-2">{"1.2 利用できる場所"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -296,12 +296,12 @@ export default function Page() {
               </div>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-1">
+          <section className={styles.section} id="sec-1">
             {" "}
             <h2 id="argon-heading-3">{"2. Argonの特徴を一枚で把握する"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -421,16 +421,16 @@ export default function Page() {
               </blockquote>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-2">
+          <section className={styles.section} id="sec-2">
             {" "}
             <h2 id="argon-heading-4">{"Step 1: アクセス経路とモデルIDを決める"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <h3 id="argon-heading-5">{"1.1 経路の選び方"}</h3>{" "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {" "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="1">
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="1">
                     <MermaidDiagram chart={DIAGRAM_1} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>{" "}
@@ -484,17 +484,17 @@ export default function Page() {
               </ol>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-3">
+          <section className={styles.section} id="sec-3">
             {" "}
             <h2 id="argon-heading-7">{"Step 2: SDK・環境を整える"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>
                 {" Long Decode の自動継続を使うには、"}
                 <strong>{"SDKのバージョン要件"}</strong>
                 {"があります。バージョンが古いと「出力が64Kで止まる」状態になります。 "}
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -542,15 +542,16 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-bash hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-comment"].join(" ")}>{"# Python"}</span>
-                    {"\npip install -U "}
-                    <span className={["hljs-string"].join(" ")}>{'"google-genai>=2.30.1"'}</span>
-                    {"\n\n"}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# JavaScript / TypeScript"}
-                    </span>
-                    {"\nnpm install "}
-                    <span className={["hljs-string"].join(" ")}>{'"@google/genai@>=2.29.1"'}</span>
+                    <span className="hljs-comment">{"# Python"}</span>
+                    {"\n"}
+                    {"pip install -U "}
+                    <span className="hljs-string">{'"google-genai>=2.30.1"'}</span>
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-comment">{"# JavaScript / TypeScript"}</span>
+                    {"\n"}
+                    {"npm install "}
+                    <span className="hljs-string">{'"@google/genai@>=2.29.1"'}</span>
                     {"\n"}
                   </span>
                 </code>
@@ -559,36 +560,57 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-keyword"].join(" ")}>{"from"}</span>
+                    <span className="hljs-keyword">{"from"}</span>
                     {" google "}
-                    <span className={["hljs-keyword"].join(" ")}>{"import"}</span>
-                    {" genai\n"}
-                    <span className={["hljs-keyword"].join(" ")}>{"from"}</span>
+                    <span className="hljs-keyword">{"import"}</span> {"genai"}
+                    {"\n"}
+                    <span className="hljs-keyword">{"from"}</span>
                     {" google.genai "}
-                    <span className={["hljs-keyword"].join(" ")}>{"import"}</span>
-                    {" types\n\nclient = genai.Client()  "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# GEMINI_API_KEY を環境変数から読む"}
-                    </span>
-                    {"\n\nresponse = client.models.generate_content(\n    model="}
-                    <span className={["hljs-string"].join(" ")}>{'"gemini-4-argon"'}</span>
-                    {",\n    contents="}
-                    <span className={["hljs-string"].join(" ")}>
+                    <span className="hljs-keyword">{"import"}</span> {"types"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client()  "}
+                    <span className="hljs-comment">{"# GEMINI_API_KEY を環境変数から読む"}</span>
+                    {"\n"}
+                    {"\n"}
+                    {"response = client.models.generate_content("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
+                    <span className="hljs-string">{'"gemini-4-argon"'}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"contents="}
+                    <span className="hljs-string">
                       {
                         '"three.jsで、重力レンズ効果を持つ3Dブラックホールを描画するスクリプトを書いてください。"'
                       }
                     </span>
-                    {",\n    config=types.GenerateContentConfig(\n        max_output_tokens="}
-                    <span className={["hljs-number"].join(" ")}>{"65536"}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"config=types.GenerateContentConfig("}
+                    {"\n"}
+                    {"        "}
+                    {"max_output_tokens="}
+                    <span className="hljs-number">{"65536"}</span>
                     {",  "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# 思考+出力の合計。明示的に設定する"}
-                    </span>
-                    {"\n        thinking_config=types.ThinkingConfig(thinking_level="}
-                    <span className={["hljs-string"].join(" ")}>{'"medium"'}</span>
-                    {"),\n    ),\n)\n"}
-                    <span className={["hljs-built_in"].join(" ")}>{"print"}</span>
-                    {"(response.text)\n"}
+                    <span className="hljs-comment">{"# 思考+出力の合計。明示的に設定する"}</span>
+                    {"\n"}
+                    {"        "}
+                    {"thinking_config=types.ThinkingConfig(thinking_level="}
+                    <span className="hljs-string">{'"medium"'}</span>
+                    {"),"}
+                    {"\n"}
+                    {"    "}
+                    {"),"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    <span className="hljs-built_in">{"print"}</span>
+                    {"(response.text)"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -603,10 +625,10 @@ export default function Page() {
               </p>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-4">
+          <section className={styles.section} id="sec-4">
             {" "}
             <h2 id="argon-heading-9">{"Step 3: thinking_level を設計する"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>
                 {" Argonでは "}
@@ -615,7 +637,7 @@ export default function Page() {
                 <strong>{"品質・レイテンシ・トークン消費を決める主要ノブ"}</strong>
                 {" です。 "}
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -656,10 +678,10 @@ export default function Page() {
                 </table>{" "}
               </div>{" "}
               <h3 id="argon-heading-10">{"3.1 選定フロー"}</h3>{" "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {" "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="2">
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="2">
                     <MermaidDiagram chart={DIAGRAM_2} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>{" "}
@@ -704,10 +726,10 @@ export default function Page() {
               </ol>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-5">
+          <section className={styles.section} id="sec-5">
             {" "}
             <h2 id="argon-heading-12">{"Step 4: 出力上限とLong Decodeを設計する"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <h3 id="argon-heading-13">{"4.1 仕組み(必ず理解しておく)"}</h3>{" "}
               <ul>
@@ -751,16 +773,16 @@ export default function Page() {
                   {"ことがある。これは正常動作で、最終回答は後続ホップで届く。 "}
                 </li>{" "}
               </ul>{" "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {" "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="3">
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="3">
                     <MermaidDiagram chart={DIAGRAM_3} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>{" "}
               </div>{" "}
               <h3 id="argon-heading-14">{"4.2 使うべき場面・避けるべき場面"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -831,7 +853,7 @@ export default function Page() {
                 <code>{"max_output_tokens"}</code>
                 {" の目安(公式ガイド)"}
               </h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -872,60 +894,94 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-keyword"].join(" ")}>{"from"}</span>
+                    <span className="hljs-keyword">{"from"}</span>
                     {" google "}
-                    <span className={["hljs-keyword"].join(" ")}>{"import"}</span>
-                    {" genai\n"}
-                    <span className={["hljs-keyword"].join(" ")}>{"from"}</span>
+                    <span className="hljs-keyword">{"import"}</span> {"genai"}
+                    {"\n"}
+                    <span className="hljs-keyword">{"from"}</span>
                     {" google.genai "}
-                    <span className={["hljs-keyword"].join(" ")}>{"import"}</span>
-                    {" types\n\nclient = genai.Client(\n    "}
-                    <span className={["hljs-comment"].join(" ")}>
+                    <span className="hljs-keyword">{"import"}</span> {"types"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client("}
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-comment">
                       {"# 20分のタイムアウト(ミリ秒)。短すぎるタイムアウトは途中切断の原因になる"}
                     </span>
-                    {"\n    http_options=types.HttpOptions(timeout="}
-                    <span className={["hljs-number"].join(" ")}>{"1_200_000"}</span>
-                    {")\n)\n\nresponse = client.models.generate_content(\n    model="}
-                    <span className={["hljs-string"].join(" ")}>{'"gemini-4-argon"'}</span>
-                    {",\n    contents="}
-                    <span className={["hljs-string"].join(" ")}>
+                    {"\n"}
+                    {"    "}
+                    {"http_options=types.HttpOptions(timeout="}
+                    <span className="hljs-number">{"1_200_000"}</span>
+                    {")"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
+                    {"response = client.models.generate_content("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
+                    <span className="hljs-string">{'"gemini-4-argon"'}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"contents="}
+                    <span className="hljs-string">
                       {'"素数定理の完全で厳密な証明を書いてください。"'}
                     </span>
-                    {",\n    config=types.GenerateContentConfig(\n        max_output_tokens="}
-                    <span className={["hljs-number"].join(" ")}>{"262_144"}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"config=types.GenerateContentConfig("}
+                    {"\n"}
+                    {"        "}
+                    {"max_output_tokens="}
+                    <span className="hljs-number">{"262_144"}</span>
                     {",  "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# 全ホップ合計の思考+出力"}
-                    </span>
-                    {"\n        thinking_config=types.ThinkingConfig(thinking_level="}
-                    <span className={["hljs-string"].join(" ")}>{'"high"'}</span>
-                    {"),\n        automatic_continuation="}
-                    <span className={["hljs-literal"].join(" ")}>{"True"}</span>
+                    <span className="hljs-comment">{"# 全ホップ合計の思考+出力"}</span>
+                    {"\n"}
+                    {"        "}
+                    {"thinking_config=types.ThinkingConfig(thinking_level="}
+                    <span className="hljs-string">{'"high"'}</span>
+                    {"),"}
+                    {"\n"}
+                    {"        "}
+                    {"automatic_continuation="}
+                    <span className="hljs-literal">{"True"}</span>
                     {",  "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# 既定。明示すると意図が伝わる"}
-                    </span>
-                    {"\n    ),\n)\n\n"}
-                    <span className={["hljs-built_in"].join(" ")}>{"print"}</span>
-                    {"(response.text)\n"}
-                    <span className={["hljs-built_in"].join(" ")}>{"print"}</span>
+                    <span className="hljs-comment">{"# 既定。明示すると意図が伝わる"}</span>
+                    {"\n"}
+                    {"    "}
+                    {"),"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-built_in">{"print"}</span>
+                    {"(response.text)"}
+                    {"\n"}
+                    <span className="hljs-built_in">{"print"}</span>
                     {"("}
-                    <span className={["hljs-string"].join(" ")}>{'"Finish reason:"'}</span>
+                    <span className="hljs-string">{'"Finish reason:"'}</span>
                     {", response.candidates["}
-                    <span className={["hljs-number"].join(" ")}>{"0"}</span>
-                    {"].finish_reason)\n"}
-                    <span className={["hljs-comment"].join(" ")}>
+                    <span className="hljs-number">{"0"}</span>
+                    {"].finish_reason)"}
+                    {"\n"}
+                    <span className="hljs-comment">
                       {"# ホップを跨いだ「実際のプロンプトサイズ」はこちらを使う"}
                     </span>
                     {"\n"}
-                    <span className={["hljs-built_in"].join(" ")}>{"print"}</span>
+                    <span className="hljs-built_in">{"print"}</span>
                     {"("}
-                    <span className={["hljs-string"].join(" ")}>{'"Prompt size:"'}</span>
-                    {", response.usage_metadata.initial_prompt_token_count)\n"}
-                    <span className={["hljs-built_in"].join(" ")}>{"print"}</span>
+                    <span className="hljs-string">{'"Prompt size:"'}</span>
+                    {", response.usage_metadata.initial_prompt_token_count)"}
+                    {"\n"}
+                    <span className="hljs-built_in">{"print"}</span>
                     {"("}
-                    <span className={["hljs-string"].join(" ")}>{'"Billed tokens:"'}</span>
-                    {", response.usage_metadata.total_token_count)\n"}
+                    <span className="hljs-string">{'"Billed tokens:"'}</span>
+                    {", response.usage_metadata.total_token_count)"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -933,30 +989,47 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-keyword"].join(" ")}>{"from"}</span>
+                    <span className="hljs-keyword">{"from"}</span>
                     {" google "}
-                    <span className={["hljs-keyword"].join(" ")}>{"import"}</span>
-                    {" genai\n\nclient = genai.Client()\n\n"}
-                    <span className={["hljs-comment"].join(" ")}>
+                    <span className="hljs-keyword">{"import"}</span> {"genai"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client()"}
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-comment">
                       {"# 64K超を生成するには background=True と max_output_tokens > 65536"}
                     </span>
-                    {"\ninteraction = client.interactions.create(\n    model="}
-                    <span className={["hljs-string"].join(" ")}>{'"gemini-4-argon"'}</span>
-                    {",\n    "}
-                    <span className={["hljs-built_in"].join(" ")}>{"input"}</span>
+                    {"\n"}
+                    {"interaction = client.interactions.create("}
+                    {"\n"}
+                    {"    "}
+                    {"model="}
+                    <span className="hljs-string">{'"gemini-4-argon"'}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-built_in">{"input"}</span>
                     {"="}
-                    <span className={["hljs-string"].join(" ")}>
+                    <span className="hljs-string">
                       {'"大規模なマルチファイル差分とテストスイートを一括で出力してください。"'}
                     </span>
-                    {",\n    background="}
-                    <span className={["hljs-literal"].join(" ")}>{"True"}</span>
-                    {",\n    "}
-                    <span className={["hljs-comment"].join(" ")}>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    {"background="}
+                    <span className="hljs-literal">{"True"}</span>
+                    {","}
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-comment">
                       {
                         "# generation_config 等で max_output_tokens=131072 以上を設定(詳細は公式ドキュメント参照)"
                       }
                     </span>
-                    {"\n)\n"}
+                    {"\n"}
+                    {")"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -977,7 +1050,7 @@ export default function Page() {
                 </p>{" "}
               </blockquote>{" "}
               <h3 id="argon-heading-18">{"4.6 タイムアウトの設計"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1010,10 +1083,10 @@ export default function Page() {
               </p>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-6">
+          <section className={styles.section} id="sec-6">
             {" "}
             <h2 id="argon-heading-19">{"Step 5: 自前ループ(REST)とトークン計測・課金"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>
                 {
@@ -1073,75 +1146,117 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-python hljs">
                   <span className={styles.codeLine}>
-                    <span className={["hljs-keyword"].join(" ")}>{"from"}</span>
+                    <span className="hljs-keyword">{"from"}</span>
                     {" google "}
-                    <span className={["hljs-keyword"].join(" ")}>{"import"}</span>
-                    {" genai\n"}
-                    <span className={["hljs-keyword"].join(" ")}>{"from"}</span>
+                    <span className="hljs-keyword">{"import"}</span> {"genai"}
+                    {"\n"}
+                    <span className="hljs-keyword">{"from"}</span>
                     {" google.genai "}
-                    <span className={["hljs-keyword"].join(" ")}>{"import"}</span>
-                    {" types\n\nclient = genai.Client()\nPROMPT = "}
-                    <span className={["hljs-string"].join(" ")}>
+                    <span className="hljs-keyword">{"import"}</span> {"types"}
+                    {"\n"}
+                    {"\n"}
+                    {"client = genai.Client()"}
+                    {"\n"}
+                    {"PROMPT = "}
+                    <span className="hljs-string">
                       {'"素数定理の完全で厳密な証明を書いてください。"'}
                     </span>
-                    {"\nparts = []\ntoken = "}
-                    <span className={["hljs-literal"].join(" ")}>{"None"}</span>
-                    {"\n\n"}
-                    <span className={["hljs-keyword"].join(" ")}>{"while"}</span>{" "}
-                    <span className={["hljs-literal"].join(" ")}>{"True"}</span>
-                    {":\n    response = client.models.generate_content(\n        model="}
-                    <span className={["hljs-string"].join(" ")}>{'"gemini-4-argon"'}</span>
-                    {",\n        contents=PROMPT,  "}
-                    <span className={["hljs-comment"].join(" ")}>
-                      {"# 毎回オリジナルのcontents"}
-                    </span>
-                    {
-                      "\n        config=types.GenerateContentConfig(\n            max_output_tokens="
-                    }
-                    <span className={["hljs-number"].join(" ")}>{"262_144"}</span>
+                    {"\n"}
+                    {"parts = []"}
+                    {"\n"}
+                    {"token = "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-keyword">{"while"}</span>{" "}
+                    <span className="hljs-literal">{"True"}</span>
+                    {":"}
+                    {"\n"}
+                    {"    "}
+                    {"response = client.models.generate_content("}
+                    {"\n"}
+                    {"        "}
+                    {"model="}
+                    <span className="hljs-string">{'"gemini-4-argon"'}</span>
+                    {","}
+                    {"\n"}
+                    {"        "}
+                    {"contents=PROMPT,  "}
+                    <span className="hljs-comment">{"# 毎回オリジナルのcontents"}</span>
+                    {"\n"}
+                    {"        "}
+                    {"config=types.GenerateContentConfig("}
+                    {"\n"}
+                    {"            "}
+                    {"max_output_tokens="}
+                    <span className="hljs-number">{"262_144"}</span>
                     {",  "}
-                    <span className={["hljs-comment"].join(" ")}>{"# 毎回同じ合計値"}</span>
-                    {"\n            thinking_config=types.ThinkingConfig(thinking_level="}
-                    <span className={["hljs-string"].join(" ")}>{'"high"'}</span>
-                    {"),\n            automatic_continuation="}
-                    <span className={["hljs-literal"].join(" ")}>{"False"}</span>
+                    <span className="hljs-comment">{"# 毎回同じ合計値"}</span>
+                    {"\n"}
+                    {"            "}
+                    {"thinking_config=types.ThinkingConfig(thinking_level="}
+                    <span className="hljs-string">{'"high"'}</span>
+                    {"),"}
+                    {"\n"}
+                    {"            "}
+                    {"automatic_continuation="}
+                    <span className="hljs-literal">{"False"}</span>
                     {",  "}
-                    <span className={["hljs-comment"].join(" ")}>{"# 自前でループする"}</span>
-                    {
-                      "\n            continuation_token=token,\n        ),\n    )\n    candidate = response.candidates["
-                    }
-                    <span className={["hljs-number"].join(" ")}>{"0"}</span>
-                    {"]\n    "}
-                    <span className={["hljs-keyword"].join(" ")}>{"if"}</span>
+                    <span className="hljs-comment">{"# 自前でループする"}</span>
+                    {"\n"}
+                    {"            "}
+                    {"continuation_token=token,"}
+                    {"\n"}
+                    {"        "}
+                    {"),"}
+                    {"\n"}
+                    {"    "}
+                    {")"}
+                    {"\n"}
+                    {"    "}
+                    {"candidate = response.candidates["}
+                    <span className="hljs-number">{"0"}</span>
+                    {"]"}
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
                     {" candidate.content "}
-                    <span className={["hljs-keyword"].join(" ")}>{"and"}</span>
-                    {
-                      " candidate.content.parts:\n        parts.extend(candidate.content.parts)\n    token = candidate.continuation_token\n    "
-                    }
-                    <span className={["hljs-keyword"].join(" ")}>{"if"}</span>
+                    <span className="hljs-keyword">{"and"}</span> {"candidate.content.parts:"}
+                    {"\n"}
+                    {"        "}
+                    {"parts.extend(candidate.content.parts)"}
+                    {"\n"}
+                    {"    "}
+                    {"token = candidate.continuation_token"}
+                    {"\n"}
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
                     {" candidate.finish_reason != types.FinishReason.CONTINUATION "}
-                    <span className={["hljs-keyword"].join(" ")}>{"or"}</span>{" "}
-                    <span className={["hljs-keyword"].join(" ")}>{"not"}</span>
-                    {" token:\n        "}
-                    <span className={["hljs-keyword"].join(" ")}>{"break"}</span>
-                    {"\n\n"}
-                    <span className={["hljs-built_in"].join(" ")}>{"print"}</span>
+                    <span className="hljs-keyword">{"or"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span> {"token:"}
+                    {"\n"}
+                    {"        "}
+                    <span className="hljs-keyword">{"break"}</span>
+                    {"\n"}
+                    {"\n"}
+                    <span className="hljs-built_in">{"print"}</span>
                     {"("}
-                    <span className={["hljs-string"].join(" ")}>{'""'}</span>
+                    <span className="hljs-string">{'""'}</span>
                     {".join(p.text "}
-                    <span className={["hljs-keyword"].join(" ")}>{"for"}</span>
+                    <span className="hljs-keyword">{"for"}</span>
                     {" p "}
-                    <span className={["hljs-keyword"].join(" ")}>{"in"}</span>
+                    <span className="hljs-keyword">{"in"}</span>
                     {" parts "}
-                    <span className={["hljs-keyword"].join(" ")}>{"if"}</span>
+                    <span className="hljs-keyword">{"if"}</span>
                     {" p.text "}
-                    <span className={["hljs-keyword"].join(" ")}>{"and"}</span>{" "}
-                    <span className={["hljs-keyword"].join(" ")}>{"not"}</span>
-                    {" p.thought))\n"}
-                    <span className={["hljs-built_in"].join(" ")}>{"print"}</span>
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span> {"p.thought))"}
+                    {"\n"}
+                    <span className="hljs-built_in">{"print"}</span>
                     {"("}
-                    <span className={["hljs-string"].join(" ")}>{'"Finish reason:"'}</span>
-                    {", candidate.finish_reason)\n"}
+                    <span className="hljs-string">{'"Finish reason:"'}</span>
+                    {", candidate.finish_reason)"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
@@ -1164,7 +1279,7 @@ export default function Page() {
                   " を返します。各ホップは「プロンプト+それまでの生成物」を入力として再送するため、同じトークンが何度も数えられます。 "
                 }
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1250,13 +1365,13 @@ export default function Page() {
               </ul>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-7">
+          <section className={styles.section} id="sec-7">
             {" "}
             <h2 id="argon-heading-23">{"Step 6: 既存アプリの移行チェックリスト"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>{"Gemini 3.x系から移行する場合のチェックリストです(公式の移行手順に準拠)。"}</p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1385,27 +1500,28 @@ export default function Page() {
               <pre data-testid="code-block">
                 <code className="language-bash hljs">
                   <span className={styles.codeLine}>
-                    {"/gemini-api-dev migrate my app to Gemini 4 Argon\n"}
+                    {"/gemini-api-dev migrate my app to Gemini 4 Argon"}
+                    {"\n"}
                   </span>
                 </code>
               </pre>{" "}
               <h3 id="argon-heading-25">{"移行フロー"}</h3>{" "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {" "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="4">
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="4">
                     <MermaidDiagram chart={DIAGRAM_4} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>{" "}
               </div>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-8">
+          <section className={styles.section} id="sec-8">
             {" "}
             <h2 id="argon-heading-26">
               {"Step 7: エージェント開発(Antigravity・/goal・.agents/skills)"}
             </h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>
                 {" Argonの強みである「長時間・多段・自律」を引き出すには、"}
@@ -1422,7 +1538,7 @@ export default function Page() {
                 <strong>{"2ラウンドの比較から得られる教訓"}</strong>
                 {":"}
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1522,10 +1638,10 @@ export default function Page() {
                 </li>{" "}
               </ol>{" "}
               <h3 id="argon-heading-29">{"7.3 エージェント運用フロー"}</h3>{" "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {" "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="5">
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="5">
                     <MermaidDiagram chart={DIAGRAM_5} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>{" "}
@@ -1546,10 +1662,10 @@ export default function Page() {
               </ul>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-9">
+          <section className={styles.section} id="sec-9">
             {" "}
             <h2 id="argon-heading-31">{"Step 8: コスト最適化(cost per task とルーティング)"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>
                 {" Google Cloudの技術者による2026年11月3日の公式開発者ブログが、"}
@@ -1573,7 +1689,7 @@ export default function Page() {
                 </li>{" "}
               </ul>{" "}
               <h3 id="argon-heading-33">{"8.2 実験で分かった3つの規則(ブログの結論を要約)"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1656,7 +1772,7 @@ export default function Page() {
                 }
               </p>{" "}
               <h3 id="argon-heading-36">{"8.5 Argonを選ぶ/選ばない判断"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1689,10 +1805,10 @@ export default function Page() {
               </div>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-10">
+          <section className={styles.section} id="sec-10">
             {" "}
             <h2 id="argon-heading-37">{"Step 9: 安全性・セキュリティ運用"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <h3 id="argon-heading-38">{"9.1 公式が公表している安全面の設計"}</h3>{" "}
               <p>
@@ -1702,7 +1818,7 @@ export default function Page() {
                   "を実施したと説明しています(誤用・ジェイルブレイク対策、エージェントの整合性監視、プロンプトインジェクション耐性)。 "
                 }
               </p>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -1809,16 +1925,16 @@ export default function Page() {
               </ul>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-11">
+          <section className={styles.section} id="sec-11">
             {" "}
             <h2 id="argon-heading-41">{"Step 10: 評価とプロダクション投入の最終チェック"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <h3 id="argon-heading-42">{"10.1 評価の進め方"}</h3>{" "}
-              <div className={[styles["diagram-card"]].join(" ")}>
+              <div className={styles["diagram-card"]}>
                 {" "}
-                <div className={[styles["diagram-wrap"]].join(" ")}>
-                  <div className={[styles["diagram-canvas"]].join(" ")} data-diagram-id="6">
+                <div className={styles["diagram-wrap"]}>
+                  <div className={styles["diagram-canvas"]} data-diagram-id="6">
                     <MermaidDiagram chart={DIAGRAM_6} theme="base" themeVariables={THEME_VARS} />
                   </div>
                 </div>{" "}
@@ -1835,9 +1951,9 @@ export default function Page() {
                   <i data-check-bar />
                 </div>
               </div>
-              <ul className={[styles.checklist].join(" ")}>
+              <ul className={styles.checklist}>
                 {" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
@@ -1848,14 +1964,14 @@ export default function Page() {
                     </span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
                     <span>{"SDKが最低バージョン以上(Python 2.30.1 / JS 2.29.1 ほか)"}</span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
@@ -1865,7 +1981,7 @@ export default function Page() {
                     </span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
@@ -1877,7 +1993,7 @@ export default function Page() {
                     </span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
@@ -1888,14 +2004,14 @@ export default function Page() {
                     </span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
                     <span>{"HTTP読み取りタイムアウト20分、ホップ単位のリトライ・バックオフ"}</span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
@@ -1906,35 +2022,35 @@ export default function Page() {
                     </span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
                     <span>{"Thought Signatureを含む完全な履歴を返送"}</span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
                     <span>{"12/1の価格改定(入力$4・出力$20)を織り込んだ予算"}</span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
                     <span>{"不可逆操作の承認ゲート、最小権限、サンドボックス"}</span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
                     <span>{"cost per successful task の計測基盤(トレース・思考トークン)"}</span>
                   </label>{" "}
                 </li>{" "}
-                <li className={[styles.chk].join(" ")}>
+                <li className={styles.chk}>
                   {" "}
                   <label>
                     <input type="checkbox" data-guide-check="" />{" "}
@@ -1944,12 +2060,12 @@ export default function Page() {
               </ul>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-12">
+          <section className={styles.section} id="sec-12">
             {" "}
             <h2 id="argon-heading-44">{"トラブルシューティング早見表"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -2071,10 +2187,10 @@ export default function Page() {
               </div>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-13">
+          <section className={styles.section} id="sec-13">
             {" "}
             <h2 id="argon-heading-45">{"Argonの限界と注意点(公平な見方)"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>{"Argonを導入する際は、提供元の発表と第三者の評価の両方を見てください。"}</p>{" "}
               <ol>
@@ -2133,10 +2249,10 @@ export default function Page() {
               </ol>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-14">
+          <section className={styles.section} id="sec-14">
             {" "}
             <h2 id="argon-heading-46">{"補足: その他のベストプラクティスと根拠ソースURL"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>
                 {
@@ -2144,7 +2260,7 @@ export default function Page() {
                 }
               </p>{" "}
               <h3 id="argon-heading-47">{"A. 公式ドキュメント・公式ブログ(一次情報)"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -2375,7 +2491,7 @@ export default function Page() {
                 </table>{" "}
               </div>{" "}
               <h3 id="argon-heading-48">{"B. 著名な開発者・評論家・報道(第三者の視点)"}</h3>{" "}
-              <div className={[styles["table-wrap"]].join(" ")}>
+              <div className={styles["table-wrap"]}>
                 {" "}
                 <table>
                   <thead>
@@ -2585,10 +2701,10 @@ export default function Page() {
               </blockquote>{" "}
             </div>{" "}
           </section>{" "}
-          <section className={[styles.section].join(" ")} id="sec-15">
+          <section className={styles.section} id="sec-15">
             {" "}
             <h2 id="argon-heading-49">{"参考URL一覧"}</h2>{" "}
-            <div className={[styles.prose].join(" ")}>
+            <div className={styles.prose}>
               {" "}
               <p>
                 <strong>{"公式(最優先で確認)"}</strong>
@@ -2794,7 +2910,7 @@ export default function Page() {
               </ul>{" "}
             </div>{" "}
           </section>{" "}
-          <footer className={[styles.footer].join(" ")}>
+          <footer className={styles.footer}>
             {
               " 最終更新: 2026年11月5日。Argonは仕様・価格・提供範囲が短期間で変わっています(導入価格は11月30日まで、Carbonの提供拡大など)。運用前に必ず公式ドキュメントで最新情報を確認してください。 "
             }
