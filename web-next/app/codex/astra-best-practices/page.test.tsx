@@ -324,8 +324,7 @@ it("原本62 CSS規則の全宣言・media条件を保持（図の配置は共�
       source.declarations
         // 同一規則内で後続の宣言に上書きされる無効な宣言は、実効値が同じため照合しない。
         .filter(
-          (d, i, all) =>
-            !all.some((later, j) => j > i && later[0] === d[0] && (later[2] || !d[2]))
+          (d, i, all) => !all.some((later, j) => j > i && later[0] === d[0] && (later[2] || !d[2]))
         )
         .filter(
           (d) =>
