@@ -1,0 +1,2571 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gemini Omni 実践ガイド:中級〜上級者向けステップバイステップ・ベストプラクティス</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Source+Serif+4:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <style>
+      :root {
+        --paper: #faf7f0;
+        --paper-alt: #f1ece0;
+        --ink: #1f2430;
+        --ink-soft: #4a5064;
+        --indigo: #3b4a9c;
+        --gold: #b8862b;
+        --forest: #2f6b4f;
+        --plum: #7a3b69;
+        --border: #ddd5c3;
+        --side: 264px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 16px;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', system-ui, sans-serif;
+        font-size: 1rem;
+        line-height: 1.85;
+      }
+      .layout {
+        display: block;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: var(--side);
+        overflow-y: auto;
+        background: #fff;
+        border-right: 1px solid var(--border);
+        padding: 20px 0;
+      }
+      .brand {
+        padding: 0 20px 14px;
+        font-family: 'Source Serif 4', 'Noto Serif JP', serif;
+        font-weight: 700;
+        color: var(--indigo);
+        font-size: 1.1rem;
+        line-height: 1.4;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 10px;
+      }
+      .nav-a {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 7px 20px;
+        color: var(--ink-soft);
+        text-decoration: none;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-left: 3px solid transparent;
+      }
+      .nav-a .n-dot {
+        flex: 0 0 8px;
+        height: 8px;
+        margin-top: 9px;
+        border-radius: 50%;
+        background: var(--border);
+      }
+      .nav-a span:last-child {
+        overflow-wrap: anywhere;
+        min-width: 0;
+      }
+      .nav-a:hover {
+        background: var(--paper-alt);
+      }
+      .nav-a.active {
+        color: var(--indigo);
+        font-weight: 700;
+        border-left-color: var(--indigo);
+        background: var(--paper-alt);
+      }
+      .nav-a.active .n-dot {
+        background: var(--indigo);
+      }
+      .main {
+        margin-left: var(--side);
+        min-width: 0;
+      }
+      .hero {
+        background: linear-gradient(135deg, #2b1d4a, #3b4a9c 55%, #7a3b69);
+        color: #fff;
+        padding: 56px 56px 44px;
+      }
+      .hero h1 {
+        overflow-wrap: anywhere;
+        font-family: 'Source Serif 4', 'Noto Serif JP', serif;
+        margin: 0 0 18px;
+        font-size: 2rem;
+        line-height: 1.4;
+        color: #fff;
+      }
+      .hero ul {
+        margin: 0;
+        padding: 0;
+        color: #eee9f6;
+        list-style: none;
+      }
+      .hero li {
+        margin: 4px 0;
+        overflow-wrap: break-word;
+      }
+      .hero strong {
+        color: #ffe29a;
+      }
+      .hero code {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+      .section {
+        padding: 34px 56px;
+      }
+      .section h2 {
+        overflow-wrap: anywhere;
+        font-family: 'Source Serif 4', 'Noto Serif JP', serif;
+        color: var(--indigo);
+        font-size: 1.6rem;
+        margin: 0 0 18px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--gold);
+      }
+      .prose {
+        overflow-wrap: break-word;
+        min-width: 0;
+      }
+      .prose h3 {
+        font-size: 1.25rem;
+        color: var(--plum);
+        margin: 30px 0 10px;
+      }
+      .prose h4 {
+        font-size: 1.1rem;
+        color: var(--forest);
+        margin: 22px 0 8px;
+      }
+      .prose p,
+      .prose li {
+        overflow-wrap: break-word;
+      }
+      .prose a {
+        color: var(--indigo);
+        word-break: break-all;
+      }
+      .prose code {
+        font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+        font-size: 1rem;
+        background: var(--paper-alt);
+        padding: 1px 6px;
+        border-radius: 4px;
+        overflow-wrap: anywhere;
+      }
+      .prose pre {
+        background: #282c34;
+        color: #abb2bf;
+        border-radius: 8px;
+        padding: 16px 18px;
+        overflow-x: auto;
+        margin: 16px 0;
+        line-height: 1.6;
+      }
+      .prose pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+        overflow-wrap: normal;
+        white-space: pre;
+      }
+      .prose pre code.hljs {
+        padding: 0;
+        background: transparent;
+      }
+      .prose blockquote {
+        margin: 16px 0;
+        padding: 12px 18px;
+        background: #fff8e6;
+        border-left: 4px solid var(--gold);
+        border-radius: 0 6px 6px 0;
+        color: var(--ink);
+      }
+      .prose blockquote p {
+        margin: 4px 0;
+      }
+      .table-wrap {
+        overflow-x: auto;
+        margin: 16px 0;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .table-wrap table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 1rem;
+      }
+      .table-wrap th {
+        background: var(--indigo);
+        color: #fff;
+        text-align: left;
+        padding: 10px 14px;
+        font-weight: 700;
+      }
+      .table-wrap td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        overflow-wrap: anywhere;
+      }
+      .table-wrap tr:hover td {
+        background: var(--paper-alt);
+      }
+      .diagram-card {
+        margin: 20px 0;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px;
+        min-width: 0;
+      }
+      .diagram-wrap {
+        overflow-x: auto;
+        display: flex;
+        justify-content: safe center;
+        width: 100%;
+        min-width: 0;
+      }
+      .diagram-wrap > * {
+        min-width: 0;
+      }
+      .diagram-canvas svg {
+        max-width: none;
+        flex-shrink: 0;
+      }
+      .diagram-err {
+        color: #a33;
+        white-space: pre-wrap;
+        font-size: 1rem;
+      }
+      .mermaidTooltip {
+        font-size: 1rem !important;
+      }
+      ul.checklist {
+        list-style: none;
+        padding: 0;
+        margin: 12px 0;
+      }
+      li.chk {
+        margin: 8px 0;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: 0.15s;
+      }
+      li.chk label {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+      li.chk input {
+        appearance: none;
+        -webkit-appearance: none;
+        flex: 0 0 22px;
+        height: 22px;
+        margin-top: 4px;
+        border: 2px solid var(--indigo);
+        border-radius: 5px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+      li.chk input:checked {
+        background: var(--forest);
+        border-color: var(--forest);
+        box-shadow: inset 0 0 0 3px #fff;
+      }
+      li.chk.done {
+        background: #eef7f1;
+        border-color: var(--forest);
+      }
+      li.chk.done span {
+        color: var(--ink-soft);
+        text-decoration: line-through;
+      }
+      .progress {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 14px 0 4px;
+        font-size: 1rem;
+        color: var(--ink-soft);
+      }
+      .progress .bar {
+        flex: 1;
+        height: 10px;
+        background: var(--paper-alt);
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .progress .bar i {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: var(--forest);
+        transition: width 0.2s;
+      }
+      .footer {
+        padding: 28px 56px 60px;
+        color: var(--ink-soft);
+        border-top: 1px solid var(--border);
+      }
+      .menu-btn {
+        display: none;
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 30;
+        background: var(--indigo);
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      @media (max-width: 900px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.2s;
+          z-index: 25;
+          box-shadow: 2px 0 12px rgba(0, 0, 0, 0.2);
+        }
+        body.nav-open .sidebar {
+          transform: none;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .menu-btn {
+          display: block;
+        }
+        .hero {
+          padding: 64px 20px 32px;
+        }
+        .section {
+          padding: 28px 16px;
+        }
+        .footer {
+          padding: 24px 16px 48px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button class="menu-btn" type="button" aria-label="目次">目次</button>
+    <div class="layout">
+      <nav class="sidebar">
+        <div class="brand">Gemini Omni<br />実践ガイド</div>
+        <a class="nav-a" href="#sec-0"
+          ><span class="n-dot"></span><span>0. このガイドの前提(必ず最初に読む)</span></a
+        ><a class="nav-a" href="#sec-1"
+          ><span class="n-dot"></span><span>1. Omni を 5 分で理解する</span></a
+        ><a class="nav-a" href="#sec-2"
+          ><span class="n-dot"></span><span>Step 1: モデル選定(Omni か Veo 3.1 か)</span></a
+        ><a class="nav-a" href="#sec-3"
+          ><span class="n-dot"></span><span>Step 2: 環境準備と最小実装</span></a
+        ><a class="nav-a" href="#sec-4"
+          ><span class="n-dot"></span><span>Step 3: 出力パラメータの制御</span></a
+        ><a class="nav-a" href="#sec-5"
+          ><span class="n-dot"></span><span>Step 4: プロンプト設計の原則</span></a
+        ><a class="nav-a" href="#sec-6"
+          ><span class="n-dot"></span><span>Step 5: 入力モードの使い分け</span></a
+        ><a class="nav-a" href="#sec-7"
+          ><span class="n-dot"></span><span>Step 6: 対話型の動画編集</span></a
+        ><a class="nav-a" href="#sec-8"
+          ><span class="n-dot"></span><span>Step 7: シーン拡張で最大 40 秒へ</span></a
+        ><a class="nav-a" href="#sec-9"
+          ><span class="n-dot"></span><span>Step 8: コスト設計とドラフト運用</span></a
+        ><a class="nav-a" href="#sec-10"
+          ><span class="n-dot"></span><span>Step 9: 本番運用(信頼性・安全性・地域制約)</span></a
+        ><a class="nav-a" href="#sec-11"><span class="n-dot"></span><span>既知の制約まとめ</span></a
+        ><a class="nav-a" href="#sec-12"><span class="n-dot"></span><span>アンチパターン集</span></a
+        ><a class="nav-a" href="#sec-13"
+          ><span class="n-dot"></span><span>導入チェックリスト</span></a
+        ><a class="nav-a" href="#sec-14"
+          ><span class="n-dot"></span><span>補足: 追加ベストプラクティスと根拠ソース URL</span></a
+        ><a class="nav-a" href="#sec-15"
+          ><span class="n-dot"></span><span>情報の確度と更新方針</span></a
+        >
+      </nav>
+      <main class="main">
+        <header class="hero">
+          <h1>Gemini Omni 実践ガイド:中級〜上級者向けステップバイステップ・ベストプラクティス</h1>
+          <ul>
+            <li>
+              <strong>対象読者</strong>: 動画生成 API /
+              生成メディアのプロダクト実装経験がある中級〜上級の開発者・AIエンジニア
+            </li>
+            <li><strong>調査時点</strong>: 2026年11月5日までの公開情報(執筆日 2026-11-06)</li>
+            <li>
+              <strong>対象モデル</strong>: Gemini Omni Flash(<code>gemini-omni-1.1-flash</code>)
+            </li>
+            <li>
+              <strong>注意</strong>:
+              数値・仕様は公開ドキュメントの記載を整理したものです。品質面の主張はベンダー発表を含むため、必ず自分のタスクで再評価してください。
+            </li>
+          </ul>
+        </header>
+        <section class="section" id="sec-0">
+          <h2>0. このガイドの前提(必ず最初に読む)</h2>
+          <div class="prose">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>表記の補正</td>
+                    <td>依頼文の「Googlei」は <strong>Google</strong> と解釈しました。</td>
+                  </tr>
+                  <tr>
+                    <td>Omni の正体</td>
+                    <td>
+                      Gemini Omni は
+                      <strong
+                        >「何を入力しても動画を出力する」any-to-any
+                        型の生成メディアモデルファミリー</strong
+                      >です。テキスト・画像・音声・動画を入力し、現時点の出力は
+                      <strong>音声付き動画</strong>です。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>混同しやすい点</td>
+                    <td>
+                      Google の最新フラッグシップ推論 LLM は別モデル(Gemini 4 Argon)です。Omni は
+                      LLM ではなく <strong>動画の生成・編集モデル</strong>です。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>情報の確度</td>
+                    <td>
+                      一次情報(Google
+                      公式ドキュメント・公式ブログ)を軸にし、報道・サードパーティ情報は
+                      <strong>二次情報</strong>として明記します。筆者の推論は「推論」と書きます。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>独立ベンチマーク</td>
+                    <td>
+                      Omni 1.1 Flash
+                      について、公開リーダーボード上の独立ベンチマークは調査時点で確認できませんでした。品質面の優位性の主張は
+                      <strong>ベンダー側の発表</strong>として扱ってください。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-1">
+          <h2>1. Omni を 5 分で理解する</h2>
+          <div class="prose">
+            <h3>1.1 一言でいうと</h3>
+            <p>
+              Omni は、Veo(動画)・Imagen(画像)・別系統の音声といった
+              <strong>分離されたスタック</strong>を 1 つの Gemini
+              ベースのモデルに集約し、<strong>モダリティをまたいで推論したうえで動画を出力する</strong>モデルです。「動画版
+              Nano Banana」と紹介されることが多く、会話で少しずつ直していく
+              <strong>対話型編集</strong>が中核機能です。
+            </p>
+            <h3>1.2 公式ドキュメントが挙げる 3 つの中核能力</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>能力</th>
+                    <th>意味</th>
+                    <th>実装への含意</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ネイティブ・マルチモーダル</td>
+                    <td>テキスト・画像・音声・動画を同時に処理し、整合性の高い出力を作る</td>
+                    <td>参照素材を足すほど制御しやすいが、タグで役割を明示する必要がある</td>
+                  </tr>
+                  <tr>
+                    <td>対話型編集</td>
+                    <td>Interactions API で「ここだけ直して」を繰り返せる</td>
+                    <td>状態は <code>previous_interaction_id</code> で引き継ぐ</td>
+                  </tr>
+                  <tr>
+                    <td>世界知識</td>
+                    <td>物理の理解に Gemini の歴史・科学・文化の知識を組み合わせる</td>
+                    <td>説明的・物語的なカットでも破綻しにくい設計(ただし検証は必須)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>1.3 位置づけ</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="0"></div></div>
+            </div>
+            <h3>1.4 タイムライン</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>日付</th>
+                    <th>出来事</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2026-05-19</td>
+                    <td>
+                      Google I/O 2026 で Omni を発表。第1弾の Omni Flash が Gemini
+                      アプリ・Flow・YouTube Shorts で提供開始。1 回 10
+                      秒の上限は「モデルの限界ではなく展開上の判断」と説明された
+                    </td>
+                    <td>報道(TechCrunch 等)</td>
+                  </tr>
+                  <tr>
+                    <td>2026-06-30</td>
+                    <td>開発者向けに Gemini API でプレビュー公開</td>
+                    <td>二次情報+Google DeepMind 所属開発者の投稿</td>
+                  </tr>
+                  <tr>
+                    <td>2026-08-27</td>
+                    <td>
+                      <strong>Omni 1.1 Flash が一般提供(GA)</strong>。モデル ID は
+                      <code>gemini-omni-1.1-flash</code>。シーン拡張・先頭/末尾フレーム指定・360p
+                      ドラフト・1080p/4K 出力・動画参照が追加
+                    </td>
+                    <td>公式ブログ+公式料金ページ</td>
+                  </tr>
+                  <tr>
+                    <td>2026-09-30</td>
+                    <td>プレビュー用 ID(<code>gemini-omni-flash-preview</code>)の廃止日(最短)</td>
+                    <td>二次情報。<strong>公式の Deprecations ページで要確認</strong></td>
+                  </tr>
+                  <tr>
+                    <td>未定</td>
+                    <td>
+                      上位の <strong>Omni Pro</strong> は予告のみ。調査時点で提供日は確認できず
+                    </td>
+                    <td>報道・二次情報</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>1.5 提供面(どこで使えるか)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>提供面</th>
+                    <th>用途</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Gemini アプリ</td>
+                    <td>一般ユーザー向け。Gemini アプリでは Veo 3.1 に代わる既定の動画モデル</td>
+                  </tr>
+                  <tr>
+                    <td>Google Flow</td>
+                    <td>クリエイター向けスタジオ(Google AI Plus / Pro / Ultra 契約者)</td>
+                  </tr>
+                  <tr>
+                    <td>YouTube Shorts / YouTube Create</td>
+                    <td>一般ユーザー向けに無料提供と報じられている</td>
+                  </tr>
+                  <tr>
+                    <td>Google AI Studio / Gemini API</td>
+                    <td>開発者向け(本ガイドの主対象)。有料枠</td>
+                  </tr>
+                  <tr>
+                    <td>Gemini Enterprise Agent Platform</td>
+                    <td>エンタープライズ向け本番ワークロード</td>
+                  </tr>
+                  <tr>
+                    <td>サードパーティ</td>
+                    <td>
+                      Adobe Firefly、Figma Weave、ComfyUI などが統合(公式ブログ・各社ブログ記載)
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-2">
+          <h2>Step 1: モデル選定(Omni か Veo 3.1 か)</h2>
+          <div class="prose">
+            <h3>1.1 公式の既定方針</h3>
+            <p>
+              Gemini API の動画概要ページは **「動画生成の既定は Omni
+              Flash」**としています。理由として、動画の一貫性、複数入力(テキスト・画像・音声・動画)の同時推論、キャラクター一貫性、事実の正確さ、多ターンの対話型編集を挙げています。Veo
+              3.1 は、レガシーなパイプラインとの統合などが必要な場合の選択肢という位置づけです。
+            </p>
+            <blockquote>
+              <p>
+                <strong>注意(情報の食い違い)</strong>: 動画概要ページには、Veo 3.1
+                の用途として「シーン拡張」「末尾フレーム指定」を挙げる記述が残っています。一方、Omni
+                の公式ページ(2026-09-23 更新)では Omni 1.1 でも
+                <strong>拡張と先頭/末尾フレーム指定をサポート</strong
+                >しています。概要ページの記述が古い可能性があるため、<strong
+                  >Omni のページを正</strong
+                >として扱い、実機で検証してください。
+              </p>
+            </blockquote>
+            <h3>1.2 判断フロー</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="1"></div></div>
+            </div>
+            <h3>1.3 Omni と Veo 3.1 の比較</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>観点</th>
+                    <th>Gemini Omni 1.1 Flash</th>
+                    <th>Veo 3.1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>強み</td>
+                    <td>対話型編集・複数入力の推論・参照による一貫性</td>
+                    <td>
+                      専用の動画生成モデル。サードパーティ解説では「写実性の専門家」と評されることが多い(二次情報)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>API 形態</td>
+                    <td><strong>Interactions API</strong></td>
+                    <td><code>generateContent</code> API</td>
+                  </tr>
+                  <tr>
+                    <td>出力解像度</td>
+                    <td>360p / 720p(既定)/ 1080p(アップスケール)/ 4K(アップスケール)</td>
+                    <td>4K アップスケールと報じられている(二次情報)</td>
+                  </tr>
+                  <tr>
+                    <td>編集</td>
+                    <td>会話で反復編集(最重要の差別化点)</td>
+                    <td>会話型の反復編集は公式の訴求点ではない(Omni 側の差別化点)</td>
+                  </tr>
+                  <tr>
+                    <td>音声</td>
+                    <td>動画と同期した音声を生成。プロンプトで制御</td>
+                    <td>ネイティブ音声あり</td>
+                  </tr>
+                  <tr>
+                    <td>価格目安</td>
+                    <td>720p で約 $0.10/秒(公式料金ページ)</td>
+                    <td>開発者の投稿では Omni と同水準と言及(Veo 3.1 Fast との比較)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-3">
+          <h2>Step 2: 環境準備と最小実装</h2>
+          <div class="prose">
+            <h3>2.1 前提</h3>
+            <ul>
+              <li>
+                <strong>有料枠が必要</strong>です。公式料金ページ上、Omni Flash
+                の入出力は無料枠が「Not available」です。
+              </li>
+              <li>
+                SDK は <code>google-genai</code>。呼び出しは
+                <strong>Interactions API</strong>(<code>client.interactions.create</code>)です。
+              </li>
+              <li>
+                Interactions API は 2026 年 5
+                月に破壊的変更が入っているため、古いサンプルをコピーする前に公式の移行ドキュメントを確認してください(URL
+                は補足に記載)。
+              </li>
+            </ul>
+            <pre><code class="language-bash">pip install -U google-genai
+export GEMINI_API_KEY=&quot;YOUR_API_KEY&quot;
+</code></pre>
+            <h3>2.2 最小実装(text-to-video)</h3>
+            <pre><code class="language-python">import base64
+from google import genai
+
+client = genai.Client()
+MODEL = &quot;gemini-omni-1.1-flash&quot;
+
+
+def save_video(interaction, path: str) -&gt; None:
+    &quot;&quot;&quot;SDK 専用の便利フィールド output_video から mp4 を保存する。&quot;&quot;&quot;
+    with open(path, &quot;wb&quot;) as f:
+        f.write(base64.b64decode(interaction.output_video.data))
+
+
+interaction = client.interactions.create(
+    model=MODEL,
+    input=(
+        &quot;Continuous, unbroken handheld shot of a tabby cat on a sunny windowsill, &quot;
+        &quot;looking into a leafy garden. Sound design: gentle breeze, distant birds. &quot;
+        &quot;No dialogue.&quot;
+    ),
+)
+save_video(interaction, &quot;cat.mp4&quot;)
+print(&quot;interaction id:&quot;, interaction.id)  # 後続の編集・拡張で使う
+</code></pre>
+            <h3>2.3 REST で直接呼ぶ場合の注意</h3>
+            <p>
+              <code>interaction.output_video</code> は
+              <strong>SDK 専用の便利フィールド</strong>です。REST では、レスポンスの
+              <code>steps</code> 配列から <code>type</code> が
+              <code>model_output</code> のステップを探し、その <code>content</code> 内の
+              <code>type: "video"</code> を取り出します。
+            </p>
+            <pre><code class="language-json">{
+  &quot;steps&quot;: [
+    { &quot;type&quot;: &quot;user_input&quot;, &quot;content&quot;: [{ &quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;...&quot; }] },
+    { &quot;type&quot;: &quot;thought&quot;, &quot;content&quot;: [{ &quot;text&quot;: &quot;...&quot;, &quot;type&quot;: &quot;thought&quot; }] },
+    {
+      &quot;type&quot;: &quot;model_output&quot;,
+      &quot;content&quot;: [{ &quot;type&quot;: &quot;video&quot;, &quot;mime_type&quot;: &quot;video/mp4&quot;, &quot;data&quot;: &quot;&lt;base64&gt;&quot; }]
+    }
+  ],
+  &quot;id&quot;: &quot;v1_...&quot;,
+  &quot;status&quot;: &quot;completed&quot;,
+  &quot;model&quot;: &quot;gemini-omni-1.1-flash&quot;,
+  &quot;object&quot;: &quot;interaction&quot;
+}
+</code></pre>
+            <h3>2.4 動作確認の観点</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>確認項目</th>
+                    <th>期待</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>interaction.id</code> が取得できる</td>
+                    <td>以降の編集・拡張の起点になる</td>
+                  </tr>
+                  <tr>
+                    <td>mp4 が再生でき、音声トラックがある</td>
+                    <td>既定で適切な音声が生成される</td>
+                  </tr>
+                  <tr>
+                    <td>意図しないカット割りがない</td>
+                    <td>入っていたら Step 4 の「単一ショット指定」を適用</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-4">
+          <h2>Step 3: 出力パラメータの制御</h2>
+          <div class="prose">
+            <h3>3.1 アスペクト比・解像度・配信方式</h3>
+            <p>
+              <code>response_format</code> で制御します。<code>type: "video"</code> は省略可能です。
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>パラメータ</th>
+                    <th>値</th>
+                    <th>備考</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>aspect_ratio</code></td>
+                    <td><code>"16:9"</code>(既定)/ <code>"9:16"</code></td>
+                    <td>縦動画は <code>9:16</code></td>
+                  </tr>
+                  <tr>
+                    <td><code>resolution</code></td>
+                    <td>
+                      <code>"360p"</code> / <code>"720p"</code>(既定)/ <code>"1080p"</code> /
+                      <code>"4k"</code>
+                    </td>
+                    <td>1080p と 4K は <strong>アップスケール出力</strong></td>
+                  </tr>
+                  <tr>
+                    <td><code>delivery</code></td>
+                    <td><code>"uri"</code></td>
+                    <td>4MB 超の動画は URI 配信を使う</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <pre><code class="language-python">interaction = client.interactions.create(
+    model=MODEL,
+    input=&quot;A futuristic city with neon lights and flying cars, cyberpunk style&quot;,
+    response_format={
+        &quot;type&quot;: &quot;video&quot;,
+        &quot;aspect_ratio&quot;: &quot;9:16&quot;,
+        &quot;resolution&quot;: &quot;1080p&quot;,
+    },
+)
+</code></pre>
+            <h3>3.2 大きな動画は URI 配信で取得する</h3>
+            <p>
+              公式の推奨は、<strong
+                >4MB を超える動画(720p 超など)では <code>delivery="uri"</code></strong
+              >
+              を使うことです。返ってくる Google ホストの URI が
+              <code>ACTIVE</code> になるまでポーリングしてからダウンロードします。
+            </p>
+            <pre><code class="language-python">import time
+from google import genai
+
+client = genai.Client()
+
+interaction = client.interactions.create(
+    model=&quot;gemini-omni-1.1-flash&quot;,
+    input=&quot;A beautiful sunset over a calm ocean.&quot;,
+    response_format={&quot;type&quot;: &quot;video&quot;, &quot;delivery&quot;: &quot;uri&quot;},
+)
+
+video_output = interaction.output_video
+file_name = video_output.uri.split(&quot;/&quot;)[-1]
+
+while True:
+    info = client.files.get(name=f&quot;files/{file_name}&quot;)
+    if info.state.name == &quot;ACTIVE&quot;:
+        break
+    if info.state.name == &quot;FAILED&quot;:
+        raise RuntimeError(&quot;Generation failed.&quot;)
+    time.sleep(5)
+
+client.files.download(file=video_output.uri, destination=&quot;output.mp4&quot;)
+</code></pre>
+            <blockquote>
+              <p>
+                <strong>落とし穴</strong>:
+                <code>GET /v1beta/interactions/{id}</code> で後から取得すると、最初に
+                <code>delivery: "uri"</code> で作成していても
+                <strong>動画は base64 のインラインデータで返ります</strong>。<code>uri</code>
+                フィールドが確実にあるのは、作成直後のレスポンスか SSE ストリームです。<strong
+                  >作成直後に URI を保存</strong
+                >してください。
+              </p>
+            </blockquote>
+            <h3>3.3 同期・非同期と保存設定(速度と編集可否のトレードオフ)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>設定</th>
+                    <th>効果</th>
+                    <th>副作用</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <code>background=false</code>, <code>store=false</code>,
+                      <code>stream=false</code>
+                    </td>
+                    <td>同期の単発呼び出しで最速になる</td>
+                    <td>
+                      <strong
+                        ><code>store=false</code> だと、その動画は
+                        <code>previous_interaction_id</code> での後続編集ができない</strong
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>既定(保存あり)</td>
+                    <td>後続ターンで編集・拡張できる</td>
+                    <td>同期単発より遅くなる可能性</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <strong>使い分けの指針</strong>: 一発で完結する用途(サムネイル動画など)は
+              <code>store=false</code>。編集・拡張を想定する用途は保存を有効にします。
+            </p>
+          </div>
+        </section>
+        <section class="section" id="sec-5">
+          <h2>Step 4: プロンプト設計の原則</h2>
+          <div class="prose">
+            <p>
+              公式プロンプトガイドの要点を、実務で使いやすい形に整理します。<strong>ガイドの原文の列挙ではなく、筆者による再構成</strong>です。
+            </p>
+            <h3>4.1 設計の流れ</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="2"></div></div>
+            </div>
+            <h3>4.2 原則一覧</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>原則</th>
+                    <th>やること</th>
+                    <th>理由・根拠</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>単一ショットの明示</td>
+                    <td>「single continuous shot」「no scene cuts」などを書く</td>
+                    <td>
+                      既定では <strong>複数ショットの物語的な構成</strong> を作ろうとするため(公式)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>否定はプロンプト内に書く</td>
+                    <td>「No dialogue」「No extra sound effects」</td>
+                    <td><strong>ネガティブプロンプト用の独立フィールドは無い</strong>(公式)</td>
+                  </tr>
+                  <tr>
+                    <td>音は能動的に指定</td>
+                    <td>音楽・環境音・台詞を具体的に書く</td>
+                    <td>既定でも音声は付くが、意図通りとは限らない(公式)</td>
+                  </tr>
+                  <tr>
+                    <td>時間指定は自然言語で良い</td>
+                    <td>「After 3 seconds, ...」やタイムコード <code>[0-3s]</code></td>
+                    <td>厳密な構文は不要。カット割りやリズムの設計に有効(公式)</td>
+                  </tr>
+                  <tr>
+                    <td>画面内テキストは文字列を明示</td>
+                    <td>看板・ナンバープレートなどの表記を引用符で指定</td>
+                    <td>自然に現れる文字も、定義すると正確に描かれやすい(公式)</td>
+                  </tr>
+                  <tr>
+                    <td>メタ指示を使う</td>
+                    <td>「micro-detail, expression, timing を重視」など品質観点を伝える</td>
+                    <td>公式ガイドに「meta prompting」として記載</td>
+                  </tr>
+                  <tr>
+                    <td>英語で書く</td>
+                    <td>指示文は英語で書く</td>
+                    <td>
+                      <strong>英語は完全サポート、他言語は未評価</strong
+                      >で結果にばらつきが出る(公式)
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>4.3 推奨テンプレート(筆者案)</h3>
+            <p>
+              構造化して書くと再現性が上がります。以下は筆者が整理したテンプレートで、公式が定める書式ではありません。
+            </p>
+            <pre><code class="language-yaml">Mode: text-to-video
+Format: 9:16 vertical video, 10 seconds, single continuous shot, no scene cuts
+Subject: A barista in a small Tokyo coffee shop, mid-30s, wearing a dark apron
+Action: She slowly pours steamed milk into a latte, finishing with a leaf pattern
+Camera: Slow push-in from medium shot to close-up on the cup, shallow depth of field
+Lighting/Mood: Warm morning window light, calm and cozy
+Audio: Soft jazz piano in the background, subtle milk-pouring sound
+Constraints: No dialogue. No on-screen text.
+</code></pre>
+            <h3>4.4 タイムコード指定の例</h3>
+            <pre><code class="language-markdown">[0-3s] A person is walking along a rainy street at night
+[3-6s] They stop and turn toward the camera
+[6-10s] They start running, camera tracking from behind
+Audio: Rain ambience, low synth drone. No dialogue.
+</code></pre>
+            <h3>4.5 画面内テキストの例</h3>
+            <pre><code class="language-python">prompt = (
+    'One word on screen at a time: &quot;did, you, know, that, Omni, can, do, text?&quot; '
+    &quot;Each word appears for 1 second with a different animated style. No dialogue.&quot;
+)
+</code></pre>
+            <blockquote>
+              <p>
+                <strong>日本語テキストの描画</strong>:
+                公式が評価済みとしているのは英語のみです。日本語の看板や字幕を動画内に描かせる用途は、<strong>必ず事前に品質検証</strong>し、難しければ後工程(編集ソフト)で重ねる設計にしてください(推論を含む実務上の推奨)。
+              </p>
+            </blockquote>
+          </div>
+        </section>
+        <section class="section" id="sec-6">
+          <h2>Step 5: 入力モードの使い分け</h2>
+          <div class="prose">
+            <h3>5.1 モード選択フロー</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="3"></div></div>
+            </div>
+            <h3>5.2 モード別の要点</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>モード</th>
+                    <th>入力</th>
+                    <th>要点</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>text-to-video</td>
+                    <td>テキスト</td>
+                    <td>単一ショット・音・禁止事項を明記</td>
+                  </tr>
+                  <tr>
+                    <td>image-to-video</td>
+                    <td>画像 + テキスト</td>
+                    <td>
+                      高解像度の画像と、<strong>具体的な動きの記述</strong>が有効。「make it
+                      move」のような曖昧指示は弱い(公式)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>先頭/末尾フレーム補間</td>
+                    <td>画像 2 枚 + テキスト</td>
+                    <td>2 枚を <code>input</code> に並べ、遷移を記述する</td>
+                  </tr>
+                  <tr>
+                    <td>subject reference</td>
+                    <td>参照画像 + テキスト</td>
+                    <td>複数の被写体画像(例: 猫と毛糸玉)を組み合わせて 1 本の動画にできる</td>
+                  </tr>
+                  <tr>
+                    <td>edit</td>
+                    <td>動画 + テキスト</td>
+                    <td>短い指示 + 「他は維持」(Step 6)</td>
+                  </tr>
+                  <tr>
+                    <td>extend</td>
+                    <td>動画 + テキスト</td>
+                    <td>末尾から最大 10 秒を追加(Step 7)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>5.3 <code>task</code> パラメータは最後の手段</h3>
+            <p>
+              <code>generation_config.video_config.task</code> に <code>text_to_video</code> /
+              <code>image_to_video</code> / <code>reference_to_video</code> / <code>edit</code> /
+              <code>extend</code> を指定できますが、公式は
+              <strong
+                >まずプロンプトで解決し、うまくいかないときだけ <code>task</code> で明示</strong
+              >することを推奨しています。<code>task</code> を使うと
+              <strong>追加の制約がかかる</strong>ためです。
+            </p>
+            <h3>5.4 タグで画像・動画の「役割」を縛る</h3>
+            <p>素材が複数あるときは、タグで役割を明示します。</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>タグ</th>
+                    <th>意味</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>&lt;FIRST_FRAME&gt;</code></td>
+                    <td>画像を動画の開始フレームにする</td>
+                  </tr>
+                  <tr>
+                    <td><code>&lt;LAST_FRAME&gt;</code></td>
+                    <td>画像を最終フレームにする(<code>&lt;FIRST_FRAME&gt;</code> と併用が必須)</td>
+                  </tr>
+                  <tr>
+                    <td><code>&lt;IMAGE_REF_N&gt;</code></td>
+                    <td>画像を参照にする(N は 0 から)</td>
+                  </tr>
+                  <tr>
+                    <td><code>&lt;VIDEO_REF_N&gt;</code></td>
+                    <td>動画を人物・物の参照にする(N は 0 から)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <strong>宣言形式(素材が多い・役割が複雑な場合)</strong>:
+              プロンプトの先頭で素材を宣言します。
+            </p>
+            <pre><code class="language-markdown">[# Sources &lt;FIRST_FRAME&gt;@Image1] [# References &lt;IMAGE_REF_0&gt;@Image2]
+A woman &lt;IMAGE_REF_0&gt; is walking along a beach at sunset.
+Use Image1 as the starting frame. Use Image2 as a reference for the video generation.
+</code></pre>
+            <p><strong>末尾に添える誘導文(公式の推奨)</strong>:</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>目的</th>
+                    <th>末尾に書く内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>開始フレームとして使う</td>
+                    <td>「Use this image as the starting frame.」</td>
+                  </tr>
+                  <tr>
+                    <td>ループ動画にする</td>
+                    <td>「Use this image as the first frame and the last frame.」</td>
+                  </tr>
+                  <tr>
+                    <td>参照画像として使う</td>
+                    <td>「…should not be used as literal initial frames.」の趣旨を書く</td>
+                  </tr>
+                  <tr>
+                    <td>参照動画として使う</td>
+                    <td>「Do not use them as a source for video editing.」の趣旨を書く</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>5.5 参照素材の上限と性質</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>公式の記述</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>動画参照</td>
+                    <td>
+                      最大 3 クリップ、各 3 秒まで。参照動画の <strong>音声は無視される</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>動画参照の向き</td>
+                    <td>見た目(顔や外観)の保持に向く</td>
+                  </tr>
+                  <tr>
+                    <td>音声参照のアップロード</td>
+                    <td>現行 API バージョンでは <strong>非対応</strong></td>
+                  </tr>
+                  <tr>
+                    <td>複数動画をまたぐ推論</td>
+                    <td><strong>非対応</strong>(精度低下や予期しない出力の恐れ)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-7">
+          <h2>Step 6: 対話型の動画編集</h2>
+          <div class="prose">
+            <p>
+              Omni の最大の差別化点です。<strong>1 ターンで 1 つの変更</strong
+              >を積み重ねる設計にします。
+            </p>
+            <h3>6.1 状態を持つ編集(生成 → 編集)</h3>
+            <pre><code class="language-python">import base64
+from google import genai
+
+client = genai.Client()
+MODEL = &quot;gemini-omni-1.1-flash&quot;
+
+# Turn 1: 生成(保存を有効にしておく)
+res1 = client.interactions.create(model=MODEL, input=&quot;A woman playing violin outdoors.&quot;)
+
+# Turn 2: 直前の動画を編集
+res2 = client.interactions.create(
+    model=MODEL,
+    previous_interaction_id=res1.id,
+    input=&quot;Make the violin invisible. Keep everything else the same.&quot;,
+)
+
+with open(&quot;edited.mp4&quot;, &quot;wb&quot;) as f:
+    f.write(base64.b64decode(res2.output_video.data))
+</code></pre>
+            <h3>6.2 編集のループ設計</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="4"></div></div>
+            </div>
+            <h3>6.3 編集プロンプトの 4 原則</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>原則</th>
+                    <th>悪い例</th>
+                    <th>良い例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>短く書く</td>
+                    <td>詳細に動きを描写した長文で猫を追加</td>
+                    <td>
+                      <code
+                        >Add a cat that jumps onto his lap, he begins to pet it. Keep everything
+                        else the same.</code
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>1 回に 1 変更</td>
+                    <td>背景変更と衣装変更を同時に指示</td>
+                    <td>背景 → 衣装と <strong>ターンを分ける</strong></td>
+                  </tr>
+                  <tr>
+                    <td>維持を明示</td>
+                    <td>変更点だけを書く</td>
+                    <td>
+                      末尾に <code>Keep everything else the same.</code>(公式が推奨する定型句)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>消去は「見えなくする」</td>
+                    <td><code>remove the phone and fill the background...</code></td>
+                    <td><code>Make the phone invisible. Keep everything else the same.</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              公式が示す編集の例は、スタイル変更(アニメ調)、小物の追加、照明の変更、画面内テキストの書き換えなどです。<strong>過度に説明的なプロンプトは、意図しない変更を招く</strong>とされています。
+            </p>
+            <h3>6.4 自前の動画をアップロードして編集する</h3>
+            <p>
+              Files API でアップロードし、<code>PROCESSING</code> が終わるまで待ってから
+              <code>uri</code> を渡します。
+            </p>
+            <pre><code class="language-python">import base64
+import time
+from google import genai
+
+client = genai.Client()
+
+video_file = client.files.upload(file=&quot;Video.mp4&quot;)
+while video_file.state == &quot;PROCESSING&quot;:
+    time.sleep(10)
+    video_file = client.files.get(name=video_file.name)
+
+if video_file.state == &quot;FAILED&quot;:
+    raise ValueError(video_file.state)
+
+interaction = client.interactions.create(
+    model=&quot;gemini-omni-1.1-flash&quot;,
+    input=[
+        {&quot;type&quot;: &quot;video&quot;, &quot;uri&quot;: video_file.uri},
+        {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;Change the lighting to be more dramatic. Keep everything else the same.&quot;},
+    ],
+)
+
+with open(&quot;edited.mp4&quot;, &quot;wb&quot;) as f:
+    f.write(base64.b64decode(interaction.output_video.data))
+</code></pre>
+            <h3>6.5 編集でできないこと</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>音声(声)の編集</td>
+                    <td><strong>非対応</strong>。台詞を変えたい場合は再生成か別工程で対応</td>
+                  </tr>
+                  <tr>
+                    <td>入力動画の長さ</td>
+                    <td>アップロード動画は <strong>10 秒以下</strong></td>
+                  </tr>
+                  <tr>
+                    <td>地域</td>
+                    <td>
+                      アップロード動画の編集は EEA・スイス・英国では
+                      <strong>提供なし</strong>(日本は記載なし)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>人物</td>
+                    <td>特定の識別可能な人物を含む画像のアップロード・編集は非対応</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-8">
+          <h2>Step 7: シーン拡張で最大 40 秒へ</h2>
+          <div class="prose">
+            <h3>7.1 仕組み</h3>
+            <ul>
+              <li>
+                <strong>末尾に最大 10 秒</strong>を連続して追加します(拡張の生成は 3〜10 秒)。
+              </li>
+              <li>
+                Omni 1.1 では <strong>直前 10 秒を文脈として参照</strong>します(旧版は最後の 1
+                秒のみ)。そのため映像・動き・キャラクター・音の一貫性が上がります。
+              </li>
+              <li>
+                <strong>10 秒刻みで、累計 40 秒まで</strong
+                >拡張できます。入力動画の最後のフレームの一部が、遷移を滑らかにするために編集されます。
+              </li>
+            </ul>
+            <h3>7.2 拡張の実装</h3>
+            <pre><code class="language-python">import base64
+from google import genai
+
+client = genai.Client()
+MODEL = &quot;gemini-omni-1.1-flash&quot;
+
+first = client.interactions.create(model=MODEL, input=&quot;A fox runs across a snowy field at dawn.&quot;)
+
+# モデル生成動画の続きを作る(多ターン)
+second = client.interactions.create(
+    model=MODEL,
+    previous_interaction_id=first.id,
+    input=[{&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;Continue the scene. The music builds.&quot;}],
+    response_format={&quot;resolution&quot;: &quot;360p&quot;},  # まずドラフトで確認する
+)
+
+with open(&quot;extended.mp4&quot;, &quot;wb&quot;) as f:
+    f.write(base64.b64decode(second.output_video.data))
+</code></pre>
+            <h3>7.3 拡張のプロンプトのコツ</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>目的</th>
+                    <th>書き方の例</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>音を変えたい</td>
+                    <td>
+                      「The music continues into the chorus」のように
+                      <strong>音の変化を明示</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>同じシーンか、カットか</td>
+                    <td>「Show the same characters in the next scene」で別シーンへ</td>
+                  </tr>
+                  <tr>
+                    <td>新キャラ追加</td>
+                    <td>
+                      参照画像・動画を一緒に渡し、<code>&lt;IMAGE_REF_0&gt;</code> /
+                      <code>&lt;VIDEO_REF_0&gt;</code> で参照
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>時間指定</td>
+                    <td>
+                      タイムコードの <strong>0s は「拡張部分の先頭」</strong>。10
+                      秒の動画を拡張して「After 2s cut」と書くと、全体では 12 秒地点でカットが入る
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>7.4 拡張の制約</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>制約</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>追加位置</td>
+                    <td><strong>末尾のみ</strong>。先頭への追加や中間の延長は不可</td>
+                  </tr>
+                  <tr>
+                    <td>アップロード動画の台詞</td>
+                    <td>
+                      人物が話しているアップロード動画に
+                      <strong>台詞を追加する拡張はできない</strong
+                      >(無言のままか、台詞を足さない指示なら可)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>モデル生成動画の台詞</td>
+                    <td>
+                      多ターン(<code>previous_interaction_id</code>)での拡張なら台詞・音声の生成が可能
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>入力長</td>
+                    <td>アップロード動画は 10 秒以下(多ターンの場合は対象外)</td>
+                  </tr>
+                  <tr>
+                    <td>地域</td>
+                    <td>
+                      アップロード動画の拡張は
+                      EEA・スイス・英国では提供なし(モデル生成動画の拡張は全提供地域で可)
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-9">
+          <h2>Step 8: コスト設計とドラフト運用</h2>
+          <div class="prose">
+            <h3>8.1 料金の事実関係</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                    <th>確度</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>入力</td>
+                    <td>$1.50 / 100 万トークン(テキスト・画像・動画・音声)</td>
+                    <td>公式料金ページ</td>
+                  </tr>
+                  <tr>
+                    <td>出力(テキスト)</td>
+                    <td>$9.00 / 100 万トークン</td>
+                    <td>公式料金ページ</td>
+                  </tr>
+                  <tr>
+                    <td>出力(動画)</td>
+                    <td>
+                      $17.50 / 100 万トークン。<strong>720p の動画 1 秒 = 5,792 トークン</strong
+                      >。実効では約 $0.10 / 秒
+                    </td>
+                    <td>公式料金ページ</td>
+                  </tr>
+                  <tr>
+                    <td>360p</td>
+                    <td>720p の約 3 分の 1 のコスト。<strong>最大 60% 高速</strong></td>
+                    <td>公式ブログ</td>
+                  </tr>
+                  <tr>
+                    <td>1080p / 4K</td>
+                    <td>
+                      報道・再販業者の掲載値は 1080p が約 $0.15 / 秒、4K が約 $0.30 /
+                      秒。公式料金ページには 720p のトークン換算しか見当たらない
+                    </td>
+                    <td><strong>二次情報。購入前に公式で再確認</strong></td>
+                  </tr>
+                  <tr>
+                    <td>無料枠</td>
+                    <td>公式料金ページで入出力は「Not available」</td>
+                    <td>公式料金ページ</td>
+                  </tr>
+                  <tr>
+                    <td>データ利用</td>
+                    <td>有料枠では「製品改善に利用しない」と記載</td>
+                    <td>公式料金ページ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>8.2 見積もり関数(筆者案)</h3>
+            <pre><code class="language-python">USD_PER_M_VIDEO_TOKENS = 17.50   # 公式料金ページ
+TOKENS_PER_SEC_720P = 5792       # 公式料金ページ
+# 360p は Google が約 1/3 と公表。1080p / 4K は報道・再販価格からの逆算(要確認)
+RES_MULTIPLIER = {&quot;360p&quot;: 1 / 3, &quot;720p&quot;: 1.0, &quot;1080p&quot;: 1.5, &quot;4k&quot;: 3.0}
+
+
+def estimate_cost(seconds: float, resolution: str = &quot;720p&quot;, attempts: int = 1) -&gt; float:
+    &quot;&quot;&quot;出力動画の概算コスト(USD)。attempts は採用までの試行回数。&quot;&quot;&quot;
+    per_sec = TOKENS_PER_SEC_720P * USD_PER_M_VIDEO_TOKENS / 1_000_000
+    return seconds * per_sec * RES_MULTIPLIER[resolution] * attempts
+
+
+print(f&quot;10s 720p x1      : ${estimate_cost(10):.2f}&quot;)
+print(f&quot;10s 360p x5 + 4K : ${estimate_cost(10, '360p', 5) + estimate_cost(10, '4k'):.2f}&quot;)
+print(f&quot;10s x4 拡張 720p : ${estimate_cost(10, '720p', 4):.2f}&quot;)
+</code></pre>
+            <h3>8.3 コスト目安(720p 基準・筆者計算)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>シナリオ</th>
+                    <th>概算</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>5 秒 × 1 回</td>
+                    <td>約 $0.51</td>
+                  </tr>
+                  <tr>
+                    <td>10 秒 × 1 回</td>
+                    <td>約 $1.01</td>
+                  </tr>
+                  <tr>
+                    <td>10 秒 × 4 回の拡張(累計 40 秒)</td>
+                    <td>約 $4.05</td>
+                  </tr>
+                  <tr>
+                    <td>10 秒の 360p ドラフト × 5 回</td>
+                    <td>約 $1.69</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>8.4 推奨ワークフロー</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="5"></div></div>
+            </div>
+            <h3>8.5 ドラフト運用の注意(推論を含む)</h3>
+            <ul>
+              <li>
+                <strong>ドラフトと本番は別の生成になる可能性があります。</strong> 公式は
+                <code>temperature</code>・<code>top_p</code>・システム指示などのサンプリング制御を
+                <strong>非対応</strong>としており、同じプロンプトでも結果が変わりえます。「360p
+                で確定した構図が、720p
+                以上で再生成しても再現される」と仮定せず、<strong>本番の解像度でも採用判定をする</strong>運用にしてください(推論。実測で確認を)。
+              </li>
+              <li>
+                <strong>上限の把握</strong>: 見積もりは「秒数 × 単価 ×
+                成功までの試行回数」で考えます。コストを決めるのは動画の長さより
+                <strong>試行回数</strong>です。
+              </li>
+            </ul>
+          </div>
+        </section>
+        <section class="section" id="sec-10">
+          <h2>Step 9: 本番運用(信頼性・安全性・地域制約)</h2>
+          <div class="prose">
+            <h3>9.1 運用設計のチェックポイント</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>領域</th>
+                    <th>ベストプラクティス</th>
+                    <th>根拠</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ID の永続化</td>
+                    <td>
+                      編集・拡張の可能性があるジョブは <code>interaction.id</code> を DB に保存
+                    </td>
+                    <td>状態は <code>previous_interaction_id</code> で引き継ぐ(公式)</td>
+                  </tr>
+                  <tr>
+                    <td>保存設定</td>
+                    <td>後続編集が必要なら <code>store=false</code> にしない</td>
+                    <td><code>store=false</code> の動画は編集不可(公式)</td>
+                  </tr>
+                  <tr>
+                    <td>大容量出力</td>
+                    <td>4MB 超は URI 配信。作成直後に URI を保存</td>
+                    <td>後から GET するとインライン base64 で返る(公式)</td>
+                  </tr>
+                  <tr>
+                    <td>生成待ち</td>
+                    <td>
+                      <code>FAILED</code> を含む状態遷移を処理し、ポーリング間隔と上限時間を設ける
+                    </td>
+                    <td>生成時間は長さ・解像度・負荷で変動(公式)</td>
+                  </tr>
+                  <tr>
+                    <td>モデル ID</td>
+                    <td>プレビュー ID から <code>gemini-omni-1.1-flash</code> へ移行</td>
+                    <td>プレビュー ID は廃止予定(二次情報。公式で確認)</td>
+                  </tr>
+                  <tr>
+                    <td>動画の起点管理</td>
+                    <td>
+                      参照・編集に使う素材はバージョン管理し、どの素材がどの出力を生んだか追跡
+                    </td>
+                    <td>運用上の推奨(筆者)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>9.2 安全性・ガバナンス</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>項目</th>
+                    <th>内容</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>SynthID</td>
+                    <td>
+                      すべての生成動画に不可視の透かしが入る。<strong>無効化できない</strong>ため、公開側の表示ポリシーと整合させる
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>安全フィルタ</td>
+                    <td>入力プロンプトと生成動画の両方に適用される(地域で異なる)</td>
+                  </tr>
+                  <tr>
+                    <td>人物・未成年</td>
+                    <td>
+                      識別可能な人物や、EEA・スイス・英国での未成年を含む画像のアップロード編集には制限がある
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>権利</td>
+                    <td>参照素材(顔・商品・画風)の利用許諾は自社で管理する</td>
+                  </tr>
+                  <tr>
+                    <td>データ</td>
+                    <td>
+                      有料枠は製品改善に利用されないと公式料金ページに記載。契約条件は必ず自社で確認
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>9.3 トラブルシュート</h3>
+            <div class="diagram-card">
+              <div class="diagram-wrap"><div class="diagram-canvas" data-diagram-id="6"></div></div>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-11">
+          <h2>既知の制約まとめ</h2>
+          <div class="prose">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>カテゴリ</th>
+                    <th>制約</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>生成長</td>
+                    <td>1 回あたり最大 10 秒。拡張で累計 40 秒</td>
+                  </tr>
+                  <tr>
+                    <td>制御パラメータ</td>
+                    <td>
+                      システム指示・<code>temperature</code>・<code>top_p</code>・停止シーケンス・ネガティブプロンプト欄は
+                      <strong>非対応</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>音声</td>
+                    <td>声の編集は非対応。音声参照のアップロードも非対応</td>
+                  </tr>
+                  <tr>
+                    <td>動画参照</td>
+                    <td>最大 3 クリップ・各 3 秒。複数動画をまたぐ推論は非対応</td>
+                  </tr>
+                  <tr>
+                    <td>入力動画</td>
+                    <td>編集・拡張は 10 秒以下</td>
+                  </tr>
+                  <tr>
+                    <td>拡張位置</td>
+                    <td>末尾のみ</td>
+                  </tr>
+                  <tr>
+                    <td>YouTube</td>
+                    <td>YouTube 動画をメディアソースとして使うことは非対応</td>
+                  </tr>
+                  <tr>
+                    <td>スループット</td>
+                    <td>Provisioned Throughput は非対応</td>
+                  </tr>
+                  <tr>
+                    <td>言語</td>
+                    <td>英語は完全サポート。他言語は未評価</td>
+                  </tr>
+                  <tr>
+                    <td>地域</td>
+                    <td>アップロード動画の編集・拡張は EEA・スイス・英国で提供なし</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-12">
+          <h2>アンチパターン集</h2>
+          <div class="prose">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>アンチパターン</th>
+                    <th>なぜ悪いか</th>
+                    <th>対策</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1 本の長文プロンプトに全指示を詰める</td>
+                    <td>編集では過剰な説明が意図しない変更を招く</td>
+                    <td>生成は構造化、編集は短く 1 変更ずつ</td>
+                  </tr>
+                  <tr>
+                    <td>単一ショットを指定せずに生成する</td>
+                    <td>既定で複数ショットの物語になる</td>
+                    <td>単一ショットを明記</td>
+                  </tr>
+                  <tr>
+                    <td>否定を「ネガティブ欄」に入れようとする</td>
+                    <td>そのフィールドは存在しない</td>
+                    <td>「No ...」を本文に書く</td>
+                  </tr>
+                  <tr>
+                    <td><code>store=false</code> のまま編集フローを組む</td>
+                    <td>動画が後続ターンで編集できない</td>
+                    <td>編集前提なら保存を有効に</td>
+                  </tr>
+                  <tr>
+                    <td>古い GET で URI を取り直そうとする</td>
+                    <td>インライン base64 で返ってくる</td>
+                    <td>作成直後に URI を保存</td>
+                  </tr>
+                  <tr>
+                    <td>最初から 4K で試行錯誤する</td>
+                    <td>試行回数 × 高単価でコストが膨らむ</td>
+                    <td>360p ドラフトで収束させる</td>
+                  </tr>
+                  <tr>
+                    <td><code>task</code> を常時指定する</td>
+                    <td>追加の制約がかかる</td>
+                    <td>プロンプトで解決し、最後の手段にする</td>
+                  </tr>
+                  <tr>
+                    <td>日本語の看板や字幕を動画内に直接描かせる</td>
+                    <td>非英語は未評価</td>
+                    <td>事前検証し、必要なら後工程で重ねる</td>
+                  </tr>
+                  <tr>
+                    <td>参照動画に音声を期待する</td>
+                    <td>参照動画の音声は無視される</td>
+                    <td>音はプロンプトで指定</td>
+                  </tr>
+                  <tr>
+                    <td>独立ベンチ無しで「最高品質」と断定</td>
+                    <td>評価はベンダー発表が中心</td>
+                    <td>自社データで A/B 評価</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-13">
+          <h2>導入チェックリスト</h2>
+          <div class="prose">
+            <p><strong>設計</strong></p>
+            <ul>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span
+                    >Omni と Veo 3.1 の選定基準を決め、同一プロンプトで A/B 比較した</span
+                  ></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>編集・拡張の要否を決め、保存設定(<code>store</code>)を設計した</span></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>英語プロンプトのテンプレートを整備した</span></label
+                >
+              </li>
+            </ul>
+            <p><strong>実装</strong></p>
+            <ul>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span
+                    ><code>gemini-omni-1.1-flash</code> を使い、旧プレビュー ID を使っていない</span
+                  ></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>4MB 超は URI 配信で、作成直後に URI を保存している</span></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span
+                    ><code>PROCESSING</code> と
+                    <code>FAILED</code> を処理するポーリングを実装した</span
+                  ></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span><code>interaction.id</code> を永続化している</span></label
+                >
+              </li>
+            </ul>
+            <p><strong>品質</strong></p>
+            <ul>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>単一ショット・音・禁止事項をテンプレートに含めた</span></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>編集は「短い指示 + 他は維持」で運用している</span></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>同一性・小物・文字・音の連続性を QA 項目にした</span></label
+                >
+              </li>
+            </ul>
+            <p><strong>コストと運用</strong></p>
+            <ul>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>360p ドラフト → 本番の二段階にし、試行回数の上限を決めた</span></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>1080p / 4K の単価を公式料金ページで再確認した</span></label
+                >
+              </li>
+              <li class="chk">
+                <label
+                  ><input type="checkbox" />
+                  <span>SynthID・地域制約・人物権利のポリシーを法務と整合させた</span></label
+                >
+              </li>
+            </ul>
+          </div>
+        </section>
+        <section class="section" id="sec-14">
+          <h2>補足: 追加ベストプラクティスと根拠ソース URL</h2>
+          <div class="prose">
+            <p>
+              調査時点は 2026-11-05 まで。<strong
+                >一次情報(公式)→ 著名開発者・主要メディア → サードパーティ</strong
+              >の順に整理しています。
+            </p>
+            <h3>A. 一次情報(Google 公式)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>内容</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      Omni Flash
+                      公式ドキュメント(生成・編集・拡張・プロンプトガイド・制約。2026-09-23 更新)
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://ai.google.dev/gemini-api/docs/omni"
+                        >https://ai.google.dev/gemini-api/docs/omni</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>料金ページ(Omni のトークン単価と 720p 換算)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://ai.google.dev/gemini-api/docs/pricing"
+                        >https://ai.google.dev/gemini-api/docs/pricing</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Gemini API の動画概要(Omni を既定とする方針、Veo との使い分け)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://ai.google.dev/gemini-api/docs/video"
+                        >https://ai.google.dev/gemini-api/docs/video</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      公式ブログ「Gemini Omni 1.1 Flash lets you build with more
+                      control」(シーン拡張、10 秒の文脈参照、360p プレビュー、採用事例)
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-omni-1-1-flash/"
+                        >https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-omni-1-1-flash/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Gemini アプリの Omni 紹介ページ(Veo 3.1 から Omni への切り替え)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://gemini.google/overview/video-generation/"
+                        >https://gemini.google/overview/video-generation/</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>公式 Skill(コーディングエージェント向けの Omni API 手順)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://github.com/google-gemini/gemini-skills/blob/main/skills/gemini-omni-flash-api/SKILL.md"
+                        >https://github.com/google-gemini/gemini-skills/blob/main/skills/gemini-omni-flash-api/SKILL.md</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Interactions API の概要</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://ai.google.dev/gemini-api/docs/interactions-overview"
+                        >https://ai.google.dev/gemini-api/docs/interactions-overview</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Interactions API の破壊的変更(2026 年 5 月)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://ai.google.dev/gemini-api/docs/interactions-breaking-changes-may-2026"
+                        >https://ai.google.dev/gemini-api/docs/interactions-breaking-changes-may-2026</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>廃止予定の一覧(プレビュー ID の確認用)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://ai.google.dev/gemini-api/docs/deprecations"
+                        >https://ai.google.dev/gemini-api/docs/deprecations</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>リリースノート</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://ai.google.dev/gemini-api/docs/changelog"
+                        >https://ai.google.dev/gemini-api/docs/changelog</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Files API(動画アップロード)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://ai.google.dev/gemini-api/docs/files"
+                        >https://ai.google.dev/gemini-api/docs/files</a
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>クイックスタート Colab</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://colab.sandbox.google.com/github/google-gemini/cookbook/blob/main/quickstarts/Get_started_Omni.ipynb"
+                        >https://colab.sandbox.google.com/github/google-gemini/cookbook/blob/main/quickstarts/Get_started_Omni.ipynb</a
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>B. 著名な開発者・主要メディア</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>内容</th>
+                    <th>URL</th>
+                    <th>補足</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      Philipp Schmid(Google DeepMind)の投稿。Omni Flash の API
+                      プレビュー時に「動画編集で SOTA、$0.10 / 秒で Veo 3.1 Fast
+                      と同価格」と発信(2026-06-30)。別の投稿で、Interactions API
+                      を使えば数行のコードで編集できる例も紹介
+                    </td>
+                    <td>https://digg.com/tech/plr69ybe(原典は X の @_philschmid)</td>
+                    <td><strong>ベンダー所属開発者の発言</strong>。独立した検証ではない</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      TechCrunch「Omni は動画から始まる」。Sundar Pichai の「any input から create
+                      anything」という方針、Flash の 10 秒上限が展開判断であること
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://techcrunch.com/2026/05/19/googles-gemini-omni-turns-images-audio-and-text-into-video-and-thats-just-the-start/"
+                        >https://techcrunch.com/2026/05/19/googles-gemini-omni-turns-images-audio-and-text-into-video-and-thats-just-the-start/</a
+                      >
+                    </td>
+                    <td>報道</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      FutureFive:発表時点の提供面(アプリ・Flow・YouTube)と、音声入力は当初は声の参照のみだった点
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://futurefive.co.nz/story/google-launches-gemini-omni-flash-for-video-editing"
+                        >https://futurefive.co.nz/story/google-launches-gemini-omni-flash-for-video-editing</a
+                      >
+                    </td>
+                    <td>報道</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <blockquote>
+              <p>
+                <strong>調査の限界</strong>: Simon Willison 氏など独立系の著名開発者による I/O 2026
+                の総括は確認できましたが、<strong
+                  >Omni 1.1 の API 利用に特化した詳細な検証記事は見つけられませんでした</strong
+                >。この領域は今後の一次検証が出てくる余地が大きいため、定期的に再調査してください。
+              </p>
+            </blockquote>
+            <h3>C. サードパーティ(実装・価格の補助情報)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>内容</th>
+                    <th>URL</th>
+                    <th>補足</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      ComfyUI が Omni Flash 1.1 の統合を解説(1 つのノードで text / image / reference
+                      / edit / extend)
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://blog.comfy.org/p/gemini-omni-11-flash-in-comfyui-faster"
+                        >https://blog.comfy.org/p/gemini-omni-11-flash-in-comfyui-faster</a
+                      >
+                    </td>
+                    <td>公式ブログ形式</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Replicate の Omni 1.1
+                      ページ(ネイティブ音声、台詞は引用符、プロンプト内ネガティブ)
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://replicate.com/google/gemini-omni-1.1"
+                        >https://replicate.com/google/gemini-omni-1.1</a
+                      >
+                    </td>
+                    <td>配信プラットフォーム</td>
+                  </tr>
+                  <tr>
+                    <td>Runware の Omni Flash 1.1 ガイド(プロンプト構造、参照、編集、拡張)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://runware.ai/docs/models/google-gemini-omni-flash-1-1/guides"
+                        >https://runware.ai/docs/models/google-gemini-omni-flash-1-1/guides</a
+                      >
+                    </td>
+                    <td>推論基盤の独自ガイド</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Eachlabs の編集ガイド(「1 つだけ変える」「Keep everything else the
+                      same」の運用)
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://www.eachlabs.ai/blog/gemini-omni-1-1-flash-video-editing-guide"
+                        >https://www.eachlabs.ai/blog/gemini-omni-1-1-flash-video-editing-guide</a
+                      >
+                    </td>
+                    <td>公式ガイドの解説。声の編集不可も整理</td>
+                  </tr>
+                  <tr>
+                    <td>Atlas Cloud の価格解説(5 / 10 / 40 秒のコスト)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://www.atlascloud.ai/blog/tips/gemini-omni-flash-1.1-pricing"
+                        >https://www.atlascloud.ai/blog/tips/gemini-omni-flash-1.1-pricing</a
+                      >
+                    </td>
+                    <td>解像度別単価は報道値。要確認</td>
+                  </tr>
+                  <tr>
+                    <td>TuttoAndroid(解像度別単価を報道)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://www.tuttoandroid.net/news/2026/08/28/gemini-omni-1-1-flash-ufficiale-scene-estese-4k-1169741/"
+                        >https://www.tuttoandroid.net/news/2026/08/28/gemini-omni-1-1-flash-ufficiale-scene-estese-4k-1169741/</a
+                      >
+                    </td>
+                    <td>二次情報</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      OrcaRouter の launch 解説(独立ベンチ無し、1080p / 4K
+                      の公式単価が未掲載である点の指摘)
+                    </td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://www.orcarouter.ai/blog/gemini-omni-1-1-flash-launch"
+                        >https://www.orcarouter.ai/blog/gemini-omni-1-1-flash-launch</a
+                      >
+                    </td>
+                    <td>二次情報。懐疑的な視点として有用</td>
+                  </tr>
+                  <tr>
+                    <td>Geotoolbox(日付と提供面、プレビュー ID の廃止日)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://geotoolbox.ai/blog/gemini-omni"
+                        >https://geotoolbox.ai/blog/gemini-omni</a
+                      >
+                    </td>
+                    <td>二次情報</td>
+                  </tr>
+                  <tr>
+                    <td>Usefastlane(Omni Pro は提供日未定、Veo 4 は未発表との整理)</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://www.usefastlane.ai/blog/gemini-omni"
+                        >https://www.usefastlane.ai/blog/gemini-omni</a
+                      >
+                    </td>
+                    <td>二次情報</td>
+                  </tr>
+                  <tr>
+                    <td>コミュニティのプロンプト集</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noopener"
+                        href="https://github.com/flaqai/awesome-gemini-omni-flash"
+                        >https://github.com/flaqai/awesome-gemini-omni-flash</a
+                      >
+                    </td>
+                    <td>コミュニティ。品質は玉石混交</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>D. 追加のベストプラクティス(根拠付き)</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ベストプラクティス</th>
+                    <th>根拠</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      台詞は <strong>引用符で囲み</strong>、音楽・効果音・環境音は別途記述する
+                    </td>
+                    <td>Replicate のモデルページ(上の C 表)</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      編集結果が崩れたら、再生成する前にまず指示を「1 動詞 + 1
+                      対象」まで短縮し、「Keep everything else the same」を付ける
+                    </td>
+                    <td>公式ドキュメント+Eachlabs</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      新規ジョブは Omni を既定にし、既存 Veo 資産は
+                      <strong>段階移行</strong>で比較する
+                    </td>
+                    <td>公式の動画概要ページ</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      ComfyUI
+                      などのノードベース環境では、同一ノードで全モードを切り替えてワークフロー化する
+                    </td>
+                    <td>ComfyUI ブログ</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      コーディングエージェント(Claude Code・Gemini CLI 等)には、公式 Skill
+                      を読ませて実装する
+                    </td>
+                    <td>公式 GitHub の gemini-skills</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="sec-15">
+          <h2>情報の確度と更新方針</h2>
+          <div class="prose">
+            <h3>資料間の食い違いと扱い</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>論点</th>
+                    <th>状況</th>
+                    <th>本ガイドの扱い</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1080p / 4K の単価</td>
+                    <td>
+                      公式料金ページは 720p のトークン換算が中心。報道・再販業者は 1080p ≒ $0.15、4K
+                      ≒ $0.30 / 秒と報告。一方で「Google は 1080p / 4K
+                      の単価を公表していない」と指摘する記事もある
+                    </td>
+                    <td><strong>二次情報として併記し、公式での再確認を必須</strong>とした</td>
+                  </tr>
+                  <tr>
+                    <td>拡張・末尾フレームの対応</td>
+                    <td>
+                      動画概要ページは Veo 3.1 の用途として挙げるが、Omni ページは Omni 1.1
+                      での対応を明記
+                    </td>
+                    <td>Omni ページを正とした</td>
+                  </tr>
+                  <tr>
+                    <td>プレビュー ID の廃止日</td>
+                    <td>複数の二次情報が 2026-09-30 と記載。公式ページでの直接確認は未実施</td>
+                    <td>公式 Deprecations で要確認とした</td>
+                  </tr>
+                  <tr>
+                    <td>Omni の位置づけ</td>
+                    <td>
+                      一部の解説記事は Omni を Gemini 2.0
+                      系の理解モデルと説明するなど、公式と矛盾する
+                    </td>
+                    <td>公式ドキュメントと矛盾する記事は採用しなかった</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <h3>更新のトリガー</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>トリガー</th>
+                    <th>アクション</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Omni Pro の提供開始</td>
+                    <td>モデル選定フロー(Step 1)とコスト表(Step 8)を更新</td>
+                  </tr>
+                  <tr>
+                    <td>画像・音声出力の追加</td>
+                    <td>「出力は動画のみ」という前提(第 0 章・第 1 章)を更新</td>
+                  </tr>
+                  <tr>
+                    <td>1080p / 4K の公式単価が明示</td>
+                    <td>8.1 の確度欄と見積もり関数を更新</td>
+                  </tr>
+                  <tr>
+                    <td>Interactions API の仕様変更</td>
+                    <td>全コード例を再検証</td>
+                  </tr>
+                  <tr>
+                    <td>参照・拡張の上限緩和</td>
+                    <td>5.5 と既知の制約表を更新</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <footer class="footer">
+          以上。本ガイドは 2026 年 11 月 5 日時点までの公開情報に基づきます。価格・制限・モデル ID
+          は変わりやすいため、実装前に必ず公式ドキュメントで再確認してください。
+        </footer>
+      </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"></script>
+    <script>
+      const DIAGRAMS = [
+        `flowchart LR
+    A["入力<br/>テキスト / 画像 / 音声 / 動画"] --> B["Gemini Omni Flash<br/>any-to-any ファミリーの第1弾"]
+    B --> C["出力<br/>音声付き動画<br/>1回あたり最大10秒"]
+    C --> D["シーン拡張<br/>10秒単位で累計40秒"]
+    B -.-> E["今後の計画<br/>画像・音声出力 / Omni Pro"]`,
+        `flowchart TD
+    S["動画生成の要件が発生"] --> Q1{"既存動画の部分編集や<br/>会話での反復が必要?"}
+    Q1 -->|はい| O["Omni 1.1 Flash を採用"]
+    Q1 -->|いいえ| Q2{"既存の本番パイプラインが<br/>Veo 3.1 前提?"}
+    Q2 -->|はい| V["Veo 3.1 を継続<br/>移行は段階的に検証"]
+    Q2 -->|いいえ| Q3{"複数の参照素材で<br/>人物や物の一貫性が重要?"}
+    Q3 -->|はい| O
+    Q3 -->|いいえ| AB["同一プロンプトで<br/>Omni と Veo 3.1 を A/B 比較"]`,
+        `flowchart LR
+    A["1 構造を決める<br/>単一ショットか複数カットか"] --> B["2 被写体と動き"]
+    B --> C["3 カメラとライティング"]
+    C --> D["4 音を指定する<br/>台詞は引用符"]
+    D --> E["5 不要要素を文中で禁止"]`,
+        `flowchart TD
+    A["手元の素材は?"] --> B{"素材の種類"}
+    B -->|"テキストのみ"| T["text_to_video"]
+    B -->|"画像1枚を動かす"| I["image_to_video<br/>FIRST_FRAME"]
+    B -->|"始点と終点の2枚"| F["先頭と末尾フレームの補間"]
+    B -->|"人物・物・画風の参照"| R["reference_to_video<br/>IMAGE_REF / VIDEO_REF"]
+    B -->|"既存動画を直したい"| E["edit<br/>短い指示で変更"]
+    B -->|"続きを作りたい"| X["extend<br/>末尾に追加"]`,
+        `flowchart TD
+    A["Turn 1 生成<br/>保存を有効にする"] --> B["interaction.id を保存"]
+    B --> C["Turn 2 以降<br/>previous_interaction_id + 短い編集指示"]
+    C --> D{"結果は意図通り?"}
+    D -->|はい| E["採用 または 次の編集へ"]
+    D -->|いいえ| F["指示を 1動詞+1対象 に絞る<br/>Keep everything else the same を付ける"]
+    F --> C
+    E --> G["最終版は URI 配信で保存"]`,
+        `flowchart TD
+    A["ストーリーボードとプロンプト案"] --> B["360p ドラフト<br/>約1/3コスト・最大60%高速"]
+    B --> C{"構図・動き・音は合格?"}
+    C -->|いいえ| D["プロンプトを修正"]
+    D --> B
+    C -->|はい| E["720p 以上で本番生成"]
+    E --> F{"尺が足りない?"}
+    F -->|はい| G["10秒単位で拡張<br/>累計40秒まで"]
+    F -->|いいえ| H["QA チェック"]
+    G --> H
+    H --> I["配信 SynthID は付いたまま"]`,
+        `flowchart TD
+    P["期待と違う出力"] --> Q1{"勝手にカットが入る?"}
+    Q1 -->|はい| A1["single continuous shot と<br/>no scene cuts を明記"]
+    Q1 -->|いいえ| Q2{"編集で余計な所まで変わる?"}
+    Q2 -->|はい| A2["指示を短くし<br/>Keep everything else the same を付ける"]
+    Q2 -->|いいえ| Q3{"音が不要または不自然?"}
+    Q3 -->|はい| A3["No dialogue や音楽の種類を具体指定"]
+    Q3 -->|いいえ| Q4{"モードを誤認している?"}
+    Q4 -->|はい| A4["task パラメータで明示<br/>最後の手段"]
+    Q4 -->|いいえ| A5["参照素材のタグ付けと<br/>上限を確認"]`,
+      ];
+      (function () {
+        if (window.hljs) {
+          try {
+            hljs.highlightAll();
+          } catch (e) {}
+        }
+        document.querySelectorAll('ul').forEach(function (ul) {
+          var items = ul.querySelectorAll(':scope > li.chk');
+          if (!items.length) return;
+          ul.classList.add('checklist');
+          var p = document.createElement('div');
+          p.className = 'progress';
+          p.innerHTML = '<span class="cnt"></span><div class="bar"><i></i></div>';
+          ul.parentNode.insertBefore(p, ul);
+          function upd() {
+            var d = 0;
+            items.forEach(function (li) {
+              var c = li.querySelector('input').checked;
+              li.classList.toggle('done', c);
+              if (c) d++;
+            });
+            p.querySelector('.cnt').textContent = d + ' / ' + items.length + ' 完了';
+            p.querySelector('i').style.width = (d / items.length) * 100 + '%';
+          }
+          items.forEach(function (li) {
+            li.querySelector('input').addEventListener('change', upd);
+          });
+          upd();
+        });
+        var links = Array.prototype.slice.call(document.querySelectorAll('.nav-a'));
+        var secs = links.map(function (a) {
+          return document.querySelector(a.getAttribute('href'));
+        });
+        var raf = 0;
+        function onScroll() {
+          if (raf) return;
+          raf = requestAnimationFrame(function () {
+            raf = 0;
+            var cur = 0,
+              lim = window.innerHeight * 0.25;
+            secs.forEach(function (s, i) {
+              if (s.getBoundingClientRect().top <= lim) cur = i;
+            });
+            links.forEach(function (a, i) {
+              a.classList.toggle('active', i === cur);
+            });
+          });
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        var btn = document.querySelector('.menu-btn');
+        btn.addEventListener('click', function () {
+          document.body.classList.toggle('nav-open');
+        });
+        links.forEach(function (a) {
+          a.addEventListener('click', function () {
+            document.body.classList.remove('nav-open');
+          });
+        });
+      })();
+      (async function () {
+        if (!window.mermaid) return;
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'loose',
+          theme: 'base',
+          flowchart: { htmlLabels: true, useMaxWidth: false, curve: 'basis' },
+          themeVariables: {
+            fontSize: '16px',
+            fontFamily: '"Noto Sans JP",sans-serif',
+            primaryColor: '#e8ecf8',
+            primaryBorderColor: '#3b4a9c',
+            primaryTextColor: '#1f2430',
+            lineColor: '#5b6178',
+            tertiaryColor: '#faf7f0',
+          },
+        });
+        var cs = document.querySelectorAll('.diagram-canvas');
+        for (var i = 0; i < cs.length; i++) {
+          var id = +cs[i].getAttribute('data-diagram-id');
+          try {
+            var r = await mermaid.render('mmd' + id, DIAGRAMS[id]);
+            cs[i].innerHTML = r.svg;
+            var svg = cs[i].querySelector('svg');
+            var vb = svg.viewBox.baseVal;
+            svg.setAttribute(
+              'viewBox',
+              vb.x + ' ' + vb.y + ' ' + vb.width + ' ' + (vb.height + 15),
+            );
+            svg.removeAttribute('width');
+            svg.removeAttribute('height');
+            svg.style.width = vb.width + 'px';
+            svg.style.maxWidth = 'none';
+            svg.style.height = 'auto';
+            svg.style.overflow = 'visible';
+            svg.style.flexShrink = '0';
+          } catch (e) {
+            cs[i].innerHTML =
+              '<div class="diagram-err">図の描画に失敗しました: ' +
+              String(e.message || e) +
+              '</div>';
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
