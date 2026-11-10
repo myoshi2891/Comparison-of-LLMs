@@ -12,10 +12,11 @@ Updated 2026-11-10
 
 基準コミット（drift 検出用）: `45940fd`
 
-保守同期（2026-11-10）: `/google/argon-best-practices` はIN PROGRESS。
-実装とGoogleカテゴリへの登録は作業ツリーのみ。進捗テストの期待値1行の訂正についてユーザー確認中でGreen未作成。
-全体233 files／2794 tests（2793成功・1失敗）。型・lint634 files・HTML監査exit 0・7図解析・pytest122件は成功。
-007〜009のDONE状態を維持する。npm・ビルド未実行。確認待ちの理由・再開手順はdocs/PROGRESS.mdを参照。
+保守同期（2026-11-10）: `/google/argon-best-practices` の実装・自動検証・分離コミットが完了。
+Googleカテゴリのregistryから導線を導出。進捗テスト期待値1行はユーザー承認後に原本式へ訂正済み。
+全体233 files／2794 tests、対象68契約・関連95件、型・lint634 files・HTML監査exit 0・7図解析・pytest122件が成功。
+原本2形式は内容無変更保存。007〜009のDONE状態を維持。npm・ビルド未実行。
+次はユーザーによる目視確認（Argon・Fable・Astraは個別に未確認を維持）。履歴はdocs/PROGRESS.mdを参照。
 
 保守同期（2026-11-10）: `/codex/astra-best-practices` を既存Codexカテゴリへ登録。
 007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作68契約、関連95件、

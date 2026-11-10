@@ -5,14 +5,14 @@ Updated 2026-11-10
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
 
-Gemini 4 Argon `/google/argon-best-practices` は移行作業中（2026-11-10）。
+Gemini 4 Argon `/google/argon-best-practices` を追加（2026-11-10）。
 指定HTMLの51見出し・27段落・94リスト項目・16表118行・6コード例・7図・12チェック・42外部リンクをPure JSXへ転写。
 原本固定の本文・構造・63 CSS規則・highlight.js11.9.0全トークンを照合し、HTML監査exit 0。
-全体233 files／2794 testsのうち2793成功・1失敗。進捗テストに誤記した100 / 12を原本式(1 / 12) * 100へ訂正する確認待ち。
-実装とGoogleカテゴリのregistry登録は作業ツリーにあり、Greenコミットは未作成。本文の固定期待値は無変更。
-型・lint634 files・7図解析・pytest122件と操作35件が成功。操作の行／関数100%、分岐89.87%。
-HTML／Markdownは内容無変更でarchiveへ保存。npm・ビルド未実行。目視はユーザー担当（localhost:3000）。
-確認待ちの理由・分離履歴・再開手順はdocs/PROGRESS.mdを参照。
+全体233 files／2794 tests、対象68契約・関連95件、型・lint634 files・7図解析・pytest122件が成功。
+進捗テスト期待値1行はユーザー承認後に原本式へ訂正済み。本文・構造・CSS・図の固定期待値は無変更。
+264px目次・900pxモバイル開閉・点と番号・表全列左寄せ・コード空白を保持。操作の行／関数100%、分岐89.87%。
+Googleカテゴリのregistryから導線を導出し、日付はhero内へ表示。HTML／Markdownは内容無変更保存。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。履歴はdocs/PROGRESS.md。
 
 GPT-6 Astra `/codex/astra-best-practices` を追加（2026-11-10）。
 指定HTMLの81見出し、50段落、83リスト項目、24表177行、11コード例、12図、22チェックと40外部リンクをPure JSXへ転写。
@@ -281,7 +281,7 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 233 files / 2794 tests（2793成功・1失敗、2026-11-10実測。Argon期待値訂正の確認待ち）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 233 files / 2794 tests pass（2026-11-10実測）
 (cd web-next && bun run typecheck)   # OK（2026-11-10 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
 (cd web-next && bun run lint)        # OK（634 files / 0 diagnostics。2026-11-10 実測）
