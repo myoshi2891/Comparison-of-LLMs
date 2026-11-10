@@ -222,7 +222,9 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
 - **最新実装 HEAD**: `a8577101`（GPT-6 Astraガイド。Green `4b903f0b`、分離履歴は冒頭の同名節を参照）。
-- **次の作業**: `/codex/astra-best-practices` の目視確認（ユーザー担当、localhost:3000）。264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。npm・ビルドは未実行。
+- **次の作業**: Fable・Astraの目視確認（両方とも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで未完了として残す。npm・ビルドは未実行。
+  - Fable `/claude/fable-5-1-best-practices`: 264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・8／5／5チェック進捗を確認。
+  - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
 - **ルート実数**: `page.tsx` 103件、registry 103エントリ（2026-11-10実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
@@ -691,8 +693,10 @@
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
 最新実装HEAD: a8577101（GPT-6 Astra。Green 4b903f0b、分離履歴は冒頭の同名節を参照）。
-次の作業: /codex/astra-best-practices の目視確認（ユーザー担当）。
-http://localhost:3000/codex/astra-best-practices
+次の作業: Fable・Astraの目視確認（両方とも未完了、ユーザー担当）。各ページは個別の完了確認が得られるまで未完了として残す。
+Fable: http://localhost:3000/claude/fable-5-1-best-practices
+264px目次・900pxモバイル開閉・17章・点と番号・40表251行・12コード例・10図・8／5／5チェック進捗を確認。
+Astra: http://localhost:3000/codex/astra-best-practices
 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表177行・11コード例・12図・8／7／7チェック進捗を確認。
 指定HTMLを正本とし、情報基準日2026-11-05を保持。HTML／Markdownはarchive/html/OpenAI/／archive/md/OpenAI/に内容無変更で保存。
 Markdownの後日追記と図7件の相違は本書同名節を参照。本文は混在させない。
