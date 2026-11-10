@@ -1,6 +1,6 @@
 # Plans — プラットフォーム拡張検討ドキュメント
 
-Updated 2026-11-09
+Updated 2026-11-10
 
 `.agent/skills/improve/SKILL.md` により生成・維持している方向性ドキュメント群。
 対象は web-next（Next.js 16 SSG）の「AI 最新情報キャッチアップ・プラットフォーム」化。
@@ -11,6 +11,12 @@ Updated 2026-11-09
 - 照合 v2: 2026-07-12（004〜006, commit `45940fd`）— 154 コミットのドリフトを 004 で照合済み
 
 基準コミット（drift 検出用）: `45940fd`
+
+保守同期（2026-11-10）: `/codex/astra-best-practices` を既存Codexカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作68契約、関連95件、
+全体Vitest **231 files／2725 tests**、型・lint627 files、HTML監査exit 0、Mermaid12図解析、pytest122件が成功。
+8・7・7項目のリスト別進捗と原本2形式の内容無変更保存を検証。npm・ビルド未実行。
+次はユーザーの目視確認（localhost:3000）。分離履歴と再開手順は `docs/PROGRESS.md` を参照。
 
 保守同期（2026-11-09）: `/claude/fable-5-1-best-practices` を既存Claudeカテゴリへ登録。
 007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作67契約、関連94件、

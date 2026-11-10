@@ -1,9 +1,19 @@
 # GEMINI.md
 
-Updated 2026-11-09
+Updated 2026-11-10
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
+
+GPT-6 Astra `/codex/astra-best-practices` を追加（2026-11-10）。
+指定HTMLの81見出し、50段落、83リスト項目、24表177行、11コード例、12図、22チェックと40外部リンクをPure JSXへ転写。
+原本固定の本文・構造・62 CSS規則・highlight.js11.9.0全トークンを68契約で照合。
+全体Vitest **231 files／2725 tests**、関連95件、型・lint627 files、HTML監査exit 0、Mermaid12図解析、pytest122件が成功。
+原本の264px目次と900pxモバイル開閉、本文の点と番号・heroのマーカーなし、全列左寄せとコード空白を保持。
+8・7・7項目のリスト別進捗・全ID一意性・cleanupを検証。操作の行／関数100%、分岐89.87%。
+registryのCodexカテゴリから導線を導出し、日付はヒーロー内へ表示。本文の情報基準日2026-11-05を保持。
+HTML／Markdownは内容無変更・100%リネームで保存。後日更新されたMarkdownと図7件の差は混在させない。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.md。
 
 Claude Fable 5.1 `/claude/fable-5-1-best-practices` を追加（2026-11-09）。
 指定HTMLの93見出し、48段落、56リスト項目、40表251行、12コード例、10図と18チェックをPure JSXへ転写。

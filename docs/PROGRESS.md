@@ -2,9 +2,22 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-09**
+> - 最終更新日: **Updated 2026-11-10**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## GPT-6 Astra ガイド移行（2026-11-10）
+
+- ルート: `/codex/astra-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-11-05を保持。registryは2026-11-10で既存Codexカテゴリへ登録し、ナビ・検索・RSS・関連ページを導出。
+- 全81見出し（H1×1／H2×17／H3×53／H4×10）、50段落、83リスト項目（12 ul／6 ol）、24表177行、11コード例、12図、22チェック項目、40外部リンクをPure JSXへ完全転写。Redで固定したsource-contract.jsonにより全文・順序・重複・全装飾クラス・セクション境界・表セル型と結合・リスト型／開始番号／入れ子・CDN・highlight.js11.9.0全トークン・62 CSS規則とmedia条件を照合。表構造直下の不正空白ノードは0件。
+- 原本のヒーローはマーカーなし・左paddingゼロ、本文は点と番号・入れ子を保持。重複padding宣言は宣言順ごと固定し、noDuplicatePropertiesをその宣言だけ局所抑制。共有計算機の等幅書体・nowrap・sticky表見出し等はページ内で打ち消し、全列左寄せ・ブラウザ既定太字・コード字下げ・アンカー余白を検証。
+- チェック進捗は原本スクリプトどおり8・7・7項目の3リスト別集計。各リストの本文、独立したカウンター・バー・完了クラス、全IDの一意性、全changeリスナーの解除を検証する。264px固定目次・900pxモバイル開閉、目次追従・最下部・目次内スクロール・トグル／背景／Escape／リンク・resize・inert・Tab循環・フォーカス復帰・cleanupを保持。
+- 原本のhtmlスクロール規則、図解フレームの配置／幅宣言、svg寸法・余白・tooltip規則は共有実装へ委譲。12図（sequenceDiagramを含む）のソース・順序・themeVariablesを完全一致で検証し、中央寄せ・縮小フィットは共有MermaidDiagramが担当。外部リンクはtarget="_blank"とrel="noopener noreferrer"へ統一。共有クロームの実測高を一度だけ確保し、registryの日付をヒーロー内へ表示。鮮度バー・関連ページ等の補正は本ページへ限定。
+- 検証: 対象68契約、registry／ナビを含む関連95件、全体Vitest **231 files／2725 tests**、typecheck、lint **627 files／0 diagnostics**、HTML原本監査exit 0、Mermaid10.9.8による全12図解析、pytest **122件**が成功。操作カバレッジは行／関数100%、分岐89.87%、文99.16%。
+- 原本保存: `f490eb2b`でHTML／Markdownをarchive/html/OpenAI/／archive/md/OpenAI/へ内容無変更・100%リネーム。HTML SHA-256 `f256397f9e53950f65db685c49d3437fe20d833a891b3acd602454062349d4fa`、Markdown `7d6a5c95d4faec23dd719b84727cb85f573f16750c54b8e60dd47901c2ba067a`（移動前後一致）。
+- Markdown監査はexit 1。独立した目次見出し1件、7 URL、20リスト項目、3コード例、30表行、13段落と、図2・3・4・6・7・8・9（0起算）に差がある。タイムアウト・背景実行・WebSocket操縦・承認・価格等の後日更新をHTML本文と混在させず、指定HTMLを正本として移行した。
+- 分離履歴: Red `aa3814b9`（実装未作成のimport失敗を確認）→ 原本保存 `f490eb2b` → Green `4b903f0b` → Refactor `a8577101`。本文・構造・CSSの固定期待値は実装に合わせて変更していない。
+- CSSキャッシュ退避後、通常devの `http://localhost:3000/codex/astra-best-practices` でHTTP 200。配信HTMLの8／7／7初期進捗とガイド配下100 IDの一意性を確認。目視はユーザー担当。npm・ビルド・ブラウザ自動化は未実行。依存・設定・ロックは無変更。
 
 ## Claude Fable 5.1 ガイド移行（2026-11-09）
 
@@ -208,19 +221,19 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `351b9af8`（Claude Fable 5.1ガイド。Green `89197131`、分離履歴は冒頭の同名節を参照）。
-- **次の作業**: `/claude/fable-5-1-best-practices` の目視確認（ユーザー担当、localhost:3000）。264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・3組のチェック進捗を確認。npm・ビルドは未実行。
-- **ルート実数**: `page.tsx` 102件、registry 102エントリ（2026-11-09実測）。
+- **最新実装 HEAD**: `a8577101`（GPT-6 Astraガイド。Green `4b903f0b`、分離履歴は冒頭の同名節を参照）。
+- **次の作業**: `/codex/astra-best-practices` の目視確認（ユーザー担当、localhost:3000）。264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。npm・ビルドは未実行。
+- **ルート実数**: `page.tsx` 103件、registry 103エントリ（2026-11-10実測）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-09 実測）
-  - `bun run lint` ✅（Biome check / 621 files / 0 diagnostics。2026-11-09 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-10 実測）
+  - `bun run lint` ✅（Biome check / 627 files / 0 diagnostics。2026-11-10 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **229 files / 2657 testsすべて合格**（2026-11-09実測）。Fable 5.1の対象67契約・関連94件、typecheck・lint（621 files／0 diagnostics）も成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **231 files / 2725 testsすべて合格**（2026-11-10実測）。Astraの対象68契約・関連95件、typecheck・lint（627 files／0 diagnostics）も成功。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-09実測、UV_CACHE_DIRを一時領域へ指定）。
+  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-10実測、UV_CACHE_DIRを一時領域へ指定）。
 
 ## 最近の追加内容
 
@@ -677,16 +690,14 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: 351b9af8（Claude Fable 5.1。Green 89197131、分離履歴は冒頭の同名節を参照）。
-次の作業: /claude/fable-5-1-best-practices の目視確認（ユーザー担当）。
-http://localhost:3000/claude/fable-5-1-best-practices
-264px目次・900pxモバイル開閉・17章・点と番号・40表251行・12コード例・10図・3組のチェック進捗を確認。
-指定HTMLを正本とし、情報基準日2026-11-05を保持。HTML／Markdownはarchive/html/Anthropic/／archive/md/Anthropic/に内容無変更で保存。
-Markdownの後日追記との相違は本書同名節を参照。本文は混在させない。
-チェック進捗の契約訂正はユーザー承認済み。原本の8・5・5項目のリスト別集計へ修正済み。
-固定した本文・構造・CSSの期待値は無変更。全ID一意性・グループ独立・cleanupも検証する。
-HTML監査exit 0、対象67契約・関連94件、全229 files／2657 tests、型・lint621 files、Mermaid10図解析、pytest122件が成功。
-操作の行／関数100%、分岐89.87%。ルートとregistryは102件ずつ。
+最新実装HEAD: a8577101（GPT-6 Astra。Green 4b903f0b、分離履歴は冒頭の同名節を参照）。
+次の作業: /codex/astra-best-practices の目視確認（ユーザー担当）。
+http://localhost:3000/codex/astra-best-practices
+264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表177行・11コード例・12図・8／7／7チェック進捗を確認。
+指定HTMLを正本とし、情報基準日2026-11-05を保持。HTML／Markdownはarchive/html/OpenAI/／archive/md/OpenAI/に内容無変更で保存。
+Markdownの後日追記と図7件の相違は本書同名節を参照。本文は混在させない。
+HTML監査exit 0、対象68契約・関連95件、全231 files／2725 tests、型・lint627 files、Mermaid12図解析、pytest122件が成功。
+操作の行／関数100%、分岐89.87%。ルートとregistryは103件ずつ。固定した本文・構造・CSSの期待値は無変更。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 npm・ビルドは禁止。Red → Green → Refactor → Docsの分離コミットを守る。
 CSSキャッシュ退避後の通常devでHTTP 200と配信HTMLの初期進捗・ID一意性を確認済み。目視はユーザー担当。
