@@ -210,7 +210,7 @@ it("全チェック本文・リスト別進捗・バー・完了クラスを保�
   expect(bars()).toEqual(["0%"]);
   fireEvent.click(boxes[0]);
   expect(count()).toEqual(["1 / 12 完了"]);
-  expect(bars()).toEqual([`${100 / 12}%`]);
+  expect(bars()).toEqual([`${(1 / 12) * 100}%`]);
   for (const box of boxes.slice(1)) fireEvent.click(box);
   expect(count()).toEqual(["12 / 12 完了"]);
   expect(bars()).toEqual(["100%"]);
