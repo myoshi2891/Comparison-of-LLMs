@@ -95,10 +95,9 @@
 }
 .root .hero :global(ul) {
   margin: 0;
-  padding-left: 1.2em;
   color: #e8f3ec;
   list-style: none;
-  /* biome-ignore lint/suspicious/noDuplicateProperties: Preserve the source declaration order; hero bullets use zero padding. */
+  /* 原本は padding-left: 1.2em の後に 0 で上書きするため、実効値の 0 だけを宣言する。 */
   padding-left: 0;
 }
 .root .hero :global(li) {

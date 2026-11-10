@@ -279,6 +279,17 @@ const scoped = (selector: string) =>
       return s.startsWith(".root") ? s : `.root ${s}`;
     })
     .join(", ");
+it("同一規則内で同じプロパティを二重宣言しない（SonarQube css:S4656）", () => {
+  const duplicates: string[] = [];
+  postcss.parse(css()).walkRules((r) => {
+    const props = r.nodes
+      .filter((n): n is postcss.Declaration => n.type === "decl")
+      .map((d) => d.prop);
+    for (const prop of new Set(props.filter((p, i) => props.indexOf(p) !== i)))
+      duplicates.push(`${r.selector} ${prop}`);
+  });
+  expect(duplicates).toEqual([]);
+});
 it("原本62 CSS規則の全宣言・media条件を保持（図の配置は共有部品へ委譲）", () => {
   const ast = postcss.parse(css());
   for (const source of expected.css) {
@@ -311,6 +322,11 @@ it("原本62 CSS規則の全宣言・media条件を保持（図の配置は共�
       source.selector
     ).toContainEqual(
       source.declarations
+        // 同一規則内で後続の宣言に上書きされる無効な宣言は、実効値が同じため照合しない。
+        .filter(
+          (d, i, all) =>
+            !all.some((later, j) => j > i && later[0] === d[0] && (later[2] || !d[2]))
+        )
         .filter(
           (d) =>
             ![".diagram-wrap", ".diagram-canvas"].includes(source.selector) ||
