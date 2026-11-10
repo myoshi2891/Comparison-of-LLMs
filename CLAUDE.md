@@ -10,6 +10,15 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+Gemini 4 Argon `/google/argon-best-practices` は移行作業中（2026-11-10）。
+指定HTMLの51見出し・27段落・94リスト項目・16表118行・6コード例・7図・12チェック・42外部リンクをPure JSXへ転写。
+原本固定の本文・構造・63 CSS規則・highlight.js11.9.0全トークンを照合し、HTML監査exit 0。
+全体233 files／2794 testsのうち2793成功・1失敗。進捗テストに誤記した100 / 12を原本式(1 / 12) * 100へ訂正する確認待ち。
+実装とGoogleカテゴリのregistry登録は作業ツリーにあり、Greenコミットは未作成。本文の固定期待値は無変更。
+型・lint634 files・7図解析・pytest122件と操作35件が成功。操作の行／関数100%、分岐89.87%。
+HTML／Markdownは内容無変更でarchiveへ保存。npm・ビルド未実行。目視はユーザー担当（localhost:3000）。
+確認待ちの理由・分離履歴・再開手順はdocs/PROGRESS.mdを参照。
+
 GPT-6 Astra `/codex/astra-best-practices` を追加（2026-11-10）。
 指定HTMLの81見出し、50段落、83リスト項目、24表177行、11コード例、12図、22チェックと40外部リンクをPure JSXへ転写。
 原本固定の本文・構造・62 CSS規則・highlight.js11.9.0全トークンを68契約で照合。

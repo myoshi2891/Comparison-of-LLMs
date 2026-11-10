@@ -6,6 +6,17 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## Gemini 4 Argon ガイド移行・確認待ち（2026-11-10）
+
+- 状態: **IN PROGRESS**。`/google/argon-best-practices` のPure JSX／CSS Modules／TocObserverとGoogleカテゴリのregistry登録を実装済み。実装4ファイルは未コミット。進捗テストの期待値1行についてユーザー確認中であり、Green／Refactorコミットは未作成。
+- 指定HTMLを正本として、51見出し（H1×1／H2×16／H3×34）、27段落、94リスト項目（20リスト）、16表118行、6コード例、7図、12チェック項目、42外部リンクを転写。Redで固定したsource-contract.jsonで本文・順序・重複・セクション境界・全装飾クラス・リスト型と入れ子・表セル型と結合・コード空白・highlight.js11.9.0全トークン・63 CSS規則とmedia条件を照合する。
+- 原本の264px固定目次と900pxモバイル開閉、本文の点／番号とheroのマーカーなし、全列左寄せ、既定太字、アンカー余白を保持。目次追従・inert・Tab循環・フォーカス復帰・チェックのUL別進捗・cleanupは既存DrawerTocObserverへ委譲。図の配置／寸法・tooltipとhtmlスクロールは共有実装へ委譲し、7図のソース・順序・テーマを保持。日付はregistryからheroへ表示し、共通クローム補正はページ内へ限定。
+- **訂正確認中の期待値**: page.test.tsxの進捗バー検証に誤って `100 / 12` を記述した。原本および共有実装は `(1 / 12) * 100` であり、浮動小数点の末尾が `8.333333333333334%` と `8.333333333333332%` に分かれる。原本式へ1行を訂正する案を提示済み。`.claude/rules/tdd-mandatory-cycle.md` の期待値変更には確認必須という規約に従い、回答まで変更しない。本文・構造・CSSの固定期待値は無変更。
+- 検証: 対象68件中67成功／上記1失敗。全体Vitest **233 files／2794 tests（2793成功・1失敗）**。registry・navと操作の関連62件、typecheck、lint **634 files／0 diagnostics**、HTML原本監査exit 0、Mermaid10.9.8の全7図解析、pytest **122件**は成功。操作カバレッジは行／関数100%、分岐89.87%、文99.18%。初回全体検証は実装中のregistry読込と重なり登録漏れ1件が出たが、その後の関連契約と全体検証では登録漏れを解消している。
+- 原本保存: `3e393047`でHTML／Markdownをarchive/html/Google/／archive/md/Google/へ内容無変更・100%リネーム。HTML SHA-256 `30e4f758cb405474e414016cc476f9995c91d36818947b320c5282994bd09bcb`、Markdown `0107b1e45603cb2f1db9532c37bed12b58b1b4591f6c4879a573da6ce80e0022`（移動前後一致）。Markdown監査はexit 1で、独立目次1件、7 URL、16リスト項目、4コード例、19表行、11段落と図1（0起算）に差がある。保持・課金・SDK等の後日追記をHTML本文と混在させない。
+- 分離履歴: Red `bb5be8fb`（実装未作成のimport失敗を確認）→ 原本保存 `3e393047` → 既存Astraテストの整形のみ `543b4817`（34契約成功、期待値無変更）。既存HEADのAstra整形違反1行を修正し、移行コードと分離した。
+- CSSキャッシュ退避後、通常devの `http://localhost:3000/google/argon-best-practices` でHTTP 200。配信HTMLの69 ID一意性・初期進捗0 / 12・全文と構造を確認。原本と配信HTMLの各1092要素の意味的ツリー（タグ・本文・リスト階層・表結合・リンク先・コード空白・図位置）が一致。目視はユーザー担当。npm・ビルド・ブラウザ自動化は未実行。依存・設定・ロックは無変更。
+
 ## GPT-6 Astra ガイド移行（2026-11-10）
 
 - ルート: `/codex/astra-best-practices`。指定HTMLを正本とし、本文の情報基準日2026-11-05を保持。registryは2026-11-10で既存Codexカテゴリへ登録し、ナビ・検索・RSS・関連ページを導出。
@@ -221,17 +232,17 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `a8577101`（GPT-6 Astraガイド。Green `4b903f0b`、分離履歴は冒頭の同名節を参照）。
-- **次の作業**: Fable・Astraの目視確認（両方とも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで未完了として残す。npm・ビルドは未実行。
+- **最新実装 HEAD**: `543b4817`（既存Astraテストの整形。ArgonはRed `bb5be8fb`／原本保存 `3e393047`、実装は未コミット・Green未作成）。
+- **次の作業**: Argon進捗テストの期待値1行の訂正についてユーザー回答を待つ。承認後は訂正コミット→再検証→Green→Refactor→Docsの順。Fable・Astraの目視確認（両方とも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで未完了として残す。npm・ビルドは未実行。
   - Fable `/claude/fable-5-1-best-practices`: 264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・8／5／5チェック進捗を確認。
   - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
-- **ルート実数**: `page.tsx` 103件、registry 103エントリ（2026-11-10実測）。
+- **ルート実数**: `page.tsx` 104件、registry 104エントリ（2026-11-10実測、Argonは作業ツリーのみ）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-10 実測）
-  - `bun run lint` ✅（Biome check / 627 files / 0 diagnostics。2026-11-10 実測）
+  - `bun run lint` ✅（Biome check / 634 files / 0 diagnostics。2026-11-10 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **231 files / 2725 testsすべて合格**（2026-11-10実測）。Astraの対象68契約・関連95件、typecheck・lint（627 files／0 diagnostics）も成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **233 files／2794 tests（2793成功・1失敗）**（2026-11-10実測）。失敗はArgon進捗テストの浮動小数点末尾のみ。訂正の確認中でGreen未作成。関連62件・型・lint634 files・HTML監査exit 0・7図解析は成功。過去のAstra全体成功は231 files／2725 testsであり、今回の全体成功値として扱わない。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -692,17 +703,17 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: a8577101（GPT-6 Astra。Green 4b903f0b、分離履歴は冒頭の同名節を参照）。
-次の作業: Fable・Astraの目視確認（両方とも未完了、ユーザー担当）。各ページは個別の完了確認が得られるまで未完了として残す。
-Fable: http://localhost:3000/claude/fable-5-1-best-practices
-264px目次・900pxモバイル開閉・17章・点と番号・40表251行・12コード例・10図・8／5／5チェック進捗を確認。
-Astra: http://localhost:3000/codex/astra-best-practices
-264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表177行・11コード例・12図・8／7／7チェック進捗を確認。
-指定HTMLを正本とし、情報基準日2026-11-05を保持。HTML／Markdownはarchive/html/OpenAI/／archive/md/OpenAI/に内容無変更で保存。
-Markdownの後日追記と図7件の相違は本書同名節を参照。本文は混在させない。
-HTML監査exit 0、対象68契約・関連95件、全231 files／2725 tests、型・lint627 files、Mermaid12図解析、pytest122件が成功。
-操作の行／関数100%、分岐89.87%。ルートとregistryは103件ずつ。固定した本文・構造・CSSの期待値は無変更。
+現在のArgon作業: Red bb5be8fb → 原本保存3e393047 → 既存Astra整形543b4817。実装4ファイルは未コミット、Green／Refactorは未作成。
+次の作業: /google/argon-best-practices の進捗テスト期待値1行の訂正についてユーザー回答を確認する。
+page.test.tsxの100 / 12を、原本式(1 / 12) * 100へ訂正する案を提示済み。承認なしに期待値を変更しない。
+承認後は訂正コミット→対象・全体テスト→HTML原本監査exit 0→Green→Refactor→Docsの順で続ける。
+全体233 files／2794 tests（2793成功・1失敗）。対象68件中67成功。失敗は進捗バーの浮動小数点末尾のみ。
+型・lint634 files・関連62件・Mermaid7図解析・pytest122件は成功。操作の行／関数100%、分岐89.87%。
+指定HTMLを正本として51見出し・27段落・94項目・16表118行・6コード例・7図・12チェック・42外部リンクを保持する。
+原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。Markdownの後日追記を混在させない。
+確認URL: http://localhost:3000/google/argon-best-practices （通常dev起動済み、HTTP 200）。目視はユーザー担当。
+Fable・Astraの目視も個別の完了確認が得られるまで未完了として残す。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-今回の移行依頼に限り、ユーザー指定でnpm・ビルドは実行しない。通常のコミット前ビルド確認（Antigravityサンドボックス外で必須）はCLAUDE.mdの既存規則を維持する。Red → Green → Refactor → Docsの分離コミットを守る。
-CSSキャッシュ退避後の通常devでHTTP 200と配信HTMLの初期進捗・ID一意性を確認済み。目視はユーザー担当。
+今回の移行依頼ではユーザー指定でnpm・ビルドを実行しない。他環境の通常ビルド確認規約は維持する。
+依存・設定・ロックは無変更。固定した本文・構造・CSSの期待値は無変更。
 ```
