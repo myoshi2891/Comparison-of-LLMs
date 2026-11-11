@@ -483,3 +483,26 @@ it("共有の小さい表文字と計算機フッターが原本の書体・幅�
   }))
     expect(footer[property], `footer ${property}`).toBe(value);
 });
+it("完了行の文字色は白背景・ホバー背景の両方でWCAG AAの4.5:1以上を満たし取り消し線を保持", () => {
+  /** WCAG 2.x の相対輝度（#rrggbb）。 */
+  const luminance = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+      const c = Number.parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a: string, b: string) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+  // 原本固定の規則は変更せず、表ラッパー内のページ補正が実効値を担う
+  expect(declarations(".root :global(tr).done :global(td)").color).toBe("#8a8575");
+  const done = declarations(".root .table-wrap :global(tr).done :global(td)");
+  expect(done.color).toMatch(/^#[0-9a-f]{6}$/);
+  for (const background of ["#ffffff", "#f1ece0"])
+    expect(contrast(done.color, background), background).toBeGreaterThanOrEqual(4.5);
+  expect(declarations(".root :global(tr).done :global(td)")["text-decoration"]).toBe(
+    "line-through"
+  );
+});
