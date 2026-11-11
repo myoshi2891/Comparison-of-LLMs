@@ -6,6 +6,16 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## Codex ベストプラクティス移行とレビュー指摘対応（2026-11-11）
+
+- ルート: `/codex/best-practices`（registryのCodexカテゴリへ新規登録、追加・確認日2026-11-11）。原本は `archive/html/OpenAI/Openai-codex-best-practices-guide.html`／`archive/md/OpenAI/Openai-codex-best-practices-guide.md`。
+- 分離履歴: Red `cd066c1b` → 原本保存 `836ec57b` → 型アサーション補正 `1652b88b` → Green `a3ca5742`。目視未確認（ユーザー担当）。
+- レビュー指摘への対応（3件。いずれも原本固定の規則と期待値を変えず、規則を後ろに追加して補正）:
+  - Codexのアンカー余白: `--header-height` がこのページで未定義のため固定140pxだった。実測の `--ch-height`＋`--ch-disclaimer-height`＋`--mobile-bar-height`＋16pxを後勝ちの規則で適用。Red `5a036bb3` → Green `d8a13749`。test:367 の固定文字列の検証は残している。
+  - Antigravityの完了行: 原本色 `#8a8575` は白背景で約3.7:1。表ラッパー内で `#6b6658`（白背景約5.7:1、ホバー背景約4.8:1）へ補正し、取り消し線は維持。Red `6dfb7479` → Green `2ff865cf`。
+  - Antigravityのモバイルドロワー: 開いている間は本文だけでなく、共有ヘッダー・RelatedPagesを含む背景全体をinertにする。閉じる操作・desktopへの拡大・unmountで元の値へ戻す。Red `a102a2d5` → jsdomは `inert` を属性に反映しないため検証方法を補正 `38631818` → Green `a99b4614`。
+- 同じ `#8a8575` の規則と `[data-guide-content]` だけをinertにする処理はCodexページにも残っている（今回のレビュー範囲外のため未修正）。
+
 ## Google Antigravity ガイド移行（2026-11-11）
 
 - 状態: **実装・自動検証・分離コミット完了、目視未確認（ユーザー担当）**。既存 `/google/antigravity-best-practices` を指定HTMLの27章へ更新。Googleカテゴリ・topics・公開日2026-05-07を維持し、registryの要約と確認日2026-11-11を更新。本文の情報基準日2026-11-06、App v2.29.0／CLI v1.4.12の記載は保持する。
@@ -257,20 +267,21 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `ea6f7389`（Google Antigravityガイド。Green `e9ace689`、分離履歴は冒頭の同名節を参照）。
-- **次の作業**: Antigravity・Omni・Argon・Fable・Astraの目視確認（5ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。npm・ビルドは未実行。
+- **最新実装 HEAD**: `d8a13749`（Codexベストプラクティスのアンカー余白補正。移行Green `a3ca5742`。レビュー指摘への対応と分離履歴は冒頭の同名節を参照）。
+- **次の作業**: Codexベストプラクティス・Antigravity・Omni・Argon・Fable・Astraの目視確認（6ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。npm・ビルドは未実行。
+  - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
   - Antigravity `/google/antigravity-best-practices`: 268px目次・900pxモバイル開閉・27章・点と番号・61表404行・18コード例・11図・8行チェックと単一進捗を確認。
   - Omni `/google/omni-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点／heroのマーカーなし・29表185行・13コード例・7図・3／4／3／3チェック進捗を確認。
   - Argon `/google/argon-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点と番号／heroのマーカーなし・16表118行・6コード例・7図・12チェック進捗を確認。
   - Fable `/claude/fable-5-1-best-practices`: 264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・8／5／5チェック進捗を確認。
   - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
-- **ルート実数**: `page.tsx` 105件、registry 105エントリ（2026-11-11実測）。
+- **ルート実数**: `page.tsx` 106件、registry 106エントリ（2026-11-11実測。`/codex/best-practices` を追加）。
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-11 実測）
-  - `bun run lint` ✅（Biome check / 642 files / 0 diagnostics。2026-11-11 実測）
+  - `bun run lint` ✅（Biome check / 649 files / 0 diagnostics。2026-11-11 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **235 files／2920 testsすべて成功**（2026-11-11実測）。Antigravityの対象66契約・関連93件、型・lint642 files・HTML監査exit 0・11図解析も成功。Redで固定した期待値は無変更。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **237 files／2992 testsすべて成功**（2026-11-11実測。Codex移行とレビュー指摘への対応後）。型・lint649 files・pytest122件も成功。Redで固定した期待値は無変更。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -731,8 +742,9 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: ea6f7389（Google Antigravity。Green e9ace689、分離履歴は冒頭の同名節を参照）。
-次の作業: Antigravity・Omni・Argon・Fable・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+最新実装HEAD: d8a13749（Codexのアンカー余白補正。移行Green a3ca5742。レビュー指摘への対応は冒頭の同名節を参照）。
+次の作業: Codexベストプラクティス・Antigravity・Omni・Argon・Fable・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+Codex: http://localhost:3000/codex/best-practices （アンカー移動の余白を確認）
 Antigravity: http://localhost:3000/google/antigravity-best-practices
 268px目次・900pxモバイル開閉・27章・本文の点と番号・61表404行・18コード例・11図・8行チェックの単一進捗を確認。
 Omni: http://localhost:3000/google/omni-best-practices
@@ -742,8 +754,8 @@ Astra: http://localhost:3000/codex/astra-best-practices
 指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
-全体235 files／2920 tests成功。対象66契約・関連93件、型・lint642 files・HTML監査exit 0・11図解析・pytest122件が成功。
-操作の行／関数100%、分岐95.06%。ルートとregistryは既存の105件ずつ。
+全体237 files／2992 tests成功（Codex移行とレビュー指摘への対応後）。型・lint649 files・pytest122件が成功。
+Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは106件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 今回の移行依頼ではユーザー指定でnpm・ビルドを実行していない。他環境の通常ビルド確認規約は維持する。
 依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、139 ID一意性・初期進捗0 / 8・原本と配信HTMLの3254要素の一致を確認。
