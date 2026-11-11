@@ -418,6 +418,20 @@
   .root .main {
     width: 100%;
   }
+  .root .section,
+  .root :global(h1),
+  .root :global(h2),
+  .root :global(h3) {
+    scroll-margin-top: max(
+      calc(var(--header-height, 60px) + 80px),
+      calc(
+        var(--ch-height, 60px) +
+        var(--ch-disclaimer-height, 0px) +
+        var(--mobile-bar-height, 0px) +
+        16px
+      )
+    );
+  }
   .root.open .scrim {
     display: block;
     position: fixed;

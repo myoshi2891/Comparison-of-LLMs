@@ -25,7 +25,9 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
     </div>
   ),
 }));
+/** DOM本文の比較用に連続空白を正規化する。 */
 const text = (e: Element) => (e.textContent ?? "").replace(/\s+/g, " ").trim();
+/** ページ固有のCSSを原本との照合用に読み込む。 */
 const css = () => fs.readFileSync("app/google/antigravity-best-practices/page.module.css", "utf8");
 beforeEach(() => {
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
@@ -252,6 +254,7 @@ it("registry登録とヒーロー内の日付表示", () => {
   ]);
 });
 // Ignore CSS formatter whitespace around slash separators and function parentheses only.
+/** CSS整形の空白と引用符だけを同義の表現へ揃える。 */
 const normalized = (s: string) =>
   s
     .replace(/\s+/g, " ")
@@ -260,6 +263,7 @@ const normalized = (s: string) =>
     .replace(/\s*\/\s*/g, "/")
     .replace(/\(\s+/g, "(")
     .replace(/\s+\)/g, ")");
+/** 原本のセレクターをページ限定のCSS Modules表記へ変換する。 */
 const scoped = (selector: string) =>
   selector
     .split(",")
@@ -327,6 +331,7 @@ it("原本58 CSS規則の全宣言・media条件を保持（図の配置は共�
     );
   }
 });
+/** 指定セレクターの非media宣言を後勝ちの順で集める。 */
 const declarations = (selector: string) => {
   const result: Record<string, string> = {};
   postcss.parse(css()).walkRules((r) => {
@@ -448,6 +453,7 @@ it("全要素ツリーのタグ・本文・入れ子・図位置を原本と完�
   layout.querySelector('[data-testid="hero-dates"]')?.remove();
   const content = layout.querySelector("[data-guide-content]");
   content?.replaceWith(...Array.from(content.childNodes));
+  /** 本文・属性・図位置を原本と比較できる要素ツリーへ変換する。 */
   function shape(n: Node): unknown {
     if (n.nodeType === 3) return n.textContent?.replace(/\s+/g, " ").trim() || null;
     if (!(n instanceof Element)) return null;
@@ -483,6 +489,26 @@ it("共有の小さい表文字と計算機フッターが原本の書体・幅�
   }))
     expect(footer[property], `footer ${property}`).toBe(value);
 });
+it("モバイルアンカーは実測バー高さと従来の最低余白を確保する", () => {
+  const actual: Record<string, string> = {};
+  postcss.parse(css()).walkRules((rule) => {
+    if (rule.parent?.type !== "atrule" || rule.parent.params !== "(max-width: 900px)") return;
+    rule.walkDecls("scroll-margin-top", (declaration) => {
+      for (const selector of rule.selector.split(",").map((s) => s.trim()))
+        actual[selector] = normalized(declaration.value);
+    });
+  });
+  expect(actual).toEqual(
+    Object.fromEntries(
+      [".root .section", ".root :global(h1)", ".root :global(h2)", ".root :global(h3)"].map(
+        (selector) => [
+          selector,
+          "max(calc(var(--header-height, 60px) + 80px), calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height, 0px) + 16px))",
+        ]
+      )
+    )
+  );
+});
 it("完了行の文字色は白背景・ホバー背景の両方でWCAG AAの4.5:1以上を満たし取り消し線を保持", () => {
   /** WCAG 2.x の相対輝度（#rrggbb）。 */
   const luminance = (hex: string) => {
@@ -492,6 +518,7 @@ it("完了行の文字色は白背景・ホバー背景の両方でWCAG AAの4.5
     });
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   };
+  /** 2色の相対輝度からWCAGのコントラスト比を返す。 */
   const contrast = (a: string, b: string) => {
     const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
     return (hi + 0.05) / (lo + 0.05);

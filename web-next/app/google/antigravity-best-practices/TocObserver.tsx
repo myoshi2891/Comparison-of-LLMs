@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import styles from "./page.module.css";
 
+/** 目次追従、モバイルドロワーの操作制御とチェック進捗を同期する。 */
 export default function TocObserver() {
   useEffect(() => {
     const root = document.getElementById("antigravity-guide");
@@ -40,10 +41,12 @@ export default function TocObserver() {
         }
       }
     };
+    /** 開く直前のinert状態を復元し、次回の開閉に備えて保存値を破棄する。 */
     const restoreBackground = () => {
       for (const [el, prior] of background) el.inert = prior;
       background.clear();
     };
+    /** 開閉状態、背景の操作可否とフォーカスを現在の画面幅へ同期する。 */
     const sync = (open: boolean) => {
       root?.classList.toggle(styles.open, open);
       menu?.setAttribute("aria-expanded", String(open));
@@ -64,7 +67,9 @@ export default function TocObserver() {
       if (mobile && open && !wasOpen) links[0]?.focus();
       wasOpen = open;
     };
+    /** ドロワーを閉じ、背景の操作状態を戻す。 */
     const close = () => sync(false);
+    /** メニューボタンからドロワーの開閉を切り替える。 */
     const toggle = () => sync(!root?.classList.contains(styles.open));
     /** 開いたモバイルドロワーでは、Tab 移動を目次リンクとメニューの間で循環させる。 */
     const containFocus = (event: KeyboardEvent) => {
@@ -79,10 +84,12 @@ export default function TocObserver() {
       event.preventDefault();
       (event.shiftKey ? last : first).focus();
     };
+    /** Escapeで閉じ、開いている間のTab移動を制御する。 */
     const key = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
       if (event.key === "Tab") containFocus(event);
     };
+    /** モバイルバーの実測高さをページの配置用CSS変数へ渡す。 */
     const measure = () => {
       if (mobileBar)
         root?.style.setProperty(
@@ -93,6 +100,7 @@ export default function TocObserver() {
     const observer =
       typeof ResizeObserver !== "undefined" && mobileBar ? new ResizeObserver(measure) : null;
     if (mobileBar) observer?.observe(mobileBar);
+    /** スクロール位置から現在の章を選び、目次内で可視に保つ。 */
     const update = () => {
       const h = document.documentElement;
       let current = 0;
@@ -123,6 +131,7 @@ export default function TocObserver() {
           sidebar.scrollTop += r.top - sr.top - sr.height / 3;
       }
     };
+    /** サイズ変更後にバー高さ、ドロワー状態と現在の章を再計算する。 */
     const resize = () => {
       measure();
       sync(window.innerWidth <= 900 && Boolean(root?.classList.contains(styles.open)));
@@ -132,6 +141,7 @@ export default function TocObserver() {
       root?.querySelectorAll<HTMLInputElement>(`.${styles.chk} input[type="checkbox"]`) ?? []
     );
     const counter = root?.querySelector<HTMLElement>("#chkDone");
+    /** チェック行の完了装飾とページ内の完了件数を更新する。 */
     const progress = () => {
       for (const box of boxes) box.closest("tr")?.classList.toggle(styles.done, box.checked);
       if (counter) counter.textContent = String(boxes.filter((box) => box.checked).length);

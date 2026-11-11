@@ -40,6 +40,7 @@ const THEME_VARS = {
   secondaryColor: "#f7f1e3",
   tertiaryColor: "#fff",
 } as const;
+/** 原本のAntigravityガイド全文と図解、目次、公開・確認日を描画する。 */
 export default function AntigravityBestPracticesPage() {
   const entry = findBySlug("/google/antigravity-best-practices");
   return (
