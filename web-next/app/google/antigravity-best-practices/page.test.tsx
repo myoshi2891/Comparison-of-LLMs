@@ -251,7 +251,15 @@ it("registry登録とヒーロー内の日付表示", () => {
     [entry?.addedAt, entry?.addedAt],
   ]);
 });
-const normalized = (s: string) => s.replace(/\s+/g, " ").trim().replace(/'/g, '"');
+// Ignore CSS formatter whitespace around slash separators and function parentheses only.
+const normalized = (s: string) =>
+  s
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/'/g, '"')
+    .replace(/\s*\/\s*/g, "/")
+    .replace(/\(\s+/g, "(")
+    .replace(/\s+\)/g, ")");
 const scoped = (selector: string) =>
   selector
     .split(",")
@@ -331,7 +339,7 @@ const declarations = (selector: string) => {
     )
       return;
     r.walkDecls((d) => {
-      result[d.prop] = d.value;
+      result[d.prop] = normalized(d.value);
     });
   });
   return result;
