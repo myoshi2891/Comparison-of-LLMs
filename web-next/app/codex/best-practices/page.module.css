@@ -259,6 +259,10 @@
   color: #8a8575;
   text-decoration: line-through;
 }
+/* 白背景とホバー背景で完了行のコントラストを確保する。 */
+.root .table-wrap :global(tr).done :global(td) {
+  color: #6b6658;
+}
 .root .chk-count {
   font-weight: 700;
   color: var(--forest);

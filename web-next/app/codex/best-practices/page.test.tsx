@@ -25,7 +25,9 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
     </div>
   ),
 }));
+/** DOM本文の比較用に連続空白を正規化する。 */
 const text = (e: Element) => (e.textContent ?? "").replace(/\s+/g, " ").trim();
+/** ページ固有のCSSを原本との照合用に読み込む。 */
 const css = () => fs.readFileSync("app/codex/best-practices/page.module.css", "utf8");
 beforeEach(() => {
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
@@ -251,7 +253,7 @@ it("registry登録とヒーロー内の日付表示", () => {
     [entry?.addedAt, entry?.addedAt],
   ]);
 });
-// Ignore CSS formatter whitespace around slash separators and function parentheses only.
+/** CSS整形の空白と引用符だけを同義の表現へ揃える。 */
 const normalized = (s: string) =>
   s
     .replace(/\s+/g, " ")
@@ -260,6 +262,7 @@ const normalized = (s: string) =>
     .replace(/\s*\/\s*/g, "/")
     .replace(/\(\s+/g, "(")
     .replace(/\s+\)/g, ")");
+/** 原本のセレクターをページ限定のCSS Modules表記へ変換する。 */
 const scoped = (selector: string) =>
   selector
     .split(",")
@@ -328,6 +331,7 @@ it("原本75 CSS規則の全宣言・media条件を保持（図の配置は共�
     );
   }
 });
+/** 指定セレクターの非media宣言を後勝ちの順で集める。 */
 const declarations = (selector: string) => {
   const result: Record<string, string> = {};
   postcss.parse(css()).walkRules((r) => {
@@ -449,6 +453,7 @@ it("全要素ツリーのタグ・本文・入れ子・図位置を原本と完�
   layout.querySelector('[data-testid="hero-dates"]')?.remove();
   const content = layout.querySelector("[data-guide-content]");
   content?.replaceWith(...Array.from(content.childNodes));
+  /** 本文・属性・図位置を原本と比較できる要素ツリーへ変換する。 */
   function shape(n: Node): unknown {
     if (n.nodeType === 3) return n.textContent?.replace(/\s+/g, " ").trim() || null;
     if (!(n instanceof Element)) return null;
@@ -526,4 +531,24 @@ it("アンカー移動の余白は実測のヘッダー・免責バナー・モ�
     ".root :global(h3)",
   ])
     expect(declarations(selector)["scroll-margin-top"], selector).toBe(measured);
+});
+
+it("完了行は白・ホバー背景で4.5:1以上の文字色と取り消し線を保つ", () => {
+  /** #rrggbb の相対輝度からWCAGのコントラストを計算する。 */
+  const luminance = (hex: string) => {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+      const c = Number.parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const done = declarations(".root .table-wrap :global(tr).done :global(td)");
+  expect(done.color).toMatch(/^#[0-9a-f]{6}$/);
+  for (const background of ["#ffffff", "#f1ece0"]) {
+    const [hi, lo] = [luminance(done.color), luminance(background)].sort((a, b) => b - a);
+    expect((hi + 0.05) / (lo + 0.05), background).toBeGreaterThanOrEqual(4.5);
+  }
+  expect(declarations(".root :global(tr).done :global(td)")["text-decoration"]).toBe(
+    "line-through"
+  );
 });

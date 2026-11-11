@@ -42,6 +42,7 @@ const THEME_VARS = {
   secondaryColor: "#f7f1e3",
   tertiaryColor: "#fff",
 } as const;
+/** 原本のCodexガイド全文と図解、目次、公開・確認日を描画する。 */
 export default function CodexBestPracticesPage() {
   const entry = findBySlug("/codex/best-practices");
   return (

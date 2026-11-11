@@ -23,6 +23,7 @@ const listenerRecords = ({ mock }: { mock: { calls: unknown[][]; contexts: unkno
             Boolean(options.capture),
     })
   );
+/** リスナー解除時に一致すべき対象・種別・関数・captureを比較する。 */
 const isSameListener = (a: ListenerRecord, b: ListenerRecord) =>
   a.target === b.target &&
   a.type === b.type &&
@@ -32,6 +33,7 @@ const isSameListener = (a: ListenerRecord, b: ListenerRecord) =>
 let width: number;
 let rect: ReturnType<typeof vi.spyOn>;
 let position = 0;
+/** 目次・ドロワー操作部・チェック表を備えた検証用ガイドを描画する。 */
 function Harness({ checked = false }: { checked?: boolean }) {
   return (
     <div id="codex-practices-guide" className={styles.root}>
@@ -85,15 +87,22 @@ function Harness({ checked = false }: { checked?: boolean }) {
     </div>
   );
 }
+/** テスト中の目次開閉ボタンを返す。 */
 const menu = () => document.getElementById("codex-practices-menu") as HTMLElement;
+/** テスト中の目次サイドバーを返す。 */
 const sidebar = () => document.getElementById("codex-practices-sidebar") as HTMLElement;
+/** 開閉クラスと高さ変数を保持するガイドのルートを返す。 */
 const root = () => document.getElementById("codex-practices-guide") as HTMLElement;
+/** ドロワーの背後にある本文を返す。 */
 const main = () => document.querySelector("[data-guide-content]") as HTMLElement;
+/** 目次リンクをDOM順に返す。 */
 const links = () => Array.from(sidebar().querySelectorAll("a"));
+/** 現在の章として選ばれたリンク先を返す。 */
 const active = () =>
   Array.from(sidebar().querySelectorAll("a"))
     .filter((e) => e.getAttribute("aria-current") === "location")
     .map((e) => e.getAttribute("href"));
+/** 開閉クラス・ARIA・サイドバーの操作可否の一致を検証する。 */
 const state = (open: boolean) => {
   expect(menu().getAttribute("aria-expanded")).toBe(String(open));
   expect(menu().getAttribute("aria-label")).toBe(open ? "目次を閉じる" : "目次を開く");
@@ -219,6 +228,7 @@ it("目次の選択リンクが可視範囲外なら目次内スクロール", (
 it("モバイルバーの実測高さとResizeObserver cleanup", () => {
   const disconnect = vi.fn(),
     observe = vi.fn();
+  /** ResizeObserverの通知をテストから再現するためのコールバック。 */
   let callback: () => void = () => undefined;
   vi.stubGlobal(
     "ResizeObserver",
@@ -283,6 +293,58 @@ it("unmountで本文のinertを解除する", () => {
   unmount();
   expect(m.inert).toBe(false);
 });
+it.each([
+  "close",
+  "resize",
+  "unmount",
+] as const)("背景の全兄弟をinertにし、%s時に以前の状態へ戻す", (finish) => {
+  const { container, unmount } = render(
+    <>
+      <header>
+        <button type="button">サイトメニュー</button>
+      </header>
+      <div>
+        <Harness />
+      </div>
+      <nav aria-label="関連ページ">
+        <a href="/">関連ページ</a>
+      </nav>
+      <footer>以前から操作不能</footer>
+    </>
+  );
+  const background = [
+    container.querySelector("header") as HTMLElement,
+    main(),
+    ...sectionIds.map((id) => document.getElementById(id) as HTMLElement),
+    container.querySelector("nav[aria-label]") as HTMLElement,
+    container.querySelector("footer") as HTMLElement,
+  ];
+  background.forEach((element, i) => {
+    element.inert = i === background.length - 1;
+  });
+  const previous = background.map((element) => element.inert);
+  fireEvent.click(menu());
+  expect(background.map((element) => element.inert)).toEqual(background.map(() => true));
+  for (const element of [sidebar(), menu(), document.getElementById("codex-practices-backdrop")]) {
+    for (let ancestor = element; ancestor; ancestor = ancestor.parentElement)
+      expect(Boolean(ancestor.inert)).toBe(false);
+  }
+  // モバイル内の再測定で保存済みの状態を上書きしない。
+  fireEvent.resize(window);
+  expect(background.map((element) => element.inert)).toEqual(background.map(() => true));
+  if (finish === "unmount") unmount();
+  else if (finish === "resize") {
+    Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+    fireEvent.resize(window);
+  } else fireEvent.keyDown(document, { key: "Escape" });
+  expect(background.map((element) => element.inert)).toEqual(previous);
+  if (finish === "close") {
+    background[0].inert = true;
+    fireEvent.click(menu());
+    fireEvent.click(menu());
+    expect(background.map((element) => element.inert)).toEqual([true, ...previous.slice(1)]);
+  }
+});
 describe("モバイルドロワーのTabフォーカス閉じ込め", () => {
   /** layout.tsx が #codex-practices-guide の外へ描画する RelatedPages の代役を含めて描画する。 */
   const renderWithRelated = () =>
@@ -294,6 +356,7 @@ describe("モバイルドロワーのTabフォーカス閉じ込め", () => {
         </button>
       </>
     );
+  /** ガイド外にある関連ページのフォーカス対象を返す。 */
   const related = () => document.getElementById("related-page") as HTMLElement;
   /** Tab を送り、ブラウザ既定の移動を止めたかどうかを返す。 */
   const pressTab = (shiftKey = false) => !fireEvent.keyDown(document, { key: "Tab", shiftKey });
