@@ -907,9 +907,9 @@ const entries: PageEntry[] = [
     provider: "google",
     topics: ["antigravity", "best-practices", "agent"],
     summary:
-      "Google Antigravity IDE・CLI の設計思想、アーキテクチャ、Rules (GEMINI.md)、Skills (SKILL.md)、Workflows、Artifacts、Permissions、Claude Code との比較・共存戦略まで、仕様駆動開発を支えるエコシステム全容を網羅。",
+      "Google Antigravity の導入・権限設計・AGENTS.md・スキル・検証ループ・並列実行・自動化・CLI・SDK・セキュリティ・コスト管理を学ぶ中級〜上級ガイド。",
     addedAt: "2026-05-07",
-    lastReviewed: "2026-10-22",
+    lastReviewed: "2026-11-11",
   },
   {
     slug: "/google/stitch-guide",
