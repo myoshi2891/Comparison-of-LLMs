@@ -475,3 +475,49 @@ it("ResizeObserver非対応でも実測高・resize・cleanupが動作する", (
   expect(r.style.getPropertyValue("--mobile-bar-height")).toBe("");
   vi.unstubAllGlobals();
 });
+describe("モバイルドロワー表示中の背景全体のinert化", () => {
+  /** layout.tsx がルート外へ描画する共有ヘッダー等の代役を body 直下へ置く。 */
+  const outside = (id: string, inert = false) => {
+    const el = document.createElement("div");
+    el.id = id;
+    el.inert = inert;
+    document.body.appendChild(el);
+    return el;
+  };
+  afterEach(() => {
+    for (const id of ["outside-header", "outside-preinert"]) document.getElementById(id)?.remove();
+  });
+
+  it("開くとルート外の兄弟・同階層の要素もinertにし、目次・メニュー・背景は操作可能に保つ", () => {
+    const header = outside("outside-header");
+    render(<Harness />);
+    fireEvent.click(menu());
+    expect(header.inert).toBe(true);
+    expect(main().inert).toBe(true);
+    // inert プロパティが属性へ反映されることを確かめ、下の closest 検証を意味のあるものにする
+    expect(main().closest("[inert]")).not.toBeNull();
+    expect(sidebar().inert).toBe(false);
+    expect(menu().closest("[inert]")).toBeNull();
+    expect(document.getElementById("antigravity-backdrop")?.closest("[inert]")).toBeNull();
+    expect(sidebar().closest("[inert]")).toBeNull();
+  });
+  it("閉じる・desktopへの拡大・unmountで元のinert状態へ戻す", () => {
+    const header = outside("outside-header");
+    const preinert = outside("outside-preinert", true);
+    const { unmount } = render(<Harness />);
+    fireEvent.click(menu());
+    expect(header.inert).toBe(true);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect([header.inert, preinert.inert]).toEqual([false, true]);
+    fireEvent.click(menu());
+    Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+    fireEvent.resize(window);
+    expect([header.inert, preinert.inert]).toEqual([false, true]);
+    Object.defineProperty(window, "innerWidth", { value: 800, configurable: true });
+    fireEvent.resize(window);
+    fireEvent.click(menu());
+    expect(header.inert).toBe(true);
+    unmount();
+    expect([header.inert, preinert.inert]).toEqual([false, true]);
+  });
+});
