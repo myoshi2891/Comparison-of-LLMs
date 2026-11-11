@@ -2,9 +2,19 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-11**
+> - 最終更新日: **Updated 2026-11-12**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## ガイドの追加レビュー指摘対応（2026-11-12）
+
+- 現行コードで4指摘すべてを確認。AGENTS.mdとCLAUDE.mdの全体テスト基準を後続実測の237 files／2992 testsへ同期し、今回の回帰5件を含む実測237 files／2997 testsへ更新。lintは649 files。
+- Codex完了行は表ラッパー内の補正色 `#6b6658` で白・ホバー背景の4.5:1以上を検証し、原本の取り消し線と固定CSS契約を保持。
+- Codexドロワーは目次・メニュー・背景ボタンへの経路を残し、共有ヘッダー・関連ページを含む各階層の背景をinert化。閉じる操作・desktopへの拡大・unmountで開く前の値へ戻し、モバイル内resizeと再開閉も検証。
+- Antigravityのモバイルアンカーはsection・h1・h2・h3へ実測ヘッダー＋免責バナー＋モバイルバー＋16pxを適用し、従来のヘッダー＋80pxを `max()` で最低余白として保持。
+- 回帰5件の失敗を実測後に修正し、関連4 files／143 testsが成功。両ページの原本HTML監査exit 0、typecheck、lint649 files、pytest122件が成功。
+- Docstring Coverage対応として両ガイドの関数とテストヘルパーへJSDocを追加。TypeScript ASTで名前付き71関数すべてのJSDocを確認。外部チェックの対象・閾値・再実行結果は未確認。
+- 全体Vitest 237 files／2997 tests、通常権限環境でのビルド（114静的ページ生成）が成功。制限環境で停止したビルドは終了して再実行した。CSSキャッシュ退避済み。変更は未コミット、目視未確認（ユーザー担当）。
 
 ## Codex ベストプラクティス移行とレビュー指摘対応（2026-11-11）
 
@@ -14,7 +24,7 @@
   - Codexのアンカー余白: `--header-height` がこのページで未定義のため固定140pxだった。実測の `--ch-height`＋`--ch-disclaimer-height`＋`--mobile-bar-height`＋16pxを後勝ちの規則で適用。Red `5a036bb3` → Green `d8a13749`。test:367 の固定文字列の検証は残している。
   - Antigravityの完了行: 原本色 `#8a8575` は白背景で約3.7:1。表ラッパー内で `#6b6658`（白背景約5.7:1、ホバー背景約4.8:1）へ補正し、取り消し線は維持。Red `6dfb7479` → Green `2ff865cf`。
   - Antigravityのモバイルドロワー: 開いている間は本文だけでなく、共有ヘッダー・RelatedPagesを含む背景全体をinertにする。閉じる操作・desktopへの拡大・unmountで元の値へ戻す。Red `a102a2d5` → jsdomは `inert` を属性に反映しないため検証方法を補正 `38631818` → Green `a99b4614`。
-- 同じ `#8a8575` の規則と `[data-guide-content]` だけをinertにする処理はCodexページにも残っている（今回のレビュー範囲外のため未修正）。
+- 当時はCodex側の完了色と背景inertを未修正。2026-11-12の追加レビュー対応で修正済み（上記参照）。
 
 ## Google Antigravity ガイド移行（2026-11-11）
 
@@ -277,15 +287,15 @@
   - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
 - **ルート実数**: `page.tsx` 106件、registry 106エントリ（2026-11-11実測。`/codex/best-practices` を追加）。
 - **動作検証**:
-  - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-11 実測）
-  - `bun run lint` ✅（Biome check / 649 files / 0 diagnostics。2026-11-11 実測）
+  - ビルド: `bun run build` ✅（2026-11-12実測、114静的ページ生成。2026-11-11の移行時にはユーザー指定で未実行）。
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-12 実測）
+  - `bun run lint` ✅（Biome check / 649 files / 0 diagnostics。2026-11-12 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **237 files／2992 testsすべて成功**（2026-11-11実測。Codex移行とレビュー指摘への対応後）。型・lint649 files・pytest122件も成功。Redで固定した期待値は無変更。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **237 files／2997 testsすべて成功**（2026-11-12実測。追加レビューの回帰5件を含む）。型・lint649 files・pytest122件も成功。Redで固定した期待値は無変更。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-11実測、UV_CACHE_DIRを一時領域へ指定）。
+  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-12実測、UV_CACHE_DIRを一時領域へ指定）。
 
 ## 最近の追加内容
 
@@ -754,9 +764,9 @@ Astra: http://localhost:3000/codex/astra-best-practices
 指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
-全体237 files／2992 tests成功（Codex移行とレビュー指摘への対応後）。型・lint649 files・pytest122件が成功。
+全体237 files／2997 tests成功（2026-11-12実測。追加レビューの回帰5件を含む）。型・lint649 files・pytest122件が成功。
 Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは106件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-今回の移行依頼ではユーザー指定でnpm・ビルドを実行していない。他環境の通常ビルド確認規約は維持する。
+2026-11-11の移行時はユーザー指定でnpm・ビルド未実行。2026-11-12の追加レビュー対応ではbun run build成功（114静的ページ生成）。
 依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、139 ID一意性・初期進捗0 / 8・原本と配信HTMLの3254要素の一致を確認。
 ```
