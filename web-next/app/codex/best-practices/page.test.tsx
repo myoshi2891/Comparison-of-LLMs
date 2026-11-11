@@ -515,3 +515,15 @@ it("highlight.jsの実クラスにCSS規則が一致する", () => {
     background: "transparent",
   });
 });
+it("アンカー移動の余白は実測のヘッダー・免責バナー・モバイルバー高さから導出する", () => {
+  const measured =
+    "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height, 0px) + 16px)";
+  // 複数規則に一致する場合は後勝ちの実効値を declarations() が返す
+  for (const selector of [
+    ".root .section",
+    ".root :global(h1)",
+    ".root :global(h2)",
+    ".root :global(h3)",
+  ])
+    expect(declarations(selector)["scroll-margin-top"], selector).toBe(measured);
+});
