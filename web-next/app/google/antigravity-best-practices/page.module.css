@@ -500,3 +500,7 @@ body:has(.root) :global(nav[aria-label="関連ページ"] a) {
   max-width: none;
   margin: 0;
 }
+/* 完了行の原本色 #8a8575 は白背景で約3.7:1のため、表ラッパー内で4.5:1以上へ補正する（取り消し線は原本規則を維持）。 */
+.root .table-wrap :global(tr).done :global(td) {
+  color: #6b6658;
+}
