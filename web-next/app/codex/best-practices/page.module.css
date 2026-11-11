@@ -583,3 +583,15 @@ body:has(.root) :global(nav[aria-label="関連ページ"] a) {
   max-width: none;
   margin: 0;
 }
+/* 未定義の --header-height による固定140pxではなく、実測のヘッダー・免責バナー・モバイルバー高さでアンカー余白を確保する。 */
+.root .section,
+.root :global(h1),
+.root :global(h2),
+.root :global(h3) {
+  scroll-margin-top: calc(
+    var(--ch-height, 60px) +
+    var(--ch-disclaimer-height, 0px) +
+    var(--mobile-bar-height, 0px) +
+    16px
+  );
+}
