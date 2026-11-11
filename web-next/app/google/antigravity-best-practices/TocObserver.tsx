@@ -11,6 +11,10 @@ export default function TocObserver() {
     const mobileBar = document.getElementById("antigravity-mobile-bar");
     const links = Array.from(sidebar?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
     const main = root?.querySelector<HTMLElement>("[data-guide-content]") ?? null;
+    // The guide is static; resolve section targets once per mount rather than on every scroll.
+    const sections = links.map((link) =>
+      document.getElementById((link.getAttribute("href") ?? "").slice(1))
+    );
     let wasOpen = false;
     const sync = (open: boolean) => {
       root?.classList.toggle(styles.open, open);
@@ -61,8 +65,7 @@ export default function TocObserver() {
     const update = () => {
       const h = document.documentElement;
       let current = 0;
-      links.forEach((link, index) => {
-        const section = document.getElementById((link.getAttribute("href") ?? "").slice(1));
+      sections.forEach((section, index) => {
         if (!section) return;
         const margin = Number.parseFloat(window.getComputedStyle(section).scrollMarginTop);
         const threshold = Math.max(
