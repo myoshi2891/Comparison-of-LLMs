@@ -16,6 +16,34 @@ export default function TocObserver() {
       document.getElementById((link.getAttribute("href") ?? "").slice(1))
     );
     let wasOpen = false;
+    /** inert 化した背景要素と、変更前の inert 値。閉じるときにこの値へ正確に戻す。 */
+    const background = new Map<HTMLElement, boolean>();
+    const keep = [sidebar, menu, backdrop].filter((el): el is HTMLElement => el !== null);
+    /** 目次・メニュー・背景から body までの各階層で、それらを含まない兄弟をすべて inert にする。 */
+    const inertBackground = () => {
+      if (background.size > 0) return;
+      const ancestors = new Set<Element>();
+      for (const el of keep)
+        for (
+          let node: Element | null = el;
+          node && node !== document.body;
+          node = node.parentElement
+        )
+          ancestors.add(node);
+      for (const node of ancestors) {
+        for (const sibling of Array.from(node.parentElement?.children ?? [])) {
+          if (!(sibling instanceof HTMLElement) || ancestors.has(sibling)) continue;
+          if (background.has(sibling)) continue;
+          // jsdom 等で未定義の場合も真偽値として記録し、復元時に undefined を書き戻さない
+          background.set(sibling, sibling.inert === true);
+          sibling.inert = true;
+        }
+      }
+    };
+    const restoreBackground = () => {
+      for (const [el, prior] of background) el.inert = prior;
+      background.clear();
+    };
     const sync = (open: boolean) => {
       root?.classList.toggle(styles.open, open);
       menu?.setAttribute("aria-expanded", String(open));
@@ -27,7 +55,10 @@ export default function TocObserver() {
         if (hidden && (wasOpen || sidebar.contains(document.activeElement))) menu?.focus();
         sidebar.inert = hidden;
       }
-      // モバイルのドロワー表示中は背後の本文を操作不能にする。Tab の循環は containFocus が担当する。
+      // モバイルのドロワー表示中は本文・共有ヘッダー等の背景全体を支援技術からも操作不能にする。
+      if (mobile && open) inertBackground();
+      else restoreBackground();
+      // ページ所有の本文は背景処理の後に明示同期し、初期状態でも false を保証する。
       if (main) main.inert = mobile && open;
       // 先頭リンクへの移動は閉→開の遷移時だけ。resize の再同期で利用者のフォーカス位置を奪わない。
       if (mobile && open && !wasOpen) links[0]?.focus();
@@ -132,6 +163,7 @@ export default function TocObserver() {
       root?.classList.remove(styles.open);
       root?.style.removeProperty("--mobile-bar-height");
       if (sidebar) sidebar.inert = false;
+      restoreBackground();
       if (main) main.inert = false;
     };
   }, []);
