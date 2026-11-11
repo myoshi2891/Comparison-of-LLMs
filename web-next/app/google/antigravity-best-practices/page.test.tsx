@@ -469,3 +469,17 @@ it("全要素ツリーのタグ・本文・入れ子・図位置を原本と完�
   }
   expect(shape(layout)).toEqual(expectedTree);
 });
+
+it("共有の小さい表文字と計算機フッターが原本の書体・幅・配置へ漏れない", () => {
+  expect(declarations(".root :global(table)")["font-size"]).toBe("inherit");
+  const footer = declarations(".root .foot");
+  for (const [property, value] of Object.entries({
+    "border-top": "none",
+    display: "block",
+    "font-size": "inherit",
+    "font-family": "inherit",
+    "max-width": "none",
+    margin: "0",
+  }))
+    expect(footer[property], `footer ${property}`).toBe(value);
+});
