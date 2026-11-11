@@ -1,9 +1,19 @@
 # GEMINI.md
 
-Updated 2026-11-10
+Updated 2026-11-11
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
+
+Gemini Omni `/google/omni-best-practices` を追加（2026-11-11）。
+指定HTMLの65見出し・24段落・25リスト項目・29表185行・13コード例・7図・13チェック・24外部リンクをPure JSXへ転写。
+原本固定の全文・要素ツリー・63 CSS規則・highlight.js11.9.0全トークンを69契約で照合。
+全体235 files／2863 tests、関連96件、型・lint640 files・HTML監査exit 0・7図解析・pytest122件が成功。
+264px目次・900pxモバイル開閉・本文の点／heroのマーカーなし・全列左寄せ・コード空白を保持。
+チェックは原本どおり3・4・3・3項目を独立集計し、操作の行／関数100%、分岐89.87%。
+Googleカテゴリのregistryから導線を導出し、日付はhero内へ表示。原本2形式は内容無変更保存。
+配信HTMLと原本の各1242要素の意味的ツリーが一致。npm・ビルド未実行、依存・設定・ロックは無変更。
+目視はユーザー担当（localhost:3000）。分離履歴とMarkdownとの差はdocs/PROGRESS.mdを参照。
 
 Gemini 4 Argon `/google/argon-best-practices` を追加（2026-11-10）。
 指定HTMLの51見出し・27段落・94リスト項目・16表118行・6コード例・7図・12チェック・42外部リンクをPure JSXへ転写。
@@ -281,11 +291,11 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 233 files / 2794 tests pass（2026-11-10実測）
-(cd web-next && bun run typecheck)   # OK（2026-11-10 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 235 files / 2863 tests pass（2026-11-11実測）
+(cd web-next && bun run typecheck)   # OK（2026-11-11 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（634 files / 0 diagnostics。2026-11-10 実測）
-(cd scraper && uv run pytest)        # 122件成功（2026-11-10 実測）
+(cd web-next && bun run lint)        # OK（640 files / 0 diagnostics。2026-11-11 実測）
+(cd scraper && uv run pytest)        # 122件成功（2026-11-11 実測）
 ```
 
 ## 次セッション再開プロンプト

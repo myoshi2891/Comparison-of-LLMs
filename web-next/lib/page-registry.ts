@@ -852,6 +852,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-22",
   },
   {
+    slug: "/google/omni-best-practices",
+    title: "Gemini Omni 実践ガイド",
+    group: "Providers",
+    category: "Google",
+    provider: "google",
+    topics: ["google", "gemini", "omni", "video", "api", "cost", "security"],
+    summary:
+      "Gemini Omni Flash のモデル選定、動画生成・編集・拡張、プロンプト、コスト設計、信頼性・安全性・地域制約を学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-11",
+    lastReviewed: "2026-11-11",
+  },
+  {
     slug: "/google/sandbox-best-practices",
     title: "Google サンドボックス技術 完全ガイド",
     group: "Providers",

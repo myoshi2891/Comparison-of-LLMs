@@ -1,6 +1,6 @@
 # Plans — プラットフォーム拡張検討ドキュメント
 
-Updated 2026-11-10
+Updated 2026-11-11
 
 `.agent/skills/improve/SKILL.md` により生成・維持している方向性ドキュメント群。
 対象は web-next（Next.js 16 SSG）の「AI 最新情報キャッチアップ・プラットフォーム」化。
@@ -11,6 +11,12 @@ Updated 2026-11-10
 - 照合 v2: 2026-07-12（004〜006, commit `45940fd`）— 154 コミットのドリフトを 004 で照合済み
 
 基準コミット（drift 検出用）: `45940fd`
+
+保守同期（2026-11-11）: `/google/omni-best-practices` を既存Googleカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作69契約、関連96件、
+全体235 files／2863 tests、型・lint640 files・HTML監査exit 0・7図解析・pytest122件が成功。
+3・4・3・3項目の独立進捗と原本2形式の内容無変更保存を確認。npm・ビルド未実行。
+次はユーザーによる目視確認（Omni・Argon・Fable・Astraは個別に未確認を維持）。履歴はdocs/PROGRESS.mdを参照。
 
 保守同期（2026-11-10）: `/google/argon-best-practices` の実装・自動検証・分離コミットが完了。
 Googleカテゴリのregistryから導線を導出。進捗テスト期待値1行はユーザー承認後に原本式へ訂正済み。

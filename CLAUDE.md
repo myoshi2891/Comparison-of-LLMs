@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-10
+Updated 2026-11-11
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+Gemini Omni `/google/omni-best-practices` を追加（2026-11-11）。
+指定HTMLの65見出し・24段落・25リスト項目・29表185行・13コード例・7図・13チェック・24外部リンクをPure JSXへ転写。
+原本固定の全文・要素ツリー・63 CSS規則・highlight.js11.9.0全トークンを69契約で照合。
+全体235 files／2863 tests、関連96件、型・lint640 files・HTML監査exit 0・7図解析・pytest122件が成功。
+264px目次・900pxモバイル開閉・本文の点／heroのマーカーなし・全列左寄せ・コード空白を保持。
+チェックは原本どおり3・4・3・3項目を独立集計し、操作の行／関数100%、分岐89.87%。
+Googleカテゴリのregistryから導線を導出し、日付はhero内へ表示。原本2形式は内容無変更保存。
+配信HTMLと原本の各1242要素の意味的ツリーが一致。npm・ビルド未実行、依存・設定・ロックは無変更。
+目視はユーザー担当（localhost:3000）。分離履歴とMarkdownとの差はdocs/PROGRESS.mdを参照。
 
 Gemini 4 Argon `/google/argon-best-practices` を追加（2026-11-10）。
 指定HTMLの51見出し・27段落・94リスト項目・16表118行・6コード例・7図・12チェック・42外部リンクをPure JSXへ転写。
@@ -598,7 +608,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（233 files / 2794 tests pass、2026-11-10実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（235 files / 2863 tests pass、2026-11-11実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
