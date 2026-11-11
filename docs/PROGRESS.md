@@ -6,6 +6,19 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## Google Antigravity ガイド移行（2026-11-11）
+
+- 状態: **実装・自動検証・分離コミット完了、目視未確認（ユーザー担当）**。既存 `/google/antigravity-best-practices` を指定HTMLの27章へ更新。Googleカテゴリ・topics・公開日2026-05-07を維持し、registryの要約と確認日2026-11-11を更新。本文の情報基準日2026-11-06、App v2.29.0／CLI v1.4.12の記載は保持する。
+- 原本の全108見出し（H1×1／H2×27／H3×80）、92段落、48リスト項目（11 ul／2 ol）、61表404行、18コード例、11図、26引用、8チェック項目、4外部アンカーをPure JSXへ転写。URL一覧の文字列表示も維持。Redで固定した `source-contract.json` と `structure-contract.json` により、本文・順序・重複・全装飾クラス・セクション境界・表セル型と結合・リスト型と開始番号・入れ子・構文トークン・全要素ツリーを照合する。
+- 原本58 CSS規則とmedia条件を固定。268px固定目次・900px以下のドロワー、点と番号・入れ子、ブラウザ既定の太字・余白・リンク下線、24pxチェック、行全体の取消線を保持。表の全列左寄せはR2に従い原本の一部セルの中央指定より優先。コードはhighlight.js11.11.0を原本SRIで照合して一時取得し、先頭空白・改行を明示式とcodeLineで保持する。アプリへの依存追加はない。
+- 原本のhtmlスクロール規則、図解フレームのdisplay／justify-content／width、svg寸法とtooltipは共有実装へ委譲し、該当規則・宣言のみCSS契約で明示除外。11図の本文・順序・themeVariablesを完全一致で照合し、既存Mermaid10.9.8で全図の解析に成功。原本の11.14.0へ依存を更新していない。
+- チェックは原本どおり表の8行を単一カウンターへ集計し、クリック・取消し・初期チェック・他ページからの分離・全changeリスナーの解除を検証。保存・バー表示を追加していない。モバイル開閉・900px境界・背景／Escape／リンク・実測バー・inert・DOM順のTab循環・フォーカス復帰・目次追従・最下部・cleanupを31操作契約で検証する。メニューを操作不能にしないため本文部分だけをラップしてinert化し、ツリー比較では追加ラッパーとhero日付だけを除く。
+- 検証: ページ35＋操作31＝**66契約**、registry／navを含む関連**93件**、全体Vitest **235 files／2920 testsすべて成功**。typecheck、lint **642 files／0 diagnostics**、HTML原本監査exit 0、CSS変数監査、Mermaid11図解析、pytest **122件**が成功。整理後の操作カバレッジは行／関数100%、分岐95.06%。開始時の全体実行はRed追加と重なり、233ファイルは成功・対象2ファイルの58件が意図どおり失敗。最初のGreen全体実行は追加CSS契約の読込前で2919件成功し、最終実行で2920件を確認した。
+- 原本保存 `272bd93a`: HTML／Markdownを `archive/html/Google/Google-antigravity-best-practices-guide.html`／`archive/md/Google/Google-antigravity-best-practices-guide.md` へ100%リネーム。HTML SHA-256 `2570a9bea033b760a32e0005fc443a1ccd97653d9293038261631b591dcf0a00`、Markdown `d86c07657afc492f9466362d2b3e7659e12e2c596dd19d08abe7d9749207b11b`（移動前後一致）。
+- Markdown監査はexit 1。独立した目次1見出し、区切り行 `:--` の表行扱い、プレースホルダーの除去・根拠タグ／チェック記号・インラインのリンク様構文・footerの段落分類による差を含む。外部URL・通常コード・11図の欠落はない。指定HTMLの固定期待値と配信HTMLのツリーが一致しているため、Markdownの構造を混在させず両原本を保存する。
+- 分離履歴: Red `eca3559a`（65契約中58件の失敗を確認）→ 原本保存 `272bd93a` → CSS整形空白の比較処理 `29bb341b` → 共有表文字／フッターの追加Red `342bd867`（新規1件失敗）→ Green `e9ace689` → Refactor `ea6f7389`（静的見出しのDOM検索をmount時へ集約）。Red固定の本文・構造・CSS・図・操作の期待値は無変更。
+- CSSキャッシュ退避後、通常devの `http://localhost:3000/google/antigravity-best-practices` がHTTP 200。配信HTMLと原本の**3254個の意味的要素**（タグ・本文・リスト階層・表結合・リンク先・コード空白・図位置）が一致。ガイド配下139 IDの一意性・初期進捗 `0 / 8`・hero日付を確認。npm・ビルド・ブラウザ自動化は未実行。依存・設定・ロック・legacyは無変更。目視はユーザー担当。
+
 ## Gemini Omni ガイド移行（2026-11-11）
 
 - 状態: **実装・自動検証・分離コミット完了、目視未確認（ユーザー担当）**。`/google/omni-best-practices` を既存Googleカテゴリへ登録し、ナビ・検索・RSS・関連ページをregistryから導出。本文の情報基準日2026-11-05と執筆日2026-11-06を保持。
@@ -244,8 +257,9 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `39d04b0c`（Gemini Omniガイド。Green `97bb9af7`、分離履歴は冒頭の同名節を参照）。
-- **次の作業**: Omni・Argon・Fable・Astraの目視確認（4ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。npm・ビルドは未実行。
+- **最新実装 HEAD**: `ea6f7389`（Google Antigravityガイド。Green `e9ace689`、分離履歴は冒頭の同名節を参照）。
+- **次の作業**: Antigravity・Omni・Argon・Fable・Astraの目視確認（5ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。npm・ビルドは未実行。
+  - Antigravity `/google/antigravity-best-practices`: 268px目次・900pxモバイル開閉・27章・点と番号・61表404行・18コード例・11図・8行チェックと単一進捗を確認。
   - Omni `/google/omni-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点／heroのマーカーなし・29表185行・13コード例・7図・3／4／3／3チェック進捗を確認。
   - Argon `/google/argon-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点と番号／heroのマーカーなし・16表118行・6コード例・7図・12チェック進捗を確認。
   - Fable `/claude/fable-5-1-best-practices`: 264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・8／5／5チェック進捗を確認。
@@ -254,9 +268,9 @@
 - **動作検証**:
   - ビルド: 今回はユーザー指定で未実行。過去の成功記録は 2026-09-17 の 90 静的ページであり、今回の変更を検証した値ではない。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-11 実測）
-  - `bun run lint` ✅（Biome check / 640 files / 0 diagnostics。2026-11-11 実測）
+  - `bun run lint` ✅（Biome check / 642 files / 0 diagnostics。2026-11-11 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **235 files／2863 testsすべて成功**（2026-11-11実測）。Omniの対象69契約・関連96件、型・lint640 files・HTML監査exit 0・7図解析も成功。Redで固定した期待値は無変更。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **235 files／2920 testsすべて成功**（2026-11-11実測）。Antigravityの対象66契約・関連93件、型・lint642 files・HTML監査exit 0・11図解析も成功。Redで固定した期待値は無変更。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -717,19 +731,20 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: 39d04b0c（Gemini Omni。Green 97bb9af7、分離履歴は冒頭の同名節を参照）。
-次の作業: Omni・Argon・Fable・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+最新実装HEAD: ea6f7389（Google Antigravity。Green e9ace689、分離履歴は冒頭の同名節を参照）。
+次の作業: Antigravity・Omni・Argon・Fable・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+Antigravity: http://localhost:3000/google/antigravity-best-practices
+268px目次・900pxモバイル開閉・27章・本文の点と番号・61表404行・18コード例・11図・8行チェックの単一進捗を確認。
 Omni: http://localhost:3000/google/omni-best-practices
-264px目次・900pxモバイル開閉・16章・本文の点／heroのマーカーなし・29表185行・13コード例・7図・3／4／3／3チェック進捗を確認。
 Argon: http://localhost:3000/google/argon-best-practices
 Fable: http://localhost:3000/claude/fable-5-1-best-practices
 Astra: http://localhost:3000/codex/astra-best-practices
-指定HTMLを正本として65見出し・24段落・25項目・29表185行・13コード例・7図・13チェック・24外部リンクを保持。
-Omni原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。Markdownのモデル・料金・上限等の更新を混在させない。
-Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。
-全体235 files／2863 tests成功。対象69契約・関連96件、型・lint640 files・HTML監査exit 0・Mermaid7図解析・pytest122件が成功。
-操作の行／関数100%、分岐89.87%。ルートとregistryは105件ずつ。
+指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
+Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
+Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
+全体235 files／2920 tests成功。対象66契約・関連93件、型・lint642 files・HTML監査exit 0・11図解析・pytest122件が成功。
+操作の行／関数100%、分岐95.06%。ルートとregistryは既存の105件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-今回の移行依頼ではユーザー指定でnpm・ビルドを実行しない。他環境の通常ビルド確認規約は維持する。
-依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、84 ID一意性・4組の初期進捗・原本と配信HTMLの1242要素の一致を確認。
+今回の移行依頼ではユーザー指定でnpm・ビルドを実行していない。他環境の通常ビルド確認規約は維持する。
+依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、139 ID一意性・初期進捗0 / 8・原本と配信HTMLの3254要素の一致を確認。
 ```

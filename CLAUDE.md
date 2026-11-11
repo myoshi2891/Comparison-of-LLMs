@@ -10,6 +10,16 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+Google Antigravity `/google/antigravity-best-practices` を指定HTMLで完全更新（2026-11-11）。
+108見出し・92段落・48リスト項目・61表404行・18コード例・11図・26引用・8表形式チェック・4外部リンクをPure JSXへ転写。
+原本固定の全文・要素ツリー・58 CSS規則・highlight.js11.11.0全トークンを66契約（ページ35／操作31）で照合。
+全体235 files／2920 tests、関連93件、型・lint642 files・HTML監査exit 0・11図解析・pytest122件が成功。
+268px固定目次・900pxモバイル開閉・点と番号・全列左寄せ・コード空白・8行の単一進捗を保持。
+操作の行／関数100%、分岐95.06%。共有CSSの表文字サイズ・フッターへの干渉を追加Redからページ内で補正。
+Googleカテゴリと公開日2026-05-07を維持し、確認日は2026-11-11、日付はheroへ表示。
+HTML／Markdownは内容無変更保存。配信HTMLの3254個の意味的要素と原本が一致し、139 IDに重複なし。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.mdを参照。
+
 Gemini Omni `/google/omni-best-practices` を追加（2026-11-11）。
 指定HTMLの65見出し・24段落・25リスト項目・29表185行・13コード例・7図・13チェック・24外部リンクをPure JSXへ転写。
 原本固定の全文・要素ツリー・63 CSS規則・highlight.js11.9.0全トークンを69契約で照合。
@@ -608,7 +618,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（235 files / 2863 tests pass、2026-11-11実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（235 files / 2920 tests pass、2026-11-11実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
