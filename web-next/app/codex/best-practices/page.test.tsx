@@ -500,7 +500,7 @@ it("参考文献4種のカード・リンク・マーカーなしを原本どお
     "rc-dom",
     "rc-path",
     "t-res",
-  ]) {
+  ] as const) {
     expect(
       Array.from(container.querySelectorAll(`.${styles[cls]}`)).map((e) => [e.localName, text(e)])
     ).toEqual(expected.referenceElements[cls]);
