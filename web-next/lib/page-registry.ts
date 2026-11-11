@@ -64,6 +64,18 @@ export type PageEntry = z.infer<typeof PageEntrySchema>;
 
 const entries: PageEntry[] = [
   {
+    slug: "/codex/best-practices",
+    title: "Codex ベストプラクティス（中級〜上級）",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
+    topics: ["codex", "best-practices", "agent", "security"],
+    summary:
+      "OpenAI Codex のモデル選定・環境設定・権限・AGENTS.md・Skills・MCP・検証・並列化・長時間タスク・CI・コスト・セキュリティを学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-11",
+    lastReviewed: "2026-11-11",
+  },
+  {
     slug: "/codex/astra-best-practices",
     title: "GPT-6 Astra ベストプラクティス",
     group: "Providers",

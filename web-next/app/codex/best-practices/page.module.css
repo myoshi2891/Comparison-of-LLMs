@@ -1,0 +1,585 @@
+/* Original HTML styles, scoped to this page. MermaidDiagram owns diagram geometry. */
+
+.root {
+  --paper: #faf7f0;
+  --paper-alt: #f1ece0;
+  --ink: #1f2430;
+  --ink-soft: #4a5160;
+  --indigo: #33428f;
+  --gold: #9a6f1c;
+  --forest: #2c6b4b;
+  --plum: #7a3b6a;
+  --border: #ded6c4;
+  --side: 268px;
+}
+.root * {
+  box-sizing: border-box;
+}
+.root {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font:
+    1rem / 1.85 "Noto Sans JP",
+    system-ui,
+    sans-serif;
+  overflow-wrap: break-word;
+}
+.root .layout {
+  display: block;
+}
+.root .sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--side);
+  background: #fff;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 20px 12px 40px;
+  z-index: 20;
+}
+.root .brand {
+  font:
+    700 1.1rem / 1.4 "Source Serif 4",
+    "Noto Sans JP",
+    serif;
+  color: var(--indigo);
+  padding: 0 8px 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.root .nav-a {
+  display: block;
+  padding: 7px 10px;
+  margin: 2px 0;
+  border-radius: 6px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 1rem;
+  line-height: 1.45;
+  border-left: 3px solid transparent;
+}
+.root .nav-a:hover {
+  background: var(--paper-alt);
+}
+.root .nav-a.active {
+  background: #e8ebf8;
+  color: var(--indigo);
+  font-weight: 700;
+  border-left-color: var(--indigo);
+}
+.root .main {
+  margin-left: var(--side);
+  min-width: 0;
+}
+.root .hero {
+  padding: 56px 56px 40px;
+  background: linear-gradient(135deg, #eef0fa, #f7f1e3);
+  border-bottom: 1px solid var(--border);
+}
+.root .hero :global(h1) {
+  font:
+    700 2.1rem / 1.35 "Source Serif 4",
+    "Noto Sans JP",
+    serif;
+  color: var(--indigo);
+  margin: 0 0 18px;
+}
+.root .hero :global(p) {
+  margin: 6px 0;
+  color: var(--ink-soft);
+}
+.root .section {
+  padding: 34px 56px;
+}
+.root .section :global(h2) {
+  font:
+    700 1.65rem / 1.4 "Source Serif 4",
+    "Noto Sans JP",
+    serif;
+  color: var(--indigo);
+  margin: 0 0 18px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--gold);
+}
+.root .section :global(h3) {
+  font-size: 1.25rem;
+  color: var(--forest);
+  margin: 32px 0 10px;
+}
+.root .section :global(h4) {
+  font-size: 1.1rem;
+  color: var(--plum);
+}
+.root :global(p),
+.root :global(li) {
+  overflow-wrap: break-word;
+}
+.root :global(a) {
+  color: var(--indigo);
+}
+.root :global(code) {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 1rem;
+  background: #ece7d8;
+  padding: 1px 6px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+.root :global(pre) {
+  margin: 16px 0;
+  border-radius: 10px;
+  overflow-x: auto;
+  background: #282c34;
+  max-width: 100%;
+}
+.root :global(pre) :global(code) {
+  display: block;
+  background: none;
+  padding: 16px 18px;
+  color: #abb2bf;
+  line-height: 1.65;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+.root :global(pre) :global(code):global(.hljs) {
+  padding: 16px 18px;
+  background: transparent;
+}
+.root :global(blockquote) {
+  margin: 16px 0;
+  padding: 12px 18px;
+  background: #fff;
+  border-left: 4px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+}
+.root :global(blockquote) :global(p) {
+  margin: 4px 0;
+}
+.root .table-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  min-width: 0;
+}
+.root :global(table) {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+}
+.root :global(thead) :global(th) {
+  background: var(--indigo);
+  color: #fff;
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 700;
+}
+.root :global(td) {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.root :global(th) {
+  overflow-wrap: anywhere;
+}
+.root :global(tbody) :global(tr):hover {
+  background: var(--paper-alt);
+}
+.root :global(tbody) :global(tr):last-child :global(td) {
+  border-bottom: none;
+}
+.root .tag {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.4;
+  padding: 0 8px;
+  border-radius: 999px;
+  margin: 0 2px;
+  white-space: nowrap;
+}
+.root .t-official {
+  background: #dff0e7;
+  color: #1d5a3b;
+}
+.root .t-dev {
+  background: #e8e3f6;
+  color: #4b2f8a;
+}
+.root .t-sec {
+  background: #ece9e0;
+  color: #5a5340;
+}
+.root .t-rec {
+  background: #fbe9c9;
+  color: #7a5410;
+}
+.root .t-res {
+  background: #dbe7f7;
+  color: #1e3a6e;
+}
+.root .diagram-wrap {
+  overflow-x: auto;
+  min-width: 0;
+  margin: 20px 0;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.root .diagram-wrap > * {
+  min-width: 0;
+}
+.root .diagram-canvas {
+  /* Geometry is owned by MermaidDiagram. */
+}
+.root .chk {
+  display: inline-flex;
+}
+.root .chk :global(input) {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--indigo);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  margin: 0;
+  font-size: 1rem;
+}
+.root .chk :global(input):checked {
+  background: var(--indigo);
+  box-shadow: inset 0 0 0 4px #fff;
+}
+.root :global(tr).done :global(td) {
+  color: #8a8575;
+  text-decoration: line-through;
+}
+.root .chk-count {
+  font-weight: 700;
+  color: var(--forest);
+}
+.root .reflist {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+.root .refcard {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: 5px solid var(--indigo);
+  border-radius: 10px;
+  padding: 14px 16px;
+  min-width: 0;
+}
+.root .rc-official {
+  border-top-color: var(--forest);
+}
+.root .rc-dev {
+  border-top-color: var(--plum);
+}
+.root .rc-res {
+  border-top-color: var(--indigo);
+}
+.root .rc-sec {
+  border-top-color: var(--gold);
+}
+.root .rc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.root .rc-title {
+  font-weight: 700;
+  color: var(--ink);
+}
+.root .rc-count {
+  font-weight: 700;
+  background: var(--paper-alt);
+  border-radius: 999px;
+  padding: 0 10px;
+  white-space: nowrap;
+  color: var(--ink-soft);
+}
+.root .refcard :global(ul) {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.root .refcard :global(li) {
+  margin: 0;
+  border-bottom: 1px dashed var(--border);
+}
+.root .refcard :global(li):last-child {
+  border-bottom: none;
+}
+.root .refcard :global(a) {
+  display: block;
+  padding: 7px 6px;
+  text-decoration: none;
+  border-radius: 6px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.root .refcard :global(a):hover {
+  background: #e8ebf8;
+}
+.root .rc-dom {
+  display: block;
+  font-weight: 700;
+  color: var(--indigo);
+}
+.root .rc-path {
+  display: block;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+.root .mobile-bar {
+  display: none;
+}
+.root .mobile-bar :global(button) {
+  font-size: 1rem;
+}
+.root .foot {
+  padding: 30px 56px 60px;
+  color: var(--ink-soft);
+}
+@media (max-width: 900px) {
+  .root .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+  }
+  .root.open .sidebar {
+    transform: none;
+  }
+  .root .main {
+    margin-left: 0;
+  }
+  .root .mobile-bar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 8px 12px;
+    align-items: center;
+    gap: 10px;
+  }
+  .root .mobile-bar :global(button) {
+    font-size: 1rem;
+    border: 1px solid var(--indigo);
+    background: #fff;
+    color: var(--indigo);
+    border-radius: 6px;
+    padding: 6px 12px;
+  }
+  .root .hero,
+  .root .section,
+  .root .foot {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .root .hero :global(h1) {
+    font-size: 1.6rem;
+  }
+}
+/* Restore browser defaults removed by the shared reset, without affecting other pages. */
+.layout {
+  width: 100%;
+}
+.root {
+  width: 100%;
+  color-scheme: light;
+}
+.root .main {
+  width: calc(100% - var(--side));
+}
+.root :global(h1),
+.root :global(h2),
+.root :global(h3),
+.root :global(h4),
+.root :global(strong) {
+  font-weight: 700;
+}
+.root :global(p) {
+  margin: 1em 0;
+}
+.root :global(ul),
+.root :global(ol) {
+  padding-left: 40px;
+  margin: 1em 0;
+}
+.root :global(ul) {
+  list-style-type: disc;
+}
+.root :global(ol) {
+  list-style-type: decimal;
+}
+.root :global(ul) :global(ul) {
+  list-style-type: circle;
+}
+.root :global(ul) :global(ul) :global(ul) {
+  list-style-type: square;
+}
+.root :global(a) {
+  text-decoration: underline;
+}
+.root .nav-a {
+  text-decoration: none;
+}
+.root :global(th),
+.root :global(td) {
+  text-align: left !important;
+}
+.root .section,
+.root :global(h1),
+.root :global(h2),
+.root :global(h3) {
+  scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+}
+.root .sidebar {
+  top: calc(
+    var(--ch-height, 60px) +
+    var(--ch-disclaimer-height, 0px) +
+    var(--mobile-bar-height, 0px)
+  );
+  z-index: 61;
+}
+.root .mobile-bar {
+  top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  z-index: 63;
+}
+.root :global(pre) {
+  color: #abb2bf;
+}
+.root :global(pre code) {
+  background: none;
+  border: none;
+  color: inherit;
+}
+.codeLine {
+  white-space: pre;
+}
+.root .heroDates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px 24px;
+  margin-bottom: 24px;
+  color: inherit;
+  font-size: 0.8rem;
+}
+.root .scrim {
+  display: none;
+}
+.root :global(button:focus-visible),
+.root :global(a:focus-visible),
+.root :global(input:focus-visible) {
+  outline: 3px solid var(--indigo);
+  outline-offset: 3px;
+}
+@media (max-width: 900px) {
+  .root .sidebar {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .root.open .sidebar {
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .root .main {
+    width: 100%;
+  }
+  .root.open .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    top: calc(
+      var(--ch-height, 60px) +
+      var(--ch-disclaimer-height, 0px) +
+      var(--mobile-bar-height, 0px)
+    );
+    background: rgb(0 0 0 / 30%);
+    border: 0;
+    z-index: 60;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .root .sidebar {
+    transition: none;
+  }
+}
+body:has(.root):global(.has-common-header) {
+  margin-top: 0;
+  padding-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+  background: #faf7f0;
+  color-scheme: light;
+}
+body:has(.root) :global(#site-freshness-bar) {
+  display: none;
+}
+body:has(.root) :global(nav[aria-label="関連ページ"]) {
+  margin-left: 268px !important;
+  background: #faf7f0;
+  color: #1f2430;
+  border-color: #ded6c4;
+  --line: #ded6c4;
+  --card: #fff;
+  --fg: #1f2430;
+  --muted: #4a5160;
+  --accent: #33428f;
+}
+body:has(.root) :global(nav[aria-label="関連ページ"] a) {
+  color: #33428f;
+  background: #fff;
+  border-color: #ded6c4;
+}
+@media (max-width: 900px) {
+  body:has(.root) :global(nav[aria-label="関連ページ"]) {
+    margin-left: 0 !important;
+  }
+}
+.root .table-wrap :global(thead) {
+  position: static;
+}
+.root .table-wrap :global(th) {
+  font-family: inherit;
+  font-size: inherit;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+  min-width: 0;
+  border-bottom: none;
+}
+.root .table-wrap :global(td) {
+  font-family: inherit;
+}
+.root .table-wrap :global(tbody tr) {
+  border-bottom: none;
+}
+.root .table-wrap :global(tbody tr:hover) {
+  background: var(--paper-alt);
+}
+
+.root :global(table) {
+  font-size: inherit;
+}
+.root .foot {
+  border-top: none;
+  display: block;
+  font-size: inherit;
+  font-family: inherit;
+  max-width: none;
+  margin: 0;
+}
