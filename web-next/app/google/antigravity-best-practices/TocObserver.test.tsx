@@ -484,6 +484,12 @@ describe("モバイルドロワー表示中の背景全体のinert化", () => {
     document.body.appendChild(el);
     return el;
   };
+  /** 自身または祖先のいずれかが inert なら true（ブラウザでは操作不能）。 */
+  const inertChain = (el: HTMLElement) => {
+    for (let node: HTMLElement | null = el; node; node = node.parentElement)
+      if (node.inert === true) return true;
+    return false;
+  };
   afterEach(() => {
     for (const id of ["outside-header", "outside-preinert"]) document.getElementById(id)?.remove();
   });
@@ -494,12 +500,11 @@ describe("モバイルドロワー表示中の背景全体のinert化", () => {
     fireEvent.click(menu());
     expect(header.inert).toBe(true);
     expect(main().inert).toBe(true);
-    // inert プロパティが属性へ反映されることを確かめ、下の closest 検証を意味のあるものにする
-    expect(main().closest("[inert]")).not.toBeNull();
-    expect(sidebar().inert).toBe(false);
-    expect(menu().closest("[inert]")).toBeNull();
-    expect(document.getElementById("antigravity-backdrop")?.closest("[inert]")).toBeNull();
-    expect(sidebar().closest("[inert]")).toBeNull();
+    // jsdom は inert を属性へ反映しないため、祖先を .inert で直接たどって検証する
+    expect(inertChain(main())).toBe(true);
+    expect(inertChain(sidebar())).toBe(false);
+    expect(inertChain(menu())).toBe(false);
+    expect(inertChain(document.getElementById("antigravity-backdrop") as HTMLElement)).toBe(false);
   });
   it("閉じる・desktopへの拡大・unmountで元のinert状態へ戻す", () => {
     const header = outside("outside-header");
