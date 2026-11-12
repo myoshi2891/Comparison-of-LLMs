@@ -6,6 +6,13 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## Antigravity目次のモーダル境界と現状記録の追加修正（2026-11-12）
+
+- 2指摘を現行コードで確認し、両方修正。「次の作業」のnpm・ビルド未実行を2026-11-11移行時へ限定し、2026-11-12のビルド成功を明記。
+- モバイルで開いている間だけ、目次を含む境界へ `role="dialog"`・`aria-modal="true"`・ラベル「ページ内目次」を付与。内部に閉じるボタンを追加し、外側のメニューは `aria-haspopup="dialog"` と境界への `aria-controls` を持つ開くボタンとして維持。
+- Tab循環は目次リンクと内部の閉じるボタンへ限定し、外側のメニューを含む背景をinert化。閉じる前に背景を復元してから開くボタンへフォーカスを戻し、Escape・背景・リンクでの終了、resize・unmount時の解除を維持。desktopへ拡大して内部の閉じるボタンを隠す際は、目次リンクへフォーカスを移す。
+- 原本固定の全文・構造JSONは無変更。追加した境界と閉じる操作を別契約で検証し、原本ツリー比較時だけ追加要素を除いて照合。Redの失敗確認後に実装し、関連72件と原本HTML監査exit 0、typecheck、lint649 files、ビルド114静的ページ生成、Markdown lintが成功。全体実行中の追加編集が重なった初回はフォーカス1件が失敗したが、最終コード固定後の再実行で237 files／2999 testsすべて成功。変更は未コミット、目視未確認（ユーザー担当）。
+
 ## ガイドの追加レビュー指摘対応（2026-11-12）
 
 - 現行コードで4指摘すべてを確認。AGENTS.mdとCLAUDE.mdの全体テスト基準を後続実測の237 files／2992 testsへ同期し、今回の回帰5件を含む実測237 files／2997 testsへ更新。lintは649 files。
@@ -278,7 +285,7 @@
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
 - **最新実装 HEAD**: `d8a13749`（Codexベストプラクティスのアンカー余白補正。移行Green `a3ca5742`。レビュー指摘への対応と分離履歴は冒頭の同名節を参照）。
-- **次の作業**: Codexベストプラクティス・Antigravity・Omni・Argon・Fable・Astraの目視確認（6ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。npm・ビルドは未実行。
+- **次の作業**: Codexベストプラクティス・Antigravity・Omni・Argon・Fable・Astraの目視確認（6ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
   - Antigravity `/google/antigravity-best-practices`: 268px目次・900pxモバイル開閉・27章・点と番号・61表404行・18コード例・11図・8行チェックと単一進捗を確認。
   - Omni `/google/omni-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点／heroのマーカーなし・29表185行・13コード例・7図・3／4／3／3チェック進捗を確認。
@@ -291,7 +298,7 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-12 実測）
   - `bun run lint` ✅（Biome check / 649 files / 0 diagnostics。2026-11-12 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **237 files／2997 testsすべて成功**（2026-11-12実測。追加レビューの回帰5件を含む）。型・lint649 files・pytest122件も成功。Redで固定した期待値は無変更。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **237 files／2999 testsすべて成功**（2026-11-12実測。モーダル境界の追加2契約を含む）。型・lint649 files・pytest122件も成功。Redで固定した期待値は無変更。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -764,7 +771,7 @@ Astra: http://localhost:3000/codex/astra-best-practices
 指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
-全体237 files／2997 tests成功（2026-11-12実測。追加レビューの回帰5件を含む）。型・lint649 files・pytest122件が成功。
+全体237 files／2999 tests成功（2026-11-12実測。モーダル境界の追加2契約を含む）。型・lint649 files・pytest122件が成功。
 Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは106件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 2026-11-11の移行時はユーザー指定でnpm・ビルド未実行。2026-11-12の追加レビュー対応ではbun run build成功（114静的ページ生成）。
