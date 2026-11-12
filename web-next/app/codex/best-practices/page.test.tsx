@@ -288,6 +288,48 @@ it("同一規則内で同じプロパティを二重宣言しない（SonarQube 
 });
 it("原本75 CSS規則の全宣言・media条件を保持（図の配置は共有部品へ委譲）", () => {
   const ast = postcss.parse(css());
+  // 共有リセット・クローム・モバイル操作への既存補正だけを、宣言全体で許容する。
+  const additions = postcss.parse(`
+    .root { width: 100%; color-scheme: light; }
+    .root .sidebar {
+      top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height, 0px));
+      z-index: 61;
+    }
+    .root .nav-a { text-decoration: none; }
+    .root .main { width: calc(100% - var(--side)); }
+    .root :global(p) { margin: 1em 0; }
+    .root :global(a) { text-decoration: underline; }
+    .root :global(th), .root :global(td) { text-align: left !important; }
+    .root .section {
+      scroll-margin-top: calc(var(--header-height, 60px) + 80px);
+    }
+    .root :global(pre) { color: #abb2bf; }
+    .root :global(table) { font-size: inherit; }
+    .root .mobile-bar {
+      top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
+      z-index: 63;
+    }
+    .root .foot {
+      border-top: none; display: block; font-size: inherit;
+      font-family: inherit; max-width: none; margin: 0;
+    }
+    @media (max-width: 900px) {
+      .root .sidebar { visibility: hidden; pointer-events: none; }
+      .root.open .sidebar { visibility: visible; pointer-events: auto; }
+      .root .main { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .root .sidebar { transition: none; }
+    }
+    .root .section {
+      scroll-margin-top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height, 0px) + 16px);
+    }
+  `);
+  const ruleKey = (selector: string, media: string | null) =>
+    JSON.stringify([normalized(selector), media]);
+  type Declarations = (string | boolean)[][];
+  const expectedRules = new Map<string, Declarations[]>();
+  const selectors = new Set<string>();
   for (const source of expected.css) {
     if (
       [
@@ -298,38 +340,41 @@ it("原本75 CSS規則の全宣言・media条件を保持（図の配置は共�
       ].includes(source.selector)
     )
       continue;
-    const rules: postcss.Rule[] = [];
-    ast.walkRules((r) => {
-      if (
-        normalized(r.selector) === normalized(scoped(source.selector)) &&
-        (r.parent?.type === "atrule" ? (r.parent as postcss.AtRule).params : null) === source.media
+    const declarations = source.declarations
+      // 同一規則内で後続の宣言に上書きされる無効な宣言は、実効値が同じため照合しない。
+      .filter(
+        (d, i, all) => !all.some((later, j) => j > i && later[0] === d[0] && (later[2] || !d[2]))
       )
-        rules.push(r);
-    });
-    expect(
-      rules.map((r) =>
-        r.nodes
-          .filter((n) => n.type === "decl")
-          .map((n) => {
-            const d = n as postcss.Declaration;
-            return [d.prop, normalized(d.value), !!d.important];
-          })
-      ),
-      source.selector
-    ).toContainEqual(
-      source.declarations
-        // 同一規則内で後続の宣言に上書きされる無効な宣言は、実効値が同じため照合しない。
-        .filter(
-          (d, i, all) => !all.some((later, j) => j > i && later[0] === d[0] && (later[2] || !d[2]))
-        )
-        .filter(
-          (d) =>
-            ![".diagram-wrap", ".diagram-canvas"].includes(source.selector) ||
-            !["display", "justify-content", "width"].includes(String(d[0]))
-        )
-        .map((d) => d.map((v) => (typeof v === "string" ? normalized(v) : v)))
-    );
+      .filter(
+        (d) =>
+          ![".diagram-wrap", ".diagram-canvas"].includes(source.selector) ||
+          !["display", "justify-content", "width"].includes(String(d[0]))
+      )
+      .map((d) => d.map((v) => (typeof v === "string" ? normalized(v) : v)));
+    for (const selector of scoped(source.selector).split(",").map(normalized)) {
+      selectors.add(selector);
+      const key = ruleKey(selector, source.media);
+      expectedRules.set(key, [...(expectedRules.get(key) ?? []), declarations]);
+    }
   }
+  const actualRules = new Map<string, Declarations[]>();
+  for (const [tree, target] of [
+    [additions, expectedRules],
+    [ast, actualRules],
+  ] as const) {
+    tree.walkRules((r) => {
+      const media = r.parent?.type === "atrule" ? (r.parent as postcss.AtRule).params : null;
+      const declarations = r.nodes
+        .filter((n): n is postcss.Declaration => n.type === "decl")
+        .map((d) => [d.prop, normalized(d.value), !!d.important]);
+      for (const selector of r.selectors.map(normalized)) {
+        if (!selectors.has(selector)) continue;
+        const key = ruleKey(selector, media);
+        target.set(key, [...(target.get(key) ?? []), declarations]);
+      }
+    });
+  }
+  expect(actualRules).toEqual(expectedRules);
 });
 /** 指定セレクターの非media宣言を後勝ちの順で集める。 */
 const declarations = (selector: string) => {
