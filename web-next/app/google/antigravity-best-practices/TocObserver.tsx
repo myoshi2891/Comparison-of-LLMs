@@ -6,8 +6,10 @@ import styles from "./page.module.css";
 export default function TocObserver() {
   useEffect(() => {
     const root = document.getElementById("antigravity-guide");
+    const drawer = document.getElementById("antigravity-drawer");
     const sidebar = document.getElementById("antigravity-sidebar");
     const menu = document.getElementById("antigravity-menu");
+    const closeButton = document.getElementById("antigravity-close");
     const backdrop = document.getElementById("antigravity-backdrop");
     const mobileBar = document.getElementById("antigravity-mobile-bar");
     const links = Array.from(sidebar?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
@@ -19,8 +21,8 @@ export default function TocObserver() {
     let wasOpen = false;
     /** inert 化した背景要素と、変更前の inert 値。閉じるときにこの値へ正確に戻す。 */
     const background = new Map<HTMLElement, boolean>();
-    const keep = [sidebar, menu, backdrop].filter((el): el is HTMLElement => el !== null);
-    /** 目次・メニュー・背景から body までの各階層で、それらを含まない兄弟をすべて inert にする。 */
+    const keep = [drawer, backdrop].filter((el): el is HTMLElement => el !== null);
+    /** モーダル境界と背景ボタンへの経路を残し、外側の開くボタンを含む兄弟をinertにする。 */
     const inertBackground = () => {
       if (background.size > 0) return;
       const ancestors = new Set<Element>();
@@ -50,8 +52,24 @@ export default function TocObserver() {
     const sync = (open: boolean) => {
       root?.classList.toggle(styles.open, open);
       menu?.setAttribute("aria-expanded", String(open));
-      menu?.setAttribute("aria-label", open ? "目次を閉じる" : "目次を開く");
       const mobile = window.innerWidth <= 900;
+      const modal = mobile && open;
+      if (drawer) {
+        if (modal) {
+          drawer.setAttribute("role", "dialog");
+          drawer.setAttribute("aria-modal", "true");
+          drawer.setAttribute("aria-label", "ページ内目次");
+        } else {
+          drawer.removeAttribute("role");
+          drawer.removeAttribute("aria-modal");
+          drawer.removeAttribute("aria-label");
+        }
+      }
+      // デスクトップで閉じるボタンを隠すときも、フォーカスは表示中の目次内へ残す。
+      if (!mobile && document.activeElement === closeButton) links[0]?.focus();
+      if (closeButton) closeButton.hidden = !mobile;
+      // 開くボタンへ戻す前に背景のinertを解除する。
+      if (!modal) restoreBackground();
       if (sidebar) {
         const hidden = mobile && !open;
         // 背景クリック等でフォーカスが目次外へ移っていても、閉じたら開いた要素へ戻す。
@@ -59,22 +77,21 @@ export default function TocObserver() {
         sidebar.inert = hidden;
       }
       // モバイルのドロワー表示中は本文・共有ヘッダー等の背景全体を支援技術からも操作不能にする。
-      if (mobile && open) inertBackground();
-      else restoreBackground();
+      if (modal) inertBackground();
       // ページ所有の本文は背景処理の後に明示同期し、初期状態でも false を保証する。
       if (main) main.inert = mobile && open;
       // 先頭リンクへの移動は閉→開の遷移時だけ。resize の再同期で利用者のフォーカス位置を奪わない。
-      if (mobile && open && !wasOpen) links[0]?.focus();
+      if (modal && !wasOpen) (links[0] ?? closeButton)?.focus();
       wasOpen = open;
     };
     /** ドロワーを閉じ、背景の操作状態を戻す。 */
     const close = () => sync(false);
     /** メニューボタンからドロワーの開閉を切り替える。 */
     const toggle = () => sync(!root?.classList.contains(styles.open));
-    /** 開いたモバイルドロワーでは、Tab 移動を目次リンクとメニューの間で循環させる。 */
+    /** 開いたモーダル内の目次リンクと閉じるボタンの間でTab移動を循環させる。 */
     const containFocus = (event: KeyboardEvent) => {
-      if (!menu || !wasOpen || window.innerWidth > 900) return;
-      const stops = [...links, menu];
+      if (!closeButton || !wasOpen || window.innerWidth > 900) return;
+      const stops = [...links, closeButton];
       const first = stops[0];
       const last = stops[stops.length - 1];
       const edge = event.shiftKey ? first : last;
@@ -149,6 +166,7 @@ export default function TocObserver() {
     for (const box of boxes) box.addEventListener("change", progress);
     progress();
     menu?.addEventListener("click", toggle);
+    closeButton?.addEventListener("click", close);
     backdrop?.addEventListener("click", close);
     document.addEventListener("keydown", key);
     window.addEventListener("scroll", update, { passive: true });
@@ -163,6 +181,7 @@ export default function TocObserver() {
       observer?.disconnect();
       for (const box of boxes) box.removeEventListener("change", progress);
       menu?.removeEventListener("click", toggle);
+      closeButton?.removeEventListener("click", close);
       backdrop?.removeEventListener("click", close);
       document.removeEventListener("keydown", key);
       window.removeEventListener("scroll", update);
@@ -172,6 +191,10 @@ export default function TocObserver() {
       });
       root?.classList.remove(styles.open);
       root?.style.removeProperty("--mobile-bar-height");
+      drawer?.removeAttribute("role");
+      drawer?.removeAttribute("aria-modal");
+      drawer?.removeAttribute("aria-label");
+      if (closeButton) closeButton.hidden = true;
       if (sidebar) sidebar.inert = false;
       restoreBackground();
       if (main) main.inert = false;

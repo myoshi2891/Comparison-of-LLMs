@@ -121,6 +121,32 @@ it("全リストの型・開始番号・直属項目・入れ子を完全一致"
     ])
   ).toEqual(expected.lists);
 });
+it("モバイル目次のモーダル境界はナビと閉じるボタンを含み、外側のボタンから開く", () => {
+  const width = window.innerWidth;
+  Object.defineProperty(window, "innerWidth", { value: 800, configurable: true });
+  try {
+    const { container, getByRole, getByTestId } = render(<Page />);
+    const opener = getByRole("button", { name: "目次を開く" });
+    expect(opener.getAttribute("aria-controls")).toBe("antigravity-drawer");
+    expect(opener.getAttribute("aria-haspopup")).toBe("dialog");
+    fireEvent.click(opener);
+    const dialog = getByRole("dialog", { name: "ページ内目次" });
+    const close = dialog.querySelector<HTMLButtonElement>("#antigravity-close");
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(dialog.contains(getByTestId("sidebar-nav"))).toBe(true);
+    expect(close?.hidden).toBe(false);
+    expect(close?.textContent).toBe("目次を閉じる");
+    expect(dialog.contains(opener)).toBe(false);
+    expect(document.activeElement).toBe(
+      container.querySelector('[data-testid="sidebar-nav-link"]')
+    );
+    fireEvent.click(close as HTMLButtonElement);
+    expect(dialog.getAttribute("role")).toBeNull();
+    expect(document.activeElement).toBe(opener);
+  } finally {
+    Object.defineProperty(window, "innerWidth", { value: width, configurable: true });
+  }
+});
 it("目次27リンクの文言・順序・到達先と初期選択", () => {
   const { container, getByTestId } = render(<Page />);
   expect(getByTestId("sidebar-nav").getAttribute("aria-label")).toBe("ページ内ナビゲーション");
@@ -451,6 +477,10 @@ it("全要素ツリーのタグ・本文・入れ子・図位置を原本と完�
   const { getByTestId } = render(<Page />);
   const layout = getByTestId("layout-root").cloneNode(true) as Element;
   layout.querySelector('[data-testid="hero-dates"]')?.remove();
+  // 追加したモーダル境界・閉じる操作は別契約で検証し、原本文書のツリーは固定したまま照合する。
+  layout.querySelector("#antigravity-close")?.remove();
+  const drawer = layout.querySelector("#antigravity-drawer");
+  drawer?.replaceWith(...Array.from(drawer.childNodes));
   const content = layout.querySelector("[data-guide-content]");
   content?.replaceWith(...Array.from(content.childNodes));
   /** 本文・属性・図位置を原本と比較できる要素ツリーへ変換する。 */

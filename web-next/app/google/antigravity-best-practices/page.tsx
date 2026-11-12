@@ -66,106 +66,111 @@ export default function AntigravityBestPracticesPage() {
       />
       <div className={styles.layout} data-testid="layout-root">
         {" "}
-        <nav
-          className={styles.sidebar}
-          id="antigravity-sidebar"
-          aria-label="ページ内ナビゲーション"
-          data-testid="sidebar-nav"
-        >
-          {" "}
-          <div className={styles.brand}>
-            {"Google Antigravity"}
-            <br />
-            {"ベストプラクティス"}
-          </div>{" "}
-          <a
-            className={[styles["nav-a"], styles.active].join(" ")}
-            href="#s0"
-            data-t="s0"
-            aria-current="location"
-            data-testid="sidebar-nav-link"
+        <div id="antigravity-drawer">
+          <nav
+            className={styles.sidebar}
+            id="antigravity-sidebar"
+            aria-label="ページ内ナビゲーション"
+            data-testid="sidebar-nav"
           >
-            {"0. このガイドの読み方"}
-          </a>
-          <a className={styles["nav-a"]} href="#s1" data-t="s1" data-testid="sidebar-nav-link">
-            {"1. 全体像: Antigravityは何が違うのか"}
-          </a>
-          <a className={styles["nav-a"]} href="#s2" data-t="s2" data-testid="sidebar-nav-link">
-            {"2. 直近の動向(2026年10〜11月)"}
-          </a>
-          <a className={styles["nav-a"]} href="#s3" data-t="s3" data-testid="sidebar-nav-link">
-            {"3. モデルと思考レベルの選び方"}
-          </a>
-          <a className={styles["nav-a"]} href="#s4" data-t="s4" data-testid="sidebar-nav-link">
-            {"Step 1: 導入・認証・初期設定"}
-          </a>
-          <a className={styles["nav-a"]} href="#s5" data-t="s5" data-testid="sidebar-nav-link">
-            {"Step 2: プロジェクトと権限設計(最重要)"}
-          </a>
-          <a className={styles["nav-a"]} href="#s6" data-t="s6" data-testid="sidebar-nav-link">
-            {"Step 3: ルール(AGENTS.md)の設計"}
-          </a>
-          <a className={styles["nav-a"]} href="#s7" data-t="s7" data-testid="sidebar-nav-link">
-            {"Step 4: スキルで「手順」を資産化する"}
-          </a>
-          <a className={styles["nav-a"]} href="#s8" data-t="s8" data-testid="sidebar-nav-link">
-            {"Step 5: 探索 → 計画 → 実行(/grill-me と /plan)"}
-          </a>
-          <a className={styles["nav-a"]} href="#s9" data-t="s9" data-testid="sidebar-nav-link">
-            {"Step 6: 検証ループを先に作る"}
-          </a>
-          <a className={styles["nav-a"]} href="#s10" data-t="s10" data-testid="sidebar-nav-link">
-            {"Step 7: サブエージェントと並列実行"}
-          </a>
-          <a className={styles["nav-a"]} href="#s11" data-t="s11" data-testid="sidebar-nav-link">
-            {"Step 8: /goal・/boost・/teamwork の使い分け"}
-          </a>
-          <a className={styles["nav-a"]} href="#s12" data-t="s12" data-testid="sidebar-nav-link">
-            {"Step 9: Automations と /schedule"}
-          </a>
-          <a className={styles["nav-a"]} href="#s13" data-t="s13" data-testid="sidebar-nav-link">
-            {"Step 10: MCP・プラグイン・フック"}
-          </a>
-          <a className={styles["nav-a"]} href="#s14" data-t="s14" data-testid="sidebar-nav-link">
-            {"Step 11: Remote Control・Remote Agents・Voice mode"}
-          </a>
-          <a className={styles["nav-a"]} href="#s15" data-t="s15" data-testid="sidebar-nav-link">
-            {"Step 12: レビューとアーティファクト"}
-          </a>
-          <a className={styles["nav-a"]} href="#s16" data-t="s16" data-testid="sidebar-nav-link">
-            {"Step 13: CLI運用(セッション管理・ヘッドレス・CI)"}
-          </a>
-          <a className={styles["nav-a"]} href="#s17" data-t="s17" data-testid="sidebar-nav-link">
-            {"Step 14: SDKで独自エージェントを作る"}
-          </a>
-          <a className={styles["nav-a"]} href="#s18" data-t="s18" data-testid="sidebar-nav-link">
-            {"Step 15: セキュリティ硬化"}
-          </a>
-          <a className={styles["nav-a"]} href="#s19" data-t="s19" data-testid="sidebar-nav-link">
-            {"Step 16: クォータ・コスト管理"}
-          </a>
-          <a className={styles["nav-a"]} href="#s20" data-t="s20" data-testid="sidebar-nav-link">
-            {"アンチパターン集"}
-          </a>
-          <a className={styles["nav-a"]} href="#s21" data-t="s21" data-testid="sidebar-nav-link">
-            {"トラブルシューティング"}
-          </a>
-          <a className={styles["nav-a"]} href="#s22" data-t="s22" data-testid="sidebar-nav-link">
-            {"導入ロードマップ(4週間)"}
-          </a>
-          <a className={styles["nav-a"]} href="#s23" data-t="s23" data-testid="sidebar-nav-link">
-            {"付録A: クイックリファレンス"}
-          </a>
-          <a className={styles["nav-a"]} href="#s24" data-t="s24" data-testid="sidebar-nav-link">
-            {"補足: 著名開発者の知見に基づく追加ベストプラクティス"}
-          </a>
-          <a className={styles["nav-a"]} href="#s25" data-t="s25" data-testid="sidebar-nav-link">
-            {"参考URL一覧(根拠ソース)"}
-          </a>
-          <a className={styles["nav-a"]} href="#s26" data-t="s26" data-testid="sidebar-nav-link">
-            {"注意事項と今後の確認事項"}
-          </a>{" "}
-        </nav>{" "}
+            {" "}
+            <div className={styles.brand}>
+              {"Google Antigravity"}
+              <br />
+              {"ベストプラクティス"}
+            </div>{" "}
+            <a
+              className={[styles["nav-a"], styles.active].join(" ")}
+              href="#s0"
+              data-t="s0"
+              aria-current="location"
+              data-testid="sidebar-nav-link"
+            >
+              {"0. このガイドの読み方"}
+            </a>
+            <a className={styles["nav-a"]} href="#s1" data-t="s1" data-testid="sidebar-nav-link">
+              {"1. 全体像: Antigravityは何が違うのか"}
+            </a>
+            <a className={styles["nav-a"]} href="#s2" data-t="s2" data-testid="sidebar-nav-link">
+              {"2. 直近の動向(2026年10〜11月)"}
+            </a>
+            <a className={styles["nav-a"]} href="#s3" data-t="s3" data-testid="sidebar-nav-link">
+              {"3. モデルと思考レベルの選び方"}
+            </a>
+            <a className={styles["nav-a"]} href="#s4" data-t="s4" data-testid="sidebar-nav-link">
+              {"Step 1: 導入・認証・初期設定"}
+            </a>
+            <a className={styles["nav-a"]} href="#s5" data-t="s5" data-testid="sidebar-nav-link">
+              {"Step 2: プロジェクトと権限設計(最重要)"}
+            </a>
+            <a className={styles["nav-a"]} href="#s6" data-t="s6" data-testid="sidebar-nav-link">
+              {"Step 3: ルール(AGENTS.md)の設計"}
+            </a>
+            <a className={styles["nav-a"]} href="#s7" data-t="s7" data-testid="sidebar-nav-link">
+              {"Step 4: スキルで「手順」を資産化する"}
+            </a>
+            <a className={styles["nav-a"]} href="#s8" data-t="s8" data-testid="sidebar-nav-link">
+              {"Step 5: 探索 → 計画 → 実行(/grill-me と /plan)"}
+            </a>
+            <a className={styles["nav-a"]} href="#s9" data-t="s9" data-testid="sidebar-nav-link">
+              {"Step 6: 検証ループを先に作る"}
+            </a>
+            <a className={styles["nav-a"]} href="#s10" data-t="s10" data-testid="sidebar-nav-link">
+              {"Step 7: サブエージェントと並列実行"}
+            </a>
+            <a className={styles["nav-a"]} href="#s11" data-t="s11" data-testid="sidebar-nav-link">
+              {"Step 8: /goal・/boost・/teamwork の使い分け"}
+            </a>
+            <a className={styles["nav-a"]} href="#s12" data-t="s12" data-testid="sidebar-nav-link">
+              {"Step 9: Automations と /schedule"}
+            </a>
+            <a className={styles["nav-a"]} href="#s13" data-t="s13" data-testid="sidebar-nav-link">
+              {"Step 10: MCP・プラグイン・フック"}
+            </a>
+            <a className={styles["nav-a"]} href="#s14" data-t="s14" data-testid="sidebar-nav-link">
+              {"Step 11: Remote Control・Remote Agents・Voice mode"}
+            </a>
+            <a className={styles["nav-a"]} href="#s15" data-t="s15" data-testid="sidebar-nav-link">
+              {"Step 12: レビューとアーティファクト"}
+            </a>
+            <a className={styles["nav-a"]} href="#s16" data-t="s16" data-testid="sidebar-nav-link">
+              {"Step 13: CLI運用(セッション管理・ヘッドレス・CI)"}
+            </a>
+            <a className={styles["nav-a"]} href="#s17" data-t="s17" data-testid="sidebar-nav-link">
+              {"Step 14: SDKで独自エージェントを作る"}
+            </a>
+            <a className={styles["nav-a"]} href="#s18" data-t="s18" data-testid="sidebar-nav-link">
+              {"Step 15: セキュリティ硬化"}
+            </a>
+            <a className={styles["nav-a"]} href="#s19" data-t="s19" data-testid="sidebar-nav-link">
+              {"Step 16: クォータ・コスト管理"}
+            </a>
+            <a className={styles["nav-a"]} href="#s20" data-t="s20" data-testid="sidebar-nav-link">
+              {"アンチパターン集"}
+            </a>
+            <a className={styles["nav-a"]} href="#s21" data-t="s21" data-testid="sidebar-nav-link">
+              {"トラブルシューティング"}
+            </a>
+            <a className={styles["nav-a"]} href="#s22" data-t="s22" data-testid="sidebar-nav-link">
+              {"導入ロードマップ(4週間)"}
+            </a>
+            <a className={styles["nav-a"]} href="#s23" data-t="s23" data-testid="sidebar-nav-link">
+              {"付録A: クイックリファレンス"}
+            </a>
+            <a className={styles["nav-a"]} href="#s24" data-t="s24" data-testid="sidebar-nav-link">
+              {"補足: 著名開発者の知見に基づく追加ベストプラクティス"}
+            </a>
+            <a className={styles["nav-a"]} href="#s25" data-t="s25" data-testid="sidebar-nav-link">
+              {"参考URL一覧(根拠ソース)"}
+            </a>
+            <a className={styles["nav-a"]} href="#s26" data-t="s26" data-testid="sidebar-nav-link">
+              {"注意事項と今後の確認事項"}
+            </a>{" "}
+            <button id="antigravity-close" type="button" hidden>
+              目次を閉じる
+            </button>
+          </nav>
+        </div>{" "}
         <div className={styles.main}>
           <div className={styles["mobile-bar"]} id="antigravity-mobile-bar">
             {" "}
@@ -174,7 +179,8 @@ export default function AntigravityBestPracticesPage() {
               type="button"
               aria-label="目次を開く"
               aria-expanded="false"
-              aria-controls="antigravity-sidebar"
+              aria-controls="antigravity-drawer"
+              aria-haspopup="dialog"
             >
               {"☰ メニュー"}
             </button>

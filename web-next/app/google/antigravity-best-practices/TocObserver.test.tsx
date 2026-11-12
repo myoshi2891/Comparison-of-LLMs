@@ -38,22 +38,28 @@ function Harness({ checked = false }: { checked?: boolean }) {
   return (
     <div id="antigravity-guide" className={styles.root}>
       <button id="antigravity-backdrop" type="button" aria-label="目次を閉じる" />
-      <aside id="antigravity-sidebar">
-        <nav>
-          {[0, 1, 2].map((i) => (
-            <a key={i} href={`#${sectionIds[i]}`}>
-              {i}
-            </a>
-          ))}
-        </nav>
-      </aside>
+      <div id="antigravity-drawer">
+        <aside id="antigravity-sidebar">
+          <nav>
+            {[0, 1, 2].map((i) => (
+              <a key={i} href={`#${sectionIds[i]}`}>
+                {i}
+              </a>
+            ))}
+          </nav>
+          <button id="antigravity-close" type="button" hidden>
+            目次を閉じる
+          </button>
+        </aside>
+      </div>
       <div id="antigravity-mobile-bar">
         <button
           id="antigravity-menu"
           type="button"
           aria-expanded="false"
           aria-label="目次を開く"
-          aria-controls="antigravity-sidebar"
+          aria-controls="antigravity-drawer"
+          aria-haspopup="dialog"
         >
           目次
         </button>
@@ -91,6 +97,8 @@ function Harness({ checked = false }: { checked?: boolean }) {
 const menu = () => document.getElementById("antigravity-menu") as HTMLElement;
 /** テスト中の目次サイドバーを返す。 */
 const sidebar = () => document.getElementById("antigravity-sidebar") as HTMLElement;
+/** モーダル内部の閉じるボタンを返す。 */
+const closeButton = () => document.getElementById("antigravity-close") as HTMLButtonElement;
 /** 開閉クラスと高さ変数を保持するガイドのルートを返す。 */
 const root = () => document.getElementById("antigravity-guide") as HTMLElement;
 /** ドロワーの背後にある本文を返す。 */
@@ -105,7 +113,7 @@ const active = () =>
 /** 開閉クラス・ARIA・サイドバーの操作可否の一致を検証する。 */
 const state = (open: boolean) => {
   expect(menu().getAttribute("aria-expanded")).toBe(String(open));
-  expect(menu().getAttribute("aria-label")).toBe(open ? "目次を閉じる" : "目次を開く");
+  expect(menu().getAttribute("aria-label")).toBe("目次を開く");
   expect(root().classList.contains(styles.open)).toBe(open);
   expect(sidebar().inert).toBe(window.innerWidth <= 900 && !open);
 };
@@ -293,6 +301,40 @@ it("unmountで本文のinertを解除する", () => {
   unmount();
   expect(m.inert).toBe(false);
 });
+it("モバイルだけラベル付きモーダルとして開き、内部ボタンで閉じて外側の開くボタンへ戻す", () => {
+  const { getByRole, queryByRole, unmount } = render(<Harness />);
+  const drawer = document.getElementById("antigravity-drawer") as HTMLElement;
+  expect(queryByRole("dialog")).toBeNull();
+  expect(closeButton().hidden).toBe(false);
+  fireEvent.click(menu());
+  expect(getByRole("dialog", { name: "ページ内目次" })).toBe(drawer);
+  expect(drawer.getAttribute("aria-modal")).toBe("true");
+  expect(drawer.contains(sidebar().querySelector("nav"))).toBe(true);
+  expect(drawer.contains(closeButton())).toBe(true);
+  expect(drawer.contains(menu())).toBe(false);
+  expect(document.activeElement).toBe(links()[0]);
+  closeButton().focus();
+  fireEvent.click(closeButton());
+  state(false);
+  expect(queryByRole("dialog")).toBeNull();
+  expect(drawer.getAttribute("aria-modal")).toBeNull();
+  expect(document.activeElement).toBe(menu());
+  fireEvent.click(menu());
+  closeButton().focus();
+  Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  fireEvent.resize(window);
+  expect(queryByRole("dialog")).toBeNull();
+  expect(drawer.getAttribute("aria-modal")).toBeNull();
+  expect(closeButton().hidden).toBe(true);
+  expect(document.activeElement).toBe(links()[0]);
+  Object.defineProperty(window, "innerWidth", { value: 800, configurable: true });
+  fireEvent.resize(window);
+  fireEvent.click(menu());
+  expect(getByRole("dialog", { name: "ページ内目次" })).toBe(drawer);
+  unmount();
+  expect(drawer.getAttribute("role")).toBeNull();
+  expect(drawer.getAttribute("aria-modal")).toBeNull();
+});
 describe("モバイルドロワーのTabフォーカス閉じ込め", () => {
   /** layout.tsx が #antigravity-guide の外へ描画する RelatedPages の代役を含めて描画する。 */
   const renderWithRelated = () =>
@@ -309,19 +351,19 @@ describe("モバイルドロワーのTabフォーカス閉じ込め", () => {
   /** Tab を送り、ブラウザ既定の移動を止めたかどうかを返す。 */
   const pressTab = (shiftKey = false) => !fireEvent.keyDown(document, { key: "Tab", shiftKey });
 
-  it("最後のメニューからTabで先頭リンクへ戻す", () => {
+  it("内部の閉じるボタンからTabで先頭リンクへ戻す", () => {
     renderWithRelated();
     fireEvent.click(menu());
-    menu().focus();
+    closeButton().focus();
     expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(links()[0]);
   });
-  it("先頭リンクからShift+Tabで最後のメニューへ戻す", () => {
+  it("先頭リンクからShift+Tabで内部の閉じるボタンへ戻す", () => {
     renderWithRelated();
     fireEvent.click(menu());
     expect(document.activeElement).toBe(links()[0]);
     expect(pressTab(true)).toBe(true);
-    expect(document.activeElement).toBe(menu());
+    expect(document.activeElement).toBe(closeButton());
   });
   it("ドロワー外のRelatedPagesへ出たフォーカスを先頭リンクへ戻す", () => {
     renderWithRelated();
@@ -330,12 +372,12 @@ describe("モバイルドロワーのTabフォーカス閉じ込め", () => {
     expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(links()[0]);
   });
-  it("ドロワー外からのShift+Tabは最後のメニューへ戻す", () => {
+  it("ドロワー外からのShift+Tabは内部の閉じるボタンへ戻す", () => {
     renderWithRelated();
     fireEvent.click(menu());
     related().focus();
     expect(pressTab(true)).toBe(true);
-    expect(document.activeElement).toBe(menu());
+    expect(document.activeElement).toBe(closeButton());
   });
   it("目次リンクの途中ではブラウザ既定のTab移動を妨げない", () => {
     renderWithRelated();
@@ -386,6 +428,7 @@ it("unmount時にscroll・resize・クリック・キー監視を解除", () => 
     [window, "scroll"],
     [window, "resize"],
     [menu(), "click"],
+    [closeButton(), "click"],
     [document.getElementById("antigravity-backdrop") as HTMLElement, "click"],
     [document, "keydown"],
     ...links().map((link): [EventTarget, string] => [link, "click"]),
@@ -469,11 +512,13 @@ it("unmount後は全チェックのchangeリスナーを解除する", () => {
     false,
   ]);
 });
-it("モバイルバーのボタンはinertにせず、本文だけを対象にする", () => {
+it("外側のメニューは背景としてinertにし、内部の閉じるボタンは操作可能にする", () => {
   render(<Harness />);
   fireEvent.click(menu());
   expect(main().inert).toBe(true);
-  expect(menu().closest("[inert]")).toBeNull();
+  expect(menu().parentElement?.inert).toBe(true);
+  expect(Boolean(closeButton().inert)).toBe(false);
+  expect(sidebar().inert).toBe(false);
   expect(main().contains(menu())).toBe(false);
 });
 it("ResizeObserver非対応でも実測高・resize・cleanupが動作する", () => {
@@ -505,7 +550,7 @@ describe("モバイルドロワー表示中の背景全体のinert化", () => {
     for (const id of ["outside-header", "outside-preinert"]) document.getElementById(id)?.remove();
   });
 
-  it("開くとルート外の兄弟・同階層の要素もinertにし、目次・メニュー・背景は操作可能に保つ", () => {
+  it("開くと外側のメニューもinertにし、目次・内部の閉じるボタン・背景は操作可能に保つ", () => {
     const header = outside("outside-header");
     render(<Harness />);
     fireEvent.click(menu());
@@ -514,7 +559,8 @@ describe("モバイルドロワー表示中の背景全体のinert化", () => {
     // jsdom は inert を属性へ反映しないため、祖先を .inert で直接たどって検証する
     expect(inertChain(main())).toBe(true);
     expect(inertChain(sidebar())).toBe(false);
-    expect(inertChain(menu())).toBe(false);
+    expect(inertChain(menu())).toBe(true);
+    expect(inertChain(closeButton())).toBe(false);
     expect(inertChain(document.getElementById("antigravity-backdrop") as HTMLElement)).toBe(false);
   });
   it("閉じる・desktopへの拡大・unmountで元のinert状態へ戻す", () => {
