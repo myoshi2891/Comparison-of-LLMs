@@ -12,6 +12,12 @@ Updated 2026-11-11
 
 基準コミット（drift 検出用）: `45940fd`
 
+保守同期（2026-11-11）: 既存 `/google/antigravity-best-practices` を指定HTMLの27章へ更新。
+Googleカテゴリ・公開日を維持し、registryの確認日と要約を同期。007〜009のDONE状態は維持し、新規基盤プランは起票していない。
+原本照合・操作66契約、関連93件、全体235 files／2920 tests、型・lint642 files・HTML監査exit 0・11図解析・pytest122件が成功。
+原本2形式を内容無変更保存。npm・ビルド未実行、目視はユーザー担当（Antigravity・Omni・Argon・Fable・Astraは個別に未確認を維持）。
+分離履歴と再開手順はdocs/PROGRESS.mdを参照。
+
 保守同期（2026-11-11）: `/google/omni-best-practices` を既存Googleカテゴリへ登録。
 007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作69契約、関連96件、
 全体235 files／2863 tests、型・lint640 files・HTML監査exit 0・7図解析・pytest122件が成功。

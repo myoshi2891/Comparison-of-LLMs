@@ -1,0 +1,3333 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenAI Codex 最新版ベストプラクティスガイド(中級〜上級者向け)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.0/build/styles/atom-one-dark.min.css"
+      integrity="sha384-oaMLBGEzBOJx3UHwac0cVndtX5fxGQIfnAeFZ35RTgqPcYlbprH9o9PUV/F8Le07"
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        --paper: #faf7f0;
+        --paper-alt: #f1ece0;
+        --ink: #1f2430;
+        --ink-soft: #4a5160;
+        --indigo: #33428f;
+        --gold: #9a6f1c;
+        --forest: #2c6b4b;
+        --plum: #7a3b6a;
+        --border: #ded6c4;
+        --side: 268px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 16px;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          1rem/1.85 'Noto Sans JP',
+          system-ui,
+          sans-serif;
+        overflow-wrap: break-word;
+      }
+      .layout {
+        display: block;
+      }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: var(--side);
+        background: #fff;
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 20px 12px 40px;
+        z-index: 20;
+      }
+      .brand {
+        font:
+          700 1.1rem/1.4 'Source Serif 4',
+          'Noto Sans JP',
+          serif;
+        color: var(--indigo);
+        padding: 0 8px 14px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 10px;
+      }
+      .nav-a {
+        display: block;
+        padding: 7px 10px;
+        margin: 2px 0;
+        border-radius: 6px;
+        color: var(--ink-soft);
+        text-decoration: none;
+        font-size: 1rem;
+        line-height: 1.45;
+        border-left: 3px solid transparent;
+      }
+      .nav-a:hover {
+        background: var(--paper-alt);
+      }
+      .nav-a.active {
+        background: #e8ebf8;
+        color: var(--indigo);
+        font-weight: 700;
+        border-left-color: var(--indigo);
+      }
+      .main {
+        margin-left: var(--side);
+        min-width: 0;
+      }
+      .hero {
+        padding: 56px 56px 40px;
+        background: linear-gradient(135deg, #eef0fa, #f7f1e3);
+        border-bottom: 1px solid var(--border);
+      }
+      .hero h1 {
+        font:
+          700 2.1rem/1.35 'Source Serif 4',
+          'Noto Sans JP',
+          serif;
+        color: var(--indigo);
+        margin: 0 0 18px;
+      }
+      .hero p {
+        margin: 6px 0;
+        color: var(--ink-soft);
+      }
+      .section {
+        padding: 34px 56px;
+      }
+      .section h2 {
+        font:
+          700 1.65rem/1.4 'Source Serif 4',
+          'Noto Sans JP',
+          serif;
+        color: var(--indigo);
+        margin: 0 0 18px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--gold);
+      }
+      .section h3 {
+        font-size: 1.25rem;
+        color: var(--forest);
+        margin: 32px 0 10px;
+      }
+      .section h4 {
+        font-size: 1.1rem;
+        color: var(--plum);
+      }
+      p,
+      li {
+        overflow-wrap: break-word;
+      }
+      a {
+        color: var(--indigo);
+      }
+      code {
+        font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+        font-size: 1rem;
+        background: #ece7d8;
+        padding: 1px 6px;
+        border-radius: 4px;
+        overflow-wrap: anywhere;
+      }
+      pre {
+        margin: 16px 0;
+        border-radius: 10px;
+        overflow-x: auto;
+        background: #282c34;
+        max-width: 100%;
+      }
+      pre code {
+        display: block;
+        background: none;
+        padding: 16px 18px;
+        color: #abb2bf;
+        line-height: 1.65;
+        overflow-wrap: normal;
+        white-space: pre;
+      }
+      pre code.hljs {
+        padding: 16px 18px;
+        background: transparent;
+      }
+      blockquote {
+        margin: 16px 0;
+        padding: 12px 18px;
+        background: #fff;
+        border-left: 4px solid var(--gold);
+        border-radius: 0 8px 8px 0;
+      }
+      blockquote p {
+        margin: 4px 0;
+      }
+      .table-wrap {
+        overflow-x: auto;
+        margin: 16px 0;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        min-width: 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 560px;
+      }
+      thead th {
+        background: var(--indigo);
+        color: #fff;
+        text-align: left;
+        padding: 10px 12px;
+        font-weight: 700;
+      }
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+        overflow-wrap: anywhere;
+      }
+      th {
+        overflow-wrap: anywhere;
+      }
+      tbody tr:hover {
+        background: var(--paper-alt);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .tag {
+        display: inline-block;
+        font-weight: 700;
+        font-size: 1rem;
+        line-height: 1.4;
+        padding: 0 8px;
+        border-radius: 999px;
+        margin: 0 2px;
+        white-space: nowrap;
+      }
+      .t-official {
+        background: #dff0e7;
+        color: #1d5a3b;
+      }
+      .t-dev {
+        background: #e8e3f6;
+        color: #4b2f8a;
+      }
+      .t-sec {
+        background: #ece9e0;
+        color: #5a5340;
+      }
+      .t-rec {
+        background: #fbe9c9;
+        color: #7a5410;
+      }
+      .t-res {
+        background: #dbe7f7;
+        color: #1e3a6e;
+      }
+      .diagram-wrap {
+        overflow-x: auto;
+        display: flex;
+        justify-content: safe center;
+        width: 100%;
+        min-width: 0;
+        margin: 20px 0;
+        padding: 16px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      .diagram-wrap > * {
+        min-width: 0;
+      }
+      .diagram-canvas {
+        display: flex;
+        justify-content: safe center;
+      }
+      .diagram-canvas svg {
+        max-width: none;
+        flex-shrink: 0;
+        height: auto;
+        overflow: visible;
+      }
+      .mermaidTooltip {
+        font-size: 1rem !important;
+      }
+      .chk {
+        display: inline-flex;
+      }
+      .chk input {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--indigo);
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+        margin: 0;
+        font-size: 1rem;
+      }
+      .chk input:checked {
+        background: var(--indigo);
+        box-shadow: inset 0 0 0 4px #fff;
+      }
+      tr.done td {
+        color: #8a8575;
+        text-decoration: line-through;
+      }
+      .chk-count {
+        font-weight: 700;
+        color: var(--forest);
+      }
+      .reflist {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+        gap: 16px;
+        margin: 16px 0;
+      }
+      .refcard {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-top: 5px solid var(--indigo);
+        border-radius: 10px;
+        padding: 14px 16px;
+        min-width: 0;
+      }
+      .rc-official {
+        border-top-color: var(--forest);
+      }
+      .rc-dev {
+        border-top-color: var(--plum);
+      }
+      .rc-res {
+        border-top-color: var(--indigo);
+      }
+      .rc-sec {
+        border-top-color: var(--gold);
+      }
+      .rc-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+      .rc-title {
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .rc-count {
+        font-weight: 700;
+        background: var(--paper-alt);
+        border-radius: 999px;
+        padding: 0 10px;
+        white-space: nowrap;
+        color: var(--ink-soft);
+      }
+      .refcard ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .refcard li {
+        margin: 0;
+        border-bottom: 1px dashed var(--border);
+      }
+      .refcard li:last-child {
+        border-bottom: none;
+      }
+      .refcard a {
+        display: block;
+        padding: 7px 6px;
+        text-decoration: none;
+        border-radius: 6px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+      .refcard a:hover {
+        background: #e8ebf8;
+      }
+      .rc-dom {
+        display: block;
+        font-weight: 700;
+        color: var(--indigo);
+      }
+      .rc-path {
+        display: block;
+        color: var(--ink-soft);
+        overflow-wrap: anywhere;
+      }
+      .mobile-bar {
+        display: none;
+      }
+      .mobile-bar button {
+        font-size: 1rem;
+      }
+      .foot {
+        padding: 30px 56px 60px;
+        color: var(--ink-soft);
+      }
+      @media (max-width: 900px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.2s;
+          box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar.open {
+          transform: none;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .mobile-bar {
+          display: flex;
+          position: sticky;
+          top: 0;
+          z-index: 30;
+          background: #fff;
+          border-bottom: 1px solid var(--border);
+          padding: 8px 12px;
+          align-items: center;
+          gap: 10px;
+        }
+        .mobile-bar button {
+          font-size: 1rem;
+          border: 1px solid var(--indigo);
+          background: #fff;
+          color: var(--indigo);
+          border-radius: 6px;
+          padding: 6px 12px;
+        }
+        .hero,
+        .section,
+        .foot {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+        .hero h1 {
+          font-size: 1.6rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar" id="sidebar" aria-label="ページ内ナビゲーション">
+        <div class="brand">OpenAI Codex<br />ベストプラクティス</div>
+        <a class="nav-a" href="#s0" data-t="s0">0. 本ガイドの読み方と情報の信頼度</a
+        ><a class="nav-a" href="#s1" data-t="s1">1. Codex の現在地(2026年11月)</a
+        ><a class="nav-a" href="#s2" data-t="s2">2. モデルの選び方と推論レベル</a
+        ><a class="nav-a" href="#s3" data-t="s3">Step 1: 環境構築と設定レイヤー</a
+        ><a class="nav-a" href="#s4" data-t="s4">Step 2: 権限とサンドボックスの設計</a
+        ><a class="nav-a" href="#s5" data-t="s5">Step 3: プロンプト設計とプランニング</a
+        ><a class="nav-a" href="#s6" data-t="s6">Step 4: AGENTS.md を「痩せたまま」育てる</a
+        ><a class="nav-a" href="#s7" data-t="s7">Step 5: Skills とプラグイン</a
+        ><a class="nav-a" href="#s8" data-t="s8">Step 6: MCP で外部コンテキストをつなぐ</a
+        ><a class="nav-a" href="#s9" data-t="s9">Step 7: 検証ループとレビュー</a
+        ><a class="nav-a" href="#s10" data-t="s10">Step 8: 並列化(worktree とサブエージェント)</a
+        ><a class="nav-a" href="#s11" data-t="s11">Step 9: 長時間タスクとコンテキスト管理</a
+        ><a class="nav-a" href="#s12" data-t="s12">Step 10: 自動化と CI への組み込み</a
+        ><a class="nav-a" href="#s13" data-t="s13">Step 11: コストと使用量の最適化</a
+        ><a class="nav-a" href="#s14" data-t="s14">Step 12: セキュリティと Daybreak</a
+        ><a class="nav-a" href="#s15" data-t="s15">13. 新モデルへの移行チェックリスト</a
+        ><a class="nav-a" href="#s16" data-t="s16">14. アンチパターン集</a
+        ><a class="nav-a" href="#s17" data-t="s17">15. 著名な国際的開発者の知見まとめ</a
+        ><a class="nav-a" href="#s18" data-t="s18"
+          >16. 補足: その他のベストプラクティスと根拠ソース URL</a
+        ><a class="nav-a" href="#s19" data-t="s19">17. 未確認事項と今後の確認ポイント</a
+        ><a class="nav-a" href="#s20" data-t="s20">18. 最終チェックリスト</a>
+      </nav>
+      <div class="main">
+        <div class="mobile-bar">
+          <button id="menuBtn" type="button" aria-label="メニューを開く">☰ メニュー</button
+          ><span>Codex ガイド</span>
+        </div>
+        <header class="hero">
+          <h1>OpenAI Codex 最新版ベストプラクティスガイド(中級〜上級者向け)</h1>
+          <p>
+            <strong>対象読者</strong>:
+            すでにコーディングエージェントを触ったことがあり、チーム開発・長時間タスク・並列運用まで広げたい中級〜上級のエンジニア
+          </p>
+          <p><strong>情報基準日</strong>: 2026年11月7日(調査時点で確認できた最新の公開情報)</p>
+          <p>
+            <strong>形式</strong>: ステップバイステップ。フローチャートは Mermaid、図解と表は
+            Markdown のみ(ASCII アートは使用しません)
+          </p>
+        </header>
+        <section class="section" id="s0">
+          <h2>0. 本ガイドの読み方と情報の信頼度</h2>
+          <p>
+            Codex
+            は「モデル」「アプリ」「CLI」「クラウド」が毎月のように更新されるため、<strong>根拠の強さ</strong>を明示します。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ラベル</th>
+                  <th>意味</th>
+                  <th>扱い方</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="tag t-official">公式</span></td>
+                  <td>OpenAI 公式ドキュメント・公式ブログ・公式リリースノート</td>
+                  <td>原則そのまま採用</td>
+                </tr>
+                <tr>
+                  <td><span class="tag t-dev">開発者</span></td>
+                  <td>著名な国際的開発者・OpenAI 中の人の個人発信</td>
+                  <td>経験則として採用。文脈(モデル世代)を確認</td>
+                </tr>
+                <tr>
+                  <td><span class="tag t-res">研究</span></td>
+                  <td>論文・プレプリント</td>
+                  <td>条件付きで採用</td>
+                </tr>
+                <tr>
+                  <td><span class="tag t-sec">二次</span></td>
+                  <td>解説記事・集計サイト</td>
+                  <td>公式で裏取りしてから採用</td>
+                </tr>
+                <tr>
+                  <td><span class="tag t-rec">筆者見解</span></td>
+                  <td>上記から導いた本ガイドの推論</td>
+                  <td>自分の環境で検証</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <blockquote>
+            <p>
+              <strong>鮮度に関する注意</strong>: 筆者が確認できた Codex CLI の最新安定版は
+              <code>0.166.0</code>(2026-10-29)でした。実際の画面・コマンドは
+              <code>codex --version</code> と
+              <a href="https://developers.openai.com/codex/changelog/">公式変更履歴</a>
+              で必ず照合してください。
+            </p>
+          </blockquote>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d0"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <p>
+            <strong>読み方の推奨</strong>: すでに運用中なら Step 4(AGENTS.md)→ Step 7(検証)→
+            「新モデルへの移行チェックリスト」の順に読むと、今日から効果が出ます。
+          </p>
+        </section>
+        <section class="section" id="s1">
+          <h2>1. Codex の現在地(2026年11月)</h2>
+          <h3>1-1. 「Codex」は製品ファミリーの名前</h3>
+          <p>Codex は単一のツールではなく、複数の入口を持つ製品ファミリーです。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>サーフェス</th>
+                  <th>特徴</th>
+                  <th>向いている場面</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>デスクトップアプリ</td>
+                  <td>
+                    ChatGPT デスクトップアプリ内の独立した Codex
+                    ビュー。スレッド管理・worktree・差分レビュー・自動化
+                  </td>
+                  <td>日常の主戦場、並列スレッド運用</td>
+                </tr>
+                <tr>
+                  <td>CLI(<code>codex</code>)</td>
+                  <td>オープンソース(Apache 2.0)。<code>codex exec</code> で非対話実行</td>
+                  <td>ターミナル中心の作業、CI、スクリプト化</td>
+                </tr>
+                <tr>
+                  <td>IDE 拡張</td>
+                  <td>開いているファイルや選択範囲を自動でコンテキスト化</td>
+                  <td>編集中の局所的な依頼</td>
+                </tr>
+                <tr>
+                  <td>Codex Cloud</td>
+                  <td>OpenAI 管理のマシンでタスクを実行。PC がスリープでも継続</td>
+                  <td>長時間・非同期タスク、モバイルからの起動</td>
+                </tr>
+                <tr>
+                  <td>GitHub 連携</td>
+                  <td>PR への自動レビュー、<code>@codex review</code></td>
+                  <td>チームのレビュー標準化</td>
+                </tr>
+                <tr>
+                  <td>モバイル(Remote)</td>
+                  <td>デスクトップのチャットを遠隔操作</td>
+                  <td>外出先での承認・進捗確認</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://help.openai.com/en/articles/20001275-chatgpt-work"
+              >ChatGPT Work and Codex(ヘルプ)</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://en.wikipedia.org/wiki/OpenAI_Codex_(AI_agent)"
+              >Wikipedia: OpenAI Codex</a
+            >
+          </p>
+          <h3>1-2. ここ1年の流れ(押さえるべき転換点)</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>時期</th>
+                  <th>出来事</th>
+                  <th>運用への含意</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2025-04</td>
+                  <td>Codex CLI がオープンソースで公開</td>
+                  <td>ローカル実行の原点</td>
+                </tr>
+                <tr>
+                  <td>2025-11</td>
+                  <td>
+                    GPT-5.1-Codex-Max。複数コンテキストを跨ぐ「コンパクション」を初めてネイティブ学習
+                  </td>
+                  <td>長時間タスクの前提が変わった</td>
+                </tr>
+                <tr>
+                  <td>2026-02</td>
+                  <td>デスクトップアプリ登場、GPT-5.3-Codex、高速版 Spark</td>
+                  <td>アプリ中心の運用へ</td>
+                </tr>
+                <tr>
+                  <td>2026-03</td>
+                  <td>
+                    GPT-5.4 で Codex とメインモデルを統合、サブエージェント GA、プラグイン、Codex
+                    Security
+                  </td>
+                  <td>「コーディング専用モデル」の系列が消えた</td>
+                </tr>
+                <tr>
+                  <td>2026-04</td>
+                  <td>GPT-5.5。OpenAI は GPT-5.5-Codex を出さないと明言</td>
+                  <td>モデル選択は汎用ラインナップから</td>
+                </tr>
+                <tr>
+                  <td>2026-07</td>
+                  <td>Codex アプリが ChatGPT デスクトップアプリに統合</td>
+                  <td>入口が一本化(Codex は別ビュー)</td>
+                </tr>
+                <tr>
+                  <td>2026-09</td>
+                  <td>GPT-6 Astra(9/3)、GPT-6 Sol/Luna(9/22)、GPT-6.1 Sol(9/29 DevDay)</td>
+                  <td>現行世代の始まり</td>
+                </tr>
+                <tr>
+                  <td>2026-10</td>
+                  <td>GPT-6.1 Terra(10/26)。GPT-5.5 は ChatGPT/Work/Codex から退役(API は継続)</td>
+                  <td>旧世代前提の設定は棚卸しが必要</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            根拠: <span class="tag t-dev">開発者</span
+            ><a href="https://simonwillison.net/2026/Apr/25/romain-huet/"
+              >Simon Willison: Romain Huet の引用</a
+            >、<span class="tag t-dev">開発者</span
+            ><a href="https://simonwillison.net/tags/gpt/">Simon Willison の gpt タグ</a>、<span
+              class="tag t-official"
+              >公式</span
+            ><a href="https://openai.com/index/introducing-gpt-6-1-sol/">GPT-6.1 Sol 発表</a>、<span
+              class="tag t-sec"
+              >二次</span
+            ><a href="https://releasebot.io/updates/openai/openai-models"
+              >Releasebot: OpenAI Models</a
+            >
+          </p>
+          <h3>1-3. 設定の優先順位と全体構造</h3>
+          <p>
+            CLI・IDE・アプリは<strong>同じ設定レイヤーを共有</strong>します。つまり一度整えた
+            <code>config.toml</code> と <code>AGENTS.md</code> は全サーフェスで効きます。
+          </p>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d1"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+        </section>
+        <section class="section" id="s2">
+          <h2>2. モデルの選び方と推論レベル</h2>
+          <h3>2-1. 現行ラインナップ(2026-11-07 時点)</h3>
+          <p>
+            OpenAI のモデル階級は
+            <strong>Luna &lt; Terra &lt; Sol &lt; Astra</strong
+            >(大きいほど高性能・高価格)です。この序列は OpenAI の Ted Sanders 氏が説明しています。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>モデル</th>
+                  <th>API モデル名</th>
+                  <th>API 標準価格(100万トークン)</th>
+                  <th>位置づけ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>GPT-6 Astra</td>
+                  <td><code>gpt-6-astra</code></td>
+                  <td>入力 $10 / 出力 $50</td>
+                  <td>最上位。長期・ツール多用・コンピュータ操作</td>
+                </tr>
+                <tr>
+                  <td>GPT-6.1 Sol</td>
+                  <td><code>gpt-6.1-sol</code></td>
+                  <td>入力 $2 / キャッシュ $0.10 / 出力 $10</td>
+                  <td>Astra に迫る性能を 1/5 の価格で。Codex CLI の同梱カタログで既定</td>
+                </tr>
+                <tr>
+                  <td>GPT-6.1 Terra</td>
+                  <td><code>gpt-6.1-terra</code></td>
+                  <td>入力 $1 / キャッシュ $0.05 / 出力 $5</td>
+                  <td>画面理解・コンピュータ操作・自然な文章が得意な中位</td>
+                </tr>
+                <tr>
+                  <td>GPT-6 Luna</td>
+                  <td><code>gpt-6-luna</code></td>
+                  <td>Terra の約 1/10(Simon Willison の記述)</td>
+                  <td>高速・低価格・大量処理</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>補足:</p>
+          <ul>
+            <li>
+              Sol / Terra / Luna / Astra は、<strong
+                >ChatGPT の通常チャットではなく Work と Codex 向け</strong
+              >に提供されるモデルがあります(Sol 6.1 と Terra 6.1 は発表時点で通常 Chat 非対応)。
+            </li>
+            <li>
+              API のコンテキストは 1.05M トークン(272K 超の入力は割増)ですが、<strong
+                >ChatGPT Work / Codex 上の GPT-6.1 Sol の既定コンテキストは 500K トークン</strong
+              >です。
+            </li>
+            <li>
+              Terra はデスクトップアプリ・CLI・API で選べますが、IDE
+              拡張では当面対象外と報じられています(<span class="tag t-sec">二次</span>)。
+            </li>
+          </ul>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://openai.com/index/introducing-gpt-6-1-sol/">GPT-6.1 Sol</a>、<span
+              class="tag t-official"
+              >公式</span
+            ><a href="https://help.openai.com/en/articles/20001275-chatgpt-work"
+              >ヘルプ: ChatGPT Work and Codex</a
+            >、<span class="tag t-dev">開発者</span
+            ><a href="https://simonwillison.net/2026/Oct/26/gpt-61-terra/"
+              >Simon Willison: GPT-6.1 Terra</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://enjoy.dev/blog/gpt-6-1-terra/">Enjoy Agentic Industries: Terra</a
+            >、<span class="tag t-sec">二次</span
+            ><a
+              href="https://docs.rs/crate/everruns-contracts/latest/source/src/model_profile_data/profiles/gpt6.rs"
+              >everruns モデルプロファイル</a
+            >
+          </p>
+          <h3>2-2. 選び方のフロー</h3>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d2"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <p>
+            <span class="tag t-rec">筆者見解</span>日常の既定は
+            <strong>Sol 6.1 + medium</strong>
+            から始め、「失敗が目立つタスクだけ上げる」運用が費用対効果の面で無難です。OpenAI の Ted
+            Sanders 氏は、Terra について「技術的な文章は Astra/Sol
+            より上手い場合があり、視覚・コンピュータ操作は同等で速いが、その他は少し劣る」と述べています(Hacker
+            News コメント、Simon Willison が引用)。
+          </p>
+          <h3>2-3. 推論レベルと速度</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>設定</th>
+                  <th>内容</th>
+                  <th>使いどころ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>low</code></td>
+                  <td>速い。範囲が明確なタスク</td>
+                  <td>小修正、リネーム</td>
+                </tr>
+                <tr>
+                  <td><code>medium</code></td>
+                  <td>バランス型</td>
+                  <td>日常の実装</td>
+                </tr>
+                <tr>
+                  <td><code>high</code></td>
+                  <td>複雑な変更・デバッグ</td>
+                  <td>原因不明のバグ</td>
+                </tr>
+                <tr>
+                  <td><code>xhigh</code> / <code>max</code></td>
+                  <td>長時間・推論重視</td>
+                  <td>大規模リファクタ</td>
+                </tr>
+                <tr>
+                  <td><code>ultra</code></td>
+                  <td>単一エージェントを超え、サブエージェントに分割</td>
+                  <td>分割しやすい大タスク</td>
+                </tr>
+                <tr>
+                  <td>Fast モード</td>
+                  <td>含まれる使用量を 2.5 倍のレートで消費して高速化</td>
+                  <td>急ぎのとき</td>
+                </tr>
+                <tr>
+                  <td>Ultrafast</td>
+                  <td>最大 8 倍速のトークン生成。発売時は Pro $500 など一部プラン限定</td>
+                  <td>レイテンシ最優先</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>CLI での指定例です。</p>
+          <pre><code class="language-bash"># 起動時にモデルを指定
+codex --model gpt-6.1-sol
+
+# 1回限りの非対話実行
+codex exec -m gpt-6.1-sol "現在の変更をレビューして"
+
+# セッション中にモデルと推論レベルを切り替え
+# /model</code></pre>
+          <p><code>~/.codex/config.toml</code> で既定値にする例です。</p>
+          <pre><code class="language-toml">model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"   # low / medium / high / xhigh / max / ultra</code></pre>
+          <p>
+            バージョン 0.165.0
+            以降、対応モデルでは<strong>会話の途中で推論レベルを変更</strong>できるのが既定になりました。「最初は
+            medium で探索し、詰まったら high に上げる」が手軽にできます(<span class="tag t-sec"
+              >二次</span
+            >Releasebot の要約。詳細は公式 GitHub リリースで確認)。
+          </p>
+        </section>
+        <section class="section" id="s3">
+          <h2>Step 1: 環境構築と設定レイヤー</h2>
+          <h3>1-1. なぜ最初にやるか</h3>
+          <p>
+            公式は「品質問題の多くは実は<strong>セットアップ問題</strong>」と指摘しています(作業ディレクトリの誤り、書き込み権限の不足、モデル既定値、ツールやコネクタの欠落など)。プロンプトを工夫する前に環境を整えます。
+          </p>
+          <h3>1-2. 手順</h3>
+          <ol>
+            <li>
+              <strong>サインイン方式を決める</strong>: ChatGPT
+              アカウントでサインインするとプランの使用量・課金が適用され、API キーを使うと API
+              料金になります。
+            </li>
+            <li>
+              <strong>個人既定値</strong>を
+              <code>~/.codex/config.toml</code>
+              に書く(モデル、推論レベル、承認・サンドボックス方針)。
+            </li>
+            <li>
+              <strong>リポジトリ固有の挙動</strong>を
+              <code>.codex/config.toml</code> に書く(MCP、サブエージェント数など)。
+            </li>
+            <li><strong>一時的な変更</strong>だけを CLI 引数で上書きする。</li>
+            <li>
+              <code>/init</code> で
+              <code>AGENTS.md</code>
+              の雛形を作り、<strong>必ず自分のチームの実態に合わせて編集</strong>する。
+            </li>
+            <li>
+              診断: ネットワークまわりの不調は <code>codex doctor --network-only</code>(0.166.0
+              で追加)で切り分ける。
+            </li>
+          </ol>
+          <pre><code class="language-bash"># 雛形生成(CLI 内)
+# /init
+
+# 設定状態の確認(CLI 内)
+# /status
+
+# ネットワーク・接続・WebSocket の診断
+codex doctor --network-only</code></pre>
+          <h3>1-3. 設定ファイルの最小例</h3>
+          <pre><code class="language-toml"># ~/.codex/config.toml(個人既定値の例)
+model = "gpt-6.1-sol"
+model_reasoning_effort = "medium"
+
+# 承認とサンドボックスの方針は Step 2 で詳述
+# 値の正式な名称は公式の config-sample で確認してください</code></pre>
+          <pre><code class="language-toml"># .codex/config.toml(リポジトリ固有の例)
+[features]
+goals = true          # /goal を有効化(Step 9)
+
+[agents]
+max_threads = 4       # サブエージェントの同時数(既定は 6)
+max_depth = 1         # 入れ子の深さ(既定は 1。上げるとコストが乗算される)</code></pre>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/config-sample">Sample configuration</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/subagents">Subagents</a>、<span
+              class="tag t-sec"
+              >二次</span
+            ><a href="https://releasebot.io/updates/openai/codex">Releasebot: Codex 変更履歴</a>
+          </p>
+        </section>
+        <section class="section" id="s4">
+          <h2>Step 2: 権限とサンドボックスの設計</h2>
+          <h3>2-1. 2つのつまみ</h3>
+          <p>Codex には OS レベルのサンドボックスがあり、次の2つを独立に調整します。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>つまみ</th>
+                  <th>決めること</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>承認ポリシー(approval)</td>
+                  <td>いつ人間に許可を求めるか</td>
+                </tr>
+                <tr>
+                  <td>サンドボックス(sandbox)</td>
+                  <td>どのディレクトリを読み書きでき、何にアクセスできるか</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            公式の推奨は「<strong>最初は既定のまま厳しく</strong>。信頼できるリポジトリや特定のワークフローで必要が明確になってから緩める」です。
+          </p>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d3"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <h3>2-2. 実務上の作法</h3>
+          <ul>
+            <li><strong>フル権限を最初から与えない</strong>(公式が挙げる典型的な失敗)。</li>
+            <li>
+              権限はセッション中に <code>/permissions</code> で変更できます。0.164.0 以降は
+              <code>/model</code> と <code>/permissions</code> にインライン引数で渡せます。
+            </li>
+            <li>
+              <strong>ネットワーク</strong>: プロキシ層で「ホスト名の許可が先、DNS 解決は後」「Host
+              ヘッダ重複の拒否」など防御が強化されています(0.163.0)。管理環境では許可ドメインを明示します。
+            </li>
+            <li>
+              <strong>資格情報のマスク</strong>: リモートの Bash
+              実行などで資格情報をマスクする機能が入っています(0.164.0)。<code>.env</code>
+              を丸ごと見せない設計を維持します。
+            </li>
+            <li>
+              <strong>承認レビュー(Guardian)</strong>:
+              変更履歴には、昇格した操作を実行前に審査する仕組み(Guardian)に関する項目が多数あります。OpenAI
+              は自動レビュー側へ利用者を誘導していると報じられています<span class="tag t-sec"
+                >二次</span
+              >。有効化・既定値はバージョンで変わるため、<code>/status</code>
+              と公式リリースノートで確認してください。
+            </li>
+            <li>
+              <strong>再開時の権限</strong>:
+              スレッドの再開・フォークでは、承認済みの権限が保持されます(0.163.0 /
+              0.166.0)。ただし<strong>期限切れの承認を前提にしない</strong>運用が安全です。
+            </li>
+          </ul>
+          <h3>2-3. サブエージェントと権限</h3>
+          <p>
+            サブエージェントは<strong>親セッションのサンドボックスと承認設定を継承</strong>し、カスタムエージェントのファイルでは置き換えられません。「ファイルを編集しないで」と指示しても、それは<strong>お願いであって鍵ではありません</strong>。読み取り専用にしたい場合は、そのエージェントに明示的に
+            <code>sandbox_mode = "read-only"</code> を設定します。
+          </p>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/subagents">Subagents</a>、<span
+              class="tag t-sec"
+              >二次</span
+            ><a href="https://releasebot.io/updates/openai/codex">Releasebot: Codex 変更履歴</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://flaviocopes.com/ai-glossary/subagents/">flaviocopes: subagents</a>
+          </p>
+        </section>
+        <section class="section" id="s5">
+          <h2>Step 3: プロンプト設計とプランニング</h2>
+          <h3>3-1. 4要素フレームワーク(公式の既定)</h3>
+          <p>公式は、プロンプトに次の4つを含めることを基本形にしています。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>要素</th>
+                  <th>内容</th>
+                  <th>例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Goal</td>
+                  <td>何を変更・構築するか</td>
+                  <td>「注文 API に冪等性キーを導入する」</td>
+                </tr>
+                <tr>
+                  <td>Context</td>
+                  <td>関係するファイル・ドキュメント・エラー(<code>@</code> でファイル指定)</td>
+                  <td><code>@src/orders/</code> と失敗ログ</td>
+                </tr>
+                <tr>
+                  <td>Constraints</td>
+                  <td>守る規約・アーキテクチャ・安全要件</td>
+                  <td>「公開 API のシグネチャは変えない」</td>
+                </tr>
+                <tr>
+                  <td>Done when</td>
+                  <td>完了条件</td>
+                  <td>「該当テストが通り、型チェックが通る」</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre><code class="language-plaintext">目的: 注文作成 API に冪等性キーを導入し、二重送信で注文が重複しないようにする。
+コンテキスト: @src/orders/create.ts と @src/orders/create.test.ts、本番で起きた重複注文のログ。
+制約: 公開 API のレスポンス形式は変えない。DB マイグレーションは追加してよいが既存列は変更しない。
+完了条件: 新規テストを含む orders 配下のテストがすべて通り、lint と型チェックが通る。差分の要約と残リスクを最後に報告する。</code></pre>
+          <h3>3-2. 計画を先に立てるべき場面</h3>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d4"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <ul>
+            <li>
+              <strong>Plan モード</strong>: <code>/plan</code> または
+              <code>Shift+Tab</code>
+              で切替。コンテキスト収集と確認質問を経て、実装前に強い計画を作ります(公式が最も勧める方法)。
+            </li>
+            <li>
+              <strong>インタビュー</strong>:
+              「前提を疑い、曖昧な点を質問してから計画を書いて」と頼みます。
+            </li>
+            <li>
+              <strong>PLANS.md(実行計画テンプレート)</strong>: 長期・多段の作業向け。<a
+                href="https://developers.openai.com/cookbook/articles/codex_exec_plans"
+                >実行計画ガイド</a
+              >を参照。
+            </li>
+          </ul>
+          <p>
+            <span class="tag t-dev">開発者</span>一方で、Peter Steinberger 氏(<code
+              >Shipping at Inference-Speed</code
+            >、2025-12-28 公開)は Plan
+            モードを使わず、モデルと<strong>会話しながら探索</strong>して方向を決める流儀を取っています。これは
+            GPT-5.x
+            世代での経験談であり、<strong>どちらが正しいかはタスクとモデル次第</strong>です。迷ったら「不可逆な変更・影響範囲が広い変更では計画を先に」と覚えると安全です。
+          </p>
+          <h3>3-3. 推論レベルの当て方</h3>
+          <p>
+            公式の目安は、速く範囲が明確なら Low、複雑な変更やデバッグは
+            Medium〜High、長く推論の重い作業は Extra High
+            です。<strong>最初から最大にしない</strong>ことが、使用量の節約と待ち時間の短縮につながります。
+          </p>
+          <h3>3-4. 音声入力</h3>
+          <p>
+            アプリの音声ディクテーションで依頼を話すと、文脈を長く詰め込みやすくなります(公式のヒント)。
+          </p>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/prompting">Prompting</a>、<span
+              class="tag t-dev"
+              >開発者</span
+            ><a href="https://steipete.me/posts/2025/shipping-at-inference-speed"
+              >Steinberger: Shipping at Inference-Speed</a
+            >
+          </p>
+        </section>
+        <section class="section" id="s6">
+          <h2>Step 4: AGENTS.md を「痩せたまま」育てる</h2>
+          <h3>4-1. 公式の基本方針</h3>
+          <p>
+            <code>AGENTS.md</code> は「エージェント向けの
+            README」で、自動的にコンテキストへ読み込まれます。公式が挙げる中身は次のとおりです。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>例</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>リポジトリ構成と重要ディレクトリ</td>
+                  <td><code>src/</code> は API、<code>infra/</code> は IaC</td>
+                </tr>
+                <tr>
+                  <td>実行方法</td>
+                  <td>起動手順、必要な環境変数の名前</td>
+                </tr>
+                <tr>
+                  <td>ビルド・テスト・lint コマンド</td>
+                  <td>該当ディレクトリだけ回すコマンド</td>
+                </tr>
+                <tr>
+                  <td>規約と PR の期待値</td>
+                  <td>コミットメッセージ規約</td>
+                </tr>
+                <tr>
+                  <td>制約と禁止事項</td>
+                  <td>本番データに触れない</td>
+                </tr>
+                <tr>
+                  <td>完了の定義と検証方法</td>
+                  <td>テストと型チェックが通ること</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            配置は3層です。<code>~/.codex</code>
+            のグローバル、リポジトリ直下、サブディレクトリ。<strong>現在地に近いファイルが優先</strong>されます。
+          </p>
+          <h3>4-2. 重要な新常識: 「長いほど良い」は誤り</h3>
+          <p>ここ半年で、運用の主流が「足す」から「削る」へ変わりました。根拠は2つあります。</p>
+          <p>
+            <strong
+              >根拠1<span class="tag t-res">研究</span>ETH Zurich らの評価(Gloaguen ら,
+              2026)</strong
+            >: 複数のエージェントとモデルで、コンテキストファイル(AGENTS.md
+            など)を評価したところ、タスク成功率が改善しない(論文版の表現では低下する傾向)一方で、<strong
+              >推論コストは 20% 以上増加</strong
+            >しました。エージェントは指示に従うので、不要な要件は探索やテストを増やして<strong>タスクを難しくする</strong>というのが結論です。人手で書くファイルは「最小限の要件」に絞るべきとされます。なお、ドキュメントを削除した条件では
+            LLM
+            生成のコンテキストファイルが役立ったため、<strong>リポジトリから発見できない情報</strong>こそが
+            AGENTS.md の価値です。
+          </p>
+          <p>
+            <strong
+              >根拠2<span class="tag t-sec">公式・開発者</span>OpenAI の Eric Provencher
+              氏(2026-09-11, GPT-6 Astra 向け)</strong
+            >:
+            Skills・AGENTS.md・タスクプロンプトに積み上がった古い指示は、コンテキストを圧迫して挙動を悪化させ得ると指摘しています。要点は次のとおりです。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>旧来の指示</th>
+                  <th>問題</th>
+                  <th>改善</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>「編集の前に毎回、設計書 3 本を読む」</td>
+                  <td>誤字修正でもコンテキストを浪費</td>
+                  <td>必要なものだけ読むよう、<strong>文脈依存</strong>で文書を指す</td>
+                </tr>
+                <tr>
+                  <td>「必ずテストを走らせて確認する」</td>
+                  <td>Astra は自分でやるので過剰テストに</td>
+                  <td>削除。許可したい手順だけ明記</td>
+                </tr>
+                <tr>
+                  <td>「勝手に進めず必ず確認」など強い境界表現</td>
+                  <td>続けてほしい場面でも止まる</td>
+                  <td>境界の文言を見直す</td>
+                </tr>
+                <tr>
+                  <td>最初の実装で止めて確認する要件</td>
+                  <td>早めの停止に誘導される</td>
+                  <td>完了条件を<strong>事前に</strong>定義(実行・確認・修正まで含める)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <span class="tag t-rec">筆者見解</span>Provencher 氏の記事は Astra
+            を前提にしていますが、削る原則は Sol 6.1
+            など他モデルでも「過剰な手順の指示は害になり得る」という方向で有効と考えられます。ただし、モデルごとに挙動が違うため、<strong
+              >移行時に A/B で確認</strong
+            >してください。
+          </p>
+          <h3>4-2b. 「許可」を書くのも AGENTS.md の仕事</h3>
+          <p>
+            Astra
+            は慎重で、安全と確信できないことはしません。<strong>安全だと分かっているワークフローには許可を与える</strong>と、無駄な停止が減ります。
+          </p>
+          <pre><code class="language-markdown">## ローカルテストについて
+
+ローカルのテストは使い捨てのフィクスチャで動き、本番へのアクセスはありません。
+実行して構いません。依頼された変更が原因の失敗は修正し、影響範囲のテストを再実行してください。
+都度の承認は不要です。</code></pre>
+          <h3>4-3. 良い AGENTS.md の最小例</h3>
+          <pre><code class="language-markdown"># AGENTS.md
+
+## このリポジトリ
+- `apps/api`: REST API(TypeScript)。`apps/web`: フロントエンド。
+- 共有ライブラリは `packages/` 配下。
+
+## コマンド(ここから発見できないものだけ)
+- API のテスト: `pnpm --filter api test`
+- 型チェック: `pnpm typecheck`(全体で約 90 秒かかる)
+
+## 制約
+- 本番の資格情報や `.env.production` に触れない。
+- 公開 API の変更は `docs/api-changes.md` に追記する。
+
+## 完了の定義
+- 変更箇所のテストと型チェックが通っている。
+- 差分の要約と残リスクを最後に報告する。</code></pre>
+          <h3>4-4. 育て方のループ</h3>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d5"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <p>
+            公式も「同じミスを2回したら振り返りを依頼して AGENTS.md
+            を更新する」「ルールは繰り返しの失敗を見てから足す」「大きくなったら本体は簡潔にし、計画やレビュー用の別
+            Markdown を参照させる」と述べています。
+          </p>
+          <blockquote>
+            <p>
+              <strong>棚卸しの検証質問</strong>(他社の公式ガイドにも見られる汎用的な基準):
+              「この行を消したらエージェントはミスをするか?」答えが「いいえ」なら消す。
+            </p>
+          </blockquote>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/guides/agents-md">AGENTS.md ガイド</a
+            >、<span class="tag t-official">公式ブログ</span
+            ><a
+              href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+              >Rethinking skills and prompts for GPT-6 Astra</a
+            >、<span class="tag t-res">研究</span
+            ><a href="https://arxiv.org/abs/2602.11988">arXiv 2602.11988</a>、<span
+              class="tag t-sec"
+              >二次</span
+            ><a href="https://kiberblick.de/aktuell/2026/2026-09-14-openai-skills-agents-md-astra/"
+              >KIberblick の解説</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://developer.upsun.com/posts/ai/agents-md-less-is-more"
+              >Upsun: AGENTS.md less is more</a
+            >
+          </p>
+        </section>
+        <section class="section" id="s7">
+          <h2>Step 5: Skills とプラグイン</h2>
+          <h3>5-1. いつ Skill にするか</h3>
+          <p>
+            公式の目安は「<strong
+              >同じプロンプトを繰り返し使う、または同じワークフローを直し続けるなら Skill
+              にする</strong
+            >」です。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>手段</th>
+                  <th>向いているもの</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>AGENTS.md</td>
+                  <td>常時適用すべき、リポジトリ全体のルール</td>
+                </tr>
+                <tr>
+                  <td>Skill</td>
+                  <td>特定の作業でだけ必要な手順(ログ調査、リリースノート、移行計画など)</td>
+                </tr>
+                <tr>
+                  <td>プラグイン</td>
+                  <td>
+                    Skill や連携を<strong>配布</strong>したいとき(複数 Skill、アプリ連携の同梱)
+                  </td>
+                </tr>
+                <tr>
+                  <td>自動化</td>
+                  <td>手順が安定した繰り返し作業のスケジュール実行</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>5-2. Skill 設計の5原則</h3>
+          <ol>
+            <li><strong>1つの Skill は1つの仕事</strong>に絞る。</li>
+            <li>
+              <strong>description は短く、いつ使うかを明確に</strong
+              >。名前と説明は常にコンテキストへ載るため、長すぎる・競合する・「選んで!」と主張する説明は害になります。Skill
+              が増えすぎると、説明が短縮されて選びにくくなります。
+            </li>
+            <li>
+              <strong>段階的開示(progressive disclosure)</strong>: ルートの
+              <code>SKILL.md</code> は最小限の案内役にし、詳細は参照ファイルやスクリプトへ。
+            </li>
+            <li>
+              <strong>手順書ではなく判断基準を書く</strong>:
+              精緻な旅程のような手順は、最近のモデルでは逆効果になり得ます。
+            </li>
+            <li>
+              <strong>無差別にダウンロードしない</strong>: 多すぎる Skill
+              は、各説明の見える量を減らし、選択を難しくします。
+            </li>
+          </ol>
+          <pre><code class="language-markdown">---
+name: db-migration-review
+description: DB マイグレーションを追加・変更するときだけ使う。互換性とロールバックを確認する。
+---
+
+# DB マイグレーションレビュー
+
+確認観点は `references/checklist.md` を参照。本文には詳細を書かない。</code></pre>
+          <p>
+            悪い description の例は「データベースに関することなら何でも使う」です。DB
+            に触れるたびに読み込まれ、不要な指示でコンテキストを消費します。
+          </p>
+          <h3>5-3. 配置場所とスキル作成</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>場所</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>$HOME/.agents/skills</code></td>
+                  <td>個人用</td>
+                </tr>
+                <tr>
+                  <td><code>.agents/skills</code>(リポジトリ)</td>
+                  <td>チーム共有。新メンバーのオンボーディングにも有効</td>
+                </tr>
+                <tr>
+                  <td>プラグイン</td>
+                  <td>広く配布</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            雛形は
+            <code>$skill-creator</code>
+            で作ります。最初はローカルで反復し、広く共有する段階でプラグイン化します。リポジトリの
+            Skill
+            は<strong>他のメンバーのエージェント(別モデルかもしれない)</strong>も導くため、「どのモデルが使うか」を意識して書きます。
+          </p>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/skills">Agent Skills</a>、<span
+              class="tag t-official"
+              >公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式ブログ</span
+            ><a
+              href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+              >Rethinking skills and prompts for GPT-6 Astra</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://github.com/openai/skills">openai/skills</a>、<a
+              href="https://agentskills.io/specification"
+              >Agent Skills 仕様</a
+            >
+          </p>
+        </section>
+        <section class="section" id="s8">
+          <h2>Step 6: MCP で外部コンテキストをつなぐ</h2>
+          <h3>6-1. 使うべき条件</h3>
+          <p>公式は次の場合に MCP を使うよう勧めています。</p>
+          <ul>
+            <li>必要な文脈が<strong>リポジトリの外</strong>にある</li>
+            <li>データが頻繁に変わる</li>
+            <li>貼り付けの指示ではなく、<strong>ツールとして使わせたい</strong></li>
+            <li>ユーザーやプロジェクトを跨いで再現可能な連携が欲しい</li>
+          </ul>
+          <p>STDIO と、OAuth 付きの Streamable HTTP の両方に対応します。</p>
+          <pre><code class="language-bash"># カスタムサーバーを追加(名前・URL などを指定)
+codex mcp add
+
+# セッション中にサーバーへサインイン(0.161.0 以降)
+# /mcp login &lt;名前&gt;</code></pre>
+          <h3>6-2. 運用の作法</h3>
+          <ul>
+            <li>
+              <strong>最初は1〜2個</strong>:
+              手作業の繰り返しを確実に減らすツールだけ入れる。全部つなぐところから始めない。
+            </li>
+            <li>
+              <strong>企業利用</strong>: 企業向け MCP
+              のサインインやアカウント連携の許可(0.164.0)、組織用のプラグイン配布が整っています。
+            </li>
+            <li>
+              <strong>セキュリティ</strong>:
+              外部から取り込む内容は信頼できない入力として扱います(Step 12)。
+            </li>
+          </ul>
+          <pre><code class="language-toml"># .codex/config.toml の MCP 設定例(サーバー名と URL は例)
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"</code></pre>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/mcp">MCP</a>、<span class="tag t-sec"
+              >二次</span
+            ><a href="https://releasebot.io/updates/openai/codex">Releasebot: Codex 変更履歴</a>
+          </p>
+        </section>
+        <section class="section" id="s9">
+          <h2>Step 7: 検証ループとレビュー</h2>
+          <h3>7-1. 「生成して終わり」にしない</h3>
+          <p>
+            公式は、Codex
+            に<strong>テストの作成・実行・確認・レビュー</strong>まで担当させることを勧めています。ただし「良い状態」が何かを知らせるのは、プロンプトか
+            AGENTS.md の役割です。
+          </p>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d6"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <h3>7-2. <code>/review</code> の使い分け</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>対象</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ベースブランチとの比較</td>
+                  <td>PR スタイルのレビュー</td>
+                </tr>
+                <tr>
+                  <td>未コミットの変更</td>
+                  <td>手元の作業の確認</td>
+                </tr>
+                <tr>
+                  <td>特定コミット</td>
+                  <td>後追い確認</td>
+                </tr>
+                <tr>
+                  <td>カスタム指示</td>
+                  <td>観点を指定(セキュリティ、性能など)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            チームで <code>code_review.md</code> を作り、<code>AGENTS.md</code>
+            から参照すると、レビューの観点がリポジトリや担当者を跨いで揃います。GitHub 連携では PR
+            への自動レビューや <code>@codex review</code> が使え、OpenAI 社内では Codex が全 PR
+            をレビューしているとのことです。
+          </p>
+          <pre><code class="language-markdown">## Review guidelines
+
+- 認可チェックの漏れを最優先で指摘する。
+- 例外の握りつぶしは P1 として扱う。
+- スタイルの好みは指摘しない。</code></pre>
+          <p>
+            レビュー指針は、変更ファイルに最も近い
+            <code>AGENTS.md</code>
+            のものが適用されるため、重点パッケージには深い階層に個別の指針を置けます。
+          </p>
+          <h3>7-3. 実例が教える限界: 見た目のバグは見落とす</h3>
+          <p>
+            Simon Willison 氏は、Codex Desktop(GPT-5.6 Sol
+            Ultra、サブエージェントを積極活用するモード)に、同一プロンプトでゲームを一発で作らせました。52
+            分で、API 料金換算では約 $23
+            の作業でしたが、キャラクターの目が巨大な球になっているバグを、開発中にスクリーンショットを見ていたにもかかわらず<strong>自分では発見できませんでした</strong>。人間が「なぜ巨大な黒い球があるの?」と聞き、「直して」と頼むと解決しました。
+          </p>
+          <p><span class="tag t-rec">筆者見解</span>教訓は3つです。</p>
+          <ol>
+            <li>
+              視覚的な品質は、<strong>自動検証の対象に含めても漏れる</strong>。人間の確認か、具体的な視覚仕様(チェックリスト)が要る。
+            </li>
+            <li>一発で作らせた後の<strong>短い追撃プロンプト</strong>が非常に効く。</li>
+            <li>検証コストは、使用量見積もり(API 換算)に含めて考える。</li>
+          </ol>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/use-cases/github-code-reviews"
+              >GitHub Code Reviews</a
+            >、<span class="tag t-dev">開発者</span
+            ><a href="https://simonwillison.net/2026/Aug/7/moonlight-mayhem/"
+              >Simon Willison: Moonlight &amp; Mayhem</a
+            >(上記 gpt タグ一覧内の記事)
+          </p>
+        </section>
+        <section class="section" id="s10">
+          <h2>Step 8: 並列化(worktree とサブエージェント)</h2>
+          <h3>8-1. 3つの並列手段の違い</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>手段</th>
+                  <th>何が並列になるか</th>
+                  <th>向く場面</th>
+                  <th>主な注意点</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>複数スレッド</td>
+                  <td>独立した作業単位</td>
+                  <td>別々の機能・調査</td>
+                  <td>同じファイルを触らせない</td>
+                </tr>
+                <tr>
+                  <td>Git worktree</td>
+                  <td>ファイルシステムの隔離</td>
+                  <td>同一リポジトリで並行編集</td>
+                  <td>マージ計画</td>
+                </tr>
+                <tr>
+                  <td>サブエージェント</td>
+                  <td>1タスク内の分担</td>
+                  <td>探索・テスト・トリアージ</td>
+                  <td>トークン消費が増える</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            公式の失敗例として、「<strong
+              >同じファイルに対して複数のライブスレッドを worktree なしで走らせる</strong
+            >」ことが挙げられています。
+          </p>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d7"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <h3>8-2. サブエージェントの設定</h3>
+          <p>
+            組み込みの役割には
+            <code>default</code
+            >(汎用)、<code>worker</code>(実装・修正)、<code>explorer</code>(読み取り中心の探索)があります。独自のエージェントは
+            TOML ファイルで定義します(個人は <code>~/.codex/agents/</code>、プロジェクトは
+            <code>.codex/agents/</code>)。必須フィールドは
+            <code>name</code>、<code>description</code>、<code>developer_instructions</code> です。
+          </p>
+          <pre><code class="language-toml"># .codex/agents/pr-explorer.toml(例)
+name = "pr_explorer"
+description = "PR の変更点を読み取り専用で調べ、影響範囲を要約する担当。"
+developer_instructions = "コードを編集しない。根拠となるファイルと行を挙げて要約する。"
+sandbox_mode = "read-only"
+model_reasoning_effort = "medium"</code></pre>
+          <ul>
+            <li>
+              既定は <code>agents.max_threads = 6</code>、<code>agents.max_depth = 1</code
+              >。<strong>深さを上げるとコストが乗算</strong>されるので、多くのワークフローは深さ 1
+              で十分です。
+            </li>
+            <li>
+              カスタムエージェントは<strong>狭く、意見を持たせる</strong>(1つの明確な仕事)のが公式の助言です。
+            </li>
+            <li>
+              使うモデルの目安: 曖昧で多段の仕事には
+              <code>gpt-6.1-sol</code>、速く狭く大量の仕事には
+              <code>gpt-6-luna</code>(公式ドキュメントの提案を二次情報が要約)。
+            </li>
+            <li>
+              <strong>サブエージェントは明示的に頼んだときだけ</strong
+              >使われ、各子が独自にモデルとツールを使うため、単一エージェントより多くのトークンを消費します。
+            </li>
+            <li>
+              推論レベル <code>ultra</code> は、分割しやすい大タスクでサブエージェントへ展開します。
+            </li>
+          </ul>
+          <h3>8-3. セッション管理のコマンド</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>コマンド</th>
+                  <th>用途</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/agent</code></td>
+                  <td>並列エージェントのスレッド切替</td>
+                </tr>
+                <tr>
+                  <td><code>/fork</code></td>
+                  <td>元の履歴を保ったまま新スレッドへ分岐</td>
+                </tr>
+                <tr>
+                  <td><code>/resume</code></td>
+                  <td>保存済み会話の再開</td>
+                </tr>
+                <tr>
+                  <td><code>/side</code></td>
+                  <td>横道の会話。スレッド切替後に戻れる</td>
+                </tr>
+                <tr>
+                  <td><code>/compact</code></td>
+                  <td>長くなったスレッドの要約(自動でも行われる)</td>
+                </tr>
+                <tr>
+                  <td>Command Center</td>
+                  <td>エージェントタスクの一覧、ピン留め、履歴のページング</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <strong>1つの作業単位に1つのスレッド</strong
+            >が原則です。同じ問題の続きなら同じスレッドで推論の軌跡を保ち、本当に枝分かれするときだけフォークします。
+          </p>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/subagents">Subagents</a>、<span
+              class="tag t-official"
+              >公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-dev">開発者</span
+            ><a href="https://simonwillison.net/2026/Mar/16/codex-subagents"
+              >Simon Willison: サブエージェント GA</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://flaviocopes.com/ai-glossary/subagents/">flaviocopes: subagents</a>
+          </p>
+        </section>
+        <section class="section" id="s11">
+          <h2>Step 9: 長時間タスクとコンテキスト管理</h2>
+          <h3>9-1. モデル側の進化</h3>
+          <ul>
+            <li>
+              GPT-5.1-Codex-Max
+              以降、モデルが複数のコンテキストウィンドウを跨いで作業する<strong>コンパクション</strong>が前提になりました。
+            </li>
+            <li>
+              GPT-6 Astra
+              では、履歴を繰り返し要約し直す代わりに、<strong>ノートをコンテキスト間で保持しつつ、過去のコンテキストを検索可能に保つ</strong>変更が
+              Codex に入ったと報じられています(<span class="tag t-sec">二次</span>)。
+            </li>
+            <li>
+              Codex 自身も使用状況を監視し、長いタスクでは自動で要約して不要な詳細を捨てます。
+            </li>
+          </ul>
+          <h3>9-2. <code>/goal</code> で「終わり」を定義する</h3>
+          <p>
+            長期タスクは <code>/goal</code>(目標モード)を使います。有効化は設定の
+            <code>features.goals = true</code>、または
+            <code>codex features enable goals</code>
+            です。アプリでは進捗がコンポーザの上に表示され、一時停止・再開・編集・クリアができます。
+          </p>
+          <p>
+            <strong>良い目標は、成功を判定できる</strong
+            >(具体的な成果物、測定可能な目標値、テスト条件)ことが重要です。
+          </p>
+          <pre><code class="language-plaintext">/goal JavaScript から TypeScript へ移行する。完了条件: `pnpm typecheck` がエラー 0 件、`pnpm test` が全件成功、公開 API のエクスポート名が変わっていない。進捗は 20 ファイルごとに MIGRATION.md の表へ記録する。</code></pre>
+          <p>
+            <span class="tag t-sec">二次</span
+            >解説では、目標のプロンプトは「タスク説明」と「終了条件」を兼ねるため、「パフォーマンス改善」のような曖昧な目標は恣意的な判定を招く、と指摘されています。
+          </p>
+          <h3>9-3. 長時間運用のライフサイクル</h3>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d8"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <h3>9-4. 実務ポイント</h3>
+          <ul>
+            <li>
+              <strong>スレッドは使い捨てのチャットではなく作業場</strong>:
+              決定事項と文脈が蓄積するので、再説明のコストが減ります。
+            </li>
+            <li>
+              <strong>記録をファイルへ</strong>: OpenAI の Codex 責任者 Thibault Sottiaux
+              氏は、自分の考えや目標をファイルに書いて Codex
+              に参照させる習慣があると語っています(Latent Space のプロフィール)。長期運用では
+              TODO・意思決定・ブロッカーを同期フォルダに置く方法も紹介されています。
+            </li>
+            <li>
+              <strong>「理解」まで委譲しない</strong>: Sottiaux
+              氏は、実行だけでなく理解まで委ねると、利用者自身の把握が弱くなる危険を警告しています。PR
+              の説明は必ず自分で読んでください。
+            </li>
+            <li>
+              <strong>キュー</strong>:
+              <code>codex queue --resume</code>
+              で、メッセージをキューに積んだ後にスレッドを再開できます(0.166.0)。作業中に追加の指示を送って即座に舵を切る(Steer)こともできます(0.163.0)。
+            </li>
+            <li>
+              <strong>Codex Cloud</strong>: PC
+              がスリープしても動くので、長時間・非同期の仕事に向きます。モバイルの Remote
+              タブで承認・進捗確認ができます。
+            </li>
+          </ul>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/prompting">Prompting</a>、<span
+              class="tag t-sec"
+              >二次</span
+            ><a href="https://www.fonearena.com/blog/491506/openai-gpt-6-astra-features.html"
+              >FoneArena: GPT-6 Astra の機能</a
+            >、<span class="tag t-dev">開発者</span
+            ><a href="https://latent.space/wiki/thibault-sottiaux/"
+              >Latent Space: Thibault Sottiaux</a
+            >、<span class="tag t-dev">開発者</span
+            ><a href="https://simonwillison.net/tags/gpt/">Simon Willison: GPT-5.1-Codex-Max</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://releasebot.io/updates/openai/codex">Releasebot: Codex 変更履歴</a>
+          </p>
+        </section>
+        <section class="section" id="s12">
+          <h2>Step 10: 自動化と CI への組み込み</h2>
+          <h3>10-1. 「スキルが方法、自動化がスケジュール」</h3>
+          <p>
+            手順がまだ人の細かい介入を要するなら、<strong>先に Skill 化</strong
+            >し、予測可能になってから自動化します。公式が挙げる失敗例は「手作業で安定していない繰り返し作業を、いきなり自動化する」ことです。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>自動化に向く作業</th>
+                  <th>補足</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>直近のコミット要約</td>
+                  <td>毎朝のスタンドアップ用</td>
+                </tr>
+                <tr>
+                  <td>バグの兆候のスキャン</td>
+                  <td>結果は人が確認</td>
+                </tr>
+                <tr>
+                  <td>リリースノート下書き</td>
+                  <td>週次</td>
+                </tr>
+                <tr>
+                  <td>CI 失敗の確認</td>
+                  <td>原因の一次切り分け</td>
+                </tr>
+                <tr>
+                  <td>定期的な分析</td>
+                  <td>スケジュール実行</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            アプリの Automations タブで、プロジェクト・プロンプト(Skill
+            の呼び出し可)・頻度・実行環境(専用 worktree
+            かローカルか)を選べます。<strong>振り返りにも使う</strong>と効果的です。最近のセッションを要約させ、繰り返す摩擦を
+            AGENTS.md や Skill の改善に反映させます。
+          </p>
+          <h3>10-2. 非対話実行</h3>
+          <pre><code class="language-bash"># CI などでの一発実行(モデル指定)
+codex exec -m gpt-6.1-sol "失敗している統合テストの根本原因を調べて修正して"</code></pre>
+          <p>
+            SDK(TypeScript など)からの呼び出しにも対応しています。企業環境では、Vertex AI(<code
+              >model_provider = "gcp"</code
+            >)や Amazon Bedrock も使えます。
+          </p>
+          <pre><code class="language-toml"># Vertex AI を使う例(0.165.0 で追加された組み込みプロバイダ)
+model_provider = "gcp"</code></pre>
+          <h3>10-3. チーム運用の注意(開発者の指摘)</h3>
+          <p>
+            <span class="tag t-dev">開発者</span>AI
+            コーディングツールを配布しても<strong>配信速度が変わらない</strong>のは、コード生成の1ノードだけが自動化され、周辺の計画・レビュー・テスト・デリバリーが従来のままだからだ、という分析があります(HackerNoon
+            記事、Steinberger
+            氏の記事を引用)。個人では推論時間が律速になりますが、チームではタスクを生み出すプロセスが律速になります。<strong>プロセス側(テスト、レビュー、ドキュメント)に投資</strong>してください。
+          </p>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/learn/best-practices.md">Best practices</a
+            >、<span class="tag t-official">公式</span
+            ><a href="https://developers.openai.com/codex/app/automations">Automations</a>、<span
+              class="tag t-sec"
+              >二次</span
+            ><a href="https://hackernoon.com/ai-coding-tools-wont-fix-a-broken-development-process"
+              >HackerNoon</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://releasebot.io/updates/openai/codex">Releasebot: Codex 変更履歴</a>
+          </p>
+        </section>
+        <section class="section" id="s13">
+          <h2>Step 11: コストと使用量の最適化</h2>
+          <h3>11-1. 使用量の仕組み(押さえるべき点)</h3>
+          <ul>
+            <li>
+              ChatGPT アカウントでのサインインは<strong>プランの使用量</strong>を消費し、API キーは
+              API 料金です。
+            </li>
+            <li>
+              Astra は GPT-5.6 Sol
+              より<strong>使用量を速く消費</strong>する場合があります(タスク、入出力サイズ、推論レベル、速度設定で変わる)。
+            </li>
+            <li>
+              Terra は同じ使用量枠で、GPT-5.6 Terra より多くの作業ができ、Sol 6.1 や Astra
+              よりも大幅に多くできるとされています(固定倍率は公式に明記なし)。
+            </li>
+            <li>
+              Fast モードは 2.5 倍レートで消費します。Ultrafast は最大 8 倍速で、発売時は Pro $500
+              や一部の企業プランに限定されていました。
+            </li>
+          </ul>
+          <h3>11-2. コスト削減の優先順位</h3>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d9"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <ul>
+            <li>
+              GPT-6.1 Sol のキャッシュ入力は $0.10/100万トークンで、入力の 5%、GPT-6 Sol
+              より半額です。<strong>エージェントの長い会話ほど効く</strong>ため、プレフィックス(システム指示・AGENTS.md・ツール定義)を安定させるのが有効です(Hacker
+              News のコメントも「Codex では実利が大きい」と評価)。
+            </li>
+            <li>
+              GPT-5.6 以降は、キャッシュ書き込みが非キャッシュ入力の 1.25 倍、読み取りが 90%
+              割引という課金体系になっています。
+            </li>
+            <li>
+              <strong>一次情報で確認</strong>: Plus
+              プランのメッセージ上限などは変動するため、公式の料金ページで最新値を確認してください。
+            </li>
+          </ul>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://openai.com/index/introducing-gpt-6-1-sol/">GPT-6.1 Sol</a>、<span
+              class="tag t-official"
+              >公式</span
+            ><a href="https://help.openai.com/en/articles/20001275-chatgpt-work"
+              >ヘルプ: ChatGPT Work and Codex</a
+            >、<span class="tag t-official">公式コミュニティ</span
+            ><a
+              href="https://community.openai.com/t/gpt-6-1-terra-delivering-fast-and-capable-computer-use-at-a-lower-price/1409900"
+              >GPT-6.1 Terra 発表</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://handyai.substack.com/p/model-drop-gpt-61-sol">Handy AI: GPT-6.1 Sol</a
+            >、<span class="tag t-dev">開発者</span
+            ><a href="https://simonwillison.net/tags/gpt/">Simon Willison: 2026-06-26 の引用</a>
+          </p>
+        </section>
+        <section class="section" id="s14">
+          <h2>Step 12: セキュリティと Daybreak</h2>
+          <h3>12-1. エージェント利用の基本姿勢</h3>
+          <ul>
+            <li>最小権限で始める(Step 2)。</li>
+            <li>
+              外部から取り込む内容(Web、Issue、MCP
+              の戻り値)は<strong>信頼できない入力</strong>として扱い、プロンプトインジェクションを想定する。
+            </li>
+            <li>資格情報はマスクし、本番系へ到達できないテスト環境を使う。</li>
+            <li>共有ドキュメント・サブエージェントの権限継承を理解する(Step 2-3)。</li>
+          </ul>
+          <h3>12-2. Astra の安全装置を理解する</h3>
+          <p>
+            GPT-6 Astra は OpenAI で初めて、サイバー面の Preparedness Framework で最高の
+            <strong>Critical</strong> に分類されたモデルです。Codex
+            では、安全装置が働くと<strong>実行前にレビューを促す表示</strong>が出ることがあり、無害な作業でも誤作動し得ると
+            OpenAI 自身が認めています(API ではタスクが停止することもある)。0.166.0
+            では、<strong>安全ブロックの説明と、より安全な後続プロンプトの選択肢</strong>が TUI
+            に追加されました。
+          </p>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d10"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <h3>12-3. Daybreak と Codex Security</h3>
+          <p>
+            <strong>Daybreak</strong> は OpenAI のサイバー防御プログラムです(2026年5月に開始)。Codex
+            Security(リポジトリをスキャンし、編集可能な脅威モデルを作り、隔離環境で脆弱性を検証し、修正案を提示する)と、サイバー向けモデルなどを統合します。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>階層</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Daybreak Blue</td>
+                  <td>
+                    承認された防御者向け。汎用の最前線モデルを、セキュリティ作業向けに調整した安全装置で提供。ほとんどの防御者の出発点
+                  </td>
+                </tr>
+                <tr>
+                  <td>Daybreak Red</td>
+                  <td>
+                    高度な脆弱性調査、エクスプロイト検証、ペネトレーションテスト、レッドチーム向けの特化モデル
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            Codex のバージョンによって、Daybreak の既定の有効/無効や API
+            キーでの利用条件が変わってきた履歴があります(0.161.0 では「明示的に有効化」、0.163.0
+            では「対象アカウントで既定有効」)。<strong
+              >自分の環境の挙動は <code>/status</code> と公式リリースノートで確認</strong
+            >してください。個人の参加者には、2026年9月1日からハードウェアセキュリティキーの採用が求められると報じられています。
+          </p>
+          <p>
+            根拠: <span class="tag t-official">公式</span
+            ><a href="https://openai.com/cyber">OpenAI Daybreak</a>、<span class="tag t-sec"
+              >二次</span
+            ><a
+              href="https://www.techradar.com/pro/security/openai-extends-daybreak-security-project-and-reveals-new-cyber-model-but-for-approved-users-only"
+              >TechRadar: Daybreak 拡張</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://nationalcioreview.com/?p=79581">National CIO Review</a>、<span
+              class="tag t-sec"
+              >二次</span
+            ><a href="https://www.deeplearning.ai/the-batch/gpt-6-astra-is-a-star"
+              >The Batch: GPT-6 Astra</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://releasebot.io/updates/openai/codex">Releasebot: Codex 変更履歴</a>
+          </p>
+        </section>
+        <section class="section" id="s15">
+          <h2>13. 新モデルへの移行チェックリスト</h2>
+          <p>
+            新しい世代への移行は、<strong>棚卸しの好機</strong>です。Provencher 氏は「Codex
+            に、記事の内容に基づく監査をさせる」ことも勧めています。
+          </p>
+          <div class="diagram-wrap">
+            <div
+              class="diagram-canvas"
+              data-diagram-id="d11"
+              role="img"
+              aria-label="フローチャート"
+            ></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>チェック項目</th>
+                  <th>質問</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>AGENTS.md</td>
+                  <td>
+                    各行を消したらミスが起きるか。リポジトリから発見できる情報を重複していないか
+                  </td>
+                </tr>
+                <tr>
+                  <td>Skill</td>
+                  <td>
+                    description は「何を・いつ」だけか。他の Skill と競合しないか。ルートは案内役か
+                  </td>
+                </tr>
+                <tr>
+                  <td>読み取り指示</td>
+                  <td>「毎回全部読む」を「必要に応じて」に変えたか</td>
+                </tr>
+                <tr>
+                  <td>テスト指示</td>
+                  <td>モデルが自発的にやることを過剰に命じていないか</td>
+                </tr>
+                <tr>
+                  <td>境界表現</td>
+                  <td>強すぎる確認要求で止まっていないか。許可すべき安全な手順に許可を与えたか</td>
+                </tr>
+                <tr>
+                  <td>完了条件</td>
+                  <td>実行・確認・修正まで含めて事前に書いたか</td>
+                </tr>
+                <tr>
+                  <td>持続性</td>
+                  <td>「最初の実装で止めて確認」という要件が不要に早い停止を招いていないか</td>
+                </tr>
+                <tr>
+                  <td>公式の移行支援</td>
+                  <td>
+                    <code>$openai-docs</code> Skill を使った移行(GPT-5.5 時代から提供)や、CLI 同梱の
+                    OpenAI Docs 移行ガイド(GPT-6
+                    系の推論・ツール・データ所在の観点を追加)を活用したか
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <span class="tag t-dev">開発者</span>Simon Willison 氏は、GPT-5.5
+            の公式プロンプトガイドを引用し、「前の世代のプロンプトを全部引き継がず、<strong>製品要件を保てる最小のプロンプトから新しいベースラインを作る</strong>」という
+            OpenAI の推奨が興味深いと述べています。
+          </p>
+          <p>
+            根拠: <span class="tag t-official">公式ブログ</span
+            ><a
+              href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+              >Rethinking skills and prompts for GPT-6 Astra</a
+            >、<span class="tag t-dev">開発者</span
+            ><a href="https://simonwillison.net/2026/Apr/25/gpt-5-5-prompting-guide/"
+              >Simon Willison: GPT-5.5 prompting guide</a
+            >、<span class="tag t-sec">二次</span
+            ><a href="https://releasebot.io/updates/openai/codex">Releasebot: Codex 0.163.0</a>
+          </p>
+        </section>
+        <section class="section" id="s16">
+          <h2>14. アンチパターン集</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>アンチパターン</th>
+                  <th>なぜ悪いか</th>
+                  <th>代わりに</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>毎回の依頼に恒久ルールを書く</td>
+                  <td>重複と肥大。再現性が低い</td>
+                  <td>AGENTS.md か Skill へ</td>
+                </tr>
+                <tr>
+                  <td>AGENTS.md に何でも書く</td>
+                  <td>成功率が上がらずコストだけ上がる(ETH の評価)</td>
+                  <td>発見できない情報だけを最小限に</td>
+                </tr>
+                <tr>
+                  <td>初日からフル権限</td>
+                  <td>事故の被害範囲が広い</td>
+                  <td>既定から開始し、必要箇所だけ緩める</td>
+                </tr>
+                <tr>
+                  <td>計画なしで複雑タスク</td>
+                  <td>前提のズレが後半で発覚</td>
+                  <td>Plan モード、インタビュー、PLANS.md</td>
+                </tr>
+                <tr>
+                  <td>テスト・ビルドのコマンドを教えない</td>
+                  <td>エージェントが自分の作業を確認できない</td>
+                  <td>AGENTS.md に明記</td>
+                </tr>
+                <tr>
+                  <td>同じファイルで複数スレッド</td>
+                  <td>変更が衝突</td>
+                  <td>worktree で隔離</td>
+                </tr>
+                <tr>
+                  <td>不安定な作業を即自動化</td>
+                  <td>失敗が静かに蓄積</td>
+                  <td>手作業→Skill→自動化の順</td>
+                </tr>
+                <tr>
+                  <td>プロジェクト単位で1スレッド</td>
+                  <td>文脈肥大と品質低下</td>
+                  <td>作業単位で1スレッド</td>
+                </tr>
+                <tr>
+                  <td>1つの Skill に複数の仕事</td>
+                  <td>選択ミスと文脈の浪費</td>
+                  <td>1 Skill 1仕事、ルートは案内役</td>
+                </tr>
+                <tr>
+                  <td>常に最大の推論レベル</td>
+                  <td>遅く高価。過剰思考</td>
+                  <td>medium から始め、失敗時のみ上げる</td>
+                </tr>
+                <tr>
+                  <td>結果を見ずに信じる</td>
+                  <td>視覚・仕様のバグを見落とす</td>
+                  <td>実行して観察、具体的に指摘</td>
+                </tr>
+                <tr>
+                  <td>実装と一緒に「理解」まで委譲</td>
+                  <td>自分の把握が弱くなる</td>
+                  <td>要約を読み、設計判断は自分で</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="section" id="s17">
+          <h2>15. 著名な国際的開発者の知見まとめ</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>人物・所属</th>
+                  <th>主張(要旨)</th>
+                  <th>文脈と注意</th>
+                  <th>ソース</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Eric Provencher(OpenAI)</td>
+                  <td>
+                    Skills・AGENTS.md・プロンプトを削って整える。説明は短く、段階的開示、完了条件を事前に
+                  </td>
+                  <td>GPT-6 Astra 向けの助言(2026-09)</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+                      >OpenAI Developers ブログ</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Simon Willison</td>
+                  <td>
+                    2025年11月が能力の転換点。Codex
+                    での実践記録、サブエージェント、プロンプトの再構築を紹介
+                  </td>
+                  <td>実験的なケース(ゲーム生成など)が中心</td>
+                  <td><a href="https://simonwillison.net/tags/gpt/">gpt タグ</a></td>
+                </tr>
+                <tr>
+                  <td>Peter Steinberger</td>
+                  <td>
+                    出力は推論時間が律速。複数プロジェクトをキューで並行。Codex
+                    は先に大量に読むので手戻りが少ない
+                  </td>
+                  <td>GPT-5.x 世代(2025-12)の経験談</td>
+                  <td>
+                    <a href="https://steipete.me/posts/2025/shipping-at-inference-speed"
+                      >Shipping at Inference-Speed</a
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td>Thibault Sottiaux(OpenAI Codex)</td>
+                  <td>
+                    目標や考えをファイルに書いて渡す。理解の委譲は避ける。信頼(安全・セキュリティ)が企業導入の鍵
+                  </td>
+                  <td>プロフィール記事の要約</td>
+                  <td><a href="https://latent.space/wiki/thibault-sottiaux/">Latent Space</a></td>
+                </tr>
+                <tr>
+                  <td>Ted Sanders(OpenAI)</td>
+                  <td>
+                    Luna &lt; Terra &lt; Sol &lt; Astra。Terra は技術的な文章・速い画面操作に向く
+                  </td>
+                  <td>Hacker News のコメント</td>
+                  <td><a href="https://news.ycombinator.com/item?id=50248124">HN</a></td>
+                </tr>
+                <tr>
+                  <td>Gloaguen, Vechev ら(ETH Zurich)</td>
+                  <td>コンテキストファイルは成功率を上げず、コスト 20% 以上増。最小要件に</td>
+                  <td>評価対象は主に Python リポジトリ</td>
+                  <td><a href="https://arxiv.org/abs/2602.11988">arXiv</a></td>
+                </tr>
+                <tr>
+                  <td>Romain Huet(OpenAI)</td>
+                  <td>GPT-5.4 以降、Codex とメインモデルは単一系統。別建ての Codex モデルはない</td>
+                  <td>製品戦略の説明(2026-04)</td>
+                  <td>
+                    <a href="https://simonwillison.net/2026/Apr/25/romain-huet/"
+                      >Simon Willison の引用</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="section" id="s18">
+          <h2>16. 補足: その他のベストプラクティスと根拠ソース URL</h2>
+          <p>
+            ここでは、本文に入れきれなかった実践と、その根拠 URL をまとめます。<strong
+              ><span class="tag t-official">公式</span>を優先し、<span class="tag t-sec">二次</span
+              >は裏取りの手がかり</strong
+            >として使ってください。
+          </p>
+          <h3>16-1. 追加のベストプラクティス</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>ベストプラクティス</th>
+                  <th>要点</th>
+                  <th>根拠 URL</th>
+                  <th>種別</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>4要素のプロンプト</td>
+                  <td>Goal / Context / Constraints / Done when</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/learn/best-practices.md"
+                      >https://developers.openai.com/codex/learn/best-practices.md</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>Plan モードとインタビュー</td>
+                  <td><code>/plan</code>、Shift+Tab。曖昧なら質問させてから計画</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/learn/best-practices.md"
+                      >https://developers.openai.com/codex/learn/best-practices.md</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>実行計画テンプレート</td>
+                  <td>長期・多段は PLANS.md</td>
+                  <td>
+                    <a href="https://developers.openai.com/cookbook/articles/codex_exec_plans"
+                      >https://developers.openai.com/cookbook/articles/codex_exec_plans</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>AGENTS.md の3層配置</td>
+                  <td>グローバル、リポジトリ、サブディレクトリ。近いものが優先</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/guides/agents-md"
+                      >https://developers.openai.com/codex/guides/agents-md</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>AGENTS.md を最小化</td>
+                  <td>発見できない情報だけ。足すのは失敗の後</td>
+                  <td>
+                    <a href="https://arxiv.org/abs/2602.11988">https://arxiv.org/abs/2602.11988</a>
+                  </td>
+                  <td>研究</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>Skill の description を短く</td>
+                  <td>名前と説明は常時ロード。競合を避ける</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+                      >https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra</a
+                    >
+                  </td>
+                  <td>公式ブログ</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>Skill は1仕事・段階的開示</td>
+                  <td>ルートを案内役にし詳細は参照へ</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/skills"
+                      >https://developers.openai.com/codex/skills</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>プラグインで配布</td>
+                  <td>複数 Skill や連携の同梱</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/plugins/build"
+                      >https://developers.openai.com/codex/plugins/build</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>MCP は必要最小限</td>
+                  <td>外部・変動データ。最初は1〜2個</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/mcp"
+                      >https://developers.openai.com/codex/mcp</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>権限は既定から段階的に</td>
+                  <td>承認とサンドボックスの2つのつまみ</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/learn/best-practices.md"
+                      >https://developers.openai.com/codex/learn/best-practices.md</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>11</td>
+                  <td><code>/review</code> と <code>code_review.md</code></td>
+                  <td>レビュー観点の標準化</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/learn/best-practices.md"
+                      >https://developers.openai.com/codex/learn/best-practices.md</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>12</td>
+                  <td>GitHub の自動レビュー</td>
+                  <td><code>@codex review</code>、近い AGENTS.md の指針を適用</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/use-cases/github-code-reviews"
+                      >https://developers.openai.com/codex/use-cases/github-code-reviews</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>13</td>
+                  <td>サブエージェントの権限継承</td>
+                  <td>読み取り専用は sandbox_mode で明示</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/subagents"
+                      >https://developers.openai.com/codex/subagents</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>14</td>
+                  <td>worktree で並列隔離</td>
+                  <td>同一ファイルの並行編集を避ける</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/app/worktrees"
+                      >https://developers.openai.com/codex/app/worktrees</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>15</td>
+                  <td>自動化は安定後に</td>
+                  <td>スキルが方法、自動化がスケジュール</td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/app/automations"
+                      >https://developers.openai.com/codex/app/automations</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>16</td>
+                  <td><code>/goal</code> で完了条件を固定</td>
+                  <td>測定可能な目標。<code>features.goals</code></td>
+                  <td>
+                    <a href="https://developers.openai.com/codex/prompting"
+                      >https://developers.openai.com/codex/prompting</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>17</td>
+                  <td>Astra 向けの棚卸し</td>
+                  <td>過剰手順の削除、停止基準の見直し</td>
+                  <td>
+                    <a
+                      href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+                      >https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra</a
+                    >
+                  </td>
+                  <td>公式ブログ</td>
+                </tr>
+                <tr>
+                  <td>18</td>
+                  <td>使用量・モデル別の消費</td>
+                  <td>Fast 2.5 倍、Ultrafast 8 倍、Astra は重め</td>
+                  <td>
+                    <a href="https://help.openai.com/en/articles/20001275-chatgpt-work"
+                      >https://help.openai.com/en/articles/20001275-chatgpt-work</a
+                    >
+                  </td>
+                  <td>公式</td>
+                </tr>
+                <tr>
+                  <td>19</td>
+                  <td>Terra の位置づけ</td>
+                  <td>画面操作・文章・視覚に強い中位</td>
+                  <td>
+                    <a href="https://simonwillison.net/2026/Oct/26/gpt-61-terra/"
+                      >https://simonwillison.net/2026/Oct/26/gpt-61-terra/</a
+                    >
+                  </td>
+                  <td>開発者</td>
+                </tr>
+                <tr>
+                  <td>20</td>
+                  <td>検証で見た目のバグを拾う</td>
+                  <td>人間の確認と具体的な追撃プロンプト</td>
+                  <td>
+                    <a href="https://simonwillison.net/2026/Aug/7/moonlight-mayhem/"
+                      >https://simonwillison.net/2026/Aug/7/moonlight-mayhem/</a
+                    >
+                  </td>
+                  <td>開発者</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>キューで複数プロジェクトを並行</td>
+                  <td>計画してキューに入れ、戻ってレビュー</td>
+                  <td>
+                    <a href="https://steipete.me/posts/2025/shipping-at-inference-speed"
+                      >https://steipete.me/posts/2025/shipping-at-inference-speed</a
+                    >
+                  </td>
+                  <td>開発者</td>
+                </tr>
+                <tr>
+                  <td>22</td>
+                  <td>プロセス側の改善</td>
+                  <td>コード生成だけの自動化では全体は速くならない</td>
+                  <td>
+                    <a
+                      href="https://hackernoon.com/ai-coding-tools-wont-fix-a-broken-development-process"
+                      >https://hackernoon.com/ai-coding-tools-wont-fix-a-broken-development-process</a
+                    >
+                  </td>
+                  <td>二次</td>
+                </tr>
+                <tr>
+                  <td>23</td>
+                  <td>Daybreak と Codex Security</td>
+                  <td>脅威モデル→隔離検証→修正案</td>
+                  <td><a href="https://openai.com/cyber">https://openai.com/cyber</a></td>
+                  <td>公式</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>16-2. 参考 URL 一覧(種別ごと)</h3>
+          <p>
+            全 <strong>62</strong> 件を種別ごとに整理しました。<span class="tag t-official"
+              >公式</span
+            >を優先し、<span class="tag t-sec">二次</span>は裏取りの手がかりとして使ってください。
+          </p>
+          <div class="reflist">
+            <div class="refcard rc-official">
+              <div class="rc-head">
+                <span class="rc-title">公式(OpenAI)</span><span class="rc-count">28件</span>
+              </div>
+              <ul>
+                <li>
+                  <a href="https://developers.openai.com/codex/learn/best-practices.md"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/learn/best-practices.md</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/prompting"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/prompting</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/guides/agents-md"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/guides/agents-md</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/skills"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/skills</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/subagents"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/subagents</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/concepts/subagents"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/concepts/subagents</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/mcp"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/mcp</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/config-basic"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/config-basic</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/config-sample"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/config-sample</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/cli/slash-commands"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/cli/slash-commands</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/app/worktrees"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/app/worktrees</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/app/automations"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/app/automations</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/app/review"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/app/review</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/integrations/github"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/integrations/github</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/use-cases/github-code-reviews"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/use-cases/github-code-reviews</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/codex/plugins/build"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/codex/plugins/build</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/cookbook/articles/codex_exec_plans"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/cookbook/articles/codex_exec_plans</span></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path"
+                      >/blog/rethinking-skills-and-prompts-for-gpt-6-astra</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developers.openai.com/api/docs/models/gpt-6-astra"
+                    ><span class="rc-dom">developers.openai.com</span
+                    ><span class="rc-path">/api/docs/models/gpt-6-astra</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://openai.com/index/introducing-gpt-6-1-sol/"
+                    ><span class="rc-dom">openai.com</span
+                    ><span class="rc-path">/index/introducing-gpt-6-1-sol/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://openai.com/index/introducing-gpt-6-1-terra/"
+                    ><span class="rc-dom">openai.com</span
+                    ><span class="rc-path">/index/introducing-gpt-6-1-terra/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://openai.com/index/gpt-6-astra/"
+                    ><span class="rc-dom">openai.com</span
+                    ><span class="rc-path">/index/gpt-6-astra/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://openai.com/cyber"
+                    ><span class="rc-dom">openai.com</span><span class="rc-path">/cyber</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://help.openai.com/en/articles/20001275-chatgpt-work"
+                    ><span class="rc-dom">help.openai.com</span
+                    ><span class="rc-path">/en/articles/20001275-chatgpt-work</span></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://community.openai.com/t/gpt-6-1-terra-delivering-fast-and-capable-computer-use-at-a-lower-price/1409900"
+                    ><span class="rc-dom">community.openai.com</span
+                    ><span class="rc-path"
+                      >/t/gpt-6-1-terra-delivering-fast-and-capable-computer-use-at-a-lower-price/1409900</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a href="https://github.com/openai/codex/releases"
+                    ><span class="rc-dom">github.com</span
+                    ><span class="rc-path">/openai/codex/releases</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://github.com/openai/skills"
+                    ><span class="rc-dom">github.com</span
+                    ><span class="rc-path">/openai/skills</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://agentskills.io/specification"
+                    ><span class="rc-dom">agentskills.io</span
+                    ><span class="rc-path">/specification</span></a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="refcard rc-dev">
+              <div class="rc-head">
+                <span class="rc-title">著名な国際的開発者・OpenAI 関係者</span
+                ><span class="rc-count">13件</span>
+              </div>
+              <ul>
+                <li>
+                  <a href="https://simonwillison.net/tags/gpt/"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/tags/gpt/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://simonwillison.net/2026/Oct/26/gpt-61-terra/"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/2026/Oct/26/gpt-61-terra/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/2026/Sep/22/opus-and-sol-and-luna/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://simonwillison.net/2026/Aug/7/moonlight-mayhem/"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/2026/Aug/7/moonlight-mayhem/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://simonwillison.net/2026/Jul/12/bump/"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/2026/Jul/12/bump/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://simonwillison.net/2026/Apr/25/gpt-5-5-prompting-guide/"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/2026/Apr/25/gpt-5-5-prompting-guide/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://simonwillison.net/2026/Apr/25/romain-huet/"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/2026/Apr/25/romain-huet/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://simonwillison.net/2026/Mar/16/codex-subagents"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/2026/Mar/16/codex-subagents</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://simonwillison.net/2026/Jan/4/inflection/"
+                    ><span class="rc-dom">simonwillison.net</span
+                    ><span class="rc-path">/2026/Jan/4/inflection/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://steipete.me/posts/2025/shipping-at-inference-speed"
+                    ><span class="rc-dom">steipete.me</span
+                    ><span class="rc-path">/posts/2025/shipping-at-inference-speed</span></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://newsletter.pragmaticengineer.com/i/185922983/interesting-learnings-from-thow-peter-builds-software"
+                    ><span class="rc-dom">newsletter.pragmaticengineer.com</span
+                    ><span class="rc-path"
+                      >/i/185922983/interesting-learnings-from-thow-peter-builds-software</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a href="https://latent.space/wiki/thibault-sottiaux/"
+                    ><span class="rc-dom">latent.space</span
+                    ><span class="rc-path">/wiki/thibault-sottiaux/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://news.ycombinator.com/item?id=50248124"
+                    ><span class="rc-dom">news.ycombinator.com</span
+                    ><span class="rc-path">/item?id=50248124</span></a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="refcard rc-res">
+              <div class="rc-head">
+                <span class="rc-title">研究</span><span class="rc-count">2件</span>
+              </div>
+              <ul>
+                <li>
+                  <a href="https://arxiv.org/abs/2602.11988"
+                    ><span class="rc-dom">arxiv.org</span
+                    ><span class="rc-path">/abs/2602.11988</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://eth-sri.github.io/publications/gloaguen2026agentsmd"
+                    ><span class="rc-dom">eth-sri.github.io</span
+                    ><span class="rc-path">/publications/gloaguen2026agentsmd</span></a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="refcard rc-sec">
+              <div class="rc-head">
+                <span class="rc-title">二次情報(裏取り用)</span><span class="rc-count">19件</span>
+              </div>
+              <ul>
+                <li>
+                  <a href="https://releasebot.io/updates/openai/codex"
+                    ><span class="rc-dom">releasebot.io</span
+                    ><span class="rc-path">/updates/openai/codex</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://releasebot.io/updates/openai/openai-models"
+                    ><span class="rc-dom">releasebot.io</span
+                    ><span class="rc-path">/updates/openai/openai-models</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://en.wikipedia.org/wiki/OpenAI_Codex_(AI_agent)"
+                    ><span class="rc-dom">en.wikipedia.org</span
+                    ><span class="rc-path">/wiki/OpenAI_Codex_(AI_agent)</span></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://techcrunch.com/2026/09/29/openai-launches-gpt-6-1-sol-says-it-nearly-matches-gpt-6-astra-and-costs-less/"
+                    ><span class="rc-dom">techcrunch.com</span
+                    ><span class="rc-path"
+                      >/2026/09/29/openai-launches-gpt-6-1-sol-says-it-nearly-matches-gpt-6-astra-and-costs-less/</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://9to5mac.com/2026/10/26/openai-upgrades-chatgpt-and-codex-with-new-gpt-6-1-terra-model/"
+                    ><span class="rc-dom">9to5mac.com</span
+                    ><span class="rc-path"
+                      >/2026/10/26/openai-upgrades-chatgpt-and-codex-with-new-gpt-6-1-terra-model/</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a href="https://enjoy.dev/blog/gpt-6-1-terra/"
+                    ><span class="rc-dom">enjoy.dev</span
+                    ><span class="rc-path">/blog/gpt-6-1-terra/</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://flaviocopes.com/gpt-6-1-sol.md"
+                    ><span class="rc-dom">flaviocopes.com</span
+                    ><span class="rc-path">/gpt-6-1-sol.md</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://flaviocopes.com/ai-glossary/subagents/"
+                    ><span class="rc-dom">flaviocopes.com</span
+                    ><span class="rc-path">/ai-glossary/subagents/</span></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://codex.danielvaughan.com/2026/09/04/gpt-6-astra-codex-cli-integration-guide-critical-cyber-threshold/"
+                    ><span class="rc-dom">codex.danielvaughan.com</span
+                    ><span class="rc-path"
+                      >/2026/09/04/gpt-6-astra-codex-cli-integration-guide-critical-cyber-threshold/</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://codex.danielvaughan.com/2026/04/12/codex-cli-best-practices-workflow-maturity-model"
+                    ><span class="rc-dom">codex.danielvaughan.com</span
+                    ><span class="rc-path"
+                      >/2026/04/12/codex-cli-best-practices-workflow-maturity-model</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a href="https://www.fonearena.com/blog/491506/openai-gpt-6-astra-features.html"
+                    ><span class="rc-dom">www.fonearena.com</span
+                    ><span class="rc-path">/blog/491506/openai-gpt-6-astra-features.html</span></a
+                  >
+                </li>
+                <li>
+                  <a href="https://www.deeplearning.ai/the-batch/gpt-6-astra-is-a-star"
+                    ><span class="rc-dom">www.deeplearning.ai</span
+                    ><span class="rc-path">/the-batch/gpt-6-astra-is-a-star</span></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://www.techradar.com/pro/security/openai-extends-daybreak-security-project-and-reveals-new-cyber-model-but-for-approved-users-only"
+                    ><span class="rc-dom">www.techradar.com</span
+                    ><span class="rc-path"
+                      >/pro/security/openai-extends-daybreak-security-project-and-reveals-new-cyber-model-but-for-approved-users-only</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a href="https://nationalcioreview.com/?p=79581"
+                    ><span class="rc-dom">nationalcioreview.com</span
+                    ><span class="rc-path">/?p=79581</span></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://kiberblick.de/aktuell/2026/2026-09-14-openai-skills-agents-md-astra/"
+                    ><span class="rc-dom">kiberblick.de</span
+                    ><span class="rc-path"
+                      >/aktuell/2026/2026-09-14-openai-skills-agents-md-astra/</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a href="https://developer.upsun.com/posts/ai/agents-md-less-is-more"
+                    ><span class="rc-dom">developer.upsun.com</span
+                    ><span class="rc-path">/posts/ai/agents-md-less-is-more</span></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://www.implicator.ai/intermediate-tutorial-how-to-build-reliable-workflows-with-openai-codex/"
+                    ><span class="rc-dom">www.implicator.ai</span
+                    ><span class="rc-path"
+                      >/intermediate-tutorial-how-to-build-reliable-workflows-with-openai-codex/</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="https://hackernoon.com/ai-coding-tools-wont-fix-a-broken-development-process"
+                    ><span class="rc-dom">hackernoon.com</span
+                    ><span class="rc-path"
+                      >/ai-coding-tools-wont-fix-a-broken-development-process</span
+                    ></a
+                  >
+                </li>
+                <li>
+                  <a href="https://handyai.substack.com/p/model-drop-gpt-61-sol"
+                    ><span class="rc-dom">handyai.substack.com</span
+                    ><span class="rc-path">/p/model-drop-gpt-61-sol</span></a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section class="section" id="s19">
+          <h2>17. 未確認事項と今後の確認ポイント</h2>
+          <p>誠実さのため、本ガイドで<strong>確認しきれていない点</strong>を明記します。</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>項目</th>
+                  <th>状況</th>
+                  <th>確認方法</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>設定キーの正式な値名(approval・sandbox)</td>
+                  <td>公式の config-sample を直接は照合していない</td>
+                  <td><code>config-sample</code> と <code>/permissions</code> の表示</td>
+                </tr>
+                <tr>
+                  <td>Guardian(承認レビュー)の既定と名称</td>
+                  <td>変更履歴の断片と報道からの理解</td>
+                  <td>公式リリースノート、<code>/status</code></td>
+                </tr>
+                <tr>
+                  <td>Daybreak の既定有効化の条件</td>
+                  <td>バージョンで変遷。最新条件は未確定</td>
+                  <td>公式 Daybreak ページ、変更履歴</td>
+                </tr>
+                <tr>
+                  <td>Luna の正確な価格</td>
+                  <td>「Terra の約 1/10」という記述のみ</td>
+                  <td>API モデルページ</td>
+                </tr>
+                <tr>
+                  <td>Terra の IDE 拡張対応</td>
+                  <td>二次情報のみ</td>
+                  <td>公式モデル一覧</td>
+                </tr>
+                <tr>
+                  <td>Provencher 氏の助言の Sol 6.1 への適用範囲</td>
+                  <td>Astra 向けの記事。一般化は筆者見解</td>
+                  <td>自環境での A/B</td>
+                </tr>
+                <tr>
+                  <td>Plus プランのメッセージ上限</td>
+                  <td>変動する</td>
+                  <td>公式料金ページ</td>
+                </tr>
+                <tr>
+                  <td>ETH の論文の結論の一般性</td>
+                  <td>主に Python リポジトリ。版により表現が異なる(改善なし/低下傾向)</td>
+                  <td>論文本文と自分のリポジトリでの検証</td>
+                </tr>
+                <tr>
+                  <td>11/7 以降の更新</td>
+                  <td>本ガイドは基準日時点</td>
+                  <td>公式変更履歴</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="section" id="s20">
+          <h2>18. 最終チェックリスト</h2>
+          <p>運用を始める前、または見直しの際にコピーして使ってください。</p>
+          <p class="chk-count">進捗: <strong id="chkDone">0</strong> / 19</p>
+          <h3>環境と権限</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>✔</th>
+                  <th>項目</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目1" /></label>
+                  </td>
+                  <td><code>codex --version</code> と公式変更履歴で最新版を確認した</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目2" /></label>
+                  </td>
+                  <td>
+                    個人既定(~/.codex/config.toml)とリポジトリ固有(.codex/config.toml)を分けた
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目3" /></label>
+                  </td>
+                  <td>権限は既定から開始し、緩めた箇所を AGENTS.md に明記した</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>指示の設計</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>✔</th>
+                  <th>項目</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目4" /></label>
+                  </td>
+                  <td>プロンプトに Goal / Context / Constraints / Done when を入れている</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目5" /></label>
+                  </td>
+                  <td>複雑なタスクは Plan モードかインタビューから始めている</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目6" /></label>
+                  </td>
+                  <td>AGENTS.md は「リポジトリから発見できない情報」だけに絞った</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目7" /></label>
+                  </td>
+                  <td>Skill の description は短く、1 Skill 1仕事、ルートは案内役</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>検証と並列化</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>✔</th>
+                  <th>項目</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目8" /></label>
+                  </td>
+                  <td>テスト・lint・型チェックのコマンドを Codex が知っている</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目9" /></label>
+                  </td>
+                  <td>/review と code_review.md でレビュー観点を標準化した</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目10" /></label>
+                  </td>
+                  <td>見た目や挙動は人が確認し、具体的に追撃している</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目11" /></label>
+                  </td>
+                  <td>同一ファイルの並行編集は worktree で隔離している</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目12" /></label>
+                  </td>
+                  <td>サブエージェントは必要なときだけ、深さは 1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>長期運用とコスト</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>✔</th>
+                  <th>項目</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目13" /></label>
+                  </td>
+                  <td>長期タスクは /goal で測定可能な完了条件を定義した</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目14" /></label>
+                  </td>
+                  <td>1つの作業単位に1スレッドで運用している</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目15" /></label>
+                  </td>
+                  <td>推論レベルは medium から始め、必要時のみ上げている</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目16" /></label>
+                  </td>
+                  <td>安定した作業だけを自動化している</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>セキュリティ</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>✔</th>
+                  <th>項目</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目17" /></label>
+                  </td>
+                  <td>外部入力は信頼できないものとして扱っている</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目18" /></label>
+                  </td>
+                  <td>資格情報はマスクし、本番へ到達できない環境を使っている</td>
+                </tr>
+                <tr>
+                  <td>
+                    <label class="chk"><input type="checkbox" aria-label="項目19" /></label>
+                  </td>
+                  <td>新モデル移行時に AGENTS.md と Skill を棚卸しした</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            <em
+              >本ガイドは
+              2026年11月7日時点で公開されていた情報に基づきます。価格・提供範囲・コマンドは頻繁に変わるため、実運用では必ず公式ドキュメントで最終確認してください。</em
+            >
+          </p>
+        </section>
+        <footer class="foot">最終更新: 2026-11-07(情報基準日)</footer>
+      </div>
+    </div>
+    <script id="diagram-data" type="application/json">
+      {
+        "d0": "flowchart TB\n    A[\"Step 1 環境構築\"] --> B[\"Step 2 権限設計\"]\n    B --> C[\"Step 3 プロンプトと計画\"]\n    C --> D[\"Step 4 AGENTS.md\"]\n    D --> E[\"Step 5 Skills\"]\n    E --> F[\"Step 6 MCP\"]\n    F --> G[\"Step 7 検証ループ\"]\n    G --> H[\"Step 8 並列化\"]\n    H --> I[\"Step 9 長時間タスク\"]\n    I --> J[\"Step 10 自動化と CI\"]\n    J --> K[\"Step 11 コスト最適化\"]\n    K --> L[\"Step 12 セキュリティ\"]\n    style A fill:#dbeafe,color:#111827\n    style G fill:#fef3c7,color:#111827\n    style L fill:#fee2e2,color:#111827",
+        "d1": "flowchart LR\n    A[\"~/.codex/config.toml<br/>個人の既定値\"] --> D[\"実行時の有効設定\"]\n    B[\".codex/config.toml<br/>リポジトリ固有\"] --> D\n    C[\"CLI の -c 上書き<br/>その場限り\"] --> D\n    E[\"~/.codex/AGENTS.md<br/>個人の作法\"] --> G[\"エージェントの指示\"]\n    F[\"リポジトリの AGENTS.md<br/>コードベースの作法\"] --> G\n    H[\"サブディレクトリの AGENTS.md<br/>局所ルール\"] --> G\n    D --> I[\"Codex セッション\"]\n    G --> I\n    style D fill:#dbeafe,color:#111827\n    style G fill:#dcfce7,color:#111827",
+        "d2": "flowchart TB\n    S[\"タスクを受け取る\"] --> Q1{\"画面操作や<br/>画像読解が中心か\"}\n    Q1 -- \"はい\" --> T[\"Terra を選ぶ\"]\n    Q1 -- \"いいえ\" --> Q2{\"曖昧で長期の<br/>多段タスクか\"}\n    Q2 -- \"はい\" --> Q3{\"予算と使用量に<br/>余裕があるか\"}\n    Q3 -- \"はい\" --> A[\"Astra を選ぶ\"]\n    Q3 -- \"いいえ\" --> SX[\"Sol 6.1 の高め推論を選ぶ\"]\n    Q2 -- \"いいえ\" --> Q4{\"明確で小さく<br/>大量にある作業か\"}\n    Q4 -- \"はい\" --> L[\"Luna を選ぶ\"]\n    Q4 -- \"いいえ\" --> SD[\"Sol 6.1 の標準推論を選ぶ\"]\n    style SD fill:#dcfce7,color:#111827\n    style A fill:#fef3c7,color:#111827",
+        "d3": "flowchart TB\n    A[\"既定の権限で開始\"] --> B{\"同じ許可を<br/>何度も求められるか\"}\n    B -- \"いいえ\" --> A\n    B -- \"はい\" --> C{\"対象は信頼できる<br/>リポジトリか\"}\n    C -- \"いいえ\" --> D[\"緩めない<br/>手作業か隔離環境で実行\"]\n    C -- \"はい\" --> E[\"その作業だけ権限を緩める<br/>例 ローカルテストの許可\"]\n    E --> F[\"AGENTS.md に<br/>許可範囲を明記\"]\n    F --> G[\"定期的に棚卸し\"]\n    style D fill:#fee2e2,color:#111827\n    style F fill:#dcfce7,color:#111827",
+        "d4": "flowchart TB\n    A[\"新しい依頼\"] --> B{\"範囲が明確で<br/>小さいか\"}\n    B -- \"はい\" --> C[\"そのまま依頼<br/>推論は low か medium\"]\n    B -- \"いいえ\" --> D{\"何を作るか<br/>自分でも曖昧か\"}\n    D -- \"はい\" --> E[\"Codex に自分を<br/>インタビューさせる\"]\n    D -- \"いいえ\" --> F[\"Plan モードで計画を作らせる\"]\n    E --> F\n    F --> G{\"長期で多段か\"}\n    G -- \"はい\" --> H[\"PLANS.md か /goal で<br/>完了条件を固定\"]\n    G -- \"いいえ\" --> I[\"計画を承認して実装\"]\n    H --> I\n    style F fill:#dbeafe,color:#111827\n    style H fill:#fef3c7,color:#111827",
+        "d5": "flowchart TB\n    A[\"空に近い状態で開始\"] --> B[\"Codex を実際に使う\"]\n    B --> C{\"同じ失敗を<br/>2回したか\"}\n    C -- \"いいえ\" --> B\n    C -- \"はい\" --> D[\"Codex に振り返りを依頼\"]\n    D --> E[\"原因が環境か指示か分類\"]\n    E --> F[\"1行だけ AGENTS.md に追加\"]\n    F --> G[\"月次で棚卸し\"]\n    G --> H{\"削っても<br/>困らないか\"}\n    H -- \"はい\" --> I[\"その行を削除\"]\n    H -- \"いいえ\" --> B\n    I --> B\n    style F fill:#dcfce7,color:#111827\n    style I fill:#fee2e2,color:#111827",
+        "d6": "flowchart TB\n    A[\"実装を依頼\"] --> B[\"テストを追加か更新\"]\n    B --> C[\"関連テストと lint と型チェック\"]\n    C --> D{\"通ったか\"}\n    D -- \"いいえ\" --> E[\"原因を直す\"]\n    E --> C\n    D -- \"はい\" --> F[\"差分を /review で自己レビュー\"]\n    F --> G[\"人間が差分パネルでレビュー\"]\n    G --> H{\"画面や挙動の<br/>確認は十分か\"}\n    H -- \"いいえ\" --> I[\"実行して観察<br/>人間が具体的に指摘\"]\n    I --> E\n    H -- \"はい\" --> J[\"PR 作成とチーム標準のレビュー\"]\n    style C fill:#dbeafe,color:#111827\n    style I fill:#fef3c7,color:#111827\n    style J fill:#dcfce7,color:#111827",
+        "d7": "flowchart TB\n    A[\"並列化したい\"] --> B{\"同じファイルを<br/>編集するか\"}\n    B -- \"はい\" --> C[\"Git worktree で隔離\"]\n    B -- \"いいえ\" --> D{\"1つのタスクを<br/>分割できるか\"}\n    D -- \"はい\" --> E[\"サブエージェントに分担\"]\n    D -- \"いいえ\" --> F[\"別スレッドで独立実行\"]\n    C --> G[\"スレッドごとに<br/>1つの作業単位\"]\n    E --> H[\"メインは本題に集中<br/>子は探索とテストを担当\"]\n    F --> G\n    style C fill:#dbeafe,color:#111827\n    style E fill:#fef3c7,color:#111827",
+        "d8": "flowchart TB\n    A[\"目標と完了条件を定義\"] --> B[\"計画を承認\"]\n    B --> C[\"実行開始\"]\n    C --> D[\"進捗をファイルに記録\"]\n    D --> E{\"自動コンパクションが<br/>発生したか\"}\n    E -- \"はい\" --> F[\"記録と検索で<br/>文脈を復元\"]\n    E -- \"いいえ\" --> G[\"継続\"]\n    F --> G\n    G --> H{\"人の判断か<br/>承認が必要か\"}\n    H -- \"はい\" --> I[\"スマホなどで<br/>承認と指示\"]\n    H -- \"いいえ\" --> J{\"完了条件を満たしたか\"}\n    I --> J\n    J -- \"いいえ\" --> D\n    J -- \"はい\" --> K[\"検証とレビュー\"]\n    style D fill:#dbeafe,color:#111827\n    style K fill:#dcfce7,color:#111827",
+        "d9": "flowchart TB\n    A[\"使用量が重い\"] --> B[\"推論レベルを<br/>必要最小限に下げる\"]\n    B --> C[\"スレッドを作業単位で分け<br/>文脈の肥大を防ぐ\"]\n    C --> D[\"AGENTS.md と Skill を剪定\"]\n    D --> E[\"定型の大量作業は<br/>Luna か Terra へ\"]\n    E --> F[\"サブエージェントは<br/>本当に必要なときだけ\"]\n    F --> G[\"キャッシュを活かす<br/>共通プレフィックスを安定させる\"]\n    style B fill:#dcfce7,color:#111827\n    style G fill:#dbeafe,color:#111827",
+        "d10": "flowchart TB\n    A[\"安全装置が作動\"] --> B{\"自分の作業は<br/>正当な防御作業か\"}\n    B -- \"いいえ\" --> C[\"依頼内容を見直す\"]\n    B -- \"はい\" --> D{\"Daybreak の<br/>承認済みか\"}\n    D -- \"はい\" --> E[\"Blue か Red の<br/>承認範囲で作業\"]\n    D -- \"いいえ\" --> F[\"提示された安全な<br/>後続プロンプトを使う\"]\n    F --> G[\"必要なら Daybreak への<br/>申請を検討\"]\n    style C fill:#fee2e2,color:#111827\n    style E fill:#dcfce7,color:#111827",
+        "d11": "flowchart TB\n    A[\"新モデルへ切り替える\"] --> B[\"AGENTS.md を監査\"]\n    B --> C[\"Skill の description を短縮\"]\n    C --> D[\"プロンプト内の<br/>過剰な手順を削除\"]\n    D --> E[\"境界と停止の文言を見直す\"]\n    E --> F[\"完了条件を事前に定義\"]\n    F --> G[\"代表タスクで<br/>旧設定と新設定を比較\"]\n    G --> H{\"品質とコストは<br/>改善したか\"}\n    H -- \"はい\" --> I[\"新設定を標準化\"]\n    H -- \"いいえ\" --> J[\"差分の原因を調べ<br/>1項目ずつ戻す\"]\n    J --> G\n    style I fill:#dcfce7,color:#111827"
+      }
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/mermaid@11.14.0/dist/mermaid.min.js"
+      integrity="sha384-1CMXl090wj8Dd6YfnzSQUOgWbE6suWCaenYG7pox5AX7apTpY3PmJMeS2oPql4Gk"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.0/build/highlight.min.js"
+      integrity="sha384-iZTDsA4hrrdw3oWgWAtLAOgX01LVJRhWwzsaxnz4pDvF3cvDO8M6amjYktKA8uJU"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      (function () {
+        try {
+          if (window.hljs) {
+            document.querySelectorAll('pre code').forEach(function (c) {
+              window.hljs.highlightElement(c);
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+        var side = document.getElementById('sidebar');
+        document.getElementById('menuBtn').addEventListener('click', function () {
+          side.classList.toggle('open');
+        });
+        side.addEventListener('click', function (e) {
+          if (e.target.closest('a') && window.innerWidth <= 900) side.classList.remove('open');
+        });
+        var links = [].slice.call(document.querySelectorAll('.nav-a')),
+          secs = links.map(function (a) {
+            return document.getElementById(a.dataset.t);
+          }),
+          tk = false;
+        function upd() {
+          tk = false;
+          var y = window.innerHeight * 0.25,
+            cur = 0;
+          secs.forEach(function (s, i) {
+            if (s.getBoundingClientRect().top <= y) cur = i;
+          });
+          links.forEach(function (a, i) {
+            a.classList.toggle('active', i === cur);
+          });
+          var act = links[cur];
+          if (act) {
+            var r = act.getBoundingClientRect(),
+              sr = side.getBoundingClientRect();
+            if (r.top < sr.top || r.bottom > sr.bottom) side.scrollTop += r.top - sr.top - 80;
+          }
+        }
+        window.addEventListener(
+          'scroll',
+          function () {
+            if (!tk) {
+              tk = true;
+              requestAnimationFrame(upd);
+            }
+          },
+          { passive: true },
+        );
+        upd();
+        var cbs = document.querySelectorAll('.chk input'),
+          cnt = document.getElementById('chkDone');
+        cbs.forEach(function (cb) {
+          cb.addEventListener('change', function () {
+            cb.closest('tr').classList.toggle('done', cb.checked);
+            if (cnt)
+              cnt.textContent = [].filter.call(cbs, function (x) {
+                return x.checked;
+              }).length;
+          });
+        });
+        var data = JSON.parse(document.getElementById('diagram-data').textContent);
+        if (!window.mermaid) {
+          document.querySelectorAll('.diagram-canvas').forEach(function (c) {
+            c.textContent = '図の読み込みに失敗しました(Mermaid CDN)';
+          });
+          return;
+        }
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          securityLevel: 'strict',
+          flowchart: { htmlLabels: true, useMaxWidth: false, curve: 'basis' },
+          themeVariables: {
+            fontSize: '16px',
+            fontFamily: '"Noto Sans JP",sans-serif',
+            primaryColor: '#e8ebf8',
+            primaryTextColor: '#1f2430',
+            primaryBorderColor: '#33428f',
+            lineColor: '#4a5160',
+            secondaryColor: '#f7f1e3',
+            tertiaryColor: '#fff',
+          },
+        });
+        (async function () {
+          var cs = document.querySelectorAll('.diagram-canvas');
+          for (var i = 0; i < cs.length; i++) {
+            var c = cs[i],
+              id = c.dataset.diagramId;
+            try {
+              var r = await mermaid.render('mm-' + id, data[id]);
+              c.innerHTML = r.svg;
+              var s = c.querySelector('svg');
+              var vb = s.getAttribute('viewBox').split(/\s+/).map(Number);
+              vb[3] += 15;
+              s.setAttribute('viewBox', vb.join(' '));
+              s.removeAttribute('width');
+              s.removeAttribute('height');
+              s.style.width = vb[2] + 'px';
+              s.style.maxWidth = 'none';
+              s.style.height = 'auto';
+              s.style.overflow = 'visible';
+              s.style.flexShrink = '0';
+            } catch (e) {
+              console.error(id, e);
+              c.textContent = '図の描画に失敗しました: ' + id;
+            }
+          }
+          document.body.setAttribute('data-diagrams', 'done');
+        })();
+      })();
+    </script>
+  </body>
+</html>

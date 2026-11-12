@@ -64,6 +64,18 @@ export type PageEntry = z.infer<typeof PageEntrySchema>;
 
 const entries: PageEntry[] = [
   {
+    slug: "/codex/best-practices",
+    title: "Codex ベストプラクティス（中級〜上級）",
+    group: "Providers",
+    category: "Codex",
+    provider: "codex",
+    topics: ["codex", "best-practices", "agent", "security"],
+    summary:
+      "OpenAI Codex のモデル選定・環境設定・権限・AGENTS.md・Skills・MCP・検証・並列化・長時間タスク・CI・コスト・セキュリティを学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-11",
+    lastReviewed: "2026-11-11",
+  },
+  {
     slug: "/codex/astra-best-practices",
     title: "GPT-6 Astra ベストプラクティス",
     group: "Providers",
@@ -907,9 +919,9 @@ const entries: PageEntry[] = [
     provider: "google",
     topics: ["antigravity", "best-practices", "agent"],
     summary:
-      "Google Antigravity IDE・CLI の設計思想、アーキテクチャ、Rules (GEMINI.md)、Skills (SKILL.md)、Workflows、Artifacts、Permissions、Claude Code との比較・共存戦略まで、仕様駆動開発を支えるエコシステム全容を網羅。",
+      "Google Antigravity の導入・権限設計・AGENTS.md・スキル・検証ループ・並列実行・自動化・CLI・SDK・セキュリティ・コスト管理を学ぶ中級〜上級ガイド。",
     addedAt: "2026-05-07",
-    lastReviewed: "2026-10-22",
+    lastReviewed: "2026-11-11",
   },
   {
     slug: "/google/stitch-guide",
