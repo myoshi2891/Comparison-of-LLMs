@@ -417,3 +417,8 @@ it("原本CSSは共有のthead thより高い詳細度で配色・余白を保�
   expect(rules.every((r) => r.split(",").every((s) => s.trim().startsWith(".root")))).toBe(true);
   expect(declarations(".root :global(table)")["font-size"]).toBe("inherit");
 });
+it("共有目次へ渡す完了クラスが実際のCSS Modulesにも定義される", () => {
+  expect(declarations(".root .checklist .done :global(span)")["text-decoration"]).toBe(
+    "line-through"
+  );
+});
