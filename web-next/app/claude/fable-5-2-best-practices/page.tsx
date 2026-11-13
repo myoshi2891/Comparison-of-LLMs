@@ -341,7 +341,7 @@ export default function Page() {
               <table>
                 <tbody>
                   <tr>
-                    <td>{"対象モデル"}</td>
+                    <th scope="row">{"対象モデル"}</th>
                     <td>
                       {" Claude Fable 5.2(API ID: "}
                       <code>{"claude-fable-5-2"}</code>
@@ -349,11 +349,11 @@ export default function Page() {
                     </td>
                   </tr>
                   <tr>
-                    <td>{"調査時点"}</td>
+                    <th scope="row">{"調査時点"}</th>
                     <td>{"2026-11-12(リリースの3日後)"}</td>
                   </tr>
                   <tr>
-                    <td>{"想定読者"}</td>
+                    <th scope="row">{"想定読者"}</th>
                     <td>
                       {
                         " Claude API / Claude Code を日常的に使い、モデル切替・effort・サブエージェント設計まで踏み込みたい開発者 "
@@ -361,7 +361,7 @@ export default function Page() {
                     </td>
                   </tr>
                   <tr>
-                    <td>{"情報源"}</td>
+                    <th scope="row">{"情報源"}</th>
                     <td>
                       {
                         " Anthropic公式発表・Platform Docs・Claude Code Docs を軸に、著名な国際的開発者(Simon Willison、Ethan Mollick、swyx / Latent Space、Boris Cherny、Alex Albert ほか)の投稿で補強 "
@@ -369,7 +369,7 @@ export default function Page() {
                     </td>
                   </tr>
                   <tr>
-                    <td>{"図解のルール"}</td>
+                    <th scope="row">{"図解のルール"}</th>
                     <td>
                       {
                         " フローチャートは Mermaid、その他の図解・比較は Markdown 表で表現(ASCII図解は不使用) "
