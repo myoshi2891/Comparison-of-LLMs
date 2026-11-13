@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-12
+Updated 2026-11-13
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+価格データ更新（2026-11-13）: 公式料金表に基づきFable 5.2・利用制限付きMythos 5.2・Gemini 4 Carbon／Hydrogen・Omni 1.2 Flashを追加。
+API 98件／ツール34件。Carbonは11月末まで$2/$10、12月から$4/$20へ生成時に切替。Homeの公開日・確認日を更新。
+Moonshotの派生版・遠距離価格の誤抽出を防止。追加9契約のRedを確認し、pytest 131件＋39 subtestsが成功。詳細はdocs/PROGRESS.md。
 
 Google Antigravity `/google/antigravity-best-practices` を指定HTMLで完全更新（2026-11-11）。
 108見出し・92段落・48リスト項目・61表404行・18コード例・11図・26引用・8表形式チェック・4外部リンクをPure JSXへ転写。

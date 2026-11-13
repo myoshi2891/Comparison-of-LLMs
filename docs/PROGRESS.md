@@ -2,9 +2,19 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-12**
+> - 最終更新日: **Updated 2026-11-13**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## Home価格更新（2026-11-13）
+
+- 公式の[Claude料金表](https://platform.claude.com/docs/en/about-claude/pricing)と[Gemini料金表](https://aistudio.google.com/docs/pricing)をウェブ検索・本文取得で確認。Fable 5.2とMythos 5.2は$8/$40、Carbonは11月末まで$2/$10（12月から$4/$20）、Hydrogenは$1.5/$7.5、Omni 1.2 Flashはテキスト$1.5/$9。いずれもUSD／100万トークンのStandard価格。Mythosは認証組織限定、Omniの動画出力$12は注記に分離。
+- スクレイパーを実行し、指定の `bash update.sh --no-scrape` で3箇所のJSONを同期。API 93→98件、ツール34件。USD/JPYは159.70（為替基準日2026-11-12）。Googleは既存規約どおりライブ抽出を無効とし、公式確認値を更新。取得に失敗・抽出できないモデルはfallbackとして記録し、全件のライブ取得成功とは扱わない。
+- 差分監査でKimi K3がK3.1の価格・離れた別行を誤取得する問題を発見。モデル名直後のドット・数字を除外し、価格までの距離を80文字へ制限。取得済み公式HTMLでK3の$3/$15へ再生成し、誤ったscraped出自は持ち越していない。
+- 新モデル5件・Carbon期限境界2件・Moonshot誤抽出2件の計9件で失敗を確認してから最小実装。pytest **131件＋39 subtests成功**。フロント関連10 files／198 testsも成功。Home／ApiTable／SubTableはデータ駆動で新フィールド不要、Pydantic／TypeScript／Zodは変更なし。Homeの公開日・確認日と月次一覧を当日に同期。
+- `bun run build` は114静的ページ生成で成功、typecheck・lint649 files・変更Markdownのlintも成功。初回の内部ポート作成拒否はキャッシュ退避後の通常権限ビルドで解消。Webpack代替は既存ガイドCSSのpure selector制約で失敗し、設定・CSSは変更していない。
+- localhostで新モデル・USD/JPY・色・サブスク34行とタブ切り替えを画面確認し、ブラウザエラーなし。全98モデル・34プランのZod検証とプロバイダー／グループの色対応も確認。既存のCursor Proは `annual: 16` をそのまま `$16/yr` と表示する単位不整合があり、今回の新モデル追加とは別件として未修正。
+- 全体テストの初回はKimi訂正中のJSON読込が重なりコピー一致1件だけ失敗（236 files／2998 tests成功）。コピーのSHA-256一致を確認して固定後の再実行で **237 files／2999 testsすべて成功**。最終データのHome／表／スキーマ／コスト／コピー関連7 files／171 testsも成功。本番成果物を含む4コピーが一致。変更は未コミット。開始時HEADは `0f6f1b3f`、未追跡の別ガイドHTMLは対象外。
 
 ## Codex CSS契約の重複規則検出強化（2026-11-12）
 
@@ -299,15 +309,15 @@
   - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
 - **ルート実数**: `page.tsx` 106件、registry 106エントリ（2026-11-11実測。`/codex/best-practices` を追加）。
 - **動作検証**:
-  - ビルド: `bun run build` ✅（2026-11-12実測、114静的ページ生成。2026-11-11の移行時にはユーザー指定で未実行）。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-12 実測）
-  - `bun run lint` ✅（Biome check / 649 files / 0 diagnostics。2026-11-12 実測）
+  - ビルド: `bun run build` ✅（2026-11-13実測、114静的ページ生成。2026-11-11の移行時にはユーザー指定で未実行）。
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-13 実測）
+  - `bun run lint` ✅（Biome check / 649 files / 0 diagnostics。2026-11-13 実測）
 - **テストの実行状況**:
   - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **237 files／2999 testsすべて成功**（2026-11-12実測。モーダル境界の追加2契約を含む）。型・lint649 files・pytest122件も成功。Redで固定した期待値は無変更。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-12実測、UV_CACHE_DIRを一時領域へ指定）。
+  - **バックエンド (`scraper/`)**: `uv run pytest -q` で131件＋39 subtests成功（2026-11-13実測、UV_CACHE_DIRを一時領域へ指定）。
 
 ## 最近の追加内容
 

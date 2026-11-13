@@ -1,9 +1,12 @@
 # GEMINI.md
 
-Updated 2026-11-11
+Updated 2026-11-13
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
+
+価格更新（2026-11-13）: Homeの公開日・確認日を更新。公式確認済みのClaude／Gemini新モデル5件を追加し、API 98件／ツール34件。
+Carbonの期限付き価格とMoonshot誤抽出防止を検証。pytest 131件＋39 subtests成功。詳細・検証結果はdocs/PROGRESS.mdを参照。
 
 Google Antigravity `/google/antigravity-best-practices` を指定HTMLで完全更新（2026-11-11）。
 108見出し・92段落・48リスト項目・61表404行・18コード例・11図・26引用・8表形式チェック・4外部リンクをPure JSXへ転写。

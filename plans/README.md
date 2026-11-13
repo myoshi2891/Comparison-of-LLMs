@@ -1,6 +1,6 @@
 # Plans — プラットフォーム拡張検討ドキュメント
 
-Updated 2026-11-11
+Updated 2026-11-13
 
 `.agent/skills/improve/SKILL.md` により生成・維持している方向性ドキュメント群。
 対象は web-next（Next.js 16 SSG）の「AI 最新情報キャッチアップ・プラットフォーム」化。
@@ -11,6 +11,9 @@ Updated 2026-11-11
 - 照合 v2: 2026-07-12（004〜006, commit `45940fd`）— 154 コミットのドリフトを 004 で照合済み
 
 基準コミット（drift 検出用）: `45940fd`
+
+保守同期（2026-11-13）: Homeの価格データと公開日・確認日を更新。Claude／Gemini新モデル5件、API 98件／ツール34件。
+007〜009のDONE状態は維持。新規基盤・ナビ構造の変更はなく、検証結果はdocs/PROGRESS.mdを参照。
 
 保守同期（2026-11-11）: 既存 `/google/antigravity-best-practices` を指定HTMLの27章へ更新。
 Googleカテゴリ・公開日を維持し、registryの確認日と要約を同期。007〜009のDONE状態は維持し、新規基盤プランは起票していない。
