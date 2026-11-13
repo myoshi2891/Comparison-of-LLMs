@@ -227,7 +227,9 @@ it("metadata・registry・ヒーローの日付を保持", () => {
 });
 /** 原本の全クラスをCSS Modulesのローカルクラスへ対応させる。 */
 const className = (c: string) =>
-  c.startsWith("ti") || c.startsWith("hljs") || c.startsWith("language-") || c === "function_" ? c : styles[c];
+  c.startsWith("ti") || c.startsWith("hljs") || c.startsWith("language-") || c === "function_"
+    ? c
+    : styles[c];
 it("全装飾クラスが原本と同じタグ・順序へ付く", () => {
   const { container } = render(<Page />);
   for (const [c, tags] of Object.entries(expected.classElements))
@@ -404,4 +406,14 @@ it("見出し階層が飛ばず生HTML注入・実行script・SVG寸法上書き
   expect(source).not.toContain(["danger", "ously", "Set", "Inner", "HTML"].join(""));
   expect(source).not.toContain("<script");
   expect(css()).not.toMatch(/:global\(svg\)/);
+});
+it("原本CSSは共有のthead thより高い詳細度で配色・余白を保持し、表書体を復元", () => {
+  const sourceRules = css().split("/* Tailwind")[0];
+  const ast = postcss.parse(sourceRules);
+  const rules: string[] = [];
+  ast.walkRules((r) => {
+    rules.push(r.selector);
+  });
+  expect(rules.every((r) => r.split(",").every((s) => s.trim().startsWith(".root")))).toBe(true);
+  expect(declarations(".root :global(table)")["font-size"]).toBe("inherit");
 });
