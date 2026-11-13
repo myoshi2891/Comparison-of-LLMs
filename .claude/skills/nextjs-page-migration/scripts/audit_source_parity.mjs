@@ -259,7 +259,7 @@ function collectSvgElements(src) {
  */
 function collectMarkupCalloutElements(src) {
   return extractElementContents(src, (openingTag) =>
-    /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
+    !/^<i\b/i.test(openingTag) && /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
       openingTag
     )
   ).map(({ openingTag, content }) => normalizeCalloutElement(openingTag, content));
@@ -905,7 +905,53 @@ function readHtmlAttribute(attributes, name) {
   return undefined;
 }
 
+/**
+ * Materialize display-only payloads scoped to their owning code/diagram card.
+ * Scripts and comments are opaque while finding nested div boundaries; no source JS is executed.
+ * @param {string} src - Original HTML.
+ * @returns {string} HTML with visible code and Mermaid sources restored.
+ */
+function materializePlainTextCards(src) {
+  const scripts = [];
+  const stashed = src.replace(/<!--[\s\S]*?-->|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>/gi,
+    (full, attributes, payload) => {
+      if (attributes === undefined) return "";
+      scripts.push({ full, attributes, payload });
+      return `<script data-audit-payload="${scripts.length - 1}"></script>`;
+    });
+  let suffix = "";
+  if (/mermaid\.render\([^;]*\bsrc\s*\+\s*CLASSDEFS\b/.test(src)) {
+    const literal = /\b(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"))*);/.exec(src)?.[1];
+    if (literal) suffix = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2])).join("");
+  }
+  const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const cards = extractElementContents(stashed, tag => {
+    const cls = readHtmlAttribute(tag, "class") ?? "";
+    return cls.split(/\s+/).some(c => c === "code-block" || c === "diagram-card");
+  });
+  let result = stashed;
+  for (const card of cards.reverse()) {
+    const marker = /<script data-audit-payload="(\d+)"><\/script>/.exec(card.content);
+    if (!marker) continue;
+    const script = scripts[Number(marker[1])];
+    if (readHtmlAttribute(script.attributes, "type")?.toLowerCase() !== "text/plain" || readHtmlAttribute(script.attributes, "data-for")) continue;
+    const rawLines = script.payload.replace(/^\n+/, "").replace(/\s+$/, "").split("\n");
+    const indent = Math.min(...rawLines.filter(l => l.trim()).map(l => l.match(/^[ \t]*/)[0].length));
+    const payload = rawLines.map(l => l.slice(Number.isFinite(indent) ? indent : 0)).join("\n");
+    let content = card.content;
+    if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
+      content = content.replace(/<code\b([^>]*)>\s*<\/code>/i, (_full, attributes) => `<code${attributes}>${escape(payload)}</code>`);
+    } else {
+      content = content.replace(marker[0], `<div class="mermaid">${escape(payload + suffix)}</div>`);
+    }
+    const start = card.index + card.openingTag.length;
+    result = result.slice(0, start) + content + result.slice(start + card.content.length);
+  }
+  return result.replace(/<script data-audit-payload="(\d+)"><\/script>/g, (_full, index) => scripts[Number(index)].full);
+}
+
 function inventoryHtml(src) {
+  src = materializePlainTextCards(src);
   // Detached text/plain payloads are displayed via code.textContent, not HTML parsing.
   // Resolve by data-for/id rather than script order and escape literal markup before inventorying.
   // 開始タグの属性部は引用値を 1 単位で消費する。`[^>]*` だと title="a>b" の `>` で
