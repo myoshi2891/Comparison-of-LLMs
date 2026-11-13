@@ -361,3 +361,45 @@ test("does not classify alert icon names as callout content",()=>{
  assert.deepEqual(result.data.counts.calloutElements,{source:1,page:1});
  assert.equal(audit('<div class="callout">Keep warning</div>','<div>Keep warning</div>').status,1);
 });
+
+test("restores CLASSDEFS only from uncommented executable scripts", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const declaration = "const CLASSDEFS = '\\nclassDef box fill:#fff;';";
+ const render = "mermaid.render('id', src + CLASSDEFS);";
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const example of [
+  `<!-- <script>${render}</script> -->`,
+  `<script>/* ${render} */</script>`,
+  `<script>// ${render}\n</script>`,
+  `<script type="text/plain">${render}</script>`,
+ ]) {
+  const source = `${card}<script>${declaration}</script>${example}`;
+  assert.equal(audit(source, page(chart)).status, 0);
+  assert.equal(audit(source, page(chart + '\nclassDef box fill:#fff;')).status, 1);
+ }
+ for (const decoy of [
+  "<!-- <script>const CLASSDEFS = 'wrong';</script> -->",
+  "<script>/* const CLASSDEFS = 'wrong'; */</script>",
+  "<script>// const CLASSDEFS = 'wrong';\n</script>",
+  `<script type="text/plain">const CLASSDEFS = 'wrong';</script>`,
+ ]) {
+  const source = `${card}${decoy}<script type="module">${declaration}${render}</script>`;
+  assert.equal(audit(source, page(chart + '\nclassDef box fill:#fff;')).status, 0);
+  assert.equal(audit(source, page(chart)).status, 1);
+ }
+});
+
+test("selects the first qualifying payload after unrelated scripts in each card", () => {
+ for (const kind of ['code-block', 'diagram-card']) {
+  const value = kind === 'code-block' ? 'print("kept")' : 'flowchart LR\nA --> B';
+  const display = kind === 'code-block' ? '<pre><code></code></pre>' : '';
+  const page = kind === 'code-block'
+   ? `<pre><code>{${JSON.stringify(value)}}</code></pre>`
+   : `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+  const source = `<div class="${kind}">${display}<script>setup();</script><script type="text/plain" data-for="elsewhere">wrong</script><script type="text/plain" data-for="">also wrong</script><script type="text/plain">${value}</script><script type="text/plain">last payload</script></div>`;
+  assert.equal(audit(source, page).status, 0);
+  assert.equal(audit(source, '').status, 1);
+  assert.equal(audit(source, page.replace('kept', 'lost').replace('A --> B', 'A --> C')).status, 1);
+ }
+});
