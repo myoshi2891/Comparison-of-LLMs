@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-13
+Updated 2026-11-14
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+2026-11-14: 原本監査のCLASSDEFS判定をコメント除去済みの実行用scriptへ限定し、カード内ではdata-for属性のない最初のtext/plain payloadを選択するよう修正。追加2件のRed確認後、監査73テストとFable 5.2のHTML原本監査exit 0が成功。アプリ・依存・設定は無変更。
 
 Claude Fable 5.2 `/claude/fable-5-2-best-practices` を追加（2026-11-13）。
 指定HTMLの100見出し・98段落・111リスト項目・45表363行・19コード例・10図・21 callout・49外部リンクをPure JSXへ転写。

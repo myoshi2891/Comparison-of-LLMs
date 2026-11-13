@@ -2,9 +2,15 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-13**
+> - 最終更新日: **Updated 2026-11-14**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## 原本監査のレビュー対応（2026-11-14）
+
+- 2指摘とも現行実装で再現。CLASSDEFSの宣言・render式は、HTMLコメントと非実行scriptを除き、JavaScriptコメントを除去してから照合する。稼働中のrender式のsuffix復元は保持。
+- カード内の全payload候補を順に調べ、text/plainかつdata-for属性のない最初のscriptを選択。先行する実行用script・data-for付きscript（空属性を含む）で後続payloadを見落とさない。
+- 追加2テストの修正前失敗を確認後、監査・形式テスト **73件すべて成功**。Fable 5.2のHTML原本監査exit 0。アプリ・原本・依存・設定は無変更で、アプリ全体テスト・ビルドは今回未実行。コミットは作成しない。
 
 ## Claude Fable 5.2 ガイド移行（2026-11-13）
 
