@@ -19,6 +19,9 @@ _URL = "https://platform.moonshot.ai/docs/pricing"
 _KIMI_K2_7_CODE_HIGHSPEED = "Kimi K2.7 Code Highspeed"
 _KIMI_K2_7_CODE = "Kimi K2.7 Code"
 
+# 改行を含む整形空白は許可し、レコード終端・次モデル・$ は越えない。
+_PRICE_GAP = r"(?:(?!</(?:p|div|tr|li|section|article|nav|h[1-6])\b|\bkimi[-\s]?k)[^$]){0,80}?"
+
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
 _FALLBACKS: dict[str, tuple[float, float]] = {
     "Kimi K3":                   ( 3.00, 15.00),
@@ -78,13 +81,13 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     for name in _FALLBACKS:
         # ハードコード値ではなく fallback_map を見る（既存のスクレイプ成功値を尊重）
         fb_in, fb_out = fallback_map[name]
-        # K3.1 など未登録の派生版と遠く離れた別行の価格を拾わない。
+        # K3.1 など未登録の派生版と別レコード・遠距離の価格を拾わない。
         key = model_key_pattern(name, _FALLBACKS) + r"(?![.\d])"
         in_price = extract_price(html, [
-            rf"{key}[^$\n]{{0,80}}?\$([\d.]+)",
+            rf"{key}{_PRICE_GAP}\$([\d.]+)",
         ])
         out_price = extract_price(html, [
-            rf"{key}[^$\n]{{0,80}}?output[^$\n]{{0,80}}?\$([\d.]+)",
+            rf"{key}{_PRICE_GAP}output{_PRICE_GAP}\$([\d.]+)",
         ])
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)

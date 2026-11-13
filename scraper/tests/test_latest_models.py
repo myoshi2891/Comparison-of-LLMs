@@ -56,9 +56,27 @@ def test_carbon_promo_boundary(today, expected):
 @pytest.mark.parametrize("html", [
     "<p>Kimi K3.1 Pro output $10</p>",
     "<nav>Kimi K3</nav>" + "x" * 200 + "<p>Other output $0.95</p>",
+    "<p>Kimi K3</p>\n<p>Other output $0.95</p>",
+    "<tr><td>Kimi K3</td></tr>\n<tr><td>Other output $0.95</td></tr>",
+    "Kimi K3\nKimi K2.6 output $0.95",
 ])
 def test_kimi_k3_rejects_other_model_prices(html):
     """A newer dotted version or distant price must not contaminate K3 pricing."""
     with patch("scraper.providers.moonshot.get_page_text", return_value=html):
         model = next(m for m in moonshot.scrape() if m.name == "Kimi K3")
     assert (model.price_in, model.price_out, model.scrape_status) == (3.0, 15.0, "fallback")
+
+
+def test_kimi_k3_extracts_multiline_prices():
+    """Formatting whitespace within a bounded record preserves both live prices."""
+    html = """
+        <p>Kimi K3
+            input
+            $3.25</p>
+        <p>Kimi K3
+            output
+            $16.50</p>
+    """
+    with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+        model = next(m for m in moonshot.scrape() if m.name == "Kimi K3")
+    assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
