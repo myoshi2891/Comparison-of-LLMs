@@ -442,6 +442,18 @@ const entries: PageEntry[] = [
     lastReviewed: "2026-10-22",
   },
   {
+    slug: "/claude/fable-5-2-best-practices",
+    title: "Claude Fable 5.2 ベストプラクティス",
+    group: "Providers",
+    category: "Claude",
+    provider: "claude",
+    topics: ["claude", "agent", "prompt", "api", "cost", "security"],
+    summary:
+      "Claude Fable 5.2 のモデル選定、effort、API実装、履歴管理、Claude Code・マルチエージェント運用、コストと評価を学ぶ中級〜上級ガイド。",
+    addedAt: "2026-11-13",
+    lastReviewed: "2026-11-13",
+  },
+  {
     slug: "/claude/fable-5-1-best-practices",
     title: "Claude Fable 5.1 ベストプラクティス",
     group: "Providers",
