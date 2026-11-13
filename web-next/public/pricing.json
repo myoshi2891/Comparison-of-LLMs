@@ -1,12 +1,44 @@
 {
-  "generated_at": "2026-10-21",
-  "jpy_rate": 157.88,
-  "jpy_rate_date": "2026-10-21",
+  "generated_at": "2026-11-13",
+  "jpy_rate": 159.7,
+  "jpy_rate_date": "2026-11-12",
   "api_models": [
     {
       "provider": "Anthropic",
-      "name": "Claude Fable 5.1",
+      "name": "Claude Fable 5.2",
       "tag": "最上位 Flagship",
+      "cls": "tag-flag",
+      "price_in": 8.0,
+      "price_out": 40.0,
+      "sub_ja": "最新最上位 / キャッシュ読取 $0.20 / Fast mode $16/$80",
+      "sub_en": "Latest top-tier / cache reads $0.20 / Fast mode $16/$80",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 8.0,
+        "fallback_out": 40.0
+      }
+    },
+    {
+      "provider": "Anthropic",
+      "name": "Claude Mythos 5.2",
+      "tag": "Restricted",
+      "cls": "tag-flag",
+      "price_in": 8.0,
+      "price_out": 40.0,
+      "sub_ja": "検証プログラム認証組織限定 / キャッシュ読取 $0.20 / Fast mode $16/$80",
+      "sub_en": "Verified organizations only / cache reads $0.20 / Fast mode $16/$80",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 8.0,
+        "fallback_out": 40.0
+      }
+    },
+    {
+      "provider": "Anthropic",
+      "name": "Claude Fable 5.1",
+      "tag": "最上位 前世代",
       "cls": "tag-flag",
       "price_in": 10.0,
       "price_out": 50.0,
@@ -741,6 +773,38 @@
     },
     {
       "provider": "Google AI",
+      "name": "Gemini 4 Carbon",
+      "tag": "最新 Flagship",
+      "cls": "tag-flag",
+      "price_in": 2.0,
+      "price_out": 10.0,
+      "sub_ja": "最上位推論 / 1M ctx / 2026-11-30までの特価 (以降 $4/$20)",
+      "sub_en": "Top reasoning / 1M ctx / promo through 2026-11-30 (then $4/$20)",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 2.0,
+        "fallback_out": 10.0
+      }
+    },
+    {
+      "provider": "Google AI",
+      "name": "Gemini 4 Hydrogen",
+      "tag": "最新 Balanced",
+      "cls": "tag-bal",
+      "price_in": 1.5,
+      "price_out": 7.5,
+      "sub_ja": "高速・効率型 / 1M ctx / キャッシュ入力95%引き",
+      "sub_en": "Fast and efficient / 1M ctx / 95% off cached input",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 1.5,
+        "fallback_out": 7.5
+      }
+    },
+    {
+      "provider": "Google AI",
       "name": "Gemini 4 Argon",
       "tag": "最新 Flagship",
       "cls": "tag-flag",
@@ -774,12 +838,12 @@
     {
       "provider": "Google AI",
       "name": "Gemini 3.8 Flash",
-      "tag": "最新 Flash",
+      "tag": "Stable",
       "cls": "tag-bal",
       "price_in": 0.75,
       "price_out": 3.75,
-      "sub_ja": "最新Flash / 1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)",
-      "sub_en": "Latest Flash / 1M ctx / promo through 2026-12-31 (then $1.5/$7.5)",
+      "sub_ja": "前世代Flash / 1M ctx / 2026-12-31までの特価 (以降 $1.5/$7.5)",
+      "sub_en": "Previous-gen Flash / 1M ctx / promo through 2026-12-31 (then $1.5/$7.5)",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",
@@ -817,6 +881,22 @@
         "origin": "hardcoded",
         "fallback_in": 0.75,
         "fallback_out": 3.75
+      }
+    },
+    {
+      "provider": "Google AI",
+      "name": "Gemini Omni 1.2 Flash",
+      "tag": "Multimodal",
+      "cls": "tag-bal",
+      "price_in": 1.5,
+      "price_out": 9.0,
+      "sub_ja": "GA / テキスト出力 (動画出力は $12 / 最大15秒)",
+      "sub_en": "GA / text output (video output $12 / up to 15 seconds)",
+      "scrape_status": "fallback",
+      "provenance": {
+        "origin": "hardcoded",
+        "fallback_in": 1.5,
+        "fallback_out": 9.0
       }
     },
     {

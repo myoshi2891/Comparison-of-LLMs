@@ -140,8 +140,8 @@ const entries: PageEntry[] = [
     topics: [],
     summary:
       "AI モデルの API 料金とコーディングツールのサブスク料金を時間別に比較するコスト計算機。",
-    addedAt: "2026-10-24",
-    lastReviewed: "2026-10-24",
+    addedAt: "2026-11-13",
+    lastReviewed: "2026-11-13",
   },
   {
     slug: "/agent/context-engineering-best-practices",
