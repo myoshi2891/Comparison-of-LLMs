@@ -12,6 +12,11 @@ Updated 2026-11-13
 
 基準コミット（drift 検出用）: `45940fd`
 
+保守同期（2026-11-13）: `/claude/fable-5-2-best-practices` を既存Claudeカテゴリへ登録。
+007〜009のDONE状態を維持し、新規基盤プランは起票していない。原本照合・操作66契約、関連93件、
+全体239 files／3065 tests、型・lint656 files・HTML監査exit 0・10図解析・pytest135件が成功。
+HTML／Markdownを内容無変更保存。npm・ビルド未実行、目視はユーザー担当。分離履歴はdocs/PROGRESS.mdを参照。
+
 保守同期（2026-11-13）: Homeの価格データと公開日・確認日を更新。Claude／Gemini新モデル5件、API 98件／ツール34件。
 007〜009のDONE状態は維持。新規基盤・ナビ構造の変更はなく、検証結果はdocs/PROGRESS.mdを参照。
 

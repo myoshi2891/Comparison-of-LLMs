@@ -10,6 +10,17 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+Claude Fable 5.2 `/claude/fable-5-2-best-practices` を追加（2026-11-13）。
+指定HTMLの100見出し・98段落・111リスト項目・45表363行・19コード例・10図・21 callout・49外部リンクをPure JSXへ転写。
+原本固定の全文・全要素ツリー・110 CSS規則・highlight.js11.12.0全トークンを66契約（ページ31／操作35）で照合。
+全体239 files／3065 tests、関連93件、型・lint656 files・HTML監査exit 0・10図解析・pytest135件が成功。
+288px固定目次・900pxモバイル開閉・点と番号・入れ子・全列左寄せ・コード空白を保持。
+41チェックは原本の9リスト（5・5・8・3・3・6・4・4・3）で独立集計。操作の行／関数100%、分岐89.87%。
+registryのClaudeカテゴリから導線を導出し、追加・確認日は2026-11-13、本文の情報基準日は2026-11-12を維持。
+カード内text/plainと実行時CLASSDEFSを読む監査を4つのRedから追加し、監査71テスト成功。
+HTML／Markdownは内容無変更保存。配信HTMLの3477個の意味的要素が原本と一致し、174 IDに重複なし。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.mdを参照。
+
 価格データ更新（2026-11-13）: 公式料金表に基づきFable 5.2・利用制限付きMythos 5.2・Gemini 4 Carbon／Hydrogen・Omni 1.2 Flashを追加。
 API 98件／ツール34件。Carbonは11月末まで$2/$10、12月から$4/$20へ生成時に切替。Homeの公開日・確認日を更新。
 Moonshotの派生版・遠距離価格の誤抽出を防止。追加9契約のRedを確認。複数行の価格取得とレコード境界の回帰4件を追加し、pytest 135件＋39 subtestsが成功。詳細はdocs/PROGRESS.md。
@@ -622,7 +633,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（237 files / 2999 tests pass、2026-11-12実測（追加レビュー対応後）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（239 files / 3065 tests pass、2026-11-13実測（Fable 5.2移行後）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

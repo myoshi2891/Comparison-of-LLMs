@@ -6,6 +6,20 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## Claude Fable 5.2 ガイド移行（2026-11-13）
+
+- 状態: **実装・自動検証・分離コミット完了、目視未確認（ユーザー担当）**。`/claude/fable-5-2-best-practices` を既存Claudeカテゴリへ登録し、ナビ・検索・RSS・関連ページをregistryから導出。追加・確認日2026-11-13、本文の情報基準日2026-11-12を保持。
+- 指定HTMLの全100見出し（H1×1／H2×19／H3×72／H4×8）、98段落、111リスト項目（18 ul／7 ol）、45表363行、19コード例、10図、21 callout、41チェック、49外部アンカーをPure JSXへ転写。原本固定のsource-contract.json／structure-contract.jsonで本文・順序・重複・タグ・全装飾クラス・表のセル型と結合・リスト型と開始番号と入れ子・構文トークン・要素ツリーを完全一致照合する。
+- 原本110 CSS規則とmedia条件を固定。288px固定目次・900px以下の開閉、disc／decimal／circle／square、nav・chips・checklistのマーカーなし、原本の色・余白・太字・22pxチェックと取消線を保持。原本CSSの全宣言をページスコープへ転写し、共有のthead thより高い詳細度で原本の配色と余白を保護。全列左寄せ、共有表の書体・大きさ・sticky・nowrapの打ち消しと全幅を検証。
+- コードは原本のhighlight.js11.12.0を一時取得し、原本SRI一致を確認して静的トークン化。全トークン・改行・先頭空白を固定照合し、複数行トークンを壊さずcodeLineと明示文字列で保持。アプリへの依存追加はない。
+- 進捗は原本スクリプトどおり9リスト（5・5・8・3・3・6・4・4・3項目）を独立集計。全チェック全文・全選択／解除・バー幅・リスト間の分離、目次追従・最下部・開閉・900px境界・inert・Tab循環・フォーカス復帰・cleanupを検証。実際に共有observerへ渡すdoneクラスがCSS Modulesに定義されることも追加Redから検証。
+- 原本のhtmlスクロール・図フレームのdisplay／justify-content／width・SVG寸法・tooltipと描画エラー表示は共有実装へ委譲し、該当するCSSの3規則と図フレーム3宣言のみ原本CSS契約から明示除外。10図は実行時のCLASSDEFSを含め順序・本文・テーマの完全一致。既存Mermaid10.9.8で全図解析が成功し、原本の11.14.0へ依存を更新していない。共有ヘッダー・免責バナー・56pxモバイルバーを避け、アンカー余白は実測高さ＋16pxと規定のヘッダー＋80pxの大きい方を適用。日付はheroへ表示。
+- 監査形式対応: カード内の空code＋兄弟text/plain、diagram-card＋text/plainと実行時CLASSDEFS連結を静的復元し、コメント内カードとalertアイコンの誤判定を除外。Red `b8e1387a`（新規4件失敗）→ Green `b34b4544`、既存を含む監査71テストが成功。文字列内のタグ・文字参照・欠落・図順序・重複を回帰検証。HTML原本監査exit 0がGreenの前提。
+- 検証: ページ31＋操作35＝**66契約**、registry／navを含む関連**93件**。全体Vitest **239 files／3065 testsすべて成功**、typecheck、lint **656 files／0 diagnostics**、HTML監査exit 0、CSS変数監査、10図解析、pytest **135件**が成功。操作カバレッジは行／関数100%、分岐89.87%、文99.18%。着手時の全体実行は編集と重なりregistryの登録漏れ1件を検出（2998件成功）。Green検証初回は3064件、最後のdoneクラス1契約を含めた最終固定後の全体再実行で3065件を確認。
+- 原本保存 `444ab7ca`: HTML／Markdownをarchive/html/Anthropic/／archive/md/Anthropic/へ内容無変更・100%リネーム。SHA-256はHTML `819be399ec9dd227f89021953ed0b2a4889f3b39abf5acc7cc2bbfc3e18233aa`、Markdown `e8696ede9283ee5cf8022201d4aa08740f7ab0d05c69df2f260945ae687fc37d`（移動前後一致）。Markdown監査はexit 1。独立目次と概要見出し、冒頭表ヘッダー1行、出典番号の説明（MarkdownはS1〜S45、HTMLはS1〜S49）、10図の改行タグ・配色・classDefに差がある。通常コード・外部URL・リスト本文の欠落はなく、指定HTMLを正本として両形式を混在させない。
+- 分離履歴: 移行Red `7acacc00` → CSS Modules proxy／空白比較の補正 `94d5a569` → 共有CSS詳細度の追加Red `ad078e8f` → 原本保存 `444ab7ca` → 原本CSS抽出範囲の補正 `576dcf41` → doneクラスの追加Red `b752eb1c` → 移行Green `98aefd2c`。原本固定の本文・構造・CSS・図・進捗の期待値は無変更。追加整理は不要で、空のRefactorコミットは作成しない。
+- CSSキャッシュは起動前に不在。通常Turbopack devの `http://localhost:3000/claude/fable-5-2-best-practices` でHTTP 200。配信HTMLと原本の**3477個の意味的要素**（タグ・本文・リスト階層・表結合・リンク先・コード空白・図位置）が一致し、174 IDに重複なし。npm・ビルド・ブラウザ自動化は未実行。依存・設定・ロック・legacyは無変更。目視はユーザー担当。
+
 ## Home価格更新（2026-11-13）
 
 - 公式の[Claude料金表](https://platform.claude.com/docs/en/about-claude/pricing)と[Gemini料金表](https://aistudio.google.com/docs/pricing)をウェブ検索・本文取得で確認。Fable 5.2とMythos 5.2は$8/$40、Carbonは11月末まで$2/$10（12月から$4/$20）、Hydrogenは$1.5/$7.5、Omni 1.2 Flashはテキスト$1.5/$9。いずれもUSD／100万トークンのStandard価格。Mythosは認証組織限定、Omniの動画出力$12は注記に分離。
@@ -301,21 +315,22 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `d8a13749`（Codexベストプラクティスのアンカー余白補正。移行Green `a3ca5742`。レビュー指摘への対応と分離履歴は冒頭の同名節を参照）。
-- **次の作業**: Codexベストプラクティス・Antigravity・Omni・Argon・Fable・Astraの目視確認（6ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
+- **最新実装 HEAD**: `98aefd2c`（Claude Fable 5.2ガイドの移行Green。分離履歴は冒頭の同名節を参照）。
+- **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
+  - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
   - Antigravity `/google/antigravity-best-practices`: 268px目次・900pxモバイル開閉・27章・点と番号・61表404行・18コード例・11図・8行チェックと単一進捗を確認。
   - Omni `/google/omni-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点／heroのマーカーなし・29表185行・13コード例・7図・3／4／3／3チェック進捗を確認。
   - Argon `/google/argon-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点と番号／heroのマーカーなし・16表118行・6コード例・7図・12チェック進捗を確認。
   - Fable `/claude/fable-5-1-best-practices`: 264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・8／5／5チェック進捗を確認。
   - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
-- **ルート実数**: `page.tsx` 106件、registry 106エントリ（2026-11-11実測。`/codex/best-practices` を追加）。
+- **ルート実数**: `page.tsx` 107件、registry 107エントリ（2026-11-13実測。Fable 5.2を追加）。
 - **動作検証**:
-  - ビルド: `bun run build` ✅（2026-11-13実測、114静的ページ生成。2026-11-11の移行時にはユーザー指定で未実行）。
+  - ビルド: Fable 5.2移行ではユーザー指定により未実行。直前の価格更新時には `bun run build` 成功（2026-11-13、114静的ページ生成）。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-13 実測）
-  - `bun run lint` ✅（Biome check / 649 files / 0 diagnostics。2026-11-13 実測）
+  - `bun run lint` ✅（Biome check / 656 files / 0 diagnostics。2026-11-13 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **237 files／2999 testsすべて成功**（2026-11-12実測。モーダル境界の追加2契約を含む）。型・lint649 files・pytest122件も成功。Redで固定した期待値は無変更。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **239 files／3065 testsすべて成功**（2026-11-13実測。Fable 5.2の66契約を含む）。型・lint656 files・pytest135件も成功。Redで固定した期待値は無変更。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -776,8 +791,10 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: d8a13749（Codexのアンカー余白補正。移行Green a3ca5742。レビュー指摘への対応は冒頭の同名節を参照）。
-次の作業: Codexベストプラクティス・Antigravity・Omni・Argon・Fable・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+最新実装HEAD: 98aefd2c（Fable 5.2移行Green。分離履歴は冒頭の同名節を参照）。
+次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
+288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
 Codex: http://localhost:3000/codex/best-practices （アンカー移動の余白を確認）
 Antigravity: http://localhost:3000/google/antigravity-best-practices
 268px目次・900pxモバイル開閉・27章・本文の点と番号・61表404行・18コード例・11図・8行チェックの単一進捗を確認。
@@ -788,9 +805,9 @@ Astra: http://localhost:3000/codex/astra-best-practices
 指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
-全体237 files／2999 tests成功（2026-11-12実測。モーダル境界の追加2契約を含む）。型・lint649 files・pytest122件が成功。
-Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは106件ずつ。
+全体239 files／3065 tests成功（2026-11-13実測。Fable 5.2の66契約を含む）。型・lint656 files・pytest135件が成功。
+Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは107件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-2026-11-11の移行時はユーザー指定でnpm・ビルド未実行。2026-11-12の追加レビュー対応ではbun run build成功（114静的ページ生成）。
+Fable 5.2移行ではユーザー指定でnpm・ビルド未実行。直前の価格更新時にはbun run build成功（2026-11-13、114静的ページ生成）。
 依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、139 ID一意性・初期進捗0 / 8・原本と配信HTMLの3254要素の一致を確認。
 ```
