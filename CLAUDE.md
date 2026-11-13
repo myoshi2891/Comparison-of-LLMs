@@ -12,7 +12,7 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 価格データ更新（2026-11-13）: 公式料金表に基づきFable 5.2・利用制限付きMythos 5.2・Gemini 4 Carbon／Hydrogen・Omni 1.2 Flashを追加。
 API 98件／ツール34件。Carbonは11月末まで$2/$10、12月から$4/$20へ生成時に切替。Homeの公開日・確認日を更新。
-Moonshotの派生版・遠距離価格の誤抽出を防止。追加9契約のRedを確認し、pytest 131件＋39 subtestsが成功。詳細はdocs/PROGRESS.md。
+Moonshotの派生版・遠距離価格の誤抽出を防止。追加9契約のRedを確認。複数行の価格取得とレコード境界の回帰4件を追加し、pytest 135件＋39 subtestsが成功。詳細はdocs/PROGRESS.md。
 
 Google Antigravity `/google/antigravity-best-practices` を指定HTMLで完全更新（2026-11-11）。
 108見出し・92段落・48リスト項目・61表404行・18コード例・11図・26引用・8表形式チェック・4外部リンクをPure JSXへ転写。
