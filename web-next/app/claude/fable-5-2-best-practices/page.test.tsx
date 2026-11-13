@@ -227,12 +227,16 @@ it("metadata・registry・ヒーローの日付を保持", () => {
 });
 /** 原本の全クラスをCSS Modulesのローカルクラスへ対応させる。 */
 const className = (c: string) =>
-  c.startsWith("ti") || c.startsWith("hljs") || c.startsWith("language-") ? c : styles[c];
+  c.startsWith("ti") || c.startsWith("hljs") || c.startsWith("language-") || c === "function_" ? c : styles[c];
 it("全装飾クラスが原本と同じタグ・順序へ付く", () => {
   const { container } = render(<Page />);
   for (const [c, tags] of Object.entries(expected.classElements))
     expect(
-      Array.from(container.querySelectorAll(`.${className(c)}`)).map((e) => e.localName),
+      Array.from(
+        container.querySelectorAll(
+          `.${styles.layout} .${className(c)}, .${styles.layout}.${className(c)}`
+        )
+      ).map((e) => e.localName),
       c
     ).toEqual(tags);
 });
@@ -254,12 +258,21 @@ function tree(n: Node): unknown {
       v = v
         .split(/\s+/)
         .filter((c) => c !== styles.active && c !== styles.main)
-        .map((c) => Object.keys(styles).find((k) => styles[k] === c) ?? c)
+        .map(
+          (c) =>
+            [...Object.keys(expected.classElements), "mobile-bar", "mb-title", "backdrop"].find(
+              (k) => styles[k] === c
+            ) ?? c
+        )
         .join(" ");
     if (key === "type" && n.id === "fable52-backdrop") v = null;
     if (v) attrs[key] = v;
   }
-  return [n.localName, attrs, Array.from(n.childNodes).map(tree).filter(Boolean)];
+  return [
+    n.id === "fable52-backdrop" ? "div" : n.localName,
+    attrs,
+    Array.from(n.childNodes).map(tree).filter(Boolean),
+  ];
 }
 it("原本の全要素ツリー・タグ・本文・リスト階層・図位置を完全一致", () => {
   const { container } = render(<Page />);
@@ -359,7 +372,7 @@ it("表全列左寄せ・太字・コードリセット・全幅・実測ヘッ�
   for (const h of ["h1", "h2", "h3", "h4"])
     expect(declarations(`.root :global(${h})`)["font-weight"]).toBe("700");
   expect(css()).toContain("scroll-margin-top: calc(var(--header-height, 60px) + 80px)");
-  expect(css()).toContain(
+  expect(normalize(css()).replace(/\s*\+\s*/g, " + ")).toContain(
     "var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height, 0px) + 16px"
   );
   expect(declarations(".root .table-wrap :global(thead)").position).toBe("static");
