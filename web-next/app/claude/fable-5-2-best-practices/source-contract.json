@@ -1215,7 +1215,7 @@
   "tables": [
     [
       [
-        ["td", null, null, "対象モデル"],
+        ["th", null, null, "対象モデル"],
         [
           "td",
           null,
@@ -1223,9 +1223,9 @@
           "Claude Fable 5.2(API ID: claude-fable-5-2)。同一基盤モデルの Claude Mythos 5.2 との関係も扱う"
         ]
       ],
-      [["td", null, null, "調査時点"], ["td", null, null, "2026-11-12(リリースの3日後)"]],
+      [["th", null, null, "調査時点"], ["td", null, null, "2026-11-12(リリースの3日後)"]],
       [
-        ["td", null, null, "想定読者"],
+        ["th", null, null, "想定読者"],
         [
           "td",
           null,
@@ -1234,7 +1234,7 @@
         ]
       ],
       [
-        ["td", null, null, "情報源"],
+        ["th", null, null, "情報源"],
         [
           "td",
           null,
@@ -1243,7 +1243,7 @@
         ]
       ],
       [
-        ["td", null, null, "図解のルール"],
+        ["th", null, null, "図解のルール"],
         [
           "td",
           null,

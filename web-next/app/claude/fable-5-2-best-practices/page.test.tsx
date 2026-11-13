@@ -422,3 +422,28 @@ it("共有目次へ渡す完了クラスが実際のCSS Modulesにも定義さ�
     "line-through"
   );
 });
+it("S5256: 全表がヘッダーセルを持ち、概要のキー値表は行見出しth[scope=row]を使う", () => {
+  const { container } = render(<Page />);
+  for (const table of Array.from(container.querySelectorAll("table")))
+    expect(table.querySelectorAll("th").length).toBeGreaterThan(0);
+  expect(
+    Array.from(container.querySelectorAll(`.${styles["kv-wrap"]} th[scope="row"]`)).map(text)
+  ).toEqual(["対象モデル", "調査時点", "想定読者", "情報源", "図解のルール"]);
+});
+it("S5256: キー値表の行見出しは原本のtd:first-childと同じ表示を保つ", () => {
+  const d = declarations(`.root .kv-wrap :global(th[scope="row"])`);
+  expect(d).toMatchObject({
+    background: "transparent",
+    color: "var(--indigo)",
+    "font-weight": "700",
+    "white-space": "nowrap",
+    padding: "12px 16px",
+    "border-bottom": "1px solid var(--border)",
+    "vertical-align": "top",
+    "line-height": "1.7",
+    "overflow-wrap": "break-word",
+  });
+  expect(
+    declarations(`.root .kv-wrap :global(tbody tr:last-child th[scope="row"])`)["border-bottom"]
+  ).toBe("none");
+});
