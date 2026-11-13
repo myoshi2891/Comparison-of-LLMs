@@ -919,9 +919,13 @@ function materializePlainTextCards(src) {
       scripts.push({ full, attributes, payload });
       return `<script data-audit-payload="${scripts.length - 1}"></script>`;
     });
+  const executable = scripts.filter(script => {
+    const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
+    return !type || type === "module" || /^(?:text|application)\/(?:java|ecma)script$/.test(type);
+  }).map(script => blankNonCodeText(script.payload)).join("\n");
   let suffix = "";
-  if (/mermaid\.render\([^;]*\bsrc\s*\+\s*CLASSDEFS\b/.test(src)) {
-    const literal = /\b(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"))*);/.exec(src)?.[1];
+  if (/mermaid\.render\([^;]*\bsrc\s*\+\s*CLASSDEFS\b/.test(executable)) {
+    const literal = /\b(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"))*);/.exec(executable)?.[1];
     if (literal) suffix = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2])).join("");
   }
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -931,10 +935,12 @@ function materializePlainTextCards(src) {
   });
   let result = stashed;
   for (const card of cards.reverse()) {
-    const marker = /<script data-audit-payload="(\d+)"><\/script>/.exec(card.content);
+    const marker = Array.from(card.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g)).find(match => {
+      const script = scripts[Number(match[1])];
+      return readHtmlAttribute(script.attributes, "type")?.toLowerCase() === "text/plain" && readHtmlAttribute(script.attributes, "data-for") === undefined;
+    });
     if (!marker) continue;
     const script = scripts[Number(marker[1])];
-    if (readHtmlAttribute(script.attributes, "type")?.toLowerCase() !== "text/plain" || readHtmlAttribute(script.attributes, "data-for")) continue;
     const rawLines = script.payload.replace(/^\n+/, "").replace(/\s+$/, "").split("\n");
     const indent = Math.min(...rawLines.filter(l => l.trim()).map(l => l.match(/^[ \t]*/)[0].length));
     const payload = rawLines.map(l => l.slice(Number.isFinite(indent) ? indent : 0)).join("\n");
