@@ -325,3 +325,39 @@ test("keeps literal markup in code blocks rendered from a string constant", () =
 	assert.equal(match.status, 0);
 	assert.equal(audit(source, 'const CODE = "ab c";\n<pre><code>{CODE}</code></pre>').status, 1);
 });
+
+test("materializes sibling text/plain code payloads without parsing literal markup", () => {
+ const value = 'print("<schema>{value}</schema> &lt;")\n  nested()';
+ const source = `<div class="code-block"><div>python</div><pre><code></code></pre><script type="text/plain">\n    ${value.replace(/\n/g,'\n    ')}\n </script></div>`;
+ const page = `<div>python<pre><code>{${JSON.stringify(value)}}</code></pre></div>`;
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('nested()','omitted()')).status,1);
+ assert.equal(audit(source,'').status,1);
+});
+
+test("collects sibling diagram payloads and concatenated runtime CLASSDEFS in document order", () => {
+ const charts=['flowchart LR\nA --> B','flowchart TD\nB --> C','flowchart LR\nA --> B'];
+ const suffix='\nclassDef hub fill:#fff;\nclassDef box color:#000;';
+ const source=charts.map(s=>`<div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('')+`<script>var CLASSDEFS = '\\nclassDef hub fill:#fff;' + '\\nclassDef box color:#000;'; mermaid.render('x', src + CLASSDEFS);</script>`;
+ const page=charts.map((s,i)=>`const D${i} = ${JSON.stringify(s+suffix)};`).join('\n')+charts.map((_,i)=>`<MermaidDiagram chart={D${i}} />`).join('');
+ const result=audit(source,page);
+ assert.equal(result.status,0);
+ assert.deepEqual(result.data.counts.mermaidSources,{source:3,page:3});
+ assert.equal(audit(source,page.replace('<MermaidDiagram chart={D1} />','')).status,1);
+ assert.equal(audit(source,page.replace('chart={D0}','chart={D1}')).status,1);
+});
+
+test("ignores commented cards and does not apply unrelated CLASSDEFS to diagrams", () => {
+ const chart='flowchart LR\nA --> B';
+ const source=`<!-- <div class="diagram-card"><script type="text/plain">flowchart TD\nWRONG --> WRONG</script></div> --><div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${chart}</script></div><script>var CLASSDEFS = 'unused'; mermaid.render('id',src);</script>`;
+ const page=`const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,'').status,1);
+});
+
+test("does not classify alert icon names as callout content",()=>{
+ const result=audit('<i class="ti ti-alert-triangle"></i><div class="callout">Keep warning</div>','<i className={styles.icon}></i><div className={styles.callout}>Keep warning</div>');
+ assert.equal(result.status,0);
+ assert.deepEqual(result.data.counts.calloutElements,{source:1,page:1});
+ assert.equal(audit('<div class="callout">Keep warning</div>','<div>Keep warning</div>').status,1);
+});
