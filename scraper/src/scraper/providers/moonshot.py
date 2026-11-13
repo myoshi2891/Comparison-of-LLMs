@@ -78,12 +78,13 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     for name in _FALLBACKS:
         # ハードコード値ではなく fallback_map を見る（既存のスクレイプ成功値を尊重）
         fb_in, fb_out = fallback_map[name]
-        key = model_key_pattern(name, _FALLBACKS)
+        # K3.1 など未登録の派生版と遠く離れた別行の価格を拾わない。
+        key = model_key_pattern(name, _FALLBACKS) + r"(?![.\d])"
         in_price = extract_price(html, [
-            rf"{key}[^$]*?\$([\d.]+)",
+            rf"{key}[^$\n]{{0,80}}?\$([\d.]+)",
         ])
         out_price = extract_price(html, [
-            rf"{key}[^$]*?output[^$]*?\$([\d.]+)",
+            rf"{key}[^$\n]{{0,80}}?output[^$\n]{{0,80}}?\$([\d.]+)",
         ])
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)
