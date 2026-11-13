@@ -293,19 +293,19 @@ function scoped(selector: string): string {
     .split(",")
     .map((s) => {
       s = s.trim();
-      if ([":root", "body"].includes(s)) return ":where(.root)";
-      s = s.replace(/^body\.menu-open /, ":where(.root).open ");
+      if ([":root", "body"].includes(s)) return ".root";
+      s = s.replace(/^body\.menu-open /, ".root.open ");
       s = s.replace(/#s16/g, ":global(#s16)");
       s = s.replace(/(^|[ >+~])([a-z][a-z0-9-]*|\*)(?=[\s.#:[>+~]|$)/g, "$1:global($2)");
       s = s.replace(/\.hljs\b/g, ":global(.hljs)");
-      return s.startsWith(":where(.root)") ? s : `:where(.root) ${s}`;
+      return s.startsWith(".root") ? s : `.root ${s}`;
     })
     .join(", ");
 }
 it("原本110 CSS規則の全宣言・順序・media条件を一致（図寸法は共有部品へ委譲）", () => {
   const actual: unknown[] = [];
-  postcss.parse(css()).walkRules((r) => {
-    if (!r.selector.startsWith(":where(.root)")) return;
+  postcss.parse(css().split("/* Tailwind")[0]).walkRules((r) => {
+    if (!r.selector.startsWith(".root")) return;
     actual.push({
       selector: normalize(r.selector),
       media: r.parent?.type === "atrule" ? (r.parent as postcss.AtRule).params : null,
