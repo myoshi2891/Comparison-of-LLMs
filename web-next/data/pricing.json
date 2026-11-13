@@ -890,8 +890,8 @@
       "cls": "tag-bal",
       "price_in": 1.5,
       "price_out": 9.0,
-      "sub_ja": "GA / テキスト出力 (動画出力は $12 / 最大15秒)",
-      "sub_en": "GA / text output (video output $12 / up to 15 seconds)",
+      "sub_ja": "GA / テキスト出力 (動画出力は100万出力トークンあたり $12 / 最大15秒)",
+      "sub_en": "GA / text output (video output $12 per 1M output tokens / up to 15 seconds)",
       "scrape_status": "fallback",
       "provenance": {
         "origin": "hardcoded",
