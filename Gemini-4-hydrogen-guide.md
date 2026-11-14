@@ -105,15 +105,15 @@ Googleの推奨は、**Carbon / Argon が判断し、Hydrogen が実行する**�
 
 ```mermaid
 flowchart TD
-    S["タスク開始"] --> Q1{"設計判断・難解なバグ・セキュリティ監査など 深い推論が主目的か"}
+    S["タスク開始"] --> Q4{"画像生成・Live API・明示的キャッシュが必須か"}
+    Q4 -- "はい" --> OTHER["必要な機能を提供するモデルを選ぶ"]
+    Q4 -- "いいえ" --> Q1{"設計判断・難解なバグ・セキュリティ監査など 深い推論が主目的か"}
     Q1 -- "はい" --> Q2{"長期タスクでトークン消費を抑えたいか"}
     Q2 -- "はい" --> ARGON["Gemini 4 Argon"]
     Q2 -- "いいえ" --> CARBON["Gemini 4 Carbon"]
     Q1 -- "いいえ" --> Q3{"コーディング・ツール実行・文書処理など 実行系が主目的か"}
     Q3 -- "はい" --> HYD["Gemini 4 Hydrogen"]
-    Q3 -- "いいえ" --> Q4{"画像生成・Live API・明示的キャッシュが必須か"}
-    Q4 -- "はい" --> OTHER["Hydrogen 以外のモデルを選ぶ"]
-    Q4 -- "いいえ" --> HYD
+    Q3 -- "いいえ" --> HYD
     HYD --> Q5{"high で品質が足りないか"}
     Q5 -- "はい" --> XH["xhigh を試す それでも不足なら Carbon / Argon に計画を任せる"]
     Q5 -- "いいえ" --> DONE["high または medium で運用"]
@@ -131,8 +131,8 @@ flowchart TD
 
 **ステップ**
 
-1. 自分のタスクを「判断系」と「実行系」に分類する
-2. 実行系は Hydrogen を既定とし、`high` から評価を始める
+1. 必須機能(画像生成・Live API・明示的キャッシュなど)の対応を確認してから、自分のタスクを「判断系」と「実行系」に分類する
+2. 必須機能を満たす実行系は Hydrogen を既定とし、`high` から評価を始める
 3. 判断系の比率が高いワークロードだけ Argon / Carbon を計画役に置く
 4. 3.8 Flash を使い続ける理由(単価)がないか確認する(第三者記事では 3.8 Flash の期間限定価格が $0.75 / $3.75 とされています。**価格だけで判断せず、品質・速度・再試行率を含めた総コストで比較**すること)
 
@@ -269,7 +269,8 @@ Hydrogen は入力・思考・出力が**1つの 1,048,576 トークン窓を共
 
 - 同期リクエストの出力は**既定で 65,536 トークン**
 - それを超える出力(複数ファイルのdiff、長大なテストスイート等)は **Long Decode** を使う
-- Interactions API では `background=True`(`store=true` が必要)かつ `max_output_tokens` を 65,536 超に設定すると、サーバー側が約64Kごとの継続(hop)を自動で連結する(Argon向け公式ガイドの記載。Hydrogen も同系統の挙動と第三者記事が報告)
+- Interactions API は、`max_output_tokens` を 65,536 超に設定し、バックグラウンド実行またはフォアグラウンドのクライアント側継続を選べる。`background=True` は `store=True` が必要で、サーバーがhopを連結する。`background=False` では対応SDKの自動継続、または `automatic_continuation=False` と `continuation_token` を使う自前ループを利用する。`store=False` のステートレス実行も可能で、その場合は前回IDの代わりに元の入力を再送し、モデル・ツール・system instruction・生成設定を各hopで維持する([公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation))。
+- GenerateContent APIでも、対応する最新版SDKは `max_output_tokens > 65,536` で自動継続する。RESTや自前ループでは `CONTINUATION` と `continuation_token` を扱い、同じリクエストを継続する([公式GenerateContent Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode))。必要なSDKバージョンは両APIの公式資料で確認する。
 
 ```mermaid
 flowchart TD
@@ -277,13 +278,18 @@ flowchart TD
     B -- "はい" --> C["通常リクエスト max_output_tokens は十分大きく"]
     B -- "いいえ" --> D{"待ち時間は数分許容できるか"}
     D -- "いいえ" --> E["タスクを分割して複数リクエストにする"]
-    D -- "はい" --> F["Interactions API で background=True と max_output_tokens 65,536超"]
+    D -- "はい" --> MODE{"Long Decode の実行方式を選ぶ max_output_tokens 65,536超"}
+    MODE -- "バックグラウンド" --> F["Interactions background=True store=True サーバーが継続"]
+    MODE -- "フォアグラウンド またはステートレス" --> FG["Interactions SDKの自動継続 または continuation_token の自前ループ"]
+    MODE -- "GenerateContent" --> GC["対応SDKの自動継続 またはRESTの継続ループ"]
     F --> G["ステータスをポーリング in_progress queued の間待機"]
     G --> H["completed を確認して output_text を取得 失敗や不完全終了は例外"]
+    FG --> H
+    GC --> RESULT["全hopの応答とusageを集計し終了理由を確認"]
 ```
 
 ```python
-# Argon向け公式ガイドの記載パターンをHydrogenに適用した例
+# Interactions API のバックグラウンド実行を選ぶ場合の例
 # 注意: 実機で動作確認し、SDKバージョン・パラメータ名は公式ドキュメントで確認してください
 import time
 from google import genai
@@ -293,7 +299,7 @@ client = genai.Client()
 interaction = client.interactions.create(
     model="gemini-4-hydrogen",
     input="このモジュール群を新APIへ移行する差分をすべて出力して",
-    background=True,   # 65,536超の出力にはバックグラウンド実行が必要
+    background=True,   # サーバー側継続を選択。フォアグラウンドのクライアント側継続も可能
     store=True,
     generation_config={"max_output_tokens": 262144, "thinking_level": "high"},
 )
@@ -322,7 +328,7 @@ text = interaction.output_text
 |---|---|
 | 必要なワークロードだけに使う(Google: チャット・Q&A・要約・抽出は通常 32K 未満で完了) | 数分かかり得る、課金も膨らむ |
 | `max_output_tokens` は仕事に必要な量だけに制限する | 出力トークン(思考を含む)の課金だけを抑える。リクエスト総額の上限ではなく、継続hopの追加入力課金やツール料金も発生し得る |
-| `max_output_tokens` を大きくするだけでは不十分。バックグラウンド実行と併用する(第三者の移行記事が指摘) | 通常リクエストで65,536超を指定すると400になる報告がある |
+| `max_output_tokens > 65,536` と対応する継続方式を選ぶ | Interactionsのバックグラウンド実行、フォアグラウンド／ステートレスのSDK自動継続・自前ループ、GenerateContentのSDK自動継続・RESTループを使い分ける。SDKの対応バージョンを確認する |
 | 集計トークンの扱いに注意(第三者: Long Decode 中は各hopの入力が合算され、見かけ上コンテキストが過大に見える) | 監視・課金ダッシュボードの誤読防止 |
 | 固定長を狙った出力指定は効かない(第三者) | 長さ制御は指示文と分割設計で行う |
 
@@ -580,7 +586,7 @@ flowchart TD
 - [ ] `temperature` / `top_p` / `top_k` を削除した
 - [ ] `thinking_budget` / `MINIMAL` を `thinking_level` に置換した
 - [ ] `max_output_tokens` を十分大きく設定した
-- [ ] 65,536超の出力が必要な箇所に Long Decode(`background=True`)を設計した
+- [ ] 65,536超の出力が必要な箇所に Long Decodeの継続方式(バックグラウンド／フォアグラウンド／ステートレス／GenerateContent)を設計した
 - [ ] thought signature を含む履歴を保持している
 - [ ] 非対応機能(明示的キャッシュ・画像生成・Live API・音声生成)を使っていない
 
@@ -618,7 +624,7 @@ flowchart TD
 | 3 | Hydrogen の既定は HIGH、XHIGH は Hydrogen のみ対応 | Google Cloud 公式ドキュメント | https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/get-started-with-gemini-4 |
 | 4 | Gemini 4 は `temperature` / `top_p` / `top_k` を無視 | 同上 | https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/get-started-with-gemini-4 |
 | 5 | thought signature を含む履歴を保持する | Argon向けマイグレーションガイド(Gemini 4 共通の要件) | https://ai.google.dev/gemini-api/docs/generate-content/latest-model |
-| 6 | Long Decode は必要なワークロードのみ。バックグラウンド実行を使用 | Google公式 Long Decode ガイド | https://ai.google.dev/gemini-api/docs/long-decode |
+| 6 | Long Decode は必要なワークロードのみ。バックグラウンドまたはクライアント側継続を選ぶ | Google公式 Long Decode ガイド | https://ai.google.dev/gemini-api/docs/long-decode |
 | 7 | 移行時は SDK 更新・パラメータ除去・出力上限見直しをチェックリスト化 | google-gemini 公式 gemini-skills の移行リファレンス | https://github.com/google-gemini/gemini-skills/blob/main/skills/gemini-api-dev/references/migration.md |
 | 8 | 移行時の落とし穴(出力上限・`temperature` 無視・Long Decode の課金)を事前に把握 | 開発者コミュニティ(DEV)の Argon 移行記事 | https://dev.to/aihubmix/moving-gemini-3x-code-to-gemini-4-argon-failure-modes-and-fixes-4h1p |
 | 9 | Long Decode は継続hopごとに課金・入力集計が膨らむため上限管理が必要 | 同上および DEV の Argon 統合ガイド | https://dev.to/aihubmix/gemini-4-argon-thinkinglevel-and-long-decode-a-developers-guide-35ll |
