@@ -906,6 +906,8 @@ function readHtmlAttribute(attributes, name) {
   return undefined;
 }
 
+const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
+
 /**
  * Materialize display-only payloads scoped to their owning code/diagram card.
  * Scripts and comments are opaque while finding nested div boundaries; no source JS is executed.
@@ -929,7 +931,12 @@ function materializePlainTextCards(src) {
   if (/mermaid\.render\([^;]*\bsrc\s*\+\s*CLASSDEFS\b/.test(executable)) {
     // Locate the declaration in code, then read its literal from the offset-aligned view.
     const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
-    const literal = declaration && /^(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"))*);/.exec(literalSource.slice(declaration.index))?.[1];
+    const initializerSource = declaration && literalSource.slice(declaration.index);
+    const initializer = initializerSource && /^(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*"))*)/.exec(initializerSource);
+    // Check the remainder separately so a failed terminator cannot backtrack to a
+    // partial concatenation. A newline permits ASI only without an expression continuation.
+    const complete = initializer && /^[ \t]*(?:;|$|[\r\n](?!\s*(?:[([`.+\-*/%<>=!&|^?:,\\]|\b(?:in|instanceof)\b)))/.test(initializerSource.slice(initializer[0].length));
+    const literal = complete && initializer[1];
     if (literal) suffix = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2])).join("");
   }
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -950,7 +957,7 @@ function materializePlainTextCards(src) {
     const payload = rawLines.map(l => l.slice(Number.isFinite(indent) ? indent : 0)).join("\n");
     let content = card.content;
     if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
-      content = content.replace(/<code\b([^>]*)>\s*<\/code>/i, (_full, attributes) => `<code${attributes}>${escape(payload)}</code>`);
+      content = content.replace(new RegExp(String.raw`<code\b${htmlAttributesPattern}>\s*<\/code>`, "i"), (_full, attributes) => `<code${attributes}>${escape(payload)}</code>`);
       // A selected data-code script must not be materialized again by inventoryHtml.
       if (content !== card.content) content = content.replace(marker[0], "");
     } else {
@@ -968,7 +975,7 @@ function inventoryHtml(src) {
   // Resolve by data-for/id rather than script order and escape literal markup before inventorying.
   // 開始タグの属性部は引用値を 1 単位で消費する。`[^>]*` だと title="a>b" の `>` で
   // タグが閉じたと誤認し、後続の data-for / id を読めず本文が監査から外れる。
-  const attrs = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
+  const attrs = htmlAttributesPattern;
   // payload の収集と差し込みは同じ走査を使う。別々に走査すると、コメントアウトされた script を
   // 実 script として拾い、後勝ちの Map で本物の payload を上書きしてしまう。
   // script 要素は先頭の分岐で丸ごと消費する。payload 内の未閉じ <code> から一致が始まると、
