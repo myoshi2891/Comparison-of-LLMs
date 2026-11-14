@@ -82,7 +82,7 @@ flowchart TB
 | サンプリング | `temperature` / `top_p` / `top_k` は Gemini 4 系では**無視される** |
 | キャッシュ | **暗黙的(implicit)キャッシュのみ**。明示的キャッシュは非対応(第三者記事が公式を引用) |
 | 無料枠 | あり(Gemini API / AI Studio) |
-| 提供面 | Gemini API、Google AI Studio、Android Studio、Gemini for business、Gemini アプリ、Google Search、Gemini in Sheets、Antigravity(有料 AI Pro / Ultra) |
+| 提供面 | Gemini API、Google AI Studio、Android Studio、Gemini for business、Gemini アプリ、Google Search、Gemini in Sheets、Antigravity(HydrogenはFree / Google AI Plus / Pro / Ultraで利用可。Orchestratorのプラン制限は別) |
 
 **価格表(Gemini API・100万トークンあたり、第三者記事が公式価格ページを引用)**
 
@@ -380,6 +380,8 @@ flowchart TD
 | 6 | 状態を持つ会話は Interactions API の `store=true` + `previous_interaction_id` を検討 | 署名を含む状態をサーバー側で保持できる(第三者記事が公式を引用) |
 | 7 | 「無関係なファイルは変更しない」「変更ファイル一覧を最後に出す」をシステム指示に入れる | 差分レビューを容易にし、過剰変更を検知する(設計判断) |
 
+履歴を圧縮するときは、以前の資料を削って後続のthought signatureだけを保持すると会話prefixが変わり、既定の `prefix_mismatch_behavior="ERROR"` ではHTTP 400になり得ます。対応する `ThinkingConfig` の `prefix_mismatch_behavior="DROP"` (Interactions APIでは `generation_config.prefix_mismatch_behavior="drop"`)を使って不一致の署名を破棄させるか、サポートされる新規履歴へのリセットを行ってください。変更していない履歴では引き続き署名をそのまま保持します([公式Hydrogenガイド](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-hydrogen))。
+
 ```python
 # マルチターンでは thought signature を含む履歴を丸ごと再送する(概念コード)
 # 呼び出し元で会話ごとに history=[] を作成し、対応する履歴を渡す。他の会話と共有しない。
@@ -458,7 +460,7 @@ flowchart TD
 2. 表・グラフ中心の資料は、**抽出してほしい項目と単位を先に列挙**する
 3. 動画は「どの区間を見るか」を指定する。Googleは「特定フレームを検査するエージェント的動画理解」を強化したと説明
 4. 出力は JSON スキーマで構造化し、**スキーマ検証→不一致だけ再質問**の自己修復ループにする
-5. 1Mトークンを使い切る前に、**不要資料を削る**(入力が多いほど課金と待ち時間が増える。出力と窓を共有する点も考慮)
+5. 1Mトークンを使い切る前に、**不要資料を削る**(入力が多いほど課金と待ち時間が増える。出力と窓を共有する点も考慮)。会話prefixを変更する場合はStep 5の `prefix_mismatch_behavior="DROP"` または対応する履歴リセットを使い、変更前の署名だけを再利用しない
 
 ---
 
@@ -504,7 +506,7 @@ flowchart TD
 | thinking level 最適化 | 評価(Step 2)に基づき、タスク種別ごとに `low`〜`high` を振り分ける。`xhigh` は例外運用 |
 | 暗黙キャッシュ前提の構造化(設計判断) | 明示的キャッシュが使えないため、**システム指示・ツール定義・参照資料を常にプロンプトの先頭に同じ順序で固定**し、可変部(ユーザー入力)を末尾に置く |
 | 出力の上限管理 | `max_output_tokens` を用途別に設定(暴走・無限ループ対策) |
-| グラウンディング課金 | Google検索グラウンディングは無料枠なし(無料階層)。有料階層では月5,000件の無料枠のち1,000件あたり$14、日次上限あり(第三者記事が公式を引用。要確認) |
+| グラウンディング課金 | Google検索グラウンディングは無料枠なし(無料階層)。有料階層では月5,000検索の無料枠をGemini 3以降のモデル間で共有し、超過分は1,000検索あたり$14、日次上限あり。Geminiリクエスト数ではなく検索クエリ数で課金され、1回のGeminiリクエストが複数の課金対象検索を起こし得る(第三者記事が公式を引用。要確認。[公式料金表](https://ai.google.dev/gemini-api/docs/pricing)) |
 | データの扱い | 無料階層の内容はGoogleの製品改善に使われる。通常の有料サービスでは原則として製品改善に使われないが、**Paid Contributor Tierの内容は製品・モデルの改善に利用される**。有料サービスでも不正利用監視のためプロンプト・応答が保持され得る。機密データを送信する前に、適用される階層・最新の保持方針・ログとデータ共有の設定を確認する([公式データ共有方針](https://ai.google.dev/gemini-api/docs/logs-policy#contributor-tier)、[有料サービス規約](https://ai.google.dev/gemini-api/terms#data-use-paid)) |
 | モデル分業 | 計画だけ上位モデル、実行は Hydrogen(Step 6) |
 
@@ -554,7 +556,7 @@ flowchart TD
 |---|---|
 | **Gemini API / Google AI Studio** | 全ティアで利用可。まず AI Studio の Run settings で thinking level を切り替えて挙動を確認 |
 | **Android Studio** | Androidアプリ開発での日常的なコード生成・デバッグ(Gemini API経由) |
-| **Antigravity** | 有料 Google AI Pro / Ultra で利用。Orchestrator で Carbon との分業を自動化。Gemini front end design skill(google-gemini/demolab)と併用したUI生成の事例が公式に紹介されている |
+| **Antigravity** | HydrogenはFree、Google AI Plus、Pro、Ultraで利用可能。Orchestratorは別機能で、Carbon版はUltra、Argon版はUltraと対象のPro(有料プランまたは対象端末の試用)に限定される。Hydrogenへのアクセス権と区別する([公式モデル一覧](https://antigravity.google/docs/models)、[プラン](https://antigravity.google/docs/plans))。Gemini front end design skill(google-gemini/demolab)と併用したUI生成の事例が公式に紹介されている |
 | **Gemini for business** | API・モデルドロップダウン・Antigravity・Sheets 内の Gemini から利用 |
 | **Gemini in Sheets** | 財務データを対話的なモデルへ変換。Googleは「Sheets canvas で出力生成が従来比30%超高速」と説明 |
 | **Gemini アプリ / Google Search** | 一般ユーザー向け。無料ユーザーは自動モデル選択で提供。Searchでは複数部分の質問の意図理解、クエリfan-outの強化、表や画像を含む視覚的回答が改善 |
