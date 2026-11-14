@@ -545,3 +545,39 @@ test("resolves CLASSDEFS separately for renderer modules targeting different car
  assert.equal(audit(cards + modules, page([suffixes[0], suffixes[0]])).status, 1);
  assert.equal(audit(cards + modules, page([...suffixes].reverse())).status, 1);
 });
+
+test("blocks unestablished renderer associations including unsupported card selectors", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card" data-chart><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ for (const selector of ["'.diagram-card[data-chart]'", 'selector']) {
+  const source = `${card}<script>const CLASSDEFS = '\\nclassDef box fill:#fff;'; document.querySelectorAll(${selector}); mermaid.render('id', src + CLASSDEFS);</script>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['renderer:chart']);
+ }
+ const noSuffix = `${card}<script>document.querySelector('#chart'); mermaid.render('id', src);</script>`;
+ assert.equal(audit(noSuffix, page).status, 0);
+});
+
+test("inserts card payload only into a real empty code element after a span title", () => {
+ for (const quote of ['"', "'"]) {
+  const source = `<div class="code-block"><span title=${quote}<code></code>${quote}></span><pre><code></code></pre><script type="text/plain">kept payload</script></div>`;
+  const result = audit(source, '<pre><code>kept payload</code></pre>');
+  assert.equal(result.status, 0);
+  assert.deepEqual(audit(source, '').data.missingCodeBlocks, ['kept payload']);
+ }
+});
+
+test("does not certify the initializer when CLASSDEFS is later reassigned", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ for (const assignment of ["CLASSDEFS = 'different';", 'CLASSDEFS = dynamic;', "CLASSDEFS += 'extra';"]) {
+  const source = `${card}<script>let CLASSDEFS = ${JSON.stringify(suffix)}; ${assignment} mermaid.render('id', src + CLASSDEFS);</script>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 1, assignment);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});

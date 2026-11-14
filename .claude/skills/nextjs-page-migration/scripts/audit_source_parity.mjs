@@ -973,6 +973,13 @@ function rendererSuffix(literalSource) {
   if (!rendersWithSuffix) return undefined;
   // Locate the declaration in code, then read its literal from the offset-aligned view.
   const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
+  if (declaration) {
+    const initialWrite = declaration.index + declaration[0].indexOf("CLASSDEFS");
+    const writes = executable.matchAll(/\bCLASSDEFS\s*(?:=(?!=|>)|(?:\*\*|&&|\|\||\?\?|[+\-*/%&|^])=|\+\+|--)/g);
+    // Additional writes may run under control flow or in callbacks. Do not
+    // certify an initializer without establishing the value at render time.
+    if (Array.from(writes).some(write => write.index !== initialWrite) || /(?:\+\+|--)\s*CLASSDEFS\b/.test(executable)) return null;
+  }
   const initializerSource = declaration && literalSource.slice(declaration.index);
   const initializer = initializerSource && /^(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*"))*)/.exec(initializerSource);
   // Check the remainder separately so a failed terminator cannot backtrack to a
@@ -1020,12 +1027,13 @@ function materializePlainTextCards(src) {
     const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n");
     const executable = blankNonCodeText(literalSource, false);
     const selectors = [];
-    for (const call of executable.matchAll(/\bdocument\.querySelector(?:All)?\s*\(/g)) {
+    const selectionCalls = Array.from(executable.matchAll(/\bdocument\.querySelector(?:All)?\s*\(/g));
+    for (const call of selectionCalls) {
       const argument = /^\s*(['"])((?:[^\\]|\\.)*?)\1\s*\)/.exec(literalSource.slice(call.index + call[0].length));
       if (argument) selectors.push(decodeQuotedEntryEscapes(argument[2]));
     }
-    return { suffix: rendererSuffix(literalSource), selectors };
-  }).filter(scope => scope.suffix !== undefined);
+    return { suffix: rendererSuffix(literalSource), selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) };
+  }).filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const cards = extractElementContents(stashed, tag => {
     const cls = readHtmlAttribute(tag, "class") ?? "";
@@ -1044,13 +1052,24 @@ function materializePlainTextCards(src) {
     const payload = rawLines.map(l => l.slice(Number.isFinite(indent) ? indent : 0)).join("\n");
     let content = card.content;
     if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
-      content = content.replace(new RegExp(String.raw`<code\b${htmlAttributesPattern}>\s*<\/code>`, "i"), (_full, attributes) => `<code${attributes}>${escape(payload)}</code>`);
+      // Consume every opening tag as a unit before looking for empty code,
+      // so a span's quoted title cannot supply a fake <code></code> target.
+      const emptyCodeOrTag = new RegExp(String.raw`<code\b${htmlAttributesPattern}>\s*<\/code>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`, "gi");
+      let inserted = false;
+      content = content.replace(emptyCodeOrTag, (full, attributes) => {
+        if (attributes === undefined || inserted) return full;
+        inserted = true;
+        return `<code${attributes}>${escape(payload)}</code>`;
+      });
       // A selected data-code script must not be materialized again by inventoryHtml.
       if (content !== card.content) content = content.replace(marker[0], "");
     } else {
-      const renderer = scopes.find(scope => scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector)))
-        ?? (scopes.length === 1 && scopes[0].selectors.length === 0 ? scopes[0] : undefined);
-      if (renderer?.suffix === null) unresolvedMermaidSources.push(`CLASSDEFS:${readHtmlAttribute(card.openingTag, "id") ?? `card-${marker[1]}`}`);
+      const matching = scopes.filter(scope => scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector)));
+      const renderer = matching.length === 1 ? matching[0]
+        : (matching.length === 0 && scopes.length === 1 && !scopes[0].hasSelection ? scopes[0] : undefined);
+      const cardId = readHtmlAttribute(card.openingTag, "id") ?? `card-${marker[1]}`;
+      if (!renderer && scopes.length > 0) unresolvedMermaidSources.push(`renderer:${cardId}`);
+      if (renderer?.suffix === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
       const suffix = renderer?.suffix ?? "";
       content = content.replace(marker[0], () => `<div class="mermaid">${escape(payload + suffix)}</div>`);
     }
