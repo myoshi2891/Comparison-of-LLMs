@@ -916,9 +916,9 @@ const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
  */
 function materializePlainTextCards(src) {
   const scripts = [];
-  const stashed = src.replace(/<!--[\s\S]*?-->|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>/gi,
+  const stashed = src.replace(/<!--[\s\S]*?-->|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
     (full, attributes, payload) => {
-      if (attributes === undefined) return "";
+      if (attributes === undefined) return full.startsWith("<!--") ? "" : full;
       scripts.push({ full, attributes, payload });
       return `<script data-audit-payload="${scripts.length - 1}"></script>`;
     });
@@ -928,7 +928,19 @@ function materializePlainTextCards(src) {
   }).map(script => blankNonCodeText(script.payload)).join("\n");
   const executable = blankNonCodeText(literalSource, false);
   let suffix = "";
-  if (/mermaid\.render\([^;]*\bsrc\s*\+\s*CLASSDEFS\b/.test(executable)) {
+  // Strings/comments are already masked. Balance parentheses so later ASI
+  // statements cannot supply a suffix that this render call never receives.
+  const rendersWithSuffix = Array.from(executable.matchAll(/\bmermaid\.render\s*\(/g)).some(call => {
+    const start = call.index + call[0].length;
+    let depth = 1;
+    for (let end = start; end < executable.length; end++) {
+      if (executable[end] === "(") depth++;
+      if (executable[end] === ")") depth--;
+      if (depth === 0) return /\bsrc\s*\+\s*CLASSDEFS\b/.test(executable.slice(start, end));
+    }
+    return false;
+  });
+  if (rendersWithSuffix) {
     // Locate the declaration in code, then read its literal from the offset-aligned view.
     const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
     const initializerSource = declaration && literalSource.slice(declaration.index);

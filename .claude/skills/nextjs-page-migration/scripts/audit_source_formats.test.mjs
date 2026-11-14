@@ -473,3 +473,21 @@ test("materializes selected card payloads through quoted angle brackets in empty
   assert.equal(audit(source, page.replace('kept', 'lost')).status, 1, attributes);
  }
 });
+
+
+test("does not infer CLASSDEFS from code after a semicolon-free render call", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const source = `${card}<script>const CLASSDEFS = '\\nclassDef box fill:#fff;'; mermaid.render('id', src)\nconsume(src + CLASSDEFS)</script>`;
+ assert.equal(audit(source, page).status, 0);
+ assert.equal(audit(source, '').status, 1);
+});
+
+test("ignores script-like text inside ordinary quoted tag attributes", () => {
+ for (const quote of ['"', "'"]) {
+  const source = `<div class="code-block"><span title=${quote}<script type=text/plain>wrong</script>${quote}></span><pre><code></code></pre><script type="text/plain">real payload</script></div>`;
+  assert.equal(audit(source, '<pre><code>real payload</code></pre>').status, 0);
+  assert.equal(audit(source, '<pre><code>wrong</code></pre>').status, 1);
+ }
+});
