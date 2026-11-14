@@ -2069,6 +2069,10 @@ export default function Page() {
                     <span className="hljs-string">{'"cache_write_5m"'}</span>
                     {": "}
                     <span className="hljs-number">{"10.0"}</span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_write_1h"'}</span>
+                    {": "}
+                    <span className="hljs-number">{"16.0"}</span>
                     {"}"}
                   </span>
                   {"\n"}
@@ -2096,6 +2100,14 @@ export default function Page() {
                         '"""usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。"""'
                       }
                     </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    cache = usage.get("}
+                    <span className="hljs-string">{'"cache_creation"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" {}"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -2135,12 +2147,22 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        + usage.get("}
-                    <span className="hljs-string">{'"cache_creation_input_tokens"'}</span>
+                    {"        + cache.get("}
+                    <span className="hljs-string">{'"ephemeral_5m_input_tokens"'}</span>
                     {", "}
                     <span className="hljs-number">{"0"}</span>
                     {") * PRICE["}
                     <span className="hljs-string">{'"cache_write_5m"'}</span>
+                    {"]"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        + cache.get("}
+                    <span className="hljs-string">{'"ephemeral_1h_input_tokens"'}</span>
+                    {", "}
+                    <span className="hljs-number">{"0"}</span>
+                    {") * PRICE["}
+                    <span className="hljs-string">{'"cache_write_1h"'}</span>
                     {"]"}
                   </span>
                   {"\n"}
@@ -3133,6 +3155,17 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"            "}
+                    <span className="hljs-string">{'"cache_control"'}</span>
+                    {": {"}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"ephemeral"'}</span>
+                    {"},  "}
+                    <span className="hljs-comment">{"# 自動キャッシュを明示的に有効化"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
                     <span className="hljs-string">{'"tools"'}</span>
                     {": tools,"}
                   </span>
@@ -3958,10 +3991,10 @@ export default function Page() {
             </div>{" "}
             <h3 id="s7-7">{"7.7 キャッシュとの相乗効果"}</h3>{" "}
             <p>
-              {" 履歴を追記のみにすると、プレフィックスが毎回一致するため"}
-              <strong>{"キャッシュ命中率が上がります"}</strong>
+              {" 履歴を追記のみにしてプレフィックスが一致すると、"}
+              <strong>{"キャッシュ再利用の条件を満たしやすくなります"}</strong>
               {
-                "。キャッシュ読み出しは入力単価の0.025倍($0.20/MTok)で、5分書き込みが $10、1時間書き込みが $16(いずれも百万トークンあたり)です。キャッシュ対象の最小サイズは512トークンです "
+                "。一致だけではキャッシュは有効になりません。agent_loop() のようにリクエストのトップレベルで cache_control を指定するか、明示的なキャッシュブレークポイントを設定することが前提です。通常のツール定義だけでは自動的にキャッシュされません。キャッシュ読み出しは入力単価の0.025倍($0.20/MTok)で、5分書き込みが $10、1時間書き込みが $16(いずれも百万トークンあたり)です。キャッシュ対象の最小サイズは512トークンです "
               }
               <span className={[styles.tag, styles.official].join(" ")}>{"公式"}</span>
               {" ("}
@@ -5880,7 +5913,7 @@ export default function Page() {
                     <span className="hljs-punctuation">{":"}</span>{" "}
                     <span className="hljs-string">
                       {
-                        '"jq -r \'.tool_input.file_path\' | xargs -I{} sh -c \'case \\"{}\\" in *.ts|*.tsx|*.js) npx prettier --write \\"{}\\";; esac\'"'
+                        '"jq -j \'.tool_input.file_path, \\"\\\\u0000\\"\' | xargs -0 sh -c \'for file do case \\"$file\\" in *.ts|*.tsx|*.js) npx prettier --write -- \\"$file\\";; esac; done\' sh"'
                       }
                     </span>
                   </span>
@@ -6558,6 +6591,84 @@ export default function Page() {
                   <span className={styles.codeLine}>{"    r = RATES[mode]"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"    cache = usage.get("}
+                    <span className="hljs-string">{'"cache_creation"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" {}"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    read = usage.get("}
+                    <span className="hljs-string">{'"cache_read_input_tokens"'}</span>
+                    {", "}
+                    <span className="hljs-number">{"0"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    write_5m = cache.get("}
+                    <span className="hljs-string">{'"ephemeral_5m_input_tokens"'}</span>
+                    {", "}
+                    <span className="hljs-number">{"0"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    write_1h = cache.get("}
+                    <span className="hljs-string">{'"ephemeral_1h_input_tokens"'}</span>
+                    {", "}
+                    <span className="hljs-number">{"0"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    cached = read "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" write_5m "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" write_1h "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" usage.get("}
+                    <span className="hljs-string">{'"cache_creation_input_tokens"'}</span>
+                    {", "}
+                    <span className="hljs-number">{"0"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" cached "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"any"}</span>
+                    {"(key "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" r "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" key "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" ("}
+                    <span className="hljs-string">{'"cache_read"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_write_5m"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_write_1h"'}</span>
+                    {")):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"raise"}</span>
+                    {" ValueError("}
+                    <span className="hljs-string">
+                      {'"このモードのキャッシュ単価を確認・設定してから見積もってください"'}
+                    </span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"    "}
                     <span className="hljs-keyword">{"return"}</span>
                     {" ("}
@@ -6584,25 +6695,34 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        + usage.get("}
-                    <span className="hljs-string">{'"cache_read_input_tokens"'}</span>
-                    {", "}
-                    <span className="hljs-number">{"0"}</span>
-                    {") * r.get("}
+                    {"        + (read * r["}
                     <span className="hljs-string">{'"cache_read"'}</span>
-                    {", "}
+                    {"] "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" read "}
+                    <span className="hljs-keyword">{"else"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
                     {")"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        + usage.get("}
-                    <span className="hljs-string">{'"cache_creation_input_tokens"'}</span>
-                    {", "}
-                    <span className="hljs-number">{"0"}</span>
-                    {") * r.get("}
+                    {"        + (write_5m * r["}
                     <span className="hljs-string">{'"cache_write_5m"'}</span>
-                    {", "}
+                    {"] "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" write_5m "}
+                    <span className="hljs-keyword">{"else"}</span>{" "}
+                    <span className="hljs-number">{"0"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        + (write_1h * r["}
+                    <span className="hljs-string">{'"cache_write_1h"'}</span>
+                    {"] "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" write_1h "}
+                    <span className="hljs-keyword">{"else"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
                     {")"}
                   </span>
