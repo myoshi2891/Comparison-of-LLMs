@@ -18,7 +18,7 @@ FROM oven/bun:1-debian AS dev
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 \
+    && apt-get install -y --no-install-recommends python3 jq \
     && rm -rf /var/lib/apt/lists/*
 
 # deps 層の node_modules をコピー
