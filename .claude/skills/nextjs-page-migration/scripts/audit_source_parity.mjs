@@ -578,11 +578,12 @@ function normalizeUrl(url) {
 }
 
 /**
- * Masks comments and template-literal contents while preserving quoted string contents.
+ * Masks comments and template-literal contents, optionally masking quoted strings too.
  * @param {string} src - The module source text.
- * @return {string} The source with comments and template-literal contents replaced by spaces.
+ * @param {boolean} preserveQuotedStrings - Keep single/double-quoted contents for literal extraction.
+ * @return {string} The source with non-code contents replaced by spaces, preserving offsets.
  */
-function blankNonCodeText(src) {
+function blankNonCodeText(src, preserveQuotedStrings = true) {
   const blank = (text) => text.replace(/[^\n]/g, " ");
   let out = "";
   let index = 0;
@@ -615,7 +616,7 @@ function blankNonCodeText(src) {
         cursor += 1;
       }
       const body = src.slice(index + 1, Math.min(cursor, src.length));
-      out += char + (char === "`" ? blank(body) : body) + (src[cursor] === char ? char : "");
+      out += char + (char === "`" || !preserveQuotedStrings ? blank(body) : body) + (src[cursor] === char ? char : "");
       index = Math.min(cursor + 1, src.length);
       continue;
     }
@@ -919,13 +920,16 @@ function materializePlainTextCards(src) {
       scripts.push({ full, attributes, payload });
       return `<script data-audit-payload="${scripts.length - 1}"></script>`;
     });
-  const executable = scripts.filter(script => {
+  const literalSource = scripts.filter(script => {
     const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
     return !type || type === "module" || /^(?:text|application)\/(?:java|ecma)script$/.test(type);
   }).map(script => blankNonCodeText(script.payload)).join("\n");
+  const executable = blankNonCodeText(literalSource, false);
   let suffix = "";
   if (/mermaid\.render\([^;]*\bsrc\s*\+\s*CLASSDEFS\b/.test(executable)) {
-    const literal = /\b(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"))*);/.exec(executable)?.[1];
+    // Locate the declaration in code, then read its literal from the offset-aligned view.
+    const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
+    const literal = declaration && /^(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*"))*);/.exec(literalSource.slice(declaration.index))?.[1];
     if (literal) suffix = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2])).join("");
   }
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -947,6 +951,8 @@ function materializePlainTextCards(src) {
     let content = card.content;
     if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
       content = content.replace(/<code\b([^>]*)>\s*<\/code>/i, (_full, attributes) => `<code${attributes}>${escape(payload)}</code>`);
+      // A selected data-code script must not be materialized again by inventoryHtml.
+      if (content !== card.content) content = content.replace(marker[0], "");
     } else {
       content = content.replace(marker[0], () => `<div class="mermaid">${escape(payload + suffix)}</div>`);
     }
