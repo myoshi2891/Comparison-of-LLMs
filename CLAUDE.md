@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-14追加レビュー: 原本監査は文字列とコメントを隠したコードでrender呼び出しとCLASSDEFS宣言を検出し、リテラル抽出用の表現を分離。カードで表示済みのscriptを消費してdata-codeの二重処理を防止。Fable 5.2の著者・独立評価22行は空の内容セルを取得状況の前へ移動し、原文・URL・リンク属性を保持。webのDocker devステージだけにテスト用python3を追加。全体240 files／3071 tests・監査76件・対象72件・HTML原本監査exit 0・typecheck・lint657 filesが成功。Dockerデーモン停止中のためイメージのビルド検証は未実施。
+
 2026-11-14追加レビュー: 原本監査の図挿入でドル記号を保持し、Moonshotの単一レコード内の入出力価格を取得するよう修正。Fable 5.2の費用例をTTL別課金・未定義キャッシュ単価の拒否へ修正し、agent_loopのキャッシュ明示設定と安全なPostToolUse引数渡しをHTML／Markdown・JSX・契約へ同期。全体240 files／3070 tests・対象71件・監査74件・pytest136件＋39 subtests・型・lint657 files・HTML原本監査exit 0・ビルド115静的ページ生成が成功。保存Markdownの既存lint指摘34件は対象外として保持。
 
 2026-11-14: 原本監査のCLASSDEFS判定をコメント除去済みの実行用scriptへ限定し、カード内ではdata-for属性のない最初のtext/plain payloadを選択するよう修正。追加2件のRed確認後、監査73テストとFable 5.2のHTML原本監査exit 0が成功。アプリ・依存・設定は無変更。

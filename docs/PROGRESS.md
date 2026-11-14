@@ -6,6 +6,13 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 原本監査・参考表・Dockerの追加レビュー4件（2026-11-14）
+
+- 4指摘すべて現行コードで確認して修正。監査のrender判定とCLASSDEFS宣言位置の検出は文字列・コメントを隠したコードを使い、リテラルの抽出用表現と分離。カード内で表示済みのscriptを消費し、data-codeによる二重復元を防止。他のcode要素の処理は維持。
+- Fable 5.2の著者・独立評価の22行は、末尾の空セルを取得状況の前の内容列へ移動。文章・URL・リンク属性は無変更。保存原本と固定JSONは変更せず、全文・構造比較時のみセル移動を逆変換する。追加契約で表示セルの全文・列順・リンク位置を完全一致検証。
+- webのDockerfileはdevステージだけpython3を追加。deps／buildステージは無変更。Dockerデーモンが停止中のため、イメージのビルド・コンテナ内テストは未検証。
+- 修正前に監査の追加2件と表契約の失敗を確認。全体Vitest 240 files／3071 tests、監査76件、対象3 files／72 tests、HTML原本監査exit 0、typecheck、lint657 files、変更Markdownのlintが成功。Next.jsビルドは今回未実行。コミットは作成しない。
+
 ## 追加レビュー6件の修正（2026-11-14）
 
 - 6指摘とも現行コードで確認し修正。図挿入はコールバック置換でドル記号列を保持。Moonshotのoutput前だけ入力価格のドル記号を許可し、80文字・レコード終端・次モデルの境界とoutput後のドル制限を維持。
@@ -819,7 +826,7 @@ Astra: http://localhost:3000/codex/astra-best-practices
 指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
-全体239 files／3065 tests成功（2026-11-13実測。Fable 5.2の66契約を含む）。型・lint656 files・pytest135件が成功。
+全体240 files／3071 tests成功（2026-11-14追加レビュー後の実測）。対象72件・監査76件・型・lint657 files・HTML原本監査exit 0が成功。Dockerデーモン停止中のためdevイメージの実ビルドは未検証。Next.jsビルド・pytestは今回未実行。
 Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは107件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 Fable 5.2移行ではユーザー指定でnpm・ビルド未実行。直前の価格更新時にはbun run build成功（2026-11-13、114静的ページ生成）。
