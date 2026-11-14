@@ -9262,6 +9262,7 @@ export default function Page() {
                       <code>{"/comments"}</code>
                       {" を除いたもの "}
                     </td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9273,7 +9274,6 @@ export default function Page() {
                         {"https://www.oneusefulthing.org/p/fable-52-and-jagged-agi/comments"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S15">
                     <td>{"S15"}</td>
@@ -9282,6 +9282,7 @@ export default function Page() {
                         " swyx / Latent Space「Fable 5.2 retakes World #1 LLM spot」(独立評価、効果的な使い方、開発者の反応の総まとめ) "
                       }
                     </td>
+                    <td></td>
                     <td>{"本文取得"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9295,7 +9296,6 @@ export default function Page() {
                         }
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S19">
                     <td>{"S19"}</td>
@@ -9304,6 +9304,7 @@ export default function Page() {
                         " Boris Cherny(Claude Code の作者)(X): チーム由来の使い方のヒント(2026年1月、5.2 以前) "
                       }
                     </td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9315,11 +9316,11 @@ export default function Page() {
                         {"https://x.com/bcherny/status/2017742741636321619"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S29">
                     <td>{"S29"}</td>
                     <td>{"Alex Albert(Anthropic)(X): Fable 5.2 の使い方"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9331,11 +9332,11 @@ export default function Page() {
                         {"https://x.com/alexalbert__/status/2119869724247077229"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S30">
                     <td>{"S30"}</td>
                     <td>{"Lydia Hallie(Anthropic)(X): 指揮役としての使用"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9347,11 +9348,11 @@ export default function Page() {
                         {"https://x.com/lydiahallie/status/2119871667400999166"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S31">
                     <td>{"S31"}</td>
                     <td>{"Felix Rieseberg(Anthropic)(X): 使い分けの助言"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9363,11 +9364,11 @@ export default function Page() {
                         {"https://x.com/felixrieseberg/status/2119867837296857361"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S32">
                     <td>{"S32"}</td>
                     <td>{"Theo(X): 利用枠の費用対効果の分析"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9379,11 +9380,11 @@ export default function Page() {
                         {"https://x.com/theo/status/2119960608816988596"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S33">
                     <td>{"S33"}</td>
                     <td>{"Yuchen Jin(X): max の評価への指摘"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9395,11 +9396,11 @@ export default function Page() {
                         {"https://x.com/Yuchenj_UW/status/2119867942603264279"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S34">
                     <td>{"S34"}</td>
                     <td>{"Elvis Saravia / DAIR.AI(X): 自前の評価セットの重要性"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9411,7 +9412,6 @@ export default function Page() {
                         {"https://x.com/omarsar0/status/2119795295630324042"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S16">
                     <td>{"S16"}</td>
@@ -9420,6 +9420,7 @@ export default function Page() {
                         " wmedia.es(Claude Code の実践ヒント)「Fable 5.2 in Claude Code: clean up your CLAUDE.md and add one line」 "
                       }
                     </td>
+                    <td></td>
                     <td>{"本文取得"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9431,7 +9432,6 @@ export default function Page() {
                         {"https://wmedia.es/en/tips/claude-code-fable-5-2-claude-md-cleanup"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                 </tbody>
               </table>{" "}
@@ -9453,6 +9453,7 @@ export default function Page() {
                   <tr id="S26">
                     <td>{"S26"}</td>
                     <td>{"SemiAnalysis(X): GDPx の結果と費用"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9464,11 +9465,11 @@ export default function Page() {
                         {"https://x.com/SemiAnalysis_/status/2119961455348826461"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S27">
                     <td>{"S27"}</td>
                     <td>{"Artificial Analysis(X): Intelligence Index とコスト"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9480,11 +9481,11 @@ export default function Page() {
                         {"https://x.com/ArtificialAnlys/status/2119878995386982508"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S28">
                     <td>{"S28"}</td>
                     <td>{"Vals AI(X): Vals Index"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9496,11 +9497,11 @@ export default function Page() {
                         {"https://x.com/ValsAI/status/2119872483629408658"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S35">
                     <td>{"S35"}</td>
                     <td>{"Cursor(X): CursorBench と effort の注意"}</td>
+                    <td></td>
                     <td>{"参照リンク(S15内)"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9512,11 +9513,11 @@ export default function Page() {
                         {"https://x.com/cursor_ai/status/2119880829212172509"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S22">
                     <td>{"S22"}</td>
                     <td>{"CNBC: リリース報道"}</td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9530,11 +9531,11 @@ export default function Page() {
                         }
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S23">
                     <td>{"S23"}</td>
                     <td>{"MacRumors: リリース報道"}</td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9548,11 +9549,11 @@ export default function Page() {
                         }
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S24">
                     <td>{"S24"}</td>
                     <td>{"TechCrunch: リリース報道(評価されていることへの疑い、能力制限)"}</td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9566,11 +9567,11 @@ export default function Page() {
                         }
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S18">
                     <td>{"S18"}</td>
                     <td>{"TechTimes: Fermat の最終定理の形式化の補足"}</td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9584,11 +9585,11 @@ export default function Page() {
                         }
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S25">
                     <td>{"S25"}</td>
                     <td>{"Medium(Raja Durai): 開発者向けチートシート(第三者の解説)"}</td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9602,11 +9603,11 @@ export default function Page() {
                         }
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S48">
                     <td>{"S48"}</td>
                     <td>{"Brave New Coin: Mollick の検証の要約(8万7千語の規則集の記述)"}</td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9620,11 +9621,11 @@ export default function Page() {
                         }
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S49">
                     <td>{"S49"}</td>
                     <td>{"GPTunneL: Mollick の検証の要約(182ページの論文の記述)"}</td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9636,11 +9637,11 @@ export default function Page() {
                         {"https://www.gptunnel.ru/en/blog/claude-fable-5-2"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                   <tr id="S45">
                     <td>{"S45"}</td>
                     <td>{"kingy.ai: 「Fable 5.5」の噂の追跡(公式発表なしとの整理)"}</td>
+                    <td></td>
                     <td>{"スニペット"}</td>
                     <td className={styles["url-cell"]}>
                       {" "}
@@ -9652,7 +9653,6 @@ export default function Page() {
                         {"https://kingy.ai/blog/claude-fable-5-5/"}
                       </a>{" "}
                     </td>
-                    <td></td>
                   </tr>
                 </tbody>
               </table>{" "}
