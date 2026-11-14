@@ -3894,7 +3894,7 @@
                     [
                       [
                         "code",
-                        "data = call(\n    {\n        \"model\": \"claude-fable-5-2\",\n        \"max_tokens\": 32_000,\n        \"output_config\": {\"effort\": \"high\"},\n        \"thinking\": {\"type\": \"adaptive\", \"display\": \"updates\"},\n        \"messages\": [{\"role\": \"user\", \"content\": \"...\"}],\n    },\n    betas=[\"thinking-display-updates-2026-08-18\"],\n)\n\n# テキストだけでなく、中身のある thinking ブロックも描画する\nfor block in data[\"content\"]:\n    if block[\"type\"] == \"text\":\n        print(block[\"text\"])\n    elif block[\"type\"] == \"thinking\" and block.get(\"thinking\"):\n        print(\"[進捗]\", block[\"thinking\"])"
+                        "data = call(\n    {\n        \"model\": \"claude-fable-5-2\",\n        \"max_tokens\": 32_000,\n        \"output_config\": {\"effort\": \"high\"},\n        \"thinking\": {\"type\": \"adaptive\", \"display\": \"updates\"},\n        \"messages\": [{\"role\": \"user\", \"content\": \"...\"}],\n    },\n    betas=[\"thinking-display-updates-2026-08-18\"],\n)\n\n# call() 完了後にテキストと thinking の進捗を表示する（待機中の逐次更新ではない）\nfor block in data[\"content\"]:\n    if block[\"type\"] == \"text\":\n        print(block[\"text\"])\n    elif block[\"type\"] == \"thinking\" and block.get(\"thinking\"):\n        print(\"[進捗]\", block[\"thinking\"])"
                       ]
                     ]
                   ]
