@@ -442,3 +442,34 @@ test("materializes a card's data-code payload exactly once and keeps other code 
   assert.equal(audit(source, page.replace('schema', 'omitted')).status, 1);
  }
 });
+
+
+test("accepts complete CLASSDEFS literals terminated by semicolons or ASI", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const initializer of [JSON.stringify(suffix), `'\\nclassDef box ' +\n'fill:#fff;'`]) {
+  for (const end of [';', '\n', ' // ASI\n']) {
+   const source = `${card}<script>const CLASSDEFS = ${initializer}${end}mermaid.render('id', src + CLASSDEFS);</script>`;
+   assert.equal(audit(source, page(chart + suffix)).status, 0, initializer + end);
+   assert.equal(audit(source, page(chart)).status, 1, initializer + end);
+  }
+ }
+ for (const tail of [' + dynamic;', '\n+ dynamic;', '\n.trim();', '\n[0];', '\n`tagged`;', '\n? "yes" : "no";', '\ninstanceof String;']) {
+  const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}${tail}mermaid.render('id', src + CLASSDEFS);</script>`;
+  assert.equal(audit(source, page(chart)).status, 0, tail);
+  assert.equal(audit(source, page(chart + suffix)).status, 1, tail);
+ }
+});
+
+test("materializes selected card payloads through quoted angle brackets in empty code attributes", () => {
+ const value = 'print("<kept> &lt;")';
+ for (const attributes of ['title="a>b"', "title='a>b'", 'title="<code>x>y"']) {
+  const source = `<div class="code-block"><pre><code ${attributes}></code></pre><script type="text/plain" data-for="elsewhere">wrong</script><script type="text/plain">${value}</script><script type="text/plain">last payload</script></div>`;
+  const page = `<pre><code>{${JSON.stringify(value)}}</code></pre>`;
+  assert.equal(audit(source, page).status, 0, attributes);
+  assert.deepEqual(audit(source, '').data.missingCodeBlocks, [value]);
+  assert.equal(audit(source, page.replace('kept', 'lost')).status, 1, attributes);
+ }
+});
