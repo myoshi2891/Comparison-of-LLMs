@@ -230,12 +230,14 @@ Googleは Hydrogen を「Gemini 3.8 Flash 以前の Flash 系からの推奨ア�
 flowchart TD
     A["移行開始"] --> B["SDKを最新版へ更新"]
     B --> C["model を gemini-4-hydrogen に変更"]
-    C --> D["temperature top_p top_k を削除"]
+    C --> D["temperature top_p top_k を削除 frequency_penalty presence_penalty も削除 candidate_count は省略または1へ"]
     D --> E["thinking_budget を thinking_level に置換 MINIMAL は LOW へ"]
     E --> F["max_output_tokens を見直し 低すぎる値を引き上げ"]
     F --> G["非対応機能の使用有無を確認 明示的キャッシュ 画像生成 Live API"]
     G --> H["thought signature を含む履歴を保持しているか確認"]
-    H --> I["評価セットで 3.8 Flash と比較"]
+    H --> PREFILL["prefilled modelターンを検出して削除 履歴末尾のmodelターンも確認"]
+    PREFILL --> FORMAT["model応答の接頭辞は使わず system instruction や response_schema で出力形式を指定"]
+    FORMAT --> I["評価セットで 3.8 Flash と比較"]
     I --> J{"品質と総コストが基準を満たすか"}
     J -- "はい" --> K["段階的にトラフィックを切替"]
     J -- "いいえ" --> L["thinking_level や指示文を調整して再評価"]
@@ -249,17 +251,22 @@ flowchart TD
 | `thinking_budget` | level に変換される場合あり | **HTTP 400** | `thinking_level` へ置換 |
 | `thinking_level="MINIMAL"` | サポート | **HTTP 400** | `LOW` を使用 |
 | `temperature` / `top_p` / `top_k` | 一部無視 | 無視(削除が公式要件) | リクエストから削除。再現性は別手段で担保 |
+| `frequency_penalty` / `presence_penalty` | モデルによる | **非対応** | リクエストから削除 |
+| `candidate_count > 1` | 複数候補を指定できるモデルあり | **非対応** | パラメータを削除するか `1` に調整 |
+| prefilled `model` ターン | 応答の接頭辞を与える構成あり | **非対応**。履歴をmodelターンで終えない | 事前挿入したmodelターンを削除し、出力形式はsystem instructionや `response_schema` で指定。過去の実応答とthought signatureは保持 |
 | 課金 | 一部トークンのみ課金 | 思考トークン、およびグラウンディング使用時の内部ツール指示・関数宣言を含め**処理した全トークンが課金対象** | コスト試算を作り直す |
 | 明示的キャッシュ | 利用可 | **非対応**(第三者記事が公式を引用) | プロンプト構造を暗黙キャッシュ向けに(Step 8) |
 | 出力上限 | 65,536 | 既定 65,536、Long Decode で拡張 | Step 4 参照 |
 
 > 出典: Google Cloud「Get started with Gemini 4」および「Thinking」ドキュメント。Argon向けの移行リファレンス(gemini-skills リポジトリ)には、Python `google-genai` ≥ 2.30.1 / JS `@google/genai` ≥ 2.29.1 という要件が記載されています。Hydrogen向けの要件はWhat's newページで確認してください。
 
+非対応パラメータとprefillの除去は[公式移行ガイド](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/migrate)も参照してください。履歴末尾がmodelの実応答なら、署名ごとその応答を保持し、次のuser入力または対応するツール結果を追加してから送信します。応答の接頭辞として挿入したmodelターンとは区別します。
+
 **移行のコツ**
 
 1. **まず同一プロンプトで比較**: 指示文を変えずに 3.8 Flash と並べ、差分が「モデル差」なのか「指示の曖昧さ」なのか切り分ける
 2. **再試行率と総トークンを見る**: 単価ではなく「1タスク完了あたりのコスト」で比較する。Google は 2〜2.8倍高速・トークン使用 12〜23% 減という**パートナー初期検証値**を公表しています(ワークロード依存なので自社計測が必須)
-3. **旧パラメータの残骸を grep**: `thinking_budget`、`temperature`、`MINIMAL` の残存はHTTP 400または無視の原因になる
+3. **旧パラメータの残骸を grep**: `thinking_budget`、`temperature`、`MINIMAL`、`frequency_penalty`、`presence_penalty`、`candidate_count > 1` の残存はHTTP 400または無視の原因になる
 
 ---
 
@@ -274,7 +281,7 @@ Hydrogen は入力・思考・出力が**1つの 1,048,576 トークン窓を共
 
 ```mermaid
 flowchart TD
-    A["出力サイズの見積り"] --> B{"65,536 トークン以内で収まるか"}
+    A["思考と回答のトークン数を合算して見積る"] --> B{"思考と回答の合計が65,536 トークン以内で収まるか"}
     B -- "はい" --> C["通常リクエスト max_output_tokens は十分大きく"]
     B -- "いいえ" --> D{"待ち時間は数分許容できるか"}
     D -- "いいえ" --> E["タスクを分割して複数リクエストにする"]
@@ -375,9 +382,8 @@ flowchart TD
 
 ```python
 # マルチターンでは thought signature を含む履歴を丸ごと再送する(概念コード)
-history = []  # model の返した content(thought signature を含む)をそのまま append する
-
-def step(client, user_msg):
+# 呼び出し元で会話ごとに history=[] を作成し、対応する履歴を渡す。他の会話と共有しない。
+def step(client, history, user_msg):
     history.append({"role": "user", "parts": [{"text": user_msg}]})
     resp = client.models.generate_content(
         model="gemini-4-hydrogen",
@@ -584,9 +590,11 @@ flowchart TD
 - [ ] SDK を最新化した
 - [ ] `model="gemini-4-hydrogen"` に変更した
 - [ ] `temperature` / `top_p` / `top_k` を削除した
+- [ ] `frequency_penalty` / `presence_penalty` を削除し、`candidate_count > 1` を削除または `1` に調整した
+- [ ] prefilled modelターンを削除し、送信履歴がmodelターンで終わっていないことを確認した。出力形式は指示や `response_schema` で指定した
 - [ ] `thinking_budget` / `MINIMAL` を `thinking_level` に置換した
 - [ ] `max_output_tokens` を十分大きく設定した
-- [ ] 65,536超の出力が必要な箇所に Long Decodeの継続方式(バックグラウンド／フォアグラウンド／ステートレス／GenerateContent)を設計した
+- [ ] 思考と回答の合計が65,536を超える箇所に Long Decodeの継続方式(バックグラウンド／フォアグラウンド／ステートレス／GenerateContent)を設計した
 - [ ] thought signature を含む履歴を保持している
 - [ ] 非対応機能(明示的キャッシュ・画像生成・Live API・音声生成)を使っていない
 
