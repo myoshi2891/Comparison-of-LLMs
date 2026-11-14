@@ -3703,15 +3703,40 @@
                 "p",
                 {},
                 [
+                  ["code", {}, [["text", "strict: true"]]],
                   [
                     "text",
-                    "強制ツール使用が使えなくなったため、スキーマに沿った JSON が必要な場合は"
+                    "はツールが呼ばれた場合の入力スキーマを検証します。応答本文がJSONになることやツール呼び出し自体は保証しません。以下の"
                   ],
-                  ["code", {}, [["text", "strict: true"]]],
-                  ["text", "を使います"],
-                  ["span", { "class": "tag official" }, [["text", "公式"]]],
+                  ["code", {}, [["text", "tool_choice: {\"type\": \"auto\"}"]]],
+                  ["text", "では、呼び出し元が"],
+                  ["code", {}, [["text", "stop_reason"]]],
+                  ["text", "とcontent内の"],
+                  ["code", {}, [["text", "tool_use"]]],
+                  ["text", "を確認し、"],
+                  ["code", {}, [["text", "record_review"]]],
+                  [
+                    "text",
+                    "が呼ばれていない通常応答を記録成功として扱わず、必要に応じて再要求します。応答本文にスキーマに沿ったJSONが必要な場合は"
+                  ],
+                  ["code", {}, [["text", "output_config.format"]]],
+                  ["text", "のJSON Schema出力を使います"],
+                  [
+                    "span",
+                    {
+                      "class": "tag official"
+                    },
+                    [["text", "公式"]]
+                  ],
                   ["text", "("],
-                  ["a", { "class": "src-link", "href": "#S3" }, [["text", "S3"]]],
+                  [
+                    "a",
+                    {
+                      "class": "src-link",
+                      "href": "#S3"
+                    },
+                    [["text", "S3"]]
+                  ],
                   ["text", ")。"]
                 ]
               ],

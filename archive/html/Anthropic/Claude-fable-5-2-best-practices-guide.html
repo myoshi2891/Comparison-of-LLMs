@@ -2154,12 +2154,7 @@
           </div>
           <h3 id="s6-3">6.3 構造化出力は「強制」ではなく「strict」で</h3>
           <p>
-            強制ツール使用が使えなくなったため、スキーマに沿った JSON が必要な場合は
-            <code>strict: true</code> を使います <span class="tag official">公式</span> (<a
-              class="src-link"
-              href="#S3"
-              >S3</a
-            >)。
+            <code>strict: true</code> はツールが呼ばれた場合の入力スキーマを検証します。応答本文がJSONになることやツール呼び出し自体は保証しません。以下の <code>tool_choice: {&quot;type&quot;: &quot;auto&quot;}</code> では、呼び出し元が <code>stop_reason</code> とcontent内の <code>tool_use</code> を確認し、<code>record_review</code> が呼ばれていない通常応答を記録成功として扱わず、必要に応じて再要求します。応答本文にスキーマに沿ったJSONが必要な場合は <code>output_config.format</code> のJSON Schema出力を使います <span class="tag official">公式</span> (<a class="src-link" href="#S3">S3</a>)。
           </p>
           <div class="code-block">
             <div class="cb-head">json</div>

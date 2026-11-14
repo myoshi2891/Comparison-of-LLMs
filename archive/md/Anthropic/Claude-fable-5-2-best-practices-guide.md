@@ -433,7 +433,7 @@ curl https://api.anthropic.com/v1/messages \
 
 ### 6.3 構造化出力は「強制」ではなく「strict」で
 
-強制ツール使用が使えなくなったため、スキーマに沿った JSON が必要な場合は `strict: true` を使います [公式] (S3)。
+`strict: true` はツールが呼ばれた場合の入力スキーマを検証します。応答本文がJSONになることやツール呼び出し自体は保証しません。以下の `tool_choice: {"type": "auto"}` では、呼び出し元が `stop_reason` とcontent内の `tool_use` を確認し、`record_review` が呼ばれていない通常応答を記録成功として扱わず、必要に応じて再要求します。応答本文にスキーマに沿ったJSONが必要な場合は `output_config.format` のJSON Schema出力を使います [公式] (S3)。
 
 ```json
 {
