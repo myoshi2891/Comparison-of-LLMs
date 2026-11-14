@@ -2,6 +2,7 @@
 
 > **対象読者**: Gemini API / Google AI Studio / Antigravity で実プロダクトやエージェントを構築・運用している中級〜上級エンジニア
 > **情報基準日**: 2026年11月13日(Gemini 4 Hydrogen 発表の翌日)
+> **最終更新日**: 2026年11月14日
 > **注意**: 発表直後のため、Google公式情報(ブログ・ドキュメント・モデルカード)と第三者記事・個人検証を明確に区別して記載しています。第三者情報には「(第三者)」、推奨設計のうち筆者の設計判断には「(設計判断)」と付けています。数値・価格は必ず公式ページで再確認してください。
 
 ---
@@ -278,7 +279,7 @@ flowchart TD
     D -- "いいえ" --> E["タスクを分割して複数リクエストにする"]
     D -- "はい" --> F["Interactions API で background=True と max_output_tokens 65,536超"]
     F --> G["ステータスをポーリング in_progress queued の間待機"]
-    G --> H["全 model_output ステップのテキストを連結して取得"]
+    G --> H["completed を確認して output_text を取得 失敗や不完全終了は例外"]
 ```
 
 ```python
@@ -301,18 +302,26 @@ while interaction.status in ("in_progress", "queued"):
     time.sleep(5)
     interaction = client.interactions.get(id=interaction.id)
 
-text = "".join(
-    step.text for step in interaction.steps
-    if getattr(step, "type", "") == "model_output"
-)
+if interaction.status == "failed":
+    raise RuntimeError(f"Interaction failed: {interaction.id}")
+if interaction.status == "cancelled":
+    raise RuntimeError(f"Interaction cancelled: {interaction.id}")
+if interaction.status == "incomplete":
+    raise RuntimeError(f"Interaction incomplete; review limits before retrying: {interaction.id}")
+if interaction.status != "completed":
+    raise RuntimeError(f"Unexpected interaction status: {interaction.status}")
+
+text = interaction.output_text
 ```
+
+[公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。
 
 **Long Decode の運用ルール**
 
 | ルール | 理由 |
 |---|---|
 | 必要なワークロードだけに使う(Google: チャット・Q&A・要約・抽出は通常 32K 未満で完了) | 数分かかり得る、課金も膨らむ |
-| `max_output_tokens` は仕事に必要な量だけに制限する | 暴走時の課金上限になる |
+| `max_output_tokens` は仕事に必要な量だけに制限する | 出力トークン(思考を含む)の課金だけを抑える。リクエスト総額の上限ではなく、継続hopの追加入力課金やツール料金も発生し得る |
 | `max_output_tokens` を大きくするだけでは不十分。バックグラウンド実行と併用する(第三者の移行記事が指摘) | 通常リクエストで65,536超を指定すると400になる報告がある |
 | 集計トークンの扱いに注意(第三者: Long Decode 中は各hopの入力が合算され、見かけ上コンテキストが過大に見える) | 監視・課金ダッシュボードの誤読防止 |
 | 固定長を狙った出力指定は効かない(第三者) | 長さ制御は指示文と分割設計で行う |
@@ -415,7 +424,7 @@ flowchart TD
 
 ## Step 7: マルチモーダル・長文書処理
 
-Hydrogen は 100万トークン入力と最大 100万トークン出力を組み合わせ、**PDF・スプレッドシート・図表・音声・録画動画**を引用付きレポートや構造化成果物へ統合するユースケースが公式に挙げられています。
+Hydrogen は入力・思考・出力で共有する 1,048,576 トークンのコンテキスト内で、**PDF・スプレッドシート・図表・音声・録画動画**を引用付きレポートや構造化成果物へ統合します。入力と出力それぞれに100万トークンを同時に使うことはできません。例えば入力80万トークンなら、思考を含む出力の残り枠は最大248,576トークンです。
 
 公式が示す指標(Google公表値): Multimodal Knowledge Agent(MKA)53.4%、Agents' Last Exam v1.1 で 71.6%。
 
@@ -449,12 +458,14 @@ flowchart TD
 - 出力は入力の5倍単価($7.50 vs $1.50)。**思考トークンが出力側に乗る**ため、thinking level がコストに直結する
 - Hydrogen は 1M コンテキスト全域でフラット価格(長文だけ高くなる階段料金がない)
 
-**試算例(筆者算出・Standard価格)**: 入力 100万、出力 20万(思考含む)の場合
+**試算例(筆者算出・Standard価格、キャッシュ割引なし・ツール利用なしの仮定)**: 初期入力5万、出力10万(思考含む)を、バックグラウンド実行の2 hopで生成する場合。1 hop目の出力を65,536トークン、2 hop目を34,464トークンとすると、2 hop目の入力は初期入力と既生成分の合計115,536トークンです。課金対象の入力は全hop合計165,536トークン、出力は100,000トークンとなり、コンテキスト使用量は最大150,000トークンで共有上限内に収まります。
 
 | モデル | 計算 | 合計 |
 |---|---|---|
-| Hydrogen | 1.5 + 0.2 × 7.5 | **$3.00** |
-| Argon / Carbon(12/1以降の倍額 $4 / $20) | 4 + 0.2 × 20 | $8.00 |
+| Hydrogen | 0.165536 × 1.5 + 0.1 × 7.5 | **$0.998304** |
+| Argon / Carbon(12/1以降の倍額 $4 / $20) | 0.165536 × 4 + 0.1 × 20 | $2.662144 |
+
+[公式のLong Decode課金説明](https://ai.google.dev/gemini-api/docs/generate-content/long-decode#understand-billing)のとおり、継続hopには追加入力課金があります。実際の請求は各hopのusageと適用されるキャッシュ割引で確認し、ツール利用時は別途その料金も加算してください。
 
 ### 8-2. 最適化フロー
 
