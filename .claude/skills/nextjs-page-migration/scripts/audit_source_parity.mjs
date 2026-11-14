@@ -948,7 +948,7 @@ function materializePlainTextCards(src) {
     if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
       content = content.replace(/<code\b([^>]*)>\s*<\/code>/i, (_full, attributes) => `<code${attributes}>${escape(payload)}</code>`);
     } else {
-      content = content.replace(marker[0], `<div class="mermaid">${escape(payload + suffix)}</div>`);
+      content = content.replace(marker[0], () => `<div class="mermaid">${escape(payload + suffix)}</div>`);
     }
     const start = card.index + card.openingTag.length;
     result = result.slice(0, start) + content + result.slice(start + card.content.length);
