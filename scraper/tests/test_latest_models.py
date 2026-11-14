@@ -80,3 +80,10 @@ def test_kimi_k3_extracts_multiline_prices():
     with patch("scraper.providers.moonshot.get_page_text", return_value=html):
         model = next(m for m in moonshot.scrape() if m.name == "Kimi K3")
     assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+
+def test_kimi_k3_extracts_single_record_prices():
+    html = '<p>Kimi K3 input $3.25 output $16.50</p>'
+    with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+        model = next(m for m in moonshot.scrape() if m.name == "Kimi K3")
+    assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
