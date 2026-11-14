@@ -3336,6 +3336,23 @@ export default function Page() {
                     {": results})"}
                   </span>
                   {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            checkpoint["}
+                    <span className="hljs-string">{'"messages"'}</span>
+                    {"] = messages  "}
+                    <span className="hljs-comment">{"# 次のAPI呼び出し前に保存する"}</span>
+                  </span>
+                  {"\n"}
                   <span className={styles.codeLine}></span>
                   {"\n"}
                   <span className={styles.codeLine}>

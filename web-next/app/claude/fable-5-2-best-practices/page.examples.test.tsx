@@ -123,6 +123,47 @@ assert len(requests) == 2
   );
 });
 
+it("agent_loopは次のAPI呼び出しが失敗しても完了済みtool_resultを保存する", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+checkpoint, requests, executed = {}, [], []
+tool = {"type": "tool_use", "id": "read-1", "name": "read", "input": {"path": "a.py"}}
+reply = {"stop_reason": "tool_use", "content": [tool]}
+expected = [{"role": "user", "content": "task"},
+    {"role": "assistant", "content": [tool]},
+    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "read-1", "content": "file content"}]}]
+done = {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}
+def call(body):
+    requests.append(copy.deepcopy(body))
+    if len(requests) == 1:
+        return reply
+    if len(requests) == 2:
+        assert checkpoint == {"messages": expected}, checkpoint
+        raise OSError("network unavailable")
+    return done
+def run_tool(name, args):
+    executed.append((name, args))
+    return "file content"
+scope = {"call": call}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+try:
+    scope["agent_loop"]("task", [], run_tool, max_turns=3, checkpoint=checkpoint)
+except OSError as error:
+    assert str(error) == "network unavailable"
+else:
+    raise AssertionError("failed API call must propagate")
+assert checkpoint == {"messages": expected}
+assert scope["agent_loop"]("task", [], run_tool, max_turns=1, checkpoint=checkpoint) == done
+assert requests[2]["messages"] == expected
+assert executed == [("read", {"path": "a.py"})]
+`,
+    examples()
+  );
+});
+
 it("PostToolUseは引用符・改行・シェル構文を含むパスをそのままPrettierへ渡す", () => {
   const code = examples().find((c) => c.includes('"PostToolUse"'));
   python(

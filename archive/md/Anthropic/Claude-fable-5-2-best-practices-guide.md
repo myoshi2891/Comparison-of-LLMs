@@ -512,6 +512,8 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                     "content": output,
                 })
         messages.append({"role": "user", "content": results})
+        if checkpoint is not None:
+            checkpoint["messages"] = messages  # 次のAPI呼び出し前に保存する
 
     if checkpoint is not None:
         checkpoint["messages"] = messages  # 最後のtool_resultも保存する
