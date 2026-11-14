@@ -2,9 +2,19 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-14**
+> - 最終更新日: **Updated 2026-11-15**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## タグ境界・変数スコープ・Carbon／Hydrogenのレビュー8件（2026-11-15）
+
+- 8指摘とも現行コードで有効と確認。監査2契約を追加し、修正前失敗を実測。コミットは作成しない。
+- カード境界は全タグを引用属性ごと消費してから同名タグの深さを更新。他タグのtitle内に開閉div様文字列があっても、兄弟text/plainの表示コードを保持する。
+- CLASSDEFSはrenderごとの参照位置と宣言の包含関係を確認。パラメータ・arrow引数・catch等の追加参照や可視範囲外の宣言は、外側の初期値で認定せず未解決とする。対応範囲内の単純な外側リテラルと内側のrenderは維持。原本JavaScriptは実行しない。
+- Carbonの認証調査例へ代表的な認証コードを渡し、調査対象が入力に含まれることをモック確認。移行表に全ターンの署名保持、並列兄弟への署名コピー禁止、履歴変更／prefill対策、Agent Platformの明示キャッシュ非対応と4,096トークン以上の静的prefixを追記。
+- Carbonの費用関数はtool_use_prompt_token_countを入力単価で加算し、検索クエリ等の個別ツール料金を除くトークン料金だけの概算と明記。非ゼロのツール入力・キャッシュ・思考込みで導入価格$3.22／通常価格$6.44、欠落カウンターとツール入力のみも実行検証。
+- Hydrogenのxhighも品質基準で判定し、不合格はCarbon／Argonへ委譲。MAX_TOKENSと候補なしは本文を採用せず例外とし、STOP時は従来どおり本文を出力することをモック確認。
+- 検証: 監査91件、FableのHTML原本監査exit 0、Carbon／Hydrogenのコード例モック、全19図の解析、Hydrogenと変更管理文書のMarkdown lint、差分検査が成功。Carbonの参照ラベルlintは変更前後47件で同一、新規指摘なし。web-next・scraperは無変更のため全体テスト・型・Biome・pytestは再実行していない。直前の実測はweb240 files／3075 tests・pytest138件＋39 subtests。ビルド・実API呼び出しは未実行。
 
 ## 入れ子カード・文字列復号・提供条件・日付の追加レビュー7件（2026-11-14）
 
@@ -387,7 +397,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `bd502fec`（追加レビュー7件の修正は未コミット）。
+- **最新実装 HEAD**: `03f05ffe`（レビュー8件の修正は未コミット）。
 - **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
@@ -863,7 +873,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: bd502fec（追加レビュー7件の修正は未コミット。冒頭の同名節を参照）。
+最新実装HEAD: 03f05ffe（レビュー8件の修正は未コミット。冒頭の同名節を参照）。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
@@ -878,6 +888,7 @@ Astra: http://localhost:3000/codex/astra-best-practices
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
 全体240 files／3075 tests成功（2026-11-14追加レビュー7件修正後の実測）。Fable対象75件・監査89件・型・lint657 files・HTML原本監査exit 0が成功。未解決CLASSDEFSは完了判定を停止し、正規表現内の引用符もマスクする。Fableのcheckpointは完了済みツール結果を次のAPI呼び出し前に保存する。管理文書・監査手順・HydrogenのMarkdown lintも成功。保存Markdownの既存lint34件は不変。pytestは今回未実行（直前の実測138件＋39 subtests）。実API呼び出し・Next.jsビルドは今回未実行。Dockerのdevイメージは未検証。
+2026-11-15レビュー8件は監査91件・HTML原本監査exit 0・ガイドコードのモック・19図解析・Hydrogen等のMarkdown lintが成功。Carbonの既存参照ラベルlint47件は不変。アプリとスクレイパーは無変更のため全体テスト・型・Biome・pytestは再実行していない。
 Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは107件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 Fable 5.2移行ではユーザー指定でnpm・ビルド未実行。直前の価格更新時にはbun run build成功（2026-11-13、114静的ページ生成）。

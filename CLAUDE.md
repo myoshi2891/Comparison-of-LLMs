@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-14
+Updated 2026-11-15
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+2026-11-15レビュー8件: 原本監査の境界走査は他タグの引用属性とコメントを丸ごと消費し、同名タグの深さだけを更新。CLASSDEFSは宣言がrenderを囲む範囲にあるか確認し、引数・catch・その他の曖昧な参照は未解決として停止。Carbonは認証コードを入力へ追加し、署名／履歴・暗黙キャッシュの移行項目とツール入力トークン課金を訂正。Hydrogenはxhighの品質判定とMAX_TOKENSの拒否を追加。監査91件・HTML原本監査exit 0・コード例のモック・19図解析・Hydrogen等のMarkdown lintが成功。Carbonの既存参照ラベルlint47件は不変。アプリと依存・設定は無変更。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-14追加レビュー7件: 原本監査は一致ラッパー内の子カードを走査し、最も近い所有カードへpayloadを対応付ける。CLASSDEFSの16進・Unicodeエスケープを復号し、不正・未対応は未解決として停止。Hydrogenは提供条件・検索課金単位・prefix変更時のDROPを訂正。最新ユーザー指示によりHomeの両日付を価格更新日2026-11-13へ同期し、月次一覧も同日に合わせる。全体240 files／3075 tests・監査89件・型・lint657 files・Markdown lint・HTML原本監査exit 0が成功。バックエンド最新実測は138件＋39 subtests。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
 
