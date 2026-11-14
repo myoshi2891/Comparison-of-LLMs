@@ -6,6 +6,15 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 未解決の図・正規表現・データ保持・チェックポイントのレビュー4件（2026-11-14）
+
+- 4指摘とも現行コードで有効と確認。監査は既存1契約を厳格化し、空の接尾辞と未解決の初期化子を区別する契約・正規表現内の引用符を扱う契約を追加。Fableは次のcall失敗時の履歴保持を実行する契約を追加。監査3件・Fable1件の修正前失敗を実測。
+- CLASSDEFSは未使用・静的評価済み文字列・未解決を区別。未解決の図はunresolvedMermaidSourcesとしてJSON／通常出力へ記録し、元の図との照合が一致しても完了判定を止める。原本JavaScriptは実行しない。
+- コードのマスクは文字列より前に正規表現リテラルを認識し、引用符・エスケープ・文字クラス・フラグを消費。除算との区別とソース位置の保持を回帰で検証。
+- Hydrogenのデータ取り扱いはPaid Contributor Tierの改善利用と有料サービスの不正利用監視用保持を公式資料で確認し、機密データ送信前の保持方針・データ共有設定の確認を案内。
+- Fableのagent_loopは完了したtool_resultバッチを追加するたび、次のAPI呼び出し前にcheckpointへ保存。ターン上限時の保存と例外は維持。次のcallが失敗しても履歴を取得でき、再開時にツールを重複実行しないことを検証。HTML／Markdown原本・JSX・対象コードの全文／構文色／要素ツリー契約へ同期。
+- 検証: 全体Vitest240 files／3074 tests、監査84件、Fable対象3 files／74 tests、typecheck、lint657 files、HTML原本監査exit 0、管理文書・監査手順・HydrogenのMarkdown lintが成功。保存Markdownの既存lint34件は変更前後で同一、新規指摘なし。ビルド・実API呼び出し・コミットは未実行。
+
 ## カード境界・モデル選定・継続実行の追加レビュー5件（2026-11-14）
 
 - 5指摘とも現行コードで有効と確認。監査2件とFableのチェックポイント1件の回帰テストを追加し、修正前の失敗を実測。コミットは作成しない。
@@ -360,7 +369,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `40744d06`（追加レビュー5件の修正は未コミット）。
+- **最新実装 HEAD**: `b2bed25b`（レビュー4件の修正は未コミット）。
 - **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
@@ -375,7 +384,7 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-14 実測）
   - `bun run lint` ✅（Biome check / 657 files / 0 diagnostics。2026-11-14 記録済み実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3073 testsすべて成功**（2026-11-14追加レビュー5件修正後の実測）。型・lint657 filesも成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3074 testsすべて成功**（2026-11-14レビュー4件修正後の実測）。型・lint657 filesも成功。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -836,7 +845,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: 40744d06（追加レビュー5件の修正は未コミット。冒頭の同名節を参照）。
+最新実装HEAD: b2bed25b（レビュー4件の修正は未コミット。冒頭の同名節を参照）。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
@@ -850,7 +859,7 @@ Astra: http://localhost:3000/codex/astra-best-practices
 指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
-全体240 files／3073 tests成功（2026-11-14追加レビュー5件修正後の実測）。Fable対象73件・監査82件・型・lint657 files・HTML原本監査exit 0が成功。Hydrogenのモデル選定ゲートと全図解析、管理文書とHydrogenのMarkdown lintも成功。保存Markdownの既存lint34件は不変。pytestは今回未実行（直前の実測137件＋39 subtests）。実API呼び出し・Next.jsビルドは今回未実行。Dockerのdevイメージは未検証。
+全体240 files／3074 tests成功（2026-11-14レビュー4件修正後の実測）。Fable対象74件・監査84件・型・lint657 files・HTML原本監査exit 0が成功。未解決CLASSDEFSは完了判定を停止し、正規表現内の引用符もマスクする。Fableのcheckpointは完了済みツール結果を次のAPI呼び出し前に保存する。管理文書・監査手順・HydrogenのMarkdown lintも成功。保存Markdownの既存lint34件は不変。pytestは今回未実行（直前の実測137件＋39 subtests）。実API呼び出し・Next.jsビルドは今回未実行。Dockerのdevイメージは未検証。
 Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは107件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
 Fable 5.2移行ではユーザー指定でnpm・ビルド未実行。直前の価格更新時にはbun run build成功（2026-11-13、114静的ページ生成）。
