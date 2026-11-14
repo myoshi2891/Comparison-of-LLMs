@@ -27,6 +27,24 @@ vi.mock("@/components/docs/MermaidDiagram", () => ({
 /** 表示上同義の整形空白だけを正規化する。 */
 const text = (e: Element) => (e.textContent ?? "").replace(/\s+/g, " ").trim();
 const css = () => fs.readFileSync("app/claude/fable-5-2-best-practices/page.module.css", "utf8");
+// 原本の列ずれだけを逆変換し、保存済みの全文・構造契約はそのまま照合する。
+const correctedReferenceIds = new Set(
+  expected.tables
+    .filter((table) => table[0].map((cell) => cell[3]).join("|") === "ID|発信者|内容|取得状況|URL")
+    .flatMap((table) =>
+      table
+        .slice(1)
+        .filter((row) => row[4][3] === "")
+        .map((row) => row[0][3])
+    )
+);
+/** 訂正された空の内容セルを、原本契約との比較時だけ旧位置へ戻す。 */
+function sourceCells(row: Element): Node[] {
+  const cells = Array.from(row.childNodes);
+  return row.localName === "tr" && correctedReferenceIds.has(row.id)
+    ? [...cells.slice(0, 2), ...cells.slice(3), cells[2]]
+    : cells;
+}
 beforeEach(() => {
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (
     this: HTMLElement
@@ -63,12 +81,10 @@ it("45表363行の全セル・タグ・結合を順序込みで照合し不正�
   expect(
     Array.from(container.querySelectorAll("table")).map((t) =>
       Array.from(t.querySelectorAll("tr")).map((r) =>
-        Array.from(r.children).map((c) => [
-          c.localName,
-          c.getAttribute("colspan"),
-          c.getAttribute("rowspan"),
-          text(c),
-        ])
+        sourceCells(r).map((node) => {
+          const c = node as Element;
+          return [c.localName, c.getAttribute("colspan"), c.getAttribute("rowspan"), text(c)];
+        })
       )
     )
   ).toEqual(expected.tables);
@@ -77,6 +93,29 @@ it("45表363行の全セル・タグ・結合を順序込みで照合し不正�
       Array.from(e.childNodes).filter((n) => n.nodeType === 3)
     )
   ).toEqual([]);
+});
+it("著者・独立評価の参考行で内容・取得状況・URLが列見出しに対応する", () => {
+  const { container } = render(<Page />);
+  const rows = expected.tables
+    .filter((table) => table[0].map((cell) => cell[3]).join("|") === "ID|発信者|内容|取得状況|URL")
+    .flatMap((table) => table.slice(1));
+  expect(
+    rows.map((row) => {
+      const id = row[0][3];
+      const cells = Array.from(container.querySelector(`#${id}`)?.children ?? []);
+      return [
+        id,
+        cells.map(text),
+        cells.map((cell) => cell.querySelector("a")?.getAttribute("href") ?? null),
+      ];
+    })
+  ).toEqual(
+    rows.map((row) => {
+      const values = row.map((cell) => cell[3]);
+      const ordered = values[4] === "" ? [values[0], values[1], "", values[2], values[3]] : values;
+      return [values[0], ordered, [null, null, null, null, ordered[4]]];
+    })
+  );
 });
 it("全リストの型・開始番号・全項目・入れ子を完全一致", () => {
   const { container } = render(<Page />);
@@ -273,7 +312,7 @@ function tree(n: Node): unknown {
   return [
     n.id === "fable52-backdrop" ? "div" : n.localName,
     attrs,
-    Array.from(n.childNodes).map(tree).filter(Boolean),
+    sourceCells(n).map(tree).filter(Boolean),
   ];
 }
 it("原本の全要素ツリー・タグ・本文・リスト階層・図位置を完全一致", () => {
