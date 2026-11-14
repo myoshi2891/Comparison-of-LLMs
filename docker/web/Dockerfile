@@ -17,6 +17,10 @@ RUN bun install --frozen-lockfile
 FROM oven/bun:1-debian AS dev
 WORKDIR /app
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends python3 \
+    && rm -rf /var/lib/apt/lists/*
+
 # deps 層の node_modules をコピー
 # docker-compose.yml の named volume がこの内容を保持し、
 # バインドマウントで流入する macOS バイナリを上書きする
