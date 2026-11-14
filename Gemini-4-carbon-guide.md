@@ -3,6 +3,7 @@
 > **対象**: Gemini API / Google AI Studio / Gemini Enterprise Agent Platform（旧 Vertex AI 系）でエージェントや業務自動化を作る中級〜上級の開発者
 > **モデルID**: `gemini-4-carbon`
 > **調査基準日**: 2026年11月14日（一般提供開始 11月10日から4日後）
+> **最終更新日**: 2026年11月15日
 > **読み方**: Step 1 から順に読むと「選ぶ → 呼ぶ → 調整する → 移行する → 運用する」の流れで理解できます。各主張の末尾の `[S番号]` は、末尾「16. 補足」のソース一覧に対応します。
 
 ---
@@ -220,9 +221,28 @@ from google.genai import types
 
 client = genai.Client()  # 環境変数 GEMINI_API_KEY を使用
 
+# 調査用の代表例。実際の調査では対象リポジトリの認証関連コードへ置き換える。
+repository_code = '''
+# auth/session.py
+import asyncio
+import secrets
+
+sessions = {"old-token": {"user_id": "demo"}}
+
+async def rotate_session(token):
+    session = sessions.get(token)
+    if session is None:
+        raise ValueError("invalid session")
+    await asyncio.sleep(0)  # 監査ログの非同期保存などによる待機を再現
+    sessions.pop(token, None)
+    new_token = secrets.token_urlsafe(32)
+    sessions[new_token] = session
+    return new_token
+'''
+
 response = client.models.generate_content(
     model="gemini-4-carbon",
-    contents="このリポジトリの認証フローの競合状態を調査し、根本原因と修正案を示してください。",
+    contents=f"次のリポジトリ抜粋の認証フローを調査してください。同じトークンで並行呼び出しした際の競合状態の根本原因と、最小限の修正案を示してください。\n\n{repository_code}",
     config=types.GenerateContentConfig(
         thinking_config=types.ThinkingConfig(thinking_level="medium"),
         # temperature / top_p / top_k は指定しない（無視され、警告になる）
@@ -327,10 +347,15 @@ flowchart TD
 | `thinking_budget` | レベルにマップされていた | Agent Platform では **HTTP 400**、Gemini API の開発者ガイドでは非推奨の警告 | `thinking_level` に置換 [S3][S7][S8] |
 | `thinking_level="MINIMAL"` | 対応 | **HTTP 400** | `LOW` を使用 [S7][S8] |
 | `temperature` / `top_p` / `top_k` | 一部有効 | 無視され、警告 | 削除 [S3][S7] |
+| 明示的コンテキストキャッシュ | 対応するモデルあり | **Agent Platformでは非対応** | `cached_content` 参照を削除し、4,096トークン以上の共有・静的コンテンツをプロンプト先頭へ置いて暗黙的キャッシュを利用 [S7] |
+| `thought_signature` と会話履歴 | モデルごとの要件に従う | 過去のfunctionCall・最終textを含む署名付きPartを保持。並列呼び出しの署名は最初のfunctionCallだけ | 応答のContentとPartをそのまま再送し、署名を兄弟呼び出しへコピーしない。必要な署名の欠落・重複はHTTP 400の原因 [S7] |
+| 履歴の編集・prefill | 構成による | 署名は会話prefixに結び付く。prefilled modelターンは非対応 | prefillを削除してmodelターン末尾のまま送信しない。履歴圧縮では `ThinkingConfig` の `prefix_mismatch_behavior="DROP"` または対応する履歴リセットを使う [S7] |
 | トークン課金 | 一部のみ課金 | **全トークン課金**（思考、内部ツール指示を含む） | 予算とアラートを再設計 [S7] |
 | 長い出力 | 上限内 | long decode が必要な場合あり | SDK更新と有効化 [S6] |
 
 > **差異に注意**: `thinking_budget` の扱いは、Agent Platform のドキュメント（400エラー）と Gemini API の開発者ガイド（警告）で記述が異なります [S3][S8]。**どちらの面でも通るよう、移行時に確実に削除** してください。
+
+並列functionCallのPartを別々のmodelターンへ分割したり、最初の署名を兄弟Partへ複製したりしないでください。元のContent内のPart順序と署名を保持し、各ツール結果のID・名前・順序を呼び出しへ対応付けます。以前の会話prefixを変更したまま古い署名を送信すると、既定のERROR動作ではHTTP 400になり得ます([公式移行ガイド](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/migrate)、[thought signatures](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/thinking/thought-signatures))。
 
 ### 8.2 移行フロー
 
@@ -475,18 +500,21 @@ STANDARD = {"in": 4.00, "cached": 0.20, "out": 20.00}   # 2026-12-01〜
 
 
 def estimate_cost(usage, rates):
-    """usage_metadata からコストを概算する。
+    """usage_metadata からトークン料金だけを概算する。
 
     前提: prompt_token_count にはキャッシュ分が含まれ、
     思考トークンは出力と同単価で課金されるものとして扱う。
+    tool_use_prompt_token_count は通常の入力単価で加算する。
+    Google Searchの検索クエリなど、トークン以外のツール料金は含めない。
     実際の課金区分は公式料金ページで確認すること。
     """
     cached = getattr(usage, "cached_content_token_count", 0) or 0
     prompt = (getattr(usage, "prompt_token_count", 0) or 0) - cached
+    tool_prompt = getattr(usage, "tool_use_prompt_token_count", 0) or 0
     thoughts = getattr(usage, "thoughts_token_count", 0) or 0
     candidates = getattr(usage, "candidates_token_count", 0) or 0
     output = candidates + thoughts
-    return (prompt * rates["in"] + cached * rates["cached"] + output * rates["out"]) / 1_000_000
+    return ((prompt + tool_prompt) * rates["in"] + cached * rates["cached"] + output * rates["out"]) / 1_000_000
 
 
 # 使い方: 11月の請求額を12月価格で再計算して予算を立てる

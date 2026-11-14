@@ -2,7 +2,7 @@
 
 > **対象読者**: Gemini API / Google AI Studio / Antigravity で実プロダクトやエージェントを構築・運用している中級〜上級エンジニア
 > **情報基準日**: 2026年11月13日(Gemini 4 Hydrogen 発表の翌日)
-> **最終更新日**: 2026年11月14日
+> **最終更新日**: 2026年11月15日
 > **注意**: 発表直後のため、Google公式情報(ブログ・ドキュメント・モデルカード)と第三者記事・個人検証を明確に区別して記載しています。第三者情報には「(第三者)」、推奨設計のうち筆者の設計判断には「(設計判断)」と付けています。数値・価格は必ず公式ページで再確認してください。
 
 ---
@@ -187,7 +187,9 @@ flowchart TD
     F -- "はい" --> M["medium を採用"]
     F -- "いいえ" --> G{"high が満たすか"}
     G -- "はい" --> H["high を採用"]
-    G -- "いいえ" --> X["xhigh を採用 または Carbon Argon に計画を委譲"]
+    G -- "いいえ" --> X{"xhigh が品質基準を満たすか"}
+    X -- "はい" --> XH["xhigh を採用"]
+    X -- "いいえ" --> PLAN["Carbon または Argon に計画を委譲"]
 ```
 
 ### 2-4. 実装上の要点
@@ -212,6 +214,10 @@ resp = client.models.generate_content(
         # temperature / top_p / top_k は Gemini 4 系では無視されるため指定しない
     ),
 )
+if not resp.candidates:
+    raise RuntimeError("応答に候補がありません")
+if resp.candidates[0].finish_reason == types.FinishReason.MAX_TOKENS:
+    raise RuntimeError("MAX_TOKENSで中断しました。出力予算・Long Decode・タスク分割を見直して再実行してください")
 print(resp.text)
 ```
 
