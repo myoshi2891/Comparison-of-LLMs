@@ -2301,7 +2301,7 @@
                   betas=["thinking-display-updates-2026-08-18"],
               )
 
-              # テキストだけでなく、中身のある thinking ブロックも描画する
+              # call() 完了後にテキストと thinking の進捗を表示する（待機中の逐次更新ではない）
               for block in data["content"]:
                   if block["type"] == "text":
                       print(block["text"])
