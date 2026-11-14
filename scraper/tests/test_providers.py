@@ -518,6 +518,13 @@ class TestMoonshot:
             models = moonshot.scrape()
         _assert_all_fallback(models, moonshot._FALLBACKS, "Moonshot(Kimi)")
 
+    def test_output_only_price_preserves_fallback_pair(self):
+        html = "<p>Kimi K3 input unavailable</p><p>Kimi K3 output $16.50</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+        assert model.scrape_status == "fallback"
+
     # "Kimi K2.7 Code" が "Kimi K2.7 Code Highspeed" の価格を拾わないこと。
     _OVERLAP_HTML = (
         "<html><body>"

@@ -22,6 +22,8 @@ _KIMI_K2_7_CODE = "Kimi K2.7 Code"
 # レコード終端・次モデルを越えず、outputより前では入力価格の$を許可する。
 _RECORD_GAP = r"(?:(?!</(?:p|div|tr|li|section|article|nav|h[1-6])\b|\bkimi[-\s]?k)[\s\S]){0,80}?"
 _PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
+# outputラベルに到達したら、その後の価格を入力単価として扱わない。
+_INPUT_PRICE_GAP = _PRICE_GAP.replace(r"[^$]", r"(?!\boutput\b)[^$]")
 
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
 _FALLBACKS: dict[str, tuple[float, float]] = {
@@ -85,7 +87,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         # K3.1 など未登録の派生版と別レコード・遠距離の価格を拾わない。
         key = model_key_pattern(name, _FALLBACKS) + r"(?![.\d])"
         in_price = extract_price(html, [
-            rf"{key}{_PRICE_GAP}\$([\d.]+)",
+            rf"{key}{_INPUT_PRICE_GAP}\$([\d.]+)",
         ])
         out_price = extract_price(html, [
             rf"{key}{_RECORD_GAP}output{_PRICE_GAP}\$([\d.]+)",
