@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-14追加レビュー5件: 原本監査はカード開始タグの引用属性を保持し、moduleごとのCLASSDEFSを静的カードセレクターで対応付ける。Hydrogenは必須機能を先に判定し、Long Decodeのフォアグラウンド／ステートレス／GenerateContent継続も案内。Fableのagent_loopは上限例外前に呼び出し元のcheckpointへツール結果込みの履歴を保存し、同じ辞書で再開できる。原本・JSX・対象コード契約を同期。全体240 files／3073 tests・対象73件・監査82件・型・lint657 files・HTML原本監査exit 0が成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-14レビュー8件: 原本監査はrender呼び出しの括弧内だけでCLASSDEFSを判定し、通常タグの引用属性内のscript様文字列を除外。Moonshotはoutputラベル以降の価格を入力単価に流用しない。Homeの公開日を2026-10-24へ復元し、確認日のみ2026-11-14へ更新。Hydrogen原稿は完了状態の確認・output_text・共有コンテキスト・継続入力課金を訂正。全体240 files／3072 tests・監査80件・pytest137件＋39 subtests・型・lint657 files・Markdown lint・HTML原本監査exit 0が成功。ビルドと実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-14追加レビュー: 原本監査は文字列とコメントを隠したコードでrender呼び出しとCLASSDEFS宣言を検出し、リテラル抽出用の表現を分離。カードで表示済みのscriptを消費してdata-codeの二重処理を防止。Fable 5.2の著者・独立評価22行は空の内容セルを取得状況の前へ移動し、原文・URL・リンク属性を保持。webのDocker devステージだけにテスト用python3を追加。全体240 files／3071 tests・監査76件・対象72件・HTML原本監査exit 0・typecheck・lint657 filesが成功。Dockerデーモン停止中のためイメージのビルド検証は未実施。
@@ -641,7 +643,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3072 tests pass、2026-11-14レビュー8件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3073 tests pass、2026-11-14追加レビュー5件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
