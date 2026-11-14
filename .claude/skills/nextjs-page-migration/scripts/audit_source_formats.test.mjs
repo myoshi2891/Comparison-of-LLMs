@@ -355,6 +355,15 @@ test("ignores commented cards and does not apply unrelated CLASSDEFS to diagrams
  assert.equal(audit(source,'').status,1);
 });
 
+test("keeps literal dollar replacement sequences in diagram payloads and suffixes", () => {
+ const chart = 'flowchart LR\nA["$$x$$ $& $` $\u0027"] --> B';
+ const suffix = '\nclassDef box fill:#fff; %% $$suffix$$ $& $` $\u0027';
+ const source = `<div class="diagram-card"><script type="text/plain">${chart}</script></div><script>const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(source, page).status, 0);
+ assert.equal(audit(source, page.replace('$$x$$', '$x$')).status, 1);
+});
+
 test("does not classify alert icon names as callout content",()=>{
  const result=audit('<i class="ti ti-alert-triangle"></i><div class="callout">Keep warning</div>','<i className={styles.icon}></i><div className={styles.callout}>Keep warning</div>');
  assert.equal(result.status,0);
