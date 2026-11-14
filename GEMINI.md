@@ -5,6 +5,8 @@ Updated 2026-11-14
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
 
+2026-11-14追加レビュー: 最新ユーザー指示によりHomeのaddedAt／lastReviewedを価格データ更新日の2026-11-13へ同期。監査とHydrogen原稿の修正・検証結果はdocs/PROGRESS.mdを参照。
+
 2026-11-14レビュー: Homeの公開日を2026-10-24へ復元し、確認日のみ2026-11-14へ更新。原本監査・Moonshot抽出・Hydrogen原稿の訂正と検証結果はCLAUDE.md／docs/PROGRESS.mdを参照。
 
 Claude Fable 5.2 `/claude/fable-5-2-best-practices` を追加（2026-11-13）。
@@ -317,11 +319,11 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3074 tests pass（2026-11-14実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3075 tests pass（2026-11-14実測）
 (cd web-next && bun run typecheck)   # OK（2026-11-14 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
 (cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-14 実測）
-(cd scraper && uv run pytest)        # 137件＋39 subtests成功（2026-11-14 実測）
+(cd scraper && uv run pytest)        # 138件＋39 subtests成功（2026-11-14 実測）
 ```
 
 ## 次セッション再開プロンプト

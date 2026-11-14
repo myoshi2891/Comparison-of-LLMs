@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-14追加レビュー7件: 原本監査は一致ラッパー内の子カードを走査し、最も近い所有カードへpayloadを対応付ける。CLASSDEFSの16進・Unicodeエスケープを復号し、不正・未対応は未解決として停止。Hydrogenは提供条件・検索課金単位・prefix変更時のDROPを訂正。最新ユーザー指示によりHomeの両日付を価格更新日2026-11-13へ同期し、月次一覧も同日に合わせる。全体240 files／3075 tests・監査89件・型・lint657 files・Markdown lint・HTML原本監査exit 0が成功。バックエンド最新実測は138件＋39 subtests。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-14レビュー11コメント: 監査は未確定renderer対応とCLASSDEFS再代入を未解決として停止し、引用属性内の偽codeを除外。Hydrogenは非対応パラメータ・prefill除去・思考込みの出力見積り・会話別履歴へ訂正。月次Home確認日をregistryへ同期。Moonshotは定義リストの境界を保持。Fableは通常のツール例外を対応するエラー結果へ変換し、全結果バッチを保存して再開する。検証結果はdocs/PROGRESS.mdを参照。
 
 2026-11-14レビュー4件: 原本監査は未解決のCLASSDEFSを空文字と区別し、unresolvedMermaidSourcesとして完了判定を停止。コードのマスクは正規表現を認識して後続宣言の位置を保持。HydrogenはContributor Tierの改善利用と有料サービスの監視用保持を明記。Fableのagent_loopはツール結果バッチを次のAPI呼び出し前にcheckpointへ保存し、API失敗後も再開できる。ターン上限時の保存は維持。全体240 files／3074 tests・Fable対象74件・監査84件・型・lint657 files・HTML原本監査exit 0・管理文書等のMarkdown lintが成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
@@ -647,7 +649,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3074 tests pass、2026-11-14レビュー4件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3075 tests pass、2026-11-14追加レビュー7件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
