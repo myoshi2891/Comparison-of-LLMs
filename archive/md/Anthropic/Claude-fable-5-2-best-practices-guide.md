@@ -475,10 +475,13 @@ def call(body: dict, betas: list[str] | None = None) -> dict:
     return r.json()
 
 
-def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "high", max_turns: int = 60) -> dict:
+def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "high", max_turns: int = 60, checkpoint: dict | None = None) -> dict:
     # system と tools は会話の途中で変更しない(prefix チェックの対象)
     system = "あなたはこのリポジトリの保守担当エージェントです。..."
+    # checkpoint={} を渡すと、上限到達後は同じ辞書で再呼び出しして続行できる
     messages = [{"role": "user", "content": user_prompt}]
+    if checkpoint is not None and "messages" in checkpoint:
+        messages = checkpoint["messages"]
 
     for _ in range(max_turns):
         data = call({
@@ -510,6 +513,8 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                 })
         messages.append({"role": "user", "content": results})
 
+    if checkpoint is not None:
+        checkpoint["messages"] = messages  # 最後のtool_resultも保存する
     raise RuntimeError("max_turns に到達しました")
 ```
 

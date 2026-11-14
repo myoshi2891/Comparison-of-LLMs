@@ -75,6 +75,54 @@ assert ast.literal_eval(cache) == {"type": "ephemeral"}
   );
 });
 
+it("agent_loopは上限時にtool_result込みの履歴を保存し、重複実行せず再開できる", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+requests, executed = [], []
+tool = {"type": "tool_use", "id": "tool-1", "name": "read", "input": {"path": "a.py"}}
+thinking = {"type": "thinking", "thinking": "", "signature": "kept"}
+reply = {"stop_reason": "tool_use", "content": [thinking, tool]}
+done = {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return reply if len(requests) == 1 else done
+def run_tool(name, args):
+    executed.append((name, args))
+    return "file content"
+scope = {"call": call}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+try:
+    scope["agent_loop"]("task", [], run_tool, max_turns=1, checkpoint=checkpoint)
+except RuntimeError as error:
+    assert str(error) == "max_turns に到達しました"
+else:
+    raise AssertionError("turn limit must raise")
+expected = [{"role": "user", "content": "task"},
+    {"role": "assistant", "content": [thinking, tool]},
+    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "tool-1", "content": "file content"}]}]
+assert checkpoint["messages"] == expected
+assert len(requests) == 1
+assert scope["agent_loop"]("task", [], run_tool, max_turns=1, checkpoint=checkpoint) == done
+assert requests[1]["messages"] == expected
+assert executed == [("read", {"path": "a.py"})]
+zero = {}
+try:
+    scope["agent_loop"]("zero", [], run_tool, max_turns=0, checkpoint=zero)
+except RuntimeError:
+    pass
+else:
+    raise AssertionError("zero turn limit must raise")
+assert zero == {"messages": [{"role": "user", "content": "zero"}]}
+assert len(requests) == 2
+`,
+    examples()
+  );
+});
+
 it("PostToolUseは引用符・改行・シェル構文を含むパスをそのままPrettierへ渡す", () => {
   const code = examples().find((c) => c.includes('"PostToolUse"'));
   python(

@@ -3080,6 +3080,12 @@ export default function Page() {
                       <span className="hljs-built_in">{"int"}</span>
                       {" = "}
                       <span className="hljs-number">{"60"}</span>
+                      {", checkpoint: "}
+                      <span className="hljs-built_in">{"dict"}</span>
+                      {" | "}
+                      <span className="hljs-literal">{"None"}</span>
+                      {" = "}
+                      <span className="hljs-literal">{"None"}</span>
                     </span>
                     {") -> "}
                     <span className="hljs-built_in">{"dict"}</span>
@@ -3101,6 +3107,13 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-comment">
+                      {"# checkpoint={} を渡すと、上限到達後は同じ辞書で再呼び出しして続行できる"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"    messages = [{"}
                     <span className="hljs-string">{'"role"'}</span>
                     {": "}
@@ -3108,6 +3121,25 @@ export default function Page() {
                     {", "}
                     <span className="hljs-string">{'"content"'}</span>
                     {": user_prompt}]"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-string">{'"messages"'}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" checkpoint:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        messages = checkpoint["}
+                    <span className="hljs-string">{'"messages"'}</span>
+                    {"]"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}></span>
@@ -3305,6 +3337,23 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}></span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        checkpoint["}
+                    <span className="hljs-string">{'"messages"'}</span>
+                    {"] = messages  "}
+                    <span className="hljs-comment">{"# 最後のtool_resultも保存する"}</span>
+                  </span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"    "}
