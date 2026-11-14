@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Updated 2026-11-13
+Updated 2026-11-14
 
 AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツール向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、AGENTS.md はその委譲 pointer として機能する。
@@ -43,10 +43,10 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 239 files / 3065 tests pass（2026-11-13 実測。Fable 5.2移行後、全 Green ✅）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3071 tests pass（2026-11-14 追加レビュー後の記録済み実測）
 (cd web-next && bun run typecheck)   # OK（2026-11-13 実測）
 (cd web-next && bun run build)       # 今回はユーザー指定で未実行（直前の価格更新では2026-11-13に114静的ページ生成）
-(cd web-next && bun run lint)        # OK（656 files / 0 diagnostics。2026-11-13 実測）
+(cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-14 記録済み実測）
 (cd scraper && uv run pytest)        # 135 tests pass（2026-11-13 実測）
 ```
 

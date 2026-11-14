@@ -6,6 +6,13 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 原本監査・表示例・検証要約のレビュー5件（2026-11-14）
+
+- 5指摘を現行コードで確認して修正。CLASSDEFSは完全な文字列リテラルの連結だけを抽出し、セミコロンとASIの改行終端に対応。継続する式の部分抽出を拒否する回帰フィクスチャを追加。
+- 空のcode要素への差し込みはinventoryHtmlと引用符対応の属性パターンを共有。引用属性内の角括弧と選択payloadの全文を確認する回帰フィクスチャを追加。
+- Dockerのdevステージにpython3と併せてjqを追加し、既存のインストール・cleanupを維持。Fable 5.2の非ストリーミング例はcall()完了後の進捗表示であることをコメントに明記し、HTML／Markdown・JSX・全文／構造契約へ同期。
+- 現在の検証要約は記録済みの240 files／3071 tests・lint657 filesに同期し、過去の記録は保持。今回はテストランナーを実行せず、型チェック・対象ファイルのBiome・変更した管理文書のMarkdown lint・HTML原本監査で確認。監査用フィクスチャの直接照合はexit 0、空の移植先との照合は選択payload全文と図の欠落を検知してexit 1。ビルド・Dockerイメージのビルドは未実行。
+
 ## 原本監査・参考表・Dockerの追加レビュー4件（2026-11-14）
 
 - 4指摘すべて現行コードで確認して修正。監査のrender判定とCLASSDEFS宣言位置の検出は文字列・コメントを隠したコードを使い、リテラルの抽出用表現と分離。カード内で表示済みのscriptを消費し、data-codeによる二重復元を防止。他のcode要素の処理は維持。
@@ -349,9 +356,9 @@
 - **動作検証**:
   - ビルド: Fable 5.2移行ではユーザー指定により未実行。直前の価格更新時には `bun run build` 成功（2026-11-13、114静的ページ生成）。
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-13 実測）
-  - `bun run lint` ✅（Biome check / 656 files / 0 diagnostics。2026-11-13 実測）
+  - `bun run lint` ✅（Biome check / 657 files / 0 diagnostics。2026-11-14 記録済み実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **239 files／3065 testsすべて成功**（2026-11-13実測。Fable 5.2の66契約を含む）。型・lint656 files・pytest135件も成功。Redで固定した期待値は無変更。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3071 testsすべて成功**（2026-11-14追加レビュー後の記録済み実測）。型・lint657 filesも成功。今回の同期ではテストを再実行していない。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
