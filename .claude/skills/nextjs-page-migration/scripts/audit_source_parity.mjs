@@ -360,12 +360,16 @@ function extractElementContents(src, predicate, includeNested = false) {
     const openingTag = opening[0];
     if (!openingTag.endsWith("/>") && predicate(openingTag)) {
       const tag = opening[1];
-      const nestedRe = new RegExp(`<\\/?${tag}\\b(?:[^>"']|"[^"]*"|'[^']*')*>`, "g");
+      const nestedRe = /<!--[\s\S]*?-->|<(\/?)([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
       nestedRe.lastIndex = openingRe.lastIndex;
       let depth = 1;
       let nested = nestedRe.exec(src);
       while (nested !== null) {
-        if (nested[0].startsWith(`</${tag}`)) depth -= 1;
+        if (nested[2] !== tag) {
+          nested = nestedRe.exec(src);
+          continue;
+        }
+        if (nested[1] === "/") depth -= 1;
         else if (!nested[0].endsWith("/>")) depth += 1;
         if (depth === 0) {
           results.push({
@@ -979,19 +983,39 @@ function rendererSuffix(literalSource) {
   const executable = blankNonCodeText(literalSource, false);
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
-  const rendersWithSuffix = Array.from(executable.matchAll(/\bmermaid\.render\s*\(/g)).some(call => {
+  const renderUses = Array.from(executable.matchAll(/\bmermaid\.render\s*\(/g)).flatMap(call => {
     const start = call.index + call[0].length;
     let depth = 1;
     for (let end = start; end < executable.length; end++) {
       if (executable[end] === "(") depth++;
       if (executable[end] === ")") depth--;
-      if (depth === 0) return /\bsrc\s*\+\s*CLASSDEFS\b/.test(executable.slice(start, end));
+      if (depth === 0) return Array.from(executable.slice(start, end).matchAll(/\bsrc\s*\+\s*CLASSDEFS\b/g), use => ({ index: start + use.index + use[0].lastIndexOf("CLASSDEFS"), call: call.index }));
     }
-    return false;
+    return [];
   });
-  if (!rendersWithSuffix) return undefined;
+  if (renderUses.length === 0) return undefined;
   // Locate the declaration in code, then read its literal from the offset-aligned view.
   const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
+  if (!declaration) return null;
+  const declarationName = declaration.index + declaration[0].indexOf("CLASSDEFS");
+  const allowedNames = new Set([declarationName, ...renderUses.map(use => use.index)]);
+  // Parameters, destructuring, catch bindings and other references require
+  // lexical analysis beyond this literal-only evaluator. Never guess an outer binding.
+  if (Array.from(executable.matchAll(/\bCLASSDEFS\b/g)).some(name => !allowedNames.has(name.index))) return null;
+  const targets = new Set([declaration.index, ...renderUses.map(use => use.call)]);
+  const paths = new Map();
+  const blocks = [];
+  for (let index = 0; index < executable.length; index++) {
+    if (targets.has(index)) paths.set(index, [...blocks]);
+    if (executable[index] === "{") blocks.push(index);
+    else if (executable[index] === "}") {
+      if (blocks.length === 0) return null;
+      blocks.pop();
+    }
+  }
+  if (blocks.length > 0) return null;
+  const declarationPath = paths.get(declaration.index);
+  if (renderUses.some(use => declaration.index > use.call || !declarationPath.every((block, index) => paths.get(use.call)?.[index] === block))) return null;
   if (declaration) {
     const initialWrite = declaration.index + declaration[0].indexOf("CLASSDEFS");
     const writes = executable.matchAll(/\bCLASSDEFS\s*(?:=(?!=|>)|(?:\*\*|&&|\|\||\?\?|[+\-*/%&|^])=|\+\+|--)/g);

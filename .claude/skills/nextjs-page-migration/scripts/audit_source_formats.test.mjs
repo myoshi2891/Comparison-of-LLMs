@@ -619,3 +619,33 @@ test("decodes hexadecimal and Unicode CLASSDEFS escapes to runtime characters", 
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
 });
+
+test("ignores tag-like attribute text while locating a card's sibling payload", () => {
+ for (const quote of ['"', "'"]) {
+  for (const text of ['</div>', '<div>']) {
+   const source = `<div class="code-block"><span title=${quote}${text}${quote}></span><pre><code></code></pre><script type="text/plain">kept example</script></div>`;
+   assert.equal(audit(source, '<pre><code>kept example</code></pre>').status, 0);
+   assert.deepEqual(audit(source, '').data.missingCodeBlocks, ['kept example']);
+  }
+ }
+});
+
+test("does not certify an outer CLASSDEFS when a render binding is shadowed or out of scope", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)};`;
+ const render = "mermaid.render('id', src + CLASSDEFS);";
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ for (const body of [
+  `${declaration} function draw(CLASSDEFS) { ${render} }`,
+  `${declaration} const draw = CLASSDEFS => { ${render} };`,
+  `${declaration} try { run(); } catch (CLASSDEFS) { ${render} }`,
+  `function unrelated() { ${declaration} } ${render}`,
+ ]) {
+  const result = audit(`${card}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+ assert.equal(audit(`${card}<script>${declaration} function draw() { ${render} }</script>`, page).status, 0);
+});
