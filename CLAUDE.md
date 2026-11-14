@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-14追加レビュー: 原本監査の図挿入でドル記号を保持し、Moonshotの単一レコード内の入出力価格を取得するよう修正。Fable 5.2の費用例をTTL別課金・未定義キャッシュ単価の拒否へ修正し、agent_loopのキャッシュ明示設定と安全なPostToolUse引数渡しをHTML／Markdown・JSX・契約へ同期。全体240 files／3070 tests・対象71件・監査74件・pytest136件＋39 subtests・型・lint657 files・HTML原本監査exit 0・ビルド115静的ページ生成が成功。保存Markdownの既存lint指摘34件は対象外として保持。
+
 2026-11-14: 原本監査のCLASSDEFS判定をコメント除去済みの実行用scriptへ限定し、カード内ではdata-for属性のない最初のtext/plain payloadを選択するよう修正。追加2件のRed確認後、監査73テストとFable 5.2のHTML原本監査exit 0が成功。アプリ・依存・設定は無変更。
 
 Claude Fable 5.2 `/claude/fable-5-2-best-practices` を追加（2026-11-13）。

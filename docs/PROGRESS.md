@@ -6,6 +6,14 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 追加レビュー6件の修正（2026-11-14）
+
+- 6指摘とも現行コードで確認し修正。図挿入はコールバック置換でドル記号列を保持。Moonshotのoutput前だけ入力価格のドル記号を許可し、80文字・レコード終端・次モデルの境界とoutput後のドル制限を維持。
+- Fable 5.2のusd／estimate_usdはcache_creationの5分・1時間カウンターを各単価で計算。fast／batchの単価が未定義のキャッシュ使用量はValueErrorで拒否。履歴の一致だけではキャッシュは有効にならないことを説明し、agent_loopのトップレベルcache_controlを追加。[公式資料](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)で設定・カウンター・標準単価を確認。
+- PostToolUseはNUL区切りのパスをシェルの位置引数へ渡し、同じ引用変数で拡張子判定とPrettier実行を行う。空白・引用符・改行・シェル構文・先頭ハイフンと対象外拡張子を実行テストで検証。
+- 指定された訂正のみHTML／Markdown原本・JSX・本文／構文トークン／要素ツリー契約へ同期。料金関数・キャッシュ設定・フックの表示コードに対する3件と、監査・スクレイパー各1件を追加し、修正前の失敗を確認。コミットは作成しない。
+- 検証: 全体Vitest **240 files／3070 testsすべて成功**。対象ページ3 files／71 tests、監査74 tests、pytest136 tests＋39 subtests、typecheck、lint657 files、HTML原本監査exit 0が成功。保存Markdownのlintは変更前35件・変更後34件（末尾改行の追加、新規指摘なし）。既存の表列数・リスト等の指摘は今回の修正対象外として保持。 ビルドは通常権限でコンパイル段階に4分以上停滞し、今回の停止プロセスのみ終了後、サンドボックス外の再実行で115静的ページ生成・exit 0を確認。再実行初回の残存ロックによる失敗はプロセス終了後に解消。依存・設定は無変更。
+
 ## 原本監査のレビュー対応（2026-11-14）
 
 - 2指摘とも現行実装で再現。CLASSDEFSの宣言・render式は、HTMLコメントと非実行scriptを除き、JavaScriptコメントを除去してから照合する。稼働中のrender式のsuffix復元は保持。
