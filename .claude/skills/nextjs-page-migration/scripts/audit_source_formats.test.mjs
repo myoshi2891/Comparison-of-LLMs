@@ -412,3 +412,33 @@ test("selects the first qualifying payload after unrelated scripts in each card"
   assert.equal(audit(source, page.replace('kept', 'lost').replace('A --> B', 'A --> C')).status, 1);
  }
 });
+
+test("ignores quoted render examples and quoted CLASSDEFS declarations", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)};`;
+ const render = "mermaid.render('id', src + CLASSDEFS);";
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const example of [JSON.stringify(render), "'mermaid.render(id, src + CLASSDEFS)'", '`mermaid.render(id, src + CLASSDEFS)`', "mermaid.render('id', 'src + CLASSDEFS')"]) {
+  const source = `${card}<script>${declaration}${example};</script>`;
+  assert.equal(audit(source, page(chart)).status, 0, example);
+  assert.equal(audit(source, page(chart + suffix)).status, 1, example);
+ }
+ const source = `${card}<script>const example = "const CLASSDEFS = 'wrong';"; ${declaration}${render}</script>`;
+ assert.equal(audit(source, page(chart + suffix)).status, 0);
+ assert.equal(audit(source, page(chart + 'wrong')).status, 1);
+});
+
+test("materializes a card's data-code payload exactly once and keeps other code blocks", () => {
+ const value = 'print("<schema> &lt;")';
+ for (const attribute of ['data-code', 'data-code-src="1"']) {
+  const source = `<div class="code-block"><pre><code></code><script type="text/plain" ${attribute}>${value}</script></pre></div><pre><code>other block</code></pre>`;
+  const page = `<pre><code>{${JSON.stringify(value)}}</code></pre><pre><code>other block</code></pre>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 0, attribute);
+  assert.deepEqual(result.data.counts.codeBlocks, {source: 2, page: 2});
+  assert.equal(audit(source, page.replace('other block', 'omitted')).status, 1);
+  assert.equal(audit(source, page.replace('schema', 'omitted')).status, 1);
+ }
+});
