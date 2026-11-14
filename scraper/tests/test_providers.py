@@ -525,6 +525,13 @@ class TestMoonshot:
         assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
         assert model.scrape_status == "fallback"
 
+    def test_definition_list_cannot_pair_prices_from_different_records(self):
+        html = "<dl><dt>Kimi K3</dt><dd>input $3.25</dd><dt>Other</dt><dd>output $16.50</dd></dl>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+        assert model.scrape_status == "fallback"
+
     # "Kimi K2.7 Code" が "Kimi K2.7 Code Highspeed" の価格を拾わないこと。
     _OVERLAP_HTML = (
         "<html><body>"
