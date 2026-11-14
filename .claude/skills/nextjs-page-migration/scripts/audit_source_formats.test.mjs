@@ -581,3 +581,41 @@ test("does not certify the initializer when CLASSDEFS is later reassigned", () =
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
 });
+
+test("inventories both child cards inside a matching wrapper with nearest payload ownership", () => {
+ for (const kind of ['code-block', 'diagram-card']) {
+  const values = kind === 'code-block' ? ['first payload', 'second payload'] : ['flowchart LR\nA --> B', 'flowchart LR\nC --> D'];
+  const child = value => `<div class="${kind}">${kind === 'code-block' ? '<pre><code></code></pre>' : ''}<script type="text/plain">${value}</script></div>`;
+  const source = `<div class="${kind}">${values.map(child).join('')}</div>`;
+  const page = kind === 'code-block' ? values.map(v => `<pre><code>${v}</code></pre>`).join('') : values.map((v,i) => `const D${i} = ${JSON.stringify(v)}; <MermaidDiagram chart={D${i}} />`).join('\n');
+  assert.equal(audit(source, page).status, 0, kind);
+  assert.equal(audit(source, page.replace('second payload', 'omitted').replace('C --> D', 'C --> E')).status, 1, kind);
+  if (kind === 'code-block') assert.deepEqual(audit(source, '').data.missingCodeBlocks, values);
+  const parent = kind === 'code-block' ? 'parent payload' : 'flowchart LR\nE --> F';
+  const parentSource = `<div class="${kind}">${kind === 'code-block' ? '<pre><code></code></pre>' : ''}${values.map(child).join('')}<script type="text/plain">${parent}</script></div>`;
+  const parentPage = kind === 'code-block' ? `<pre><code>${parent}</code></pre>${page}` : `${page}\nconst P = ${JSON.stringify(parent)}; <MermaidDiagram chart={P} />`;
+  assert.equal(audit(parentSource, parentPage).status, 0, `nearest owner: ${kind}`);
+ }
+});
+
+test("decodes hexadecimal and Unicode CLASSDEFS escapes to runtime characters", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const [raw, suffix] of [
+  [String.raw`\nclassDef box fill:\x23fff;`, '\nclassDef box fill:#fff;'],
+  [String.raw`\nclassDef \u0062ox fill:#fff;`, '\nclassDef box fill:#fff;'],
+  [String.raw`\nclassDef \u{62}ox fill:#fff;`, '\nclassDef box fill:#fff;'],
+  [String.raw`\nclassDef box fill:#fff; %% \uD83D\uDE80`, '\nclassDef box fill:#fff; %% 🚀'],
+ ]) {
+  const source = `${card}<script>const CLASSDEFS = '${raw}'; mermaid.render('id', src + CLASSDEFS);</script>`;
+  assert.equal(audit(source, page(chart + suffix)).status, 0, raw);
+  assert.equal(audit(source, page(chart + raw)).status, 1, raw);
+ }
+ for (const raw of [String.raw`\xG1`, String.raw`\uZZZZ`, String.raw`\u{110000}`, String.raw`\1`]) {
+  const source = `${card}<script>const CLASSDEFS = '${raw}'; mermaid.render('id', src + CLASSDEFS);</script>`;
+  const result = audit(source, page(chart + raw));
+  assert.equal(result.status, 1, raw);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
