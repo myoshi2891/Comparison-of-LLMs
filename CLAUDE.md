@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-15レビュー11件: 原本監査は独立scriptの文境界・render第2引数・括弧付きCLASSDEFS・HTMLタグの大小文字を扱う。Carbonは承認制御を試験運用の前へ移し、参照ラベルを保持した区切り修正でMarkdown lintを解消。Hydrogenはツール宣言をconfig経由へ訂正。Fableはstrictの入力検証とJSON応答を区別し、autoで未呼び出しの場合の扱いを原本・JSX・契約へ同期。ビルド最新実測は2026-11-14の115静的ページ成功で、以後の変更は未ビルド。全体240 files／3075 tests・監査95件・型・lint657 files・HTML原本監査exit 0が成功。検証結果はdocs/PROGRESS.mdを参照。
+
 2026-11-15レビュー8件: 原本監査の境界走査は他タグの引用属性とコメントを丸ごと消費し、同名タグの深さだけを更新。CLASSDEFSは宣言がrenderを囲む範囲にあるか確認し、引数・catch・その他の曖昧な参照は未解決として停止。Carbonは認証コードを入力へ追加し、署名／履歴・暗黙キャッシュの移行項目とツール入力トークン課金を訂正。Hydrogenはxhighの品質判定とMAX_TOKENSの拒否を追加。監査91件・HTML原本監査exit 0・コード例のモック・19図解析・Hydrogen等のMarkdown lintが成功。Carbonの既存参照ラベルlint47件は不変。アプリと依存・設定は無変更。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-14追加レビュー7件: 原本監査は一致ラッパー内の子カードを走査し、最も近い所有カードへpayloadを対応付ける。CLASSDEFSの16進・Unicodeエスケープを復号し、不正・未対応は未解決として停止。Hydrogenは提供条件・検索課金単位・prefix変更時のDROPを訂正。最新ユーザー指示によりHomeの両日付を価格更新日2026-11-13へ同期し、月次一覧も同日に合わせる。全体240 files／3075 tests・監査89件・型・lint657 files・Markdown lint・HTML原本監査exit 0が成功。バックエンド最新実測は138件＋39 subtests。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
@@ -651,7 +653,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3075 tests pass、2026-11-14追加レビュー7件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3075 tests pass、2026-11-15レビュー11件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

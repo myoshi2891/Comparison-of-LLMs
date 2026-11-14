@@ -6,6 +6,16 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## script境界・render引数・記録同期・構造化出力のレビュー11件（2026-11-15）
+
+- 11指摘とも現行コードで確認して修正。監査4契約で修正前失敗を確認し、Fableは原本由来の段落／要素ツリー契約を先に訂正して既存2契約のRedを実測。コミットは作成しない。
+- 独立scriptを明示的な文境界で結合し、末尾セミコロンなしのconst文字列が次のIIFEで継続される誤解析を防止。render引数を括弧・配列・オブジェクトの境界で分け、第2引数だけでCLASSDEFSを判定。括弧付き加算を評価し、未対応の寄与は未解決として停止。同名タグの比較は大小文字を正規化。
+- AGENTSのテスト記録をCLAUDEの3075件／138件＋39 subtestsへ同期。現在地・再開プロンプトとAGENTSのビルド記録は2026-11-14の115静的ページ成功へ訂正し、以後の変更は未ビルドであることを維持。
+- Carbonはタイトル直下の最終更新日形式を統一し、監視・ログ・人間承認の有効化を試験運用より前へ移動。隣接する参照ラベル49箇所を空白だけで分離し、ラベルの順序・件数・表記を保持して既存Markdown lint47指摘を解消。
+- HydrogenのtoolsプレースホルダーはGenerateContentConfig内へ移し、同ブロックにtypesのimportを追加。宣言を実際に有効化したモックでconfig経由の受け渡しと履歴・署名の保持を確認。
+- Fableはstrictによるツール入力の検証と、output_config.formatによるJSON応答を区別。autoでrecord_reviewが呼ばれない通常応答を記録成功とせず、呼び出し元で確認・再要求することを説明。HTML／Markdown原本・JSX・段落全文／要素ツリー契約へ同期。
+- 検証: 監査95件、Fable対象3 files／75 tests、型・lint657 files、HTML原本監査exit 0、全19図解析、Hydrogenのconfig例モック、Carbon／HydrogenのMarkdown lintが成功。保存Markdownの既存lint34件は不変。フロント全体240 files／3075 testsも成功。ビルド・実API呼び出しは未実行。
+
 ## タグ境界・変数スコープ・Carbon／Hydrogenのレビュー8件（2026-11-15）
 
 - 8指摘とも現行コードで有効と確認。監査2契約を追加し、修正前失敗を実測。コミットは作成しない。
@@ -397,7 +407,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `03f05ffe`（レビュー8件の修正は未コミット）。
+- **最新実装 HEAD**: `8ae01df5`（レビュー11件の修正は未コミット）。
 - **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
@@ -408,11 +418,11 @@
   - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
 - **ルート実数**: `page.tsx` 107件、registry 107エントリ（2026-11-13実測。Fable 5.2を追加）。
 - **動作検証**:
-  - ビルド: Fable 5.2移行ではユーザー指定により未実行。直前の価格更新時には `bun run build` 成功（2026-11-13、114静的ページ生成）。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-14 実測）
-  - `bun run lint` ✅（Biome check / 657 files / 0 diagnostics。2026-11-14 記録済み実測）
+  - ビルド: `bun run build` は2026-11-14に成功（115静的ページ生成）。その後の変更では未実行。Fable 5.2移行時はユーザー指定により未実行だった。
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-15 実測）
+  - `bun run lint` ✅（Biome check / 657 files / 0 diagnostics。2026-11-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3075 testsすべて成功**（2026-11-14追加レビュー7件修正後の実測）。型・lint657 filesも成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3075 testsすべて成功**（2026-11-15レビュー11件修正後の実測）。型・lint657 filesも成功。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
@@ -873,7 +883,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: 03f05ffe（レビュー8件の修正は未コミット。冒頭の同名節を参照）。
+最新実装HEAD: 8ae01df5（レビュー11件の修正は未コミット。冒頭の同名節を参照）。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
@@ -887,10 +897,10 @@ Astra: http://localhost:3000/codex/astra-best-practices
 指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
-全体240 files／3075 tests成功（2026-11-14追加レビュー7件修正後の実測）。Fable対象75件・監査89件・型・lint657 files・HTML原本監査exit 0が成功。未解決CLASSDEFSは完了判定を停止し、正規表現内の引用符もマスクする。Fableのcheckpointは完了済みツール結果を次のAPI呼び出し前に保存する。管理文書・監査手順・HydrogenのMarkdown lintも成功。保存Markdownの既存lint34件は不変。pytestは今回未実行（直前の実測138件＋39 subtests）。実API呼び出し・Next.jsビルドは今回未実行。Dockerのdevイメージは未検証。
-2026-11-15レビュー8件は監査91件・HTML原本監査exit 0・ガイドコードのモック・19図解析・Hydrogen等のMarkdown lintが成功。Carbonの既存参照ラベルlint47件は不変。アプリとスクレイパーは無変更のため全体テスト・型・Biome・pytestは再実行していない。
+全体240 files／3075 tests成功（2026-11-15レビュー11件修正後の実測）。Fable対象75件・監査95件・型・lint657 files・HTML原本監査exit 0が成功。未解決CLASSDEFSは完了判定を停止し、正規表現内の引用符もマスクする。Fableのcheckpointは完了済みツール結果を次のAPI呼び出し前に保存する。管理文書・監査手順・HydrogenのMarkdown lintも成功。保存Markdownの既存lint34件は不変。pytestは今回未実行（直前の実測138件＋39 subtests）。実API呼び出し・Next.jsビルドは今回未実行。Dockerのdevイメージは未検証。
+2026-11-15レビュー8件は監査91件・HTML原本監査exit 0・ガイドコードのモック・19図解析・Hydrogen等のMarkdown lintが成功。当時のCarbon参照ラベルlint47件は後続レビュー11件で解消し、全体テスト・型・Biomeも再実行済み。pytestは今回未実行。
 Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは107件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-Fable 5.2移行ではユーザー指定でnpm・ビルド未実行。直前の価格更新時にはbun run build成功（2026-11-13、114静的ページ生成）。
+Fable 5.2移行時はユーザー指定でnpm・ビルド未実行。2026-11-14にはbun run build成功（115静的ページ生成）。その後の変更ではビルド未実行。
 依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、139 ID一意性・初期進捗0 / 8・原本と配信HTMLの3254要素の一致を確認。
 ```
