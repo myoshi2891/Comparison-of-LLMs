@@ -334,16 +334,18 @@ HEADERS = {
     "content-type": "application/json",
 }
 # USD / 百万トークン(標準速度。公式価格表より)
-PRICE = {"in": 8.0, "out": 40.0, "cache_read": 0.20, "cache_write_5m": 10.0}
+PRICE = {"in": 8.0, "out": 40.0, "cache_read": 0.20, "cache_write_5m": 10.0, "cache_write_1h": 16.0}
 
 
 def usd(usage: dict) -> float:
     """usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。"""
+    cache = usage.get("cache_creation") or {}
     return (
         usage.get("input_tokens", 0) * PRICE["in"]
         + usage.get("output_tokens", 0) * PRICE["out"]
         + usage.get("cache_read_input_tokens", 0) * PRICE["cache_read"]
-        + usage.get("cache_creation_input_tokens", 0) * PRICE["cache_write_5m"]
+        + cache.get("ephemeral_5m_input_tokens", 0) * PRICE["cache_write_5m"]
+        + cache.get("ephemeral_1h_input_tokens", 0) * PRICE["cache_write_1h"]
     ) / 1_000_000
 
 
@@ -484,6 +486,7 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
             "max_tokens": 32_000,
             "output_config": {"effort": effort},
             "system": system,
+            "cache_control": {"type": "ephemeral"},  # 自動キャッシュを明示的に有効化
             "tools": tools,
             "messages": messages,
         })
@@ -638,7 +641,7 @@ sequenceDiagram
 
 ### 7.7 キャッシュとの相乗効果
 
-履歴を追記のみにすると、プレフィックスが毎回一致するため**キャッシュ命中率が上がります**。キャッシュ読み出しは入力単価の0.025倍($0.20/MTok)で、5分書き込みが $10、1時間書き込みが $16(いずれも百万トークンあたり)です。キャッシュ対象の最小サイズは512トークンです [公式] (S3, S4)。
+履歴を追記のみにしてプレフィックスが一致すると、**キャッシュ再利用の条件を満たしやすくなります**。一致だけではキャッシュは有効になりません。agent_loop() のようにリクエストのトップレベルで cache_control を指定するか、明示的なキャッシュブレークポイントを設定することが前提です。通常のツール定義だけでは自動的にキャッシュされません。キャッシュ読み出しは入力単価の0.025倍($0.20/MTok)で、5分書き込みが $10、1時間書き込みが $16(いずれも百万トークンあたり)です。キャッシュ対象の最小サイズは512トークンです [公式] (S3, S4)。
 
 ---
 
@@ -963,7 +966,7 @@ Claude Code の hooks で、編集後の自動整形や禁止操作のブロッ�
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path' | xargs -I{} sh -c 'case \"{}\" in *.ts|*.tsx|*.js) npx prettier --write \"{}\";; esac'"
+            "command": "jq -j '.tool_input.file_path, \"\\u0000\"' | xargs -0 sh -c 'for file do case \"$file\" in *.ts|*.tsx|*.js) npx prettier --write -- \"$file\";; esac; done' sh"
           }
         ]
       }
@@ -1106,11 +1109,19 @@ RATES = {  # USD / 百万トークン(公式価格表)
 
 def estimate_usd(usage: dict, mode: str = "standard") -> float:
     r = RATES[mode]
+    cache = usage.get("cache_creation") or {}
+    read = usage.get("cache_read_input_tokens", 0)
+    write_5m = cache.get("ephemeral_5m_input_tokens", 0)
+    write_1h = cache.get("ephemeral_1h_input_tokens", 0)
+    cached = read or write_5m or write_1h or usage.get("cache_creation_input_tokens", 0)
+    if cached and any(key not in r for key in ("cache_read", "cache_write_5m", "cache_write_1h")):
+        raise ValueError("このモードのキャッシュ単価を確認・設定してから見積もってください")
     return (
         usage.get("input_tokens", 0) * r["in"]
         + usage.get("output_tokens", 0) * r["out"]
-        + usage.get("cache_read_input_tokens", 0) * r.get("cache_read", 0)
-        + usage.get("cache_creation_input_tokens", 0) * r.get("cache_write_5m", 0)
+        + (read * r["cache_read"] if read else 0)
+        + (write_5m * r["cache_write_5m"] if write_5m else 0)
+        + (write_1h * r["cache_write_1h"] if write_1h else 0)
     ) / 1_000_000
 
 
