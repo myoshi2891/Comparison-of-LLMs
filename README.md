@@ -1,6 +1,6 @@
 # LLM-Studies (AI Model Cost Calculator & AI Studies Hub)
 
-最終更新日: 2026-09-18
+最終更新日: 2026-11-14
 
 [![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
@@ -138,6 +138,7 @@ flowchart LR
 ### 1. Docker を使用する場合（推奨）
 
 Docker と Docker Compose がインストールされていれば、ローカル環境を汚さずに全機能を利用できます。
+web の dev イメージには、ガイド内の Python コード例を検証するテスト用に python3 を含みます。
 
 ```bash
 # 全 Docker イメージのビルド

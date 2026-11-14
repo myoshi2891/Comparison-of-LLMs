@@ -1,9 +1,27 @@
 # GEMINI.md
 
-Updated 2026-11-11
+Updated 2026-11-14
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
+
+2026-11-14追加レビュー: 最新ユーザー指示によりHomeのaddedAt／lastReviewedを価格データ更新日の2026-11-13へ同期。監査とHydrogen原稿の修正・検証結果はdocs/PROGRESS.mdを参照。
+
+2026-11-14レビュー: Homeの公開日を2026-10-24へ復元し、確認日のみ2026-11-14へ更新。原本監査・Moonshot抽出・Hydrogen原稿の訂正と検証結果はCLAUDE.md／docs/PROGRESS.mdを参照。
+
+Claude Fable 5.2 `/claude/fable-5-2-best-practices` を追加（2026-11-13）。
+指定HTMLの100見出し・98段落・111リスト項目・45表363行・19コード例・10図・21 callout・49外部リンクをPure JSXへ転写。
+原本固定の全文・全要素ツリー・110 CSS規則・highlight.js11.12.0全トークンを66契約（ページ31／操作35）で照合。
+全体239 files／3065 tests、関連93件、型・lint656 files・HTML監査exit 0・10図解析・pytest135件が成功。
+288px固定目次・900pxモバイル開閉・点と番号・入れ子・全列左寄せ・コード空白を保持。
+41チェックは原本の9リスト（5・5・8・3・3・6・4・4・3）で独立集計。操作の行／関数100%、分岐89.87%。
+registryのClaudeカテゴリから導線を導出し、追加・確認日は2026-11-13、本文の情報基準日は2026-11-12を維持。
+カード内text/plainと実行時CLASSDEFSを読む監査を4つのRedから追加し、監査71テスト成功。
+HTML／Markdownは内容無変更保存。配信HTMLの3477個の意味的要素が原本と一致し、174 IDに重複なし。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.mdを参照。
+
+価格更新（2026-11-13）: Homeの公開日・確認日を更新。公式確認済みのClaude／Gemini新モデル5件を追加し、API 98件／ツール34件。
+Carbonの期限付き価格とMoonshot誤抽出防止を検証。pytest 131件＋39 subtests成功。詳細・検証結果はdocs/PROGRESS.mdを参照。
 
 Google Antigravity `/google/antigravity-best-practices` を指定HTMLで完全更新（2026-11-11）。
 108見出し・92段落・48リスト項目・61表404行・18コード例・11図・26引用・8表形式チェック・4外部リンクをPure JSXへ転写。
@@ -301,11 +319,11 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 235 files / 2863 tests pass（2026-11-11実測）
-(cd web-next && bun run typecheck)   # OK（2026-11-11 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3075 tests pass（2026-11-14実測）
+(cd web-next && bun run typecheck)   # OK（2026-11-14 実測）
 # ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
-(cd web-next && bun run lint)        # OK（640 files / 0 diagnostics。2026-11-11 実測）
-(cd scraper && uv run pytest)        # 122件成功（2026-11-11 実測）
+(cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-14 実測）
+(cd scraper && uv run pytest)        # 138件＋39 subtests成功（2026-11-14 実測）
 ```
 
 ## 次セッション再開プロンプト

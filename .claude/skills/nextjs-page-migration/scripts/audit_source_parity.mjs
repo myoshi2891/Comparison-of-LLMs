@@ -259,7 +259,7 @@ function collectSvgElements(src) {
  */
 function collectMarkupCalloutElements(src) {
   return extractElementContents(src, (openingTag) =>
-    /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
+    !/^<i\b/i.test(openingTag) && /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
       openingTag
     )
   ).map(({ openingTag, content }) => normalizeCalloutElement(openingTag, content));
@@ -349,30 +349,36 @@ function extractTagContents(src, tag) {
  * Extracts JSX elements whose opening tags satisfy a predicate, including their nested content.
  * @param {string} src - The source text to scan.
  * @param {function(string): boolean} predicate - Determines whether an opening tag should be extracted.
- * @returns {Array<{index: number, openingTag: string, content: string}>} The extracted elements and their source positions.
+ * @param {boolean} includeNested - Also visit descendants of a matching element.
+ * @returns {Array<{index: number, end: number, openingTag: string, content: string}>} Elements and their source positions.
  */
-function extractElementContents(src, predicate) {
+function extractElementContents(src, predicate, includeNested = false) {
   const results = [];
-  const openingRe = /<([A-Za-z][\w.-]*)\b[^>]*>/g;
+  const openingRe = /<([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
   let opening = openingRe.exec(src);
   while (opening !== null) {
     const openingTag = opening[0];
     if (!openingTag.endsWith("/>") && predicate(openingTag)) {
       const tag = opening[1];
-      const nestedRe = new RegExp(`<\\/?${tag}\\b[^>]*>`, "g");
+      const nestedRe = /<!--[\s\S]*?-->|<(\/?)([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
       nestedRe.lastIndex = openingRe.lastIndex;
       let depth = 1;
       let nested = nestedRe.exec(src);
       while (nested !== null) {
-        if (nested[0].startsWith(`</${tag}`)) depth -= 1;
+        if (nested[2] !== tag) {
+          nested = nestedRe.exec(src);
+          continue;
+        }
+        if (nested[1] === "/") depth -= 1;
         else if (!nested[0].endsWith("/>")) depth += 1;
         if (depth === 0) {
           results.push({
             index: opening.index,
             openingTag,
             content: src.slice(openingRe.lastIndex, nested.index),
+            end: nestedRe.lastIndex,
           });
-          openingRe.lastIndex = nestedRe.lastIndex;
+          if (!includeNested) openingRe.lastIndex = nestedRe.lastIndex;
           break;
         }
         nested = nestedRe.exec(src);
@@ -428,23 +434,40 @@ function resolveStringConstants(content, constants, asStringExpression = false) 
  * decode to a newline instead of a literal backslash + "n". Consuming each escape exactly
  * once avoids that.
  * @param {string} raw - Quoted or template-literal string content with escape sequences still literal.
- * @returns {string} The decoded text.
+ * @param {boolean} strict - Reject escapes whose runtime value is not supported.
+ * @returns {string|undefined} The decoded text, or an unresolved strict literal.
  */
-function decodeQuotedEntryEscapes(raw) {
+function decodeQuotedEntryEscapes(raw, strict = false) {
   let out = "";
   for (let index = 0; index < raw.length; index += 1) {
     const char = raw[index];
     if (char === "\\" && index + 1 < raw.length) {
       const next = raw[index + 1];
-      if (next === "n") {
+      if (next === "x" || next === "u") {
+        const braced = next === "u" && raw[index + 2] === "{";
+        const pattern = braced ? /^u\{([0-9a-fA-F]+)\}/ : next === "x" ? /^x([0-9a-fA-F]{2})/ : /^u([0-9a-fA-F]{4})/;
+        const escape = pattern.exec(raw.slice(index + 1));
+        const value = escape && Number.parseInt(escape[1], 16);
+        if (!escape || value > 0x10ffff) {
+          if (strict) return undefined;
+          out += char + next;
+        } else {
+          out += braced ? String.fromCodePoint(value) : String.fromCharCode(value);
+          index += escape[0].length;
+          continue;
+        }
+      } else if (next === "n") {
         out += "\n";
       } else if (next === "r") {
         out += "\r";
       } else if (next === "t") {
         out += "\t";
+      } else if (next === "b" || next === "f" || next === "v" || (next === "0" && !/\d/.test(raw[index + 2] ?? ""))) {
+        out += { b: "\b", f: "\f", v: "\v", 0: "\0" }[next];
       } else if (next === "'" || next === '"' || next === "`" || next === "\\" || next === "$") {
         out += next;
       } else {
+        if (strict) return undefined;
         out += char + next;
       }
       index += 1;
@@ -578,14 +601,19 @@ function normalizeUrl(url) {
 }
 
 /**
- * Masks comments and template-literal contents while preserving quoted string contents.
+ * Masks comments, regex literals and template contents, optionally quoted strings too.
  * @param {string} src - The module source text.
- * @return {string} The source with comments and template-literal contents replaced by spaces.
+ * @param {boolean} preserveQuotedStrings - Keep single/double-quoted contents for literal extraction.
+ * @return {string} The source with non-code contents replaced by spaces, preserving offsets.
  */
-function blankNonCodeText(src) {
+function blankNonCodeText(src, preserveQuotedStrings = true) {
   const blank = (text) => text.replace(/[^\n]/g, " ");
   let out = "";
   let index = 0;
+  let canStartRegex = true;
+  let lastToken = "";
+  const controlParens = [];
+  const wordRe = /[A-Za-z_$][\w$]*/y;
   while (index < src.length) {
     const char = src[index];
     const next = src[index + 1];
@@ -603,6 +631,26 @@ function blankNonCodeText(src) {
       index = stop;
       continue;
     }
+    if (char === "/" && canStartRegex) {
+      let cursor = index + 1;
+      let inClass = false;
+      while (cursor < src.length && src[cursor] !== "\n" && src[cursor] !== "\r") {
+        if (src[cursor] === "\\") { cursor += 2; continue; }
+        if (src[cursor] === "[") inClass = true;
+        else if (src[cursor] === "]") inClass = false;
+        else if (src[cursor] === "/" && !inClass) break;
+        cursor++;
+      }
+      if (src[cursor] === "/") {
+        cursor++;
+        while (/[A-Za-z]/.test(src[cursor] ?? "")) cursor++;
+        out += blank(src.slice(index, cursor));
+        index = cursor;
+        canStartRegex = false;
+        lastToken = "regex";
+        continue;
+      }
+    }
     if (char === "`" || char === '"' || char === "'") {
       let cursor = index + 1;
       while (cursor < src.length) {
@@ -615,9 +663,32 @@ function blankNonCodeText(src) {
         cursor += 1;
       }
       const body = src.slice(index + 1, Math.min(cursor, src.length));
-      out += char + (char === "`" ? blank(body) : body) + (src[cursor] === char ? char : "");
-      index = Math.min(cursor + 1, src.length);
+      out += char + (char === "`" || !preserveQuotedStrings ? blank(body) : body) + (src[cursor] === char ? char : "");
+      index = Math.min(cursor + (src[cursor] === char ? 1 : 0), src.length);
+      canStartRegex = false;
+      lastToken = "string";
       continue;
+    }
+    wordRe.lastIndex = index;
+    const word = wordRe.exec(src)?.[0];
+    if (word) {
+      out += word;
+      index += word.length;
+      canStartRegex = lastToken !== "." && /^(?:return|throw|case|delete|void|typeof|instanceof|in|of|yield|await|else|do)$/.test(word);
+      lastToken = word;
+      continue;
+    }
+    if ((char === "+" || char === "-") && next === char) {
+      out += char + next;
+      index += 2;
+      canStartRegex = false;
+      lastToken = char + next;
+      continue;
+    }
+    if (!/\s/.test(char)) {
+      if (char === "(") controlParens.push(/^(?:if|while|for|with|switch|catch)$/.test(lastToken));
+      canStartRegex = char === ")" ? (controlParens.pop() ?? false) : /[=(:,\[!&|?{};+\-*/%~^<>]/.test(char);
+      lastToken = char;
     }
     out += char;
     index += 1;
@@ -905,12 +976,170 @@ function readHtmlAttribute(attributes, name) {
   return undefined;
 }
 
+const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
+
+/** Resolve CLASSDEFS in this scope: undefined = unused, null = unresolved, string = evaluated. */
+function rendererSuffix(literalSource) {
+  const executable = blankNonCodeText(literalSource, false);
+  // Strings/comments are already masked. Balance parentheses so later ASI
+  // statements cannot supply a suffix that this render call never receives.
+  const renderUses = Array.from(executable.matchAll(/\bmermaid\.render\s*\(/g)).flatMap(call => {
+    const start = call.index + call[0].length;
+    let depth = 1;
+    for (let end = start; end < executable.length; end++) {
+      if (executable[end] === "(") depth++;
+      if (executable[end] === ")") depth--;
+      if (depth === 0) return Array.from(executable.slice(start, end).matchAll(/\bsrc\s*\+\s*CLASSDEFS\b/g), use => ({ index: start + use.index + use[0].lastIndexOf("CLASSDEFS"), call: call.index }));
+    }
+    return [];
+  });
+  if (renderUses.length === 0) return undefined;
+  // Locate the declaration in code, then read its literal from the offset-aligned view.
+  const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
+  if (!declaration) return null;
+  const declarationName = declaration.index + declaration[0].indexOf("CLASSDEFS");
+  const allowedNames = new Set([declarationName, ...renderUses.map(use => use.index)]);
+  // Parameters, destructuring, catch bindings and other references require
+  // lexical analysis beyond this literal-only evaluator. Never guess an outer binding.
+  if (Array.from(executable.matchAll(/\bCLASSDEFS\b/g)).some(name => !allowedNames.has(name.index))) return null;
+  const targets = new Set([declaration.index, ...renderUses.map(use => use.call)]);
+  const paths = new Map();
+  const blocks = [];
+  for (let index = 0; index < executable.length; index++) {
+    if (targets.has(index)) paths.set(index, [...blocks]);
+    if (executable[index] === "{") blocks.push(index);
+    else if (executable[index] === "}") {
+      if (blocks.length === 0) return null;
+      blocks.pop();
+    }
+  }
+  if (blocks.length > 0) return null;
+  const declarationPath = paths.get(declaration.index);
+  if (renderUses.some(use => declaration.index > use.call || !declarationPath.every((block, index) => paths.get(use.call)?.[index] === block))) return null;
+  if (declaration) {
+    const initialWrite = declaration.index + declaration[0].indexOf("CLASSDEFS");
+    const writes = executable.matchAll(/\bCLASSDEFS\s*(?:=(?!=|>)|(?:\*\*|&&|\|\||\?\?|[+\-*/%&|^])=|\+\+|--)/g);
+    // Additional writes may run under control flow or in callbacks. Do not
+    // certify an initializer without establishing the value at render time.
+    if (Array.from(writes).some(write => write.index !== initialWrite) || /(?:\+\+|--)\s*CLASSDEFS\b/.test(executable)) return null;
+  }
+  const initializerSource = declaration && literalSource.slice(declaration.index);
+  const initializer = initializerSource && /^(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*"))*)/.exec(initializerSource);
+  // Check the remainder separately so a failed terminator cannot backtrack to a
+  // partial concatenation. A newline permits ASI only without an expression continuation.
+  const complete = initializer && /^[ \t]*(?:;|$|[\r\n](?!\s*(?:[([`.+\-*/%<>=!&|^?:,\\]|\b(?:in|instanceof)\b)))/.test(initializerSource.slice(initializer[0].length));
+  const literal = complete && initializer[1];
+  if (!literal) return null;
+  const parts = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2], true));
+  return parts.some(part => part === undefined) ? null : parts.join("");
+}
+
+/** Match static card selectors; complex/dynamic selectors are not guessed. */
+function matchesCardSelector(tag, selector) {
+  if (!/^(?:[A-Za-z][\w-]*)?(?:[.#][\w-]+)*$/.test(selector) || !selector) return false;
+  const element = /^([A-Za-z][\w-]*)/.exec(selector)?.[1];
+  if (element && /^<([\w-]+)/.exec(tag)?.[1].toLowerCase() !== element.toLowerCase()) return false;
+  const classes = (readHtmlAttribute(tag, "class") ?? "").split(/\s+/);
+  return Array.from(selector.matchAll(/([.#])([\w-]+)/g)).every(([, kind, value]) =>
+    kind === "#" ? readHtmlAttribute(tag, "id") === value : classes.includes(value));
+}
+
+/**
+ * Materialize display-only payloads scoped to their owning code/diagram card.
+ * Scripts and comments are opaque while finding nested div boundaries; no source JS is executed.
+ * @param {string} src - Original HTML.
+ * @returns {{html: string, unresolvedMermaidSources: string[]}} Restored HTML and blocking unresolved contributions.
+ */
+function materializePlainTextCards(src) {
+  const scripts = [];
+  const unresolvedMermaidSources = [];
+  const stashed = src.replace(/<!--[\s\S]*?-->|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
+    (full, attributes, payload) => {
+      if (attributes === undefined) return full.startsWith("<!--") ? "" : full;
+      scripts.push({ full, attributes, payload });
+      return `<script data-audit-payload="${scripts.length - 1}"></script>`;
+    });
+  const executableScripts = scripts.filter(script => {
+    const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
+    return !type || type === "module" || /^(?:text|application)\/(?:java|ecma)script$/.test(type);
+  });
+  // Classic scripts share the global scope; each module has its own CLASSDEFS.
+  const scopes = [
+    executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module"),
+    ...executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() === "module").map(script => [script]),
+  ].map(group => {
+    const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n");
+    const executable = blankNonCodeText(literalSource, false);
+    const selectors = [];
+    const selectionCalls = Array.from(executable.matchAll(/\bdocument\.querySelector(?:All)?\s*\(/g));
+    for (const call of selectionCalls) {
+      const argument = /^\s*(['"])((?:[^\\]|\\.)*?)\1\s*\)/.exec(literalSource.slice(call.index + call[0].length));
+      if (argument) selectors.push(decodeQuotedEntryEscapes(argument[2]));
+    }
+    return { suffix: rendererSuffix(literalSource), selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) };
+  }).filter(scope => scope.hasRenderer);
+  const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const cards = extractElementContents(stashed, tag => {
+    const cls = readHtmlAttribute(tag, "class") ?? "";
+    return cls.split(/\s+/).some(c => c === "code-block" || c === "diagram-card");
+  }, true);
+  const edits = [];
+  for (const card of cards.reverse()) {
+    const start = card.index + card.openingTag.length;
+    let ownedContent = card.content;
+    // Hide descendants without shifting offsets. Each payload belongs only to
+    // its nearest card, even when a matching wrapper also contains child cards.
+    for (const child of cards.filter(child => child.index >= start && child.end <= card.end)) {
+      const from = child.index - start;
+      const to = child.end - start;
+      ownedContent = ownedContent.slice(0, from) + ownedContent.slice(from, to).replace(/[^\n]/g, " ") + ownedContent.slice(to);
+    }
+    const marker = Array.from(ownedContent.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g)).find(match => {
+      const script = scripts[Number(match[1])];
+      return readHtmlAttribute(script.attributes, "type")?.toLowerCase() === "text/plain" && readHtmlAttribute(script.attributes, "data-for") === undefined;
+    });
+    if (!marker) continue;
+    const script = scripts[Number(marker[1])];
+    const rawLines = script.payload.replace(/^\n+/, "").replace(/\s+$/, "").split("\n");
+    const indent = Math.min(...rawLines.filter(l => l.trim()).map(l => l.match(/^[ \t]*/)[0].length));
+    const payload = rawLines.map(l => l.slice(Number.isFinite(indent) ? indent : 0)).join("\n");
+    if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
+      // Consume every opening tag as a unit before looking for empty code,
+      // so a span's quoted title cannot supply a fake <code></code> target.
+      const emptyCodeOrTag = new RegExp(String.raw`<code\b${htmlAttributesPattern}>\s*<\/code>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`, "gi");
+      const code = Array.from(ownedContent.matchAll(emptyCodeOrTag)).find(match => match[1] !== undefined);
+      if (code) {
+        edits.push({ index: start + code.index, length: code[0].length, value: `<code${code[1]}>${escape(payload)}</code>` });
+        // A selected data-code script must not be materialized again by inventoryHtml.
+        edits.push({ index: start + marker.index, length: marker[0].length, value: "" });
+      }
+    } else {
+      const matching = scopes.filter(scope => scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector)));
+      const renderer = matching.length === 1 ? matching[0]
+        : (matching.length === 0 && scopes.length === 1 && !scopes[0].hasSelection ? scopes[0] : undefined);
+      const cardId = readHtmlAttribute(card.openingTag, "id") ?? `card-${marker[1]}`;
+      if (!renderer && scopes.length > 0) unresolvedMermaidSources.push(`renderer:${cardId}`);
+      if (renderer?.suffix === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
+      const suffix = renderer?.suffix ?? "";
+      edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(payload + suffix)}</div>` });
+    }
+  }
+  let result = stashed;
+  for (const edit of edits.sort((a, b) => b.index - a.index)) result = result.slice(0, edit.index) + edit.value + result.slice(edit.index + edit.length);
+  return {
+    html: result.replace(/<script data-audit-payload="(\d+)"><\/script>/g, (_full, index) => scripts[Number(index)].full),
+    unresolvedMermaidSources: unresolvedMermaidSources.reverse(),
+  };
+}
+
 function inventoryHtml(src) {
+  const materialized = materializePlainTextCards(src);
+  src = materialized.html;
   // Detached text/plain payloads are displayed via code.textContent, not HTML parsing.
   // Resolve by data-for/id rather than script order and escape literal markup before inventorying.
   // 開始タグの属性部は引用値を 1 単位で消費する。`[^>]*` だと title="a>b" の `>` で
   // タグが閉じたと誤認し、後続の data-for / id を読めず本文が監査から外れる。
-  const attrs = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
+  const attrs = htmlAttributesPattern;
   // payload の収集と差し込みは同じ走査を使う。別々に走査すると、コメントアウトされた script を
   // 実 script として拾い、後勝ちの Map で本物の payload を上書きしてしまう。
   // script 要素は先頭の分岐で丸ごと消費する。payload 内の未閉じ <code> から一致が始まると、
@@ -993,6 +1222,7 @@ function inventoryHtml(src) {
     tableRowTexts,
     paragraphTexts,
     mermaidSources: collectHtmlMermaidSources(src),
+    unresolvedMermaidSources: materialized.unresolvedMermaidSources,
     svgElements: collectSvgElements(body),
     calloutElements: collectMarkupCalloutElements(body),
     externalLinks: collectUrls(body),
@@ -1156,6 +1386,7 @@ function compare(source, page) {
   const mermaidSourcesMatch =
     source.mermaidSources.length === page.mermaidSources.length &&
     source.mermaidSources.every((value, index) => value === page.mermaidSources[index]);
+  const unresolvedMermaidSources = source.unresolvedMermaidSources ?? [];
 
   const counts = {
     listItems: { source: source.listItems, page: page.listItems },
@@ -1178,6 +1409,7 @@ function compare(source, page) {
     missingParagraphs.length > 0 ||
     missingSvgElements.length > 0 ||
     missingCalloutElements.length > 0 ||
+    unresolvedMermaidSources.length > 0 ||
     !mermaidSourcesMatch;
 
   return {
@@ -1191,6 +1423,7 @@ function compare(source, page) {
     missingSvgElements,
     missingCalloutElements,
     mermaidSourcesMatch,
+    unresolvedMermaidSources,
     sourceMermaidSources: source.mermaidSources,
     pageMermaidSources: page.mermaidSources,
     counts,
@@ -1347,6 +1580,9 @@ if (process.exitCode === undefined) {
           console.log(
             `\n❌ page.tsx に存在しないか改変された原本の callout/alert (${result.missingCalloutElements.length} 件)`
           );
+        }
+        if (result.unresolvedMermaidSources.length > 0) {
+          console.log(`\n❌ 実行時のCLASSDEFSを静的評価できません: ${result.unresolvedMermaidSources.join(", ")}`);
         }
         if (!result.mermaidSourcesMatch) {
           console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");

@@ -63,6 +63,11 @@ describe("PageEntrySchema", () => {
 });
 
 describe("pageRegistry", () => {
+  it("Homeの公開日と確認日を価格データ更新日に揃える", () => {
+    const home = findBySlug("/");
+    expect([home?.addedAt, home?.lastReviewed]).toEqual(["2026-11-13", "2026-11-13"]);
+  });
+
   it("Home（/）を含む", () => {
     expect(pageRegistry.some((e) => e.slug === "/")).toBe(true);
   });

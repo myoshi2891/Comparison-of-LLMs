@@ -2,9 +2,117 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-12**
+> - 最終更新日: **Updated 2026-11-15**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## タグ境界・変数スコープ・Carbon／Hydrogenのレビュー8件（2026-11-15）
+
+- 8指摘とも現行コードで有効と確認。監査2契約を追加し、修正前失敗を実測。コミットは作成しない。
+- カード境界は全タグを引用属性ごと消費してから同名タグの深さを更新。他タグのtitle内に開閉div様文字列があっても、兄弟text/plainの表示コードを保持する。
+- CLASSDEFSはrenderごとの参照位置と宣言の包含関係を確認。パラメータ・arrow引数・catch等の追加参照や可視範囲外の宣言は、外側の初期値で認定せず未解決とする。対応範囲内の単純な外側リテラルと内側のrenderは維持。原本JavaScriptは実行しない。
+- Carbonの認証調査例へ代表的な認証コードを渡し、調査対象が入力に含まれることをモック確認。移行表に全ターンの署名保持、並列兄弟への署名コピー禁止、履歴変更／prefill対策、Agent Platformの明示キャッシュ非対応と4,096トークン以上の静的prefixを追記。
+- Carbonの費用関数はtool_use_prompt_token_countを入力単価で加算し、検索クエリ等の個別ツール料金を除くトークン料金だけの概算と明記。非ゼロのツール入力・キャッシュ・思考込みで導入価格$3.22／通常価格$6.44、欠落カウンターとツール入力のみも実行検証。
+- Hydrogenのxhighも品質基準で判定し、不合格はCarbon／Argonへ委譲。MAX_TOKENSと候補なしは本文を採用せず例外とし、STOP時は従来どおり本文を出力することをモック確認。
+- 検証: 監査91件、FableのHTML原本監査exit 0、Carbon／Hydrogenのコード例モック、全19図の解析、Hydrogenと変更管理文書のMarkdown lint、差分検査が成功。Carbonの参照ラベルlintは変更前後47件で同一、新規指摘なし。web-next・scraperは無変更のため全体テスト・型・Biome・pytestは再実行していない。直前の実測はweb240 files／3075 tests・pytest138件＋39 subtests。ビルド・実API呼び出しは未実行。
+
+## 入れ子カード・文字列復号・提供条件・日付の追加レビュー7件（2026-11-14）
+
+- 7指摘とも現行コードで確認し対応。監査2契約とHome日付契約で修正前の失敗を実測。コミットは作成しない。
+- 監査は一致するラッパーの子カードも走査し、子の範囲を位置保持で隠してpayloadを最も近いカードへ対応付ける。元の位置への局所編集で親の変換が子の表示を上書きしない。コード／図の2子カード、親自身のpayloadも持つケースを検証。
+- CLASSDEFSの16進・Unicode固定長／コードポイント・サロゲートペアを実行時文字へ復号。未対応・不正なエスケープはstrict復号で未解決とし、元のエスケープ表記での認定を拒否。
+- HydrogenのAntigravity提供表をFree／Plus／Pro／Ultraへ訂正し、Orchestratorの個別プラン制限を区別。検索課金は検索クエリ単位・複数検索の可能性・Gemini 3以降の共有無料枠を説明。履歴圧縮はprefix変更とHTTP 400の関係、DROPまたは対応する履歴リセットを公式資料で確認して追記。
+- Homeの両日付は最新ユーザー指示に従い、価格データgenerated_atの2026-11-13へ同期。registry契約・月次一覧も同日へ揃える。バックエンドの現在地・再開プロンプトは最新実測138件＋39 subtestsへ訂正し、コマンドは維持。
+- 検証: 全体Vitest240 files／3075 tests、監査89件、型・lint657 files、FableのHTML原本監査exit 0、変更Markdownのlint、Hydrogenの図解析が成功。直前のレビューでpytest138件＋39 subtestsとFable75件も成功。ビルド・実API呼び出し・コミットは未実行。
+
+## 監査・移行ガイド・価格境界・ツール例外のレビュー11コメント（2026-11-14）
+
+- 11コメントを現行コードで確認し、すべて対応。Fableのツール例外に関する2コメントは同じ修正へ統合。監査3件・Moonshot1件・Fable1件の回帰テストを追加し、修正前失敗を実測。コミットは作成しない。
+- 監査は未対応・動的なセレクターや未確定のrenderer対応をunresolvedMermaidSourcesへ記録し、接尾辞なしと区別。対応済みrendererの接尾辞なしは維持。通常タグを引用属性ごと消費して本物の最初の空codeへpayloadを挿入。CLASSDEFSに追加の代入があれば、初期値で認定せず未解決として停止。
+- Hydrogenは非対応のfrequency_penalty／presence_penalty、candidate_count > 1、prefilled modelターンの除去を表・フロー・チェックリストへ反映。temperature／top_p／top_kの扱いは維持。出力見積りは思考と回答の合計を使い、会話ごとの履歴をstepへ渡して署名付きcontentを保持する。履歴分離と署名の同一性をモック検証し、全図を構文解析。
+- 月次一覧のHome確認日をregistryの2026-11-14へ同期。Moonshotは閉じdd／dlと次のdtを越えないよう境界を追加し、別レコードの入出力を組み合わせずフォールバックを保持。
+- Fableの通常のツール例外は対応するtool_resultへis_error:trueで変換し、成功・失敗を含む全バッチを保存してから続行。成功したターンの後に成功・失敗・成功が混在するバッチでもID・順序・完了結果を保持し、再開で重複実行しないことを検証。BaseExceptionによる中断・終了からの復旧は例の対象外と明記。HTML／Markdown・JSX・コード／トークン／要素ツリー契約へ同期。[公式のエラー結果仕様](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)とも照合。
+- 検証: 全体Vitest240 files／3075 tests、監査87件、pytest138件＋39 subtests、Fable対象3 files／75 tests、typecheck、lint657 files、HTML原本監査exit 0が成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。
+
+## 未解決の図・正規表現・データ保持・チェックポイントのレビュー4件（2026-11-14）
+
+- 4指摘とも現行コードで有効と確認。監査は既存1契約を厳格化し、空の接尾辞と未解決の初期化子を区別する契約・正規表現内の引用符を扱う契約を追加。Fableは次のcall失敗時の履歴保持を実行する契約を追加。監査3件・Fable1件の修正前失敗を実測。
+- CLASSDEFSは未使用・静的評価済み文字列・未解決を区別。未解決の図はunresolvedMermaidSourcesとしてJSON／通常出力へ記録し、元の図との照合が一致しても完了判定を止める。原本JavaScriptは実行しない。
+- コードのマスクは文字列より前に正規表現リテラルを認識し、引用符・エスケープ・文字クラス・フラグを消費。除算との区別とソース位置の保持を回帰で検証。
+- Hydrogenのデータ取り扱いはPaid Contributor Tierの改善利用と有料サービスの不正利用監視用保持を公式資料で確認し、機密データ送信前の保持方針・データ共有設定の確認を案内。
+- Fableのagent_loopは完了したtool_resultバッチを追加するたび、次のAPI呼び出し前にcheckpointへ保存。ターン上限時の保存と例外は維持。次のcallが失敗しても履歴を取得でき、再開時にツールを重複実行しないことを検証。HTML／Markdown原本・JSX・対象コードの全文／構文色／要素ツリー契約へ同期。
+- 検証: 全体Vitest240 files／3074 tests、監査84件、Fable対象3 files／74 tests、typecheck、lint657 files、HTML原本監査exit 0、管理文書・監査手順・HydrogenのMarkdown lintが成功。保存Markdownの既存lint34件は変更前後で同一、新規指摘なし。ビルド・実API呼び出し・コミットは未実行。
+
+## カード境界・モデル選定・継続実行の追加レビュー5件（2026-11-14）
+
+- 5指摘とも現行コードで有効と確認。監査2件とFableのチェックポイント1件の回帰テストを追加し、修正前の失敗を実測。コミットは作成しない。
+- extractElementContentsは開始タグ・同名の入れ子タグとも引用属性を単位として読み、属性内のgreater-thanでカード境界を切らない。回帰はコード／図カードそれぞれで単一・二重引用符を検証。
+- CLASSDEFSはクラシックスクリプトの共有スコープと各moduleのスコープを分離。静的なカードのID／クラス／タグセレクターからrendererを対応付け、2モジュールが異なる接尾辞を使う正常例と、同一・入れ替え接尾辞の拒否を検証。原本JavaScriptは実行しない。
+- Hydrogenのモデル選定は必須機能を最初に確認。Long Decodeの図・本文・チェックリストは、バックグラウンド、フォアグラウンド／ステートレスのクライアント側継続、GenerateContentのSDK／REST継続を選べるよう公式資料に合わせて訂正。
+- Fableのagent_loopは任意のcheckpoint辞書へ最後のtool_resultを含むmessagesを上限例外の前に保存し、同じ辞書で再開できる。max_turnsの既定値・例外を維持し、1ターン停止後の再開・ツール重複防止・0ターン上限を実行検証。HTML／Markdown原本・JSX・対象コードの全文／構文色／要素ツリー契約へ同期。
+- 検証: 全体Vitest240 files／3073 tests、監査82件、対象3 files／73 tests、typecheck、lint657 files、HTML原本監査exit 0、Hydrogenの全図解析と必須機能ゲート確認、変更した管理文書とHydrogenのMarkdown lintが成功。保存Markdownの既存lint34件は変更前後で同一、新規指摘なし。ビルド・実API呼び出しは未実行。
+
+## 原本監査・Hydrogen・Moonshot・Homeのレビュー8件（2026-11-14）
+
+- 8指摘すべて現行コードで有効と確認して修正。既存の未コミット回帰テストを保持し、監査2件・Moonshot片側価格・Home日付の修正前失敗を実測。
+- 監査はrender呼び出しの括弧の対応を追跡し、その引数だけでCLASSDEFSを判定。通常タグは引用属性も含めて消費し、属性内のscript様文字列をpayloadに選ばない。
+- Moonshotはoutputラベル以降の金額を入力価格に使わず、片側抽出時はフォールバックの組を維持。Homeの公開日を2026-10-24へ復元し、確認日のみ2026-11-14へ更新。
+- Hydrogen原稿はcompleted以外の終了を明示的に拒否し、テキスト専用例をoutput_textへ変更。共有1,048,576トークン枠内の2 hop例へ訂正し、継続入力課金を含めて計算。max_output_tokensは出力課金だけを抑え、総額を制限しないことを明記。
+- 検証: 全体Vitest240 files／3072 tests、監査80件、pytest137件＋39 subtests、registry／ナビ関連3 files／49 tests、typecheck、lint657 files、変更Markdownのlint、Fable 5.2のHTML原本監査exit 0が成功。Hydrogen例の7状態経路とトークン・料金計算をモックで実行確認。ビルド・実API呼び出し・コミットは未実行。
+
+## 原本監査・表示例・検証要約のレビュー5件（2026-11-14）
+
+- 5指摘を現行コードで確認して修正。CLASSDEFSは完全な文字列リテラルの連結だけを抽出し、セミコロンとASIの改行終端に対応。継続する式の部分抽出を拒否する回帰フィクスチャを追加。
+- 空のcode要素への差し込みはinventoryHtmlと引用符対応の属性パターンを共有。引用属性内の角括弧と選択payloadの全文を確認する回帰フィクスチャを追加。
+- Dockerのdevステージにpython3と併せてjqを追加し、既存のインストール・cleanupを維持。Fable 5.2の非ストリーミング例はcall()完了後の進捗表示であることをコメントに明記し、HTML／Markdown・JSX・全文／構造契約へ同期。
+- 現在の検証要約は記録済みの240 files／3071 tests・lint657 filesに同期し、過去の記録は保持。今回はテストランナーを実行せず、型チェック・対象ファイルのBiome・変更した管理文書のMarkdown lint・HTML原本監査で確認。監査用フィクスチャの直接照合はexit 0、空の移植先との照合は選択payload全文と図の欠落を検知してexit 1。ビルド・Dockerイメージのビルドは未実行。
+
+## 原本監査・参考表・Dockerの追加レビュー4件（2026-11-14）
+
+- 4指摘すべて現行コードで確認して修正。監査のrender判定とCLASSDEFS宣言位置の検出は文字列・コメントを隠したコードを使い、リテラルの抽出用表現と分離。カード内で表示済みのscriptを消費し、data-codeによる二重復元を防止。他のcode要素の処理は維持。
+- Fable 5.2の著者・独立評価の22行は、末尾の空セルを取得状況の前の内容列へ移動。文章・URL・リンク属性は無変更。保存原本と固定JSONは変更せず、全文・構造比較時のみセル移動を逆変換する。追加契約で表示セルの全文・列順・リンク位置を完全一致検証。
+- webのDockerfileはdevステージだけpython3を追加。deps／buildステージは無変更。Dockerデーモンが停止中のため、イメージのビルド・コンテナ内テストは未検証。
+- 修正前に監査の追加2件と表契約の失敗を確認。全体Vitest 240 files／3071 tests、監査76件、対象3 files／72 tests、HTML原本監査exit 0、typecheck、lint657 files、変更Markdownのlintが成功。Next.jsビルドは今回未実行。コミットは作成しない。
+
+## 追加レビュー6件の修正（2026-11-14）
+
+- 6指摘とも現行コードで確認し修正。図挿入はコールバック置換でドル記号列を保持。Moonshotのoutput前だけ入力価格のドル記号を許可し、80文字・レコード終端・次モデルの境界とoutput後のドル制限を維持。
+- Fable 5.2のusd／estimate_usdはcache_creationの5分・1時間カウンターを各単価で計算。fast／batchの単価が未定義のキャッシュ使用量はValueErrorで拒否。履歴の一致だけではキャッシュは有効にならないことを説明し、agent_loopのトップレベルcache_controlを追加。[公式資料](https://platform.claude.com/docs/en/build-with-claude/prompt-caching)で設定・カウンター・標準単価を確認。
+- PostToolUseはNUL区切りのパスをシェルの位置引数へ渡し、同じ引用変数で拡張子判定とPrettier実行を行う。空白・引用符・改行・シェル構文・先頭ハイフンと対象外拡張子を実行テストで検証。
+- 指定された訂正のみHTML／Markdown原本・JSX・本文／構文トークン／要素ツリー契約へ同期。料金関数・キャッシュ設定・フックの表示コードに対する3件と、監査・スクレイパー各1件を追加し、修正前の失敗を確認。コミットは作成しない。
+- 検証: 全体Vitest **240 files／3070 testsすべて成功**。対象ページ3 files／71 tests、監査74 tests、pytest136 tests＋39 subtests、typecheck、lint657 files、HTML原本監査exit 0が成功。保存Markdownのlintは変更前35件・変更後34件（末尾改行の追加、新規指摘なし）。既存の表列数・リスト等の指摘は今回の修正対象外として保持。 ビルドは通常権限でコンパイル段階に4分以上停滞し、今回の停止プロセスのみ終了後、サンドボックス外の再実行で115静的ページ生成・exit 0を確認。再実行初回の残存ロックによる失敗はプロセス終了後に解消。依存・設定は無変更。
+
+## 原本監査のレビュー対応（2026-11-14）
+
+- 2指摘とも現行実装で再現。CLASSDEFSの宣言・render式は、HTMLコメントと非実行scriptを除き、JavaScriptコメントを除去してから照合する。稼働中のrender式のsuffix復元は保持。
+- カード内の全payload候補を順に調べ、text/plainかつdata-for属性のない最初のscriptを選択。先行する実行用script・data-for付きscript（空属性を含む）で後続payloadを見落とさない。
+- 追加2テストの修正前失敗を確認後、監査・形式テスト **73件すべて成功**。Fable 5.2のHTML原本監査exit 0。アプリ・原本・依存・設定は無変更で、アプリ全体テスト・ビルドは今回未実行。コミットは作成しない。
+
+## Claude Fable 5.2 ガイド移行（2026-11-13）
+
+- 状態: **実装・自動検証・分離コミット完了、目視未確認（ユーザー担当）**。`/claude/fable-5-2-best-practices` を既存Claudeカテゴリへ登録し、ナビ・検索・RSS・関連ページをregistryから導出。追加・確認日2026-11-13、本文の情報基準日2026-11-12を保持。
+- 指定HTMLの全100見出し（H1×1／H2×19／H3×72／H4×8）、98段落、111リスト項目（18 ul／7 ol）、45表363行、19コード例、10図、21 callout、41チェック、49外部アンカーをPure JSXへ転写。原本固定のsource-contract.json／structure-contract.jsonで本文・順序・重複・タグ・全装飾クラス・表のセル型と結合・リスト型と開始番号と入れ子・構文トークン・要素ツリーを完全一致照合する。
+- 原本110 CSS規則とmedia条件を固定。288px固定目次・900px以下の開閉、disc／decimal／circle／square、nav・chips・checklistのマーカーなし、原本の色・余白・太字・22pxチェックと取消線を保持。原本CSSの全宣言をページスコープへ転写し、共有のthead thより高い詳細度で原本の配色と余白を保護。全列左寄せ、共有表の書体・大きさ・sticky・nowrapの打ち消しと全幅を検証。
+- コードは原本のhighlight.js11.12.0を一時取得し、原本SRI一致を確認して静的トークン化。全トークン・改行・先頭空白を固定照合し、複数行トークンを壊さずcodeLineと明示文字列で保持。アプリへの依存追加はない。
+- 進捗は原本スクリプトどおり9リスト（5・5・8・3・3・6・4・4・3項目）を独立集計。全チェック全文・全選択／解除・バー幅・リスト間の分離、目次追従・最下部・開閉・900px境界・inert・Tab循環・フォーカス復帰・cleanupを検証。実際に共有observerへ渡すdoneクラスがCSS Modulesに定義されることも追加Redから検証。
+- 原本のhtmlスクロール・図フレームのdisplay／justify-content／width・SVG寸法・tooltipと描画エラー表示は共有実装へ委譲し、該当するCSSの3規則と図フレーム3宣言のみ原本CSS契約から明示除外。10図は実行時のCLASSDEFSを含め順序・本文・テーマの完全一致。既存Mermaid10.9.8で全図解析が成功し、原本の11.14.0へ依存を更新していない。共有ヘッダー・免責バナー・56pxモバイルバーを避け、アンカー余白は実測高さ＋16pxと規定のヘッダー＋80pxの大きい方を適用。日付はheroへ表示。
+- 監査形式対応: カード内の空code＋兄弟text/plain、diagram-card＋text/plainと実行時CLASSDEFS連結を静的復元し、コメント内カードとalertアイコンの誤判定を除外。Red `b8e1387a`（新規4件失敗）→ Green `b34b4544`、既存を含む監査71テストが成功。文字列内のタグ・文字参照・欠落・図順序・重複を回帰検証。HTML原本監査exit 0がGreenの前提。
+- 検証: ページ31＋操作35＝**66契約**、registry／navを含む関連**93件**。全体Vitest **239 files／3065 testsすべて成功**、typecheck、lint **656 files／0 diagnostics**、HTML監査exit 0、CSS変数監査、10図解析、pytest **135件**が成功。操作カバレッジは行／関数100%、分岐89.87%、文99.18%。着手時の全体実行は編集と重なりregistryの登録漏れ1件を検出（2998件成功）。Green検証初回は3064件、最後のdoneクラス1契約を含めた最終固定後の全体再実行で3065件を確認。
+- 原本保存 `444ab7ca`: HTML／Markdownをarchive/html/Anthropic/／archive/md/Anthropic/へ内容無変更・100%リネーム。SHA-256はHTML `819be399ec9dd227f89021953ed0b2a4889f3b39abf5acc7cc2bbfc3e18233aa`、Markdown `e8696ede9283ee5cf8022201d4aa08740f7ab0d05c69df2f260945ae687fc37d`（移動前後一致）。Markdown監査はexit 1。独立目次と概要見出し、冒頭表ヘッダー1行、出典番号の説明（MarkdownはS1〜S45、HTMLはS1〜S49）、10図の改行タグ・配色・classDefに差がある。通常コード・外部URL・リスト本文の欠落はなく、指定HTMLを正本として両形式を混在させない。
+- 分離履歴: 移行Red `7acacc00` → CSS Modules proxy／空白比較の補正 `94d5a569` → 共有CSS詳細度の追加Red `ad078e8f` → 原本保存 `444ab7ca` → 原本CSS抽出範囲の補正 `576dcf41` → doneクラスの追加Red `b752eb1c` → 移行Green `98aefd2c`。原本固定の本文・構造・CSS・図・進捗の期待値は無変更。追加整理は不要で、空のRefactorコミットは作成しない。
+- CSSキャッシュは起動前に不在。通常Turbopack devの `http://localhost:3000/claude/fable-5-2-best-practices` でHTTP 200。配信HTMLと原本の**3477個の意味的要素**（タグ・本文・リスト階層・表結合・リンク先・コード空白・図位置）が一致し、174 IDに重複なし。npm・ビルド・ブラウザ自動化は未実行。依存・設定・ロック・legacyは無変更。目視はユーザー担当。
+
+## Home価格更新（2026-11-13）
+
+- 公式の[Claude料金表](https://platform.claude.com/docs/en/about-claude/pricing)と[Gemini料金表](https://aistudio.google.com/docs/pricing)をウェブ検索・本文取得で確認。Fable 5.2とMythos 5.2は$8/$40、Carbonは11月末まで$2/$10（12月から$4/$20）、Hydrogenは$1.5/$7.5、Omni 1.2 Flashはテキスト$1.5/$9。いずれもUSD／100万トークンのStandard価格。Mythosは認証組織限定、Omniの動画出力$12は注記に分離。
+- スクレイパーを実行し、指定の `bash update.sh --no-scrape` で3箇所のJSONを同期。API 93→98件、ツール34件。USD/JPYは159.70（為替基準日2026-11-12）。Googleは既存規約どおりライブ抽出を無効とし、公式確認値を更新。取得に失敗・抽出できないモデルはfallbackとして記録し、全件のライブ取得成功とは扱わない。
+- 差分監査でKimi K3がK3.1の価格・離れた別行を誤取得する問題を発見。モデル名直後のドット・数字を除外し、入力はモデル名から価格まで、出力はモデル名から `output` までと `output` から価格までをそれぞれ80文字以内へ制限。取得済み公式HTMLでK3の$3/$15へ再生成し、誤ったscraped出自は持ち越していない。
+- 新モデル5件・Carbon期限境界2件・Moonshot誤抽出2件の計9件で失敗を確認してから最小実装。pytest **131件＋39 subtests成功**。フロント関連10 files／198 testsも成功。Home／ApiTable／SubTableはデータ駆動で新フィールド不要、Pydantic／TypeScript／Zodは変更なし。Homeの公開日・確認日と月次一覧を当日に同期。
+- `bun run build` は114静的ページ生成で成功、typecheck・lint649 files・変更Markdownのlintも成功。初回の内部ポート作成拒否はキャッシュ退避後の通常権限ビルドで解消。Webpack代替は既存ガイドCSSのpure selector制約で失敗し、設定・CSSは変更していない。
+- localhostで新モデル・USD/JPY・色・サブスク34行とタブ切り替えを画面確認し、ブラウザエラーなし。全98モデル・34プランのZod検証とプロバイダー／グループの色対応も確認。既存のCursor Proは `annual: 16` をそのまま `$16/yr` と表示する単位不整合があり、今回の新モデル追加とは別件として未修正。
+- 全体テストの初回はKimi訂正中のJSON読込が重なりコピー一致1件だけ失敗（236 files／2998 tests成功）。コピーのSHA-256一致を確認して固定後の再実行で **237 files／2999 testsすべて成功**。最終データのHome／表／スキーマ／コスト／コピー関連7 files／171 testsも成功。本番成果物を含む4コピーが一致。変更は未コミット。開始時HEADは `0f6f1b3f`、未追跡の別ガイドHTMLは対象外。
+- 追加レビュー対応: Moonshotの上限付き価格抽出で整形空白・改行を許可し、段落・表行等の終端タグと次のKimiモデルを越えないよう制限。複数行の正常例で入力$3.25／出力$16.50の取得失敗を確認後に修正し、隣接段落・表行・別モデルの拒否3件も追加。pytest **135件＋39 subtests成功**。80文字制限の説明も実装どおりに訂正。価格JSONは変更なし。
+- Omni料金注記の再レビュー: 公式料金表と現行コードを照合し、Omni 1.2 Flashの動画出力を日英とも「100万出力トークンあたり$12・最大15秒」と明記。プロバイダーの出力から3箇所のJSONの注記を再生成し、他のデータの維持と3コピーの完全一致を確認。pytest **135件成功**、料金コピー・スキーマ・API表の関連 **3 files／61 tests成功**、対象JSONのBiomeと差分検査も成功。PR #167の既存変更にはFable 5.2ガイドのHTML／Markdown原稿が含まれており、追加は不要。コミットは作成しない。
 
 ## Codex CSS契約の重複規則検出強化（2026-11-12）
 
@@ -289,25 +397,26 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `d8a13749`（Codexベストプラクティスのアンカー余白補正。移行Green `a3ca5742`。レビュー指摘への対応と分離履歴は冒頭の同名節を参照）。
-- **次の作業**: Codexベストプラクティス・Antigravity・Omni・Argon・Fable・Astraの目視確認（6ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
+- **最新実装 HEAD**: `03f05ffe`（レビュー8件の修正は未コミット）。
+- **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
+  - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
   - Antigravity `/google/antigravity-best-practices`: 268px目次・900pxモバイル開閉・27章・点と番号・61表404行・18コード例・11図・8行チェックと単一進捗を確認。
   - Omni `/google/omni-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点／heroのマーカーなし・29表185行・13コード例・7図・3／4／3／3チェック進捗を確認。
   - Argon `/google/argon-best-practices`: 264px目次・900pxモバイル開閉・16章・本文の点と番号／heroのマーカーなし・16表118行・6コード例・7図・12チェック進捗を確認。
   - Fable `/claude/fable-5-1-best-practices`: 264px目次・900pxモバイル開閉・17章・点と番号・40表・12コード例・10図・8／5／5チェック進捗を確認。
   - Astra `/codex/astra-best-practices`: 264px目次・900pxモバイル開閉・17章・本文の点と番号／heroのマーカーなし・24表・11コード例・12図・8／7／7チェック進捗を確認。
-- **ルート実数**: `page.tsx` 106件、registry 106エントリ（2026-11-11実測。`/codex/best-practices` を追加）。
+- **ルート実数**: `page.tsx` 107件、registry 107エントリ（2026-11-13実測。Fable 5.2を追加）。
 - **動作検証**:
-  - ビルド: `bun run build` ✅（2026-11-12実測、114静的ページ生成。2026-11-11の移行時にはユーザー指定で未実行）。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-12 実測）
-  - `bun run lint` ✅（Biome check / 649 files / 0 diagnostics。2026-11-12 実測）
+  - ビルド: Fable 5.2移行ではユーザー指定により未実行。直前の価格更新時には `bun run build` 成功（2026-11-13、114静的ページ生成）。
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-14 実測）
+  - `bun run lint` ✅（Biome check / 657 files / 0 diagnostics。2026-11-14 記録済み実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **237 files／2999 testsすべて成功**（2026-11-12実測。モーダル境界の追加2契約を含む）。型・lint649 files・pytest122件も成功。Redで固定した期待値は無変更。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3075 testsすべて成功**（2026-11-14追加レビュー7件修正後の実測）。型・lint657 filesも成功。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run pytest` で122件成功（2026-11-12実測、UV_CACHE_DIRを一時領域へ指定）。
+  - **バックエンド (`scraper/`)**: `uv run --offline pytest -q` で138件＋39 subtests成功（2026-11-14実測。UV_CACHE_DIRを一時領域へ指定）。
 
 ## 最近の追加内容
 
@@ -764,8 +873,10 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: d8a13749（Codexのアンカー余白補正。移行Green a3ca5742。レビュー指摘への対応は冒頭の同名節を参照）。
-次の作業: Codexベストプラクティス・Antigravity・Omni・Argon・Fable・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+最新実装HEAD: 03f05ffe（レビュー8件の修正は未コミット。冒頭の同名節を参照）。
+次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
+Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
+288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
 Codex: http://localhost:3000/codex/best-practices （アンカー移動の余白を確認）
 Antigravity: http://localhost:3000/google/antigravity-best-practices
 268px目次・900pxモバイル開閉・27章・本文の点と番号・61表404行・18コード例・11図・8行チェックの単一進捗を確認。
@@ -776,9 +887,10 @@ Astra: http://localhost:3000/codex/astra-best-practices
 指定HTMLの108見出し・92段落・48リスト項目・26引用・8チェック・4外部アンカーとURL一覧を保持。
 Antigravity原本はarchive/html/Google/とarchive/md/Google/へ内容無変更保存。本文の情報基準日は2026-11-06。
 Redで固定した本文・構造・CSS・図・進捗の期待値は無変更。CSS比較処理だけで同義の整形空白を吸収する。
-全体237 files／2999 tests成功（2026-11-12実測。モーダル境界の追加2契約を含む）。型・lint649 files・pytest122件が成功。
-Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは106件ずつ。
+全体240 files／3075 tests成功（2026-11-14追加レビュー7件修正後の実測）。Fable対象75件・監査89件・型・lint657 files・HTML原本監査exit 0が成功。未解決CLASSDEFSは完了判定を停止し、正規表現内の引用符もマスクする。Fableのcheckpointは完了済みツール結果を次のAPI呼び出し前に保存する。管理文書・監査手順・HydrogenのMarkdown lintも成功。保存Markdownの既存lint34件は不変。pytestは今回未実行（直前の実測138件＋39 subtests）。実API呼び出し・Next.jsビルドは今回未実行。Dockerのdevイメージは未検証。
+2026-11-15レビュー8件は監査91件・HTML原本監査exit 0・ガイドコードのモック・19図解析・Hydrogen等のMarkdown lintが成功。Carbonの既存参照ラベルlint47件は不変。アプリとスクレイパーは無変更のため全体テスト・型・Biome・pytestは再実行していない。
+Antigravity移行時の対象66契約・HTML監査exit 0・11図解析、操作の行／関数100%・分岐95.06%。ルートとregistryは107件ずつ。
 NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000 を使用。
-2026-11-11の移行時はユーザー指定でnpm・ビルド未実行。2026-11-12の追加レビュー対応ではbun run build成功（114静的ページ生成）。
+Fable 5.2移行ではユーザー指定でnpm・ビルド未実行。直前の価格更新時にはbun run build成功（2026-11-13、114静的ページ生成）。
 依存・設定・ロックは無変更。CSSキャッシュ退避後の通常devでHTTP 200、139 ID一意性・初期進捗0 / 8・原本と配信HTMLの3254要素の一致を確認。
 ```

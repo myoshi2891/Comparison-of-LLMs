@@ -325,3 +325,327 @@ test("keeps literal markup in code blocks rendered from a string constant", () =
 	assert.equal(match.status, 0);
 	assert.equal(audit(source, 'const CODE = "ab c";\n<pre><code>{CODE}</code></pre>').status, 1);
 });
+
+test("materializes sibling text/plain code payloads without parsing literal markup", () => {
+ const value = 'print("<schema>{value}</schema> &lt;")\n  nested()';
+ const source = `<div class="code-block"><div>python</div><pre><code></code></pre><script type="text/plain">\n    ${value.replace(/\n/g,'\n    ')}\n </script></div>`;
+ const page = `<div>python<pre><code>{${JSON.stringify(value)}}</code></pre></div>`;
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,page.replace('nested()','omitted()')).status,1);
+ assert.equal(audit(source,'').status,1);
+});
+
+test("collects sibling diagram payloads and concatenated runtime CLASSDEFS in document order", () => {
+ const charts=['flowchart LR\nA --> B','flowchart TD\nB --> C','flowchart LR\nA --> B'];
+ const suffix='\nclassDef hub fill:#fff;\nclassDef box color:#000;';
+ const source=charts.map(s=>`<div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('')+`<script>var CLASSDEFS = '\\nclassDef hub fill:#fff;' + '\\nclassDef box color:#000;'; mermaid.render('x', src + CLASSDEFS);</script>`;
+ const page=charts.map((s,i)=>`const D${i} = ${JSON.stringify(s+suffix)};`).join('\n')+charts.map((_,i)=>`<MermaidDiagram chart={D${i}} />`).join('');
+ const result=audit(source,page);
+ assert.equal(result.status,0);
+ assert.deepEqual(result.data.counts.mermaidSources,{source:3,page:3});
+ assert.equal(audit(source,page.replace('<MermaidDiagram chart={D1} />','')).status,1);
+ assert.equal(audit(source,page.replace('chart={D0}','chart={D1}')).status,1);
+});
+
+test("ignores commented cards and does not apply unrelated CLASSDEFS to diagrams", () => {
+ const chart='flowchart LR\nA --> B';
+ const source=`<!-- <div class="diagram-card"><script type="text/plain">flowchart TD\nWRONG --> WRONG</script></div> --><div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${chart}</script></div><script>var CLASSDEFS = 'unused'; mermaid.render('id',src);</script>`;
+ const page=`const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(source,page).status,0);
+ assert.equal(audit(source,'').status,1);
+});
+
+test("keeps literal dollar replacement sequences in diagram payloads and suffixes", () => {
+ const chart = 'flowchart LR\nA["$$x$$ $& $` $\u0027"] --> B';
+ const suffix = '\nclassDef box fill:#fff; %% $$suffix$$ $& $` $\u0027';
+ const source = `<div class="diagram-card"><script type="text/plain">${chart}</script></div><script>const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(source, page).status, 0);
+ assert.equal(audit(source, page.replace('$$x$$', '$x$')).status, 1);
+});
+
+test("does not classify alert icon names as callout content",()=>{
+ const result=audit('<i class="ti ti-alert-triangle"></i><div class="callout">Keep warning</div>','<i className={styles.icon}></i><div className={styles.callout}>Keep warning</div>');
+ assert.equal(result.status,0);
+ assert.deepEqual(result.data.counts.calloutElements,{source:1,page:1});
+ assert.equal(audit('<div class="callout">Keep warning</div>','<div>Keep warning</div>').status,1);
+});
+
+test("restores CLASSDEFS only from uncommented executable scripts", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const declaration = "const CLASSDEFS = '\\nclassDef box fill:#fff;';";
+ const render = "mermaid.render('id', src + CLASSDEFS);";
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const example of [
+  `<!-- <script>${render}</script> -->`,
+  `<script>/* ${render} */</script>`,
+  `<script>// ${render}\n</script>`,
+  `<script type="text/plain">${render}</script>`,
+ ]) {
+  const source = `${card}<script>${declaration}</script>${example}`;
+  assert.equal(audit(source, page(chart)).status, 0);
+  assert.equal(audit(source, page(chart + '\nclassDef box fill:#fff;')).status, 1);
+ }
+ for (const decoy of [
+  "<!-- <script>const CLASSDEFS = 'wrong';</script> -->",
+  "<script>/* const CLASSDEFS = 'wrong'; */</script>",
+  "<script>// const CLASSDEFS = 'wrong';\n</script>",
+  `<script type="text/plain">const CLASSDEFS = 'wrong';</script>`,
+ ]) {
+  const source = `${card}${decoy}<script type="module">${declaration}${render}</script>`;
+  assert.equal(audit(source, page(chart + '\nclassDef box fill:#fff;')).status, 0);
+  assert.equal(audit(source, page(chart)).status, 1);
+ }
+});
+
+test("selects the first qualifying payload after unrelated scripts in each card", () => {
+ for (const kind of ['code-block', 'diagram-card']) {
+  const value = kind === 'code-block' ? 'print("kept")' : 'flowchart LR\nA --> B';
+  const display = kind === 'code-block' ? '<pre><code></code></pre>' : '';
+  const page = kind === 'code-block'
+   ? `<pre><code>{${JSON.stringify(value)}}</code></pre>`
+   : `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+  const source = `<div class="${kind}">${display}<script>setup();</script><script type="text/plain" data-for="elsewhere">wrong</script><script type="text/plain" data-for="">also wrong</script><script type="text/plain">${value}</script><script type="text/plain">last payload</script></div>`;
+  assert.equal(audit(source, page).status, 0);
+  assert.equal(audit(source, '').status, 1);
+  assert.equal(audit(source, page.replace('kept', 'lost').replace('A --> B', 'A --> C')).status, 1);
+ }
+});
+
+test("ignores quoted render examples and quoted CLASSDEFS declarations", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)};`;
+ const render = "mermaid.render('id', src + CLASSDEFS);";
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const example of [JSON.stringify(render), "'mermaid.render(id, src + CLASSDEFS)'", '`mermaid.render(id, src + CLASSDEFS)`', "mermaid.render('id', 'src + CLASSDEFS')"]) {
+  const source = `${card}<script>${declaration}${example};</script>`;
+  assert.equal(audit(source, page(chart)).status, 0, example);
+  assert.equal(audit(source, page(chart + suffix)).status, 1, example);
+ }
+ const source = `${card}<script>const example = "const CLASSDEFS = 'wrong';"; ${declaration}${render}</script>`;
+ assert.equal(audit(source, page(chart + suffix)).status, 0);
+ assert.equal(audit(source, page(chart + 'wrong')).status, 1);
+});
+
+test("materializes a card's data-code payload exactly once and keeps other code blocks", () => {
+ const value = 'print("<schema> &lt;")';
+ for (const attribute of ['data-code', 'data-code-src="1"']) {
+  const source = `<div class="code-block"><pre><code></code><script type="text/plain" ${attribute}>${value}</script></pre></div><pre><code>other block</code></pre>`;
+  const page = `<pre><code>{${JSON.stringify(value)}}</code></pre><pre><code>other block</code></pre>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 0, attribute);
+  assert.deepEqual(result.data.counts.codeBlocks, {source: 2, page: 2});
+  assert.equal(audit(source, page.replace('other block', 'omitted')).status, 1);
+  assert.equal(audit(source, page.replace('schema', 'omitted')).status, 1);
+ }
+});
+
+
+test("accepts complete CLASSDEFS literals terminated by semicolons or ASI", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const initializer of [JSON.stringify(suffix), `'\\nclassDef box ' +\n'fill:#fff;'`]) {
+  for (const end of [';', '\n', ' // ASI\n']) {
+   const source = `${card}<script>const CLASSDEFS = ${initializer}${end}mermaid.render('id', src + CLASSDEFS);</script>`;
+   assert.equal(audit(source, page(chart + suffix)).status, 0, initializer + end);
+   assert.equal(audit(source, page(chart)).status, 1, initializer + end);
+  }
+ }
+ for (const tail of [' + dynamic;', '\n+ dynamic;', '\n.trim();', '\n[0];', '\n`tagged`;', '\n? "yes" : "no";', '\ninstanceof String;']) {
+  const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}${tail}mermaid.render('id', src + CLASSDEFS);</script>`;
+  const result = audit(source, page(chart));
+  assert.equal(result.status, 1, tail);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0']);
+  assert.equal(audit(source, page(chart + suffix)).status, 1, tail);
+ }
+});
+
+test("distinguishes an empty CLASSDEFS literal from an unresolved runtime initializer", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(`${card}<script>const CLASSDEFS = ''; mermaid.render('id', src + CLASSDEFS);</script>`, page).status, 0);
+ for (const declaration of ['', 'const CLASSDEFS = dynamic;', 'const CLASSDEFS = buildStyles();', 'const CLASSDEFS = `dynamic ${value}`;']) {
+  const result = audit(`${card}<script>${declaration} mermaid.render('id', src + CLASSDEFS);</script>`, page);
+  assert.equal(result.status, 1, declaration);
+  assert.equal(result.data.blocking, true);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("masks regex literals before their quotes can hide CLASSDEFS or render calls", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const prefix of ['const quote = /"/;', "const quote = /'/;", 'const quote = /["/]/g;', String.raw`const quote = /\/'/;`, 'const ratio = total / count; const quote = /"/;', 'const quote = /mermaid.render(id, src + CLASSDEFS)/;']) {
+  const source = `${card}<script>${prefix} const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
+  assert.equal(audit(source, page(chart + suffix)).status, 0, prefix);
+  assert.equal(audit(source, page(chart)).status, 1, prefix);
+ }
+ const decoy = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const example = /mermaid.render(id, src + CLASSDEFS)/;</script>`;
+ assert.equal(audit(decoy, page(chart)).status, 0);
+});
+
+test("materializes selected card payloads through quoted angle brackets in empty code attributes", () => {
+ const value = 'print("<kept> &lt;")';
+ for (const attributes of ['title="a>b"', "title='a>b'", 'title="<code>x>y"']) {
+  const source = `<div class="code-block"><pre><code ${attributes}></code></pre><script type="text/plain" data-for="elsewhere">wrong</script><script type="text/plain">${value}</script><script type="text/plain">last payload</script></div>`;
+  const page = `<pre><code>{${JSON.stringify(value)}}</code></pre>`;
+  assert.equal(audit(source, page).status, 0, attributes);
+  assert.deepEqual(audit(source, '').data.missingCodeBlocks, [value]);
+  assert.equal(audit(source, page.replace('kept', 'lost')).status, 1, attributes);
+ }
+});
+
+
+test("does not infer CLASSDEFS from code after a semicolon-free render call", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const source = `${card}<script>const CLASSDEFS = '\\nclassDef box fill:#fff;'; mermaid.render('id', src)\nconsume(src + CLASSDEFS)</script>`;
+ assert.equal(audit(source, page).status, 0);
+ assert.equal(audit(source, '').status, 1);
+});
+
+test("ignores script-like text inside ordinary quoted tag attributes", () => {
+ for (const quote of ['"', "'"]) {
+  const source = `<div class="code-block"><span title=${quote}<script type=text/plain>wrong</script>${quote}></span><pre><code></code></pre><script type="text/plain">real payload</script></div>`;
+  assert.equal(audit(source, '<pre><code>real payload</code></pre>').status, 0);
+  assert.equal(audit(source, '<pre><code>wrong</code></pre>').status, 1);
+ }
+});
+
+test("discovers owning cards through quoted greater-than attributes", () => {
+ for (const quote of ['"', "'"]) {
+  for (const kind of ['code-block', 'diagram-card']) {
+   const value = kind === 'code-block' ? 'kept payload' : 'flowchart LR\nA --> B';
+   const display = kind === 'code-block' ? '<pre><code></code></pre>' : '';
+   const source = `<div title=${quote}a>b${quote} class="${kind}">${display}<script type="text/plain">${value}</script></div>`;
+   const page = kind === 'code-block' ? '<pre><code>kept payload</code></pre>' : `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+   assert.equal(audit(source, page).status, 0);
+   assert.equal(audit(source, '').status, 1);
+   if (kind === 'code-block') assert.deepEqual(audit(source, '').data.missingCodeBlocks, [value]);
+  }
+ }
+});
+
+test("resolves CLASSDEFS separately for renderer modules targeting different cards", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffixes = ['\nclassDef box fill:#fff;', '\nclassDef box fill:#000;'];
+ const cards = [0, 1].map(i => `<div id="card-${i}" class="diagram-card"><script type="text/plain">${chart}</script></div>`).join('');
+ const modules = suffixes.map((suffix, i) => `<script type="module">const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#card-${i}'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);</script>`).join('');
+ const page = values => values.map((value, i) => `const D${i} = ${JSON.stringify(chart + value)}; <MermaidDiagram chart={D${i}} />`).join('\n');
+ assert.equal(audit(cards + modules, page(suffixes)).status, 0);
+ assert.equal(audit(cards + modules, page([suffixes[0], suffixes[0]])).status, 1);
+ assert.equal(audit(cards + modules, page([...suffixes].reverse())).status, 1);
+});
+
+test("blocks unestablished renderer associations including unsupported card selectors", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card" data-chart><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ for (const selector of ["'.diagram-card[data-chart]'", 'selector']) {
+  const source = `${card}<script>const CLASSDEFS = '\\nclassDef box fill:#fff;'; document.querySelectorAll(${selector}); mermaid.render('id', src + CLASSDEFS);</script>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['renderer:chart']);
+ }
+ const noSuffix = `${card}<script>document.querySelector('#chart'); mermaid.render('id', src);</script>`;
+ assert.equal(audit(noSuffix, page).status, 0);
+});
+
+test("inserts card payload only into a real empty code element after a span title", () => {
+ for (const quote of ['"', "'"]) {
+  const source = `<div class="code-block"><span title=${quote}<code></code>${quote}></span><pre><code></code></pre><script type="text/plain">kept payload</script></div>`;
+  const result = audit(source, '<pre><code>kept payload</code></pre>');
+  assert.equal(result.status, 0);
+  assert.deepEqual(audit(source, '').data.missingCodeBlocks, ['kept payload']);
+ }
+});
+
+test("does not certify the initializer when CLASSDEFS is later reassigned", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ for (const assignment of ["CLASSDEFS = 'different';", 'CLASSDEFS = dynamic;', "CLASSDEFS += 'extra';"]) {
+  const source = `${card}<script>let CLASSDEFS = ${JSON.stringify(suffix)}; ${assignment} mermaid.render('id', src + CLASSDEFS);</script>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 1, assignment);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("inventories both child cards inside a matching wrapper with nearest payload ownership", () => {
+ for (const kind of ['code-block', 'diagram-card']) {
+  const values = kind === 'code-block' ? ['first payload', 'second payload'] : ['flowchart LR\nA --> B', 'flowchart LR\nC --> D'];
+  const child = value => `<div class="${kind}">${kind === 'code-block' ? '<pre><code></code></pre>' : ''}<script type="text/plain">${value}</script></div>`;
+  const source = `<div class="${kind}">${values.map(child).join('')}</div>`;
+  const page = kind === 'code-block' ? values.map(v => `<pre><code>${v}</code></pre>`).join('') : values.map((v,i) => `const D${i} = ${JSON.stringify(v)}; <MermaidDiagram chart={D${i}} />`).join('\n');
+  assert.equal(audit(source, page).status, 0, kind);
+  assert.equal(audit(source, page.replace('second payload', 'omitted').replace('C --> D', 'C --> E')).status, 1, kind);
+  if (kind === 'code-block') assert.deepEqual(audit(source, '').data.missingCodeBlocks, values);
+  const parent = kind === 'code-block' ? 'parent payload' : 'flowchart LR\nE --> F';
+  const parentSource = `<div class="${kind}">${kind === 'code-block' ? '<pre><code></code></pre>' : ''}${values.map(child).join('')}<script type="text/plain">${parent}</script></div>`;
+  const parentPage = kind === 'code-block' ? `<pre><code>${parent}</code></pre>${page}` : `${page}\nconst P = ${JSON.stringify(parent)}; <MermaidDiagram chart={P} />`;
+  assert.equal(audit(parentSource, parentPage).status, 0, `nearest owner: ${kind}`);
+ }
+});
+
+test("decodes hexadecimal and Unicode CLASSDEFS escapes to runtime characters", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const [raw, suffix] of [
+  [String.raw`\nclassDef box fill:\x23fff;`, '\nclassDef box fill:#fff;'],
+  [String.raw`\nclassDef \u0062ox fill:#fff;`, '\nclassDef box fill:#fff;'],
+  [String.raw`\nclassDef \u{62}ox fill:#fff;`, '\nclassDef box fill:#fff;'],
+  [String.raw`\nclassDef box fill:#fff; %% \uD83D\uDE80`, '\nclassDef box fill:#fff; %% 🚀'],
+ ]) {
+  const source = `${card}<script>const CLASSDEFS = '${raw}'; mermaid.render('id', src + CLASSDEFS);</script>`;
+  assert.equal(audit(source, page(chart + suffix)).status, 0, raw);
+  assert.equal(audit(source, page(chart + raw)).status, 1, raw);
+ }
+ for (const raw of [String.raw`\xG1`, String.raw`\uZZZZ`, String.raw`\u{110000}`, String.raw`\1`]) {
+  const source = `${card}<script>const CLASSDEFS = '${raw}'; mermaid.render('id', src + CLASSDEFS);</script>`;
+  const result = audit(source, page(chart + raw));
+  assert.equal(result.status, 1, raw);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("ignores tag-like attribute text while locating a card's sibling payload", () => {
+ for (const quote of ['"', "'"]) {
+  for (const text of ['</div>', '<div>']) {
+   const source = `<div class="code-block"><span title=${quote}${text}${quote}></span><pre><code></code></pre><script type="text/plain">kept example</script></div>`;
+   assert.equal(audit(source, '<pre><code>kept example</code></pre>').status, 0);
+   assert.deepEqual(audit(source, '').data.missingCodeBlocks, ['kept example']);
+  }
+ }
+});
+
+test("does not certify an outer CLASSDEFS when a render binding is shadowed or out of scope", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)};`;
+ const render = "mermaid.render('id', src + CLASSDEFS);";
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ for (const body of [
+  `${declaration} function draw(CLASSDEFS) { ${render} }`,
+  `${declaration} const draw = CLASSDEFS => { ${render} };`,
+  `${declaration} try { run(); } catch (CLASSDEFS) { ${render} }`,
+  `function unrelated() { ${declaration} } ${render}`,
+ ]) {
+  const result = audit(`${card}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+ assert.equal(audit(`${card}<script>${declaration} function draw() { ${render} }</script>`, page).status, 0);
+});

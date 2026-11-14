@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-12
+Updated 2026-11-15
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+2026-11-15レビュー8件: 原本監査の境界走査は他タグの引用属性とコメントを丸ごと消費し、同名タグの深さだけを更新。CLASSDEFSは宣言がrenderを囲む範囲にあるか確認し、引数・catch・その他の曖昧な参照は未解決として停止。Carbonは認証コードを入力へ追加し、署名／履歴・暗黙キャッシュの移行項目とツール入力トークン課金を訂正。Hydrogenはxhighの品質判定とMAX_TOKENSの拒否を追加。監査91件・HTML原本監査exit 0・コード例のモック・19図解析・Hydrogen等のMarkdown lintが成功。Carbonの既存参照ラベルlint47件は不変。アプリと依存・設定は無変更。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14追加レビュー7件: 原本監査は一致ラッパー内の子カードを走査し、最も近い所有カードへpayloadを対応付ける。CLASSDEFSの16進・Unicodeエスケープを復号し、不正・未対応は未解決として停止。Hydrogenは提供条件・検索課金単位・prefix変更時のDROPを訂正。最新ユーザー指示によりHomeの両日付を価格更新日2026-11-13へ同期し、月次一覧も同日に合わせる。全体240 files／3075 tests・監査89件・型・lint657 files・Markdown lint・HTML原本監査exit 0が成功。バックエンド最新実測は138件＋39 subtests。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14レビュー11コメント: 監査は未確定renderer対応とCLASSDEFS再代入を未解決として停止し、引用属性内の偽codeを除外。Hydrogenは非対応パラメータ・prefill除去・思考込みの出力見積り・会話別履歴へ訂正。月次Home確認日をregistryへ同期。Moonshotは定義リストの境界を保持。Fableは通常のツール例外を対応するエラー結果へ変換し、全結果バッチを保存して再開する。検証結果はdocs/PROGRESS.mdを参照。
+
+2026-11-14レビュー4件: 原本監査は未解決のCLASSDEFSを空文字と区別し、unresolvedMermaidSourcesとして完了判定を停止。コードのマスクは正規表現を認識して後続宣言の位置を保持。HydrogenはContributor Tierの改善利用と有料サービスの監視用保持を明記。Fableのagent_loopはツール結果バッチを次のAPI呼び出し前にcheckpointへ保存し、API失敗後も再開できる。ターン上限時の保存は維持。全体240 files／3074 tests・Fable対象74件・監査84件・型・lint657 files・HTML原本監査exit 0・管理文書等のMarkdown lintが成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14追加レビュー5件: 原本監査はカード開始タグの引用属性を保持し、moduleごとのCLASSDEFSを静的カードセレクターで対応付ける。Hydrogenは必須機能を先に判定し、Long Decodeのフォアグラウンド／ステートレス／GenerateContent継続も案内。Fableのagent_loopは上限例外前に呼び出し元のcheckpointへツール結果込みの履歴を保存し、同じ辞書で再開できる。原本・JSX・対象コード契約を同期。全体240 files／3073 tests・対象73件・監査82件・型・lint657 files・HTML原本監査exit 0が成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14レビュー8件: 原本監査はrender呼び出しの括弧内だけでCLASSDEFSを判定し、通常タグの引用属性内のscript様文字列を除外。Moonshotはoutputラベル以降の価格を入力単価に流用しない。Homeの公開日を2026-10-24へ復元し、確認日のみ2026-11-14へ更新。Hydrogen原稿は完了状態の確認・output_text・共有コンテキスト・継続入力課金を訂正。全体240 files／3072 tests・監査80件・pytest137件＋39 subtests・型・lint657 files・Markdown lint・HTML原本監査exit 0が成功。ビルドと実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14追加レビュー: 原本監査は文字列とコメントを隠したコードでrender呼び出しとCLASSDEFS宣言を検出し、リテラル抽出用の表現を分離。カードで表示済みのscriptを消費してdata-codeの二重処理を防止。Fable 5.2の著者・独立評価22行は空の内容セルを取得状況の前へ移動し、原文・URL・リンク属性を保持。webのDocker devステージだけにテスト用python3を追加。全体240 files／3071 tests・監査76件・対象72件・HTML原本監査exit 0・typecheck・lint657 filesが成功。Dockerデーモン停止中のためイメージのビルド検証は未実施。
+
+2026-11-14追加レビュー: 原本監査の図挿入でドル記号を保持し、Moonshotの単一レコード内の入出力価格を取得するよう修正。Fable 5.2の費用例をTTL別課金・未定義キャッシュ単価の拒否へ修正し、agent_loopのキャッシュ明示設定と安全なPostToolUse引数渡しをHTML／Markdown・JSX・契約へ同期。全体240 files／3070 tests・対象71件・監査74件・pytest136件＋39 subtests・型・lint657 files・HTML原本監査exit 0・ビルド115静的ページ生成が成功。保存Markdownの既存lint指摘34件は対象外として保持。
+
+2026-11-14: 原本監査のCLASSDEFS判定をコメント除去済みの実行用scriptへ限定し、カード内ではdata-for属性のない最初のtext/plain payloadを選択するよう修正。追加2件のRed確認後、監査73テストとFable 5.2のHTML原本監査exit 0が成功。アプリ・依存・設定は無変更。
+
+Claude Fable 5.2 `/claude/fable-5-2-best-practices` を追加（2026-11-13）。
+指定HTMLの100見出し・98段落・111リスト項目・45表363行・19コード例・10図・21 callout・49外部リンクをPure JSXへ転写。
+原本固定の全文・全要素ツリー・110 CSS規則・highlight.js11.12.0全トークンを66契約（ページ31／操作35）で照合。
+全体239 files／3065 tests、関連93件、型・lint656 files・HTML監査exit 0・10図解析・pytest135件が成功。
+288px固定目次・900pxモバイル開閉・点と番号・入れ子・全列左寄せ・コード空白を保持。
+41チェックは原本の9リスト（5・5・8・3・3・6・4・4・3）で独立集計。操作の行／関数100%、分岐89.87%。
+registryのClaudeカテゴリから導線を導出し、追加・確認日は2026-11-13、本文の情報基準日は2026-11-12を維持。
+カード内text/plainと実行時CLASSDEFSを読む監査を4つのRedから追加し、監査71テスト成功。
+HTML／Markdownは内容無変更保存。配信HTMLの3477個の意味的要素が原本と一致し、174 IDに重複なし。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.mdを参照。
+
+価格データ更新（2026-11-13）: 公式料金表に基づきFable 5.2・利用制限付きMythos 5.2・Gemini 4 Carbon／Hydrogen・Omni 1.2 Flashを追加。
+API 98件／ツール34件。Carbonは11月末まで$2/$10、12月から$4/$20へ生成時に切替。Homeの公開日・確認日を更新。
+Moonshotの派生版・遠距離価格の誤抽出を防止。追加9契約のRedを確認。複数行の価格取得とレコード境界の回帰4件を追加し、pytest 135件＋39 subtestsが成功。詳細はdocs/PROGRESS.md。
 
 Google Antigravity `/google/antigravity-best-practices` を指定HTMLで完全更新（2026-11-11）。
 108見出し・92段落・48リスト項目・61表404行・18コード例・11図・26引用・8表形式チェック・4外部リンクをPure JSXへ転写。
@@ -618,7 +651,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（237 files / 2999 tests pass、2026-11-12実測（追加レビュー対応後）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3075 tests pass、2026-11-14追加レビュー7件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
