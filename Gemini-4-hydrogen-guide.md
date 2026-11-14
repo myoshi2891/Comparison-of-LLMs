@@ -390,13 +390,17 @@ flowchart TD
 
 ```python
 # マルチターンでは thought signature を含む履歴を丸ごと再送する(概念コード)
+from google.genai import types
+
 # 呼び出し元で会話ごとに history=[] を作成し、対応する履歴を渡す。他の会話と共有しない。
 def step(client, history, user_msg):
     history.append({"role": "user", "parts": [{"text": user_msg}]})
     resp = client.models.generate_content(
         model="gemini-4-hydrogen",
         contents=history,
-        # tools=[...]  # 関数宣言
+        config=types.GenerateContentConfig(
+            # tools=[...]  # 関数宣言はこのconfig内へ置く
+        ),
     )
     # 重要: 返却された content を加工せずそのまま履歴へ(署名の欠落・要約置換をしない)
     history.append(resp.candidates[0].content)
