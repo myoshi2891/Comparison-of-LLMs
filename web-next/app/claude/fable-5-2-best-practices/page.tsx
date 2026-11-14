@@ -3293,38 +3293,77 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"                output = run_tool(block["}
+                    {"                result = {"}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"tool_result"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"tool_use_id"'}</span>
+                    {": block["}
+                    <span className="hljs-string">{'"id"'}</span>
+                    {"]}"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-comment">
+                      {
+                        "# 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"try"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    result["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"] = run_tool(block["}
                     <span className="hljs-string">{'"name"'}</span>
                     {"], block["}
                     <span className="hljs-string">{'"input"'}</span>
                     {"])"}
                   </span>
                   {"\n"}
-                  <span className={styles.codeLine}>{"                results.append({"}</span>
-                  {"\n"}
                   <span className={styles.codeLine}>
-                    {"                    "}
-                    <span className="hljs-string">{'"type"'}</span>
-                    {": "}
-                    <span className="hljs-string">{'"tool_result"'}</span>
-                    {","}
+                    {"                "}
+                    <span className="hljs-keyword">{"except"}</span>
+                    {" Exception "}
+                    <span className="hljs-keyword">{"as"}</span>
+                    {" error:"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"                    "}
-                    <span className="hljs-string">{'"tool_use_id"'}</span>
-                    {": block["}
-                    <span className="hljs-string">{'"id"'}</span>
-                    {"],"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"                    "}
+                    {"                    result["}
                     <span className="hljs-string">{'"content"'}</span>
-                    {": output,"}
+                    {"] = "}
+                    <span className="hljs-string">
+                      {'f"'}
+                      <span className="hljs-subst">
+                        {"{"}
+                        <span className="hljs-built_in">{"type"}</span>
+                        {"(error).__name__}"}
+                      </span>
+                      {": "}
+                      <span className="hljs-subst">{"{error}"}</span>
+                      {'"'}
+                    </span>
                   </span>
                   {"\n"}
-                  <span className={styles.codeLine}>{"                })"}</span>
+                  <span className={styles.codeLine}>
+                    {"                    result["}
+                    <span className="hljs-string">{'"is_error"'}</span>
+                    {"] = "}
+                    <span className="hljs-literal">{"True"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                results.append(result)"}
+                  </span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"        messages.append({"}

@@ -164,6 +164,51 @@ assert executed == [("read", {"path": "a.py"})]
   );
 });
 
+it("agent_loopは成功後のツール例外も対応する結果へ変換し、完全なバッチで再開する", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+checkpoint, requests, executed = {}, [], []
+def tool(n):
+    return {"type": "tool_use", "id": "tool-" + str(n), "name": "read", "input": {"n": n}}
+replies = [{"stop_reason": "tool_use", "content": [tool(1)]},
+    {"stop_reason": "tool_use", "content": [tool(2), tool(3), tool(4)]},
+    {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}]
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return replies[len(requests) - 1]
+def run_tool(name, args):
+    executed.append(args["n"])
+    if args["n"] == 3:
+        raise OSError("read unavailable")
+    return "result-" + str(args["n"])
+scope = {"call": call}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+try:
+    scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint)
+except RuntimeError as error:
+    assert str(error) == "max_turns に到達しました"
+else:
+    raise AssertionError("turn limit must raise after saving the batch")
+history = copy.deepcopy(checkpoint["messages"])
+assert len(history) == 5
+assert history[2]["content"] == [{"type": "tool_result", "tool_use_id": "tool-1", "content": "result-1"}]
+assert history[4]["content"] == [
+    {"type": "tool_result", "tool_use_id": "tool-2", "content": "result-2"},
+    {"type": "tool_result", "tool_use_id": "tool-3", "content": "OSError: read unavailable", "is_error": True},
+    {"type": "tool_result", "tool_use_id": "tool-4", "content": "result-4"}]
+for assistant, user in zip(history[1::2], history[2::2]):
+    assert [b["id"] for b in assistant["content"]] == [b["tool_use_id"] for b in user["content"]]
+assert scope["agent_loop"]("task", [], run_tool, max_turns=1, checkpoint=checkpoint) == replies[2]
+assert requests[2]["messages"] == history
+assert executed == [1, 2, 3, 4]
+`,
+    examples()
+  );
+});
+
 it("PostToolUseは引用符・改行・シェル構文を含むパスをそのままPrettierへ渡す", () => {
   const code = examples().find((c) => c.includes('"PostToolUse"'));
   python(

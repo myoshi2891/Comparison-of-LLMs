@@ -505,12 +505,14 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
         results = []
         for block in data["content"]:
             if block["type"] == "tool_use":
-                output = run_tool(block["name"], block["input"])
-                results.append({
-                    "type": "tool_result",
-                    "tool_use_id": block["id"],
-                    "content": output,
-                })
+                result = {"type": "tool_result", "tool_use_id": block["id"]}
+                # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
+                try:
+                    result["content"] = run_tool(block["name"], block["input"])
+                except Exception as error:
+                    result["content"] = f"{type(error).__name__}: {error}"
+                    result["is_error"] = True
+                results.append(result)
         messages.append({"role": "user", "content": results})
         if checkpoint is not None:
             checkpoint["messages"] = messages  # 次のAPI呼び出し前に保存する
