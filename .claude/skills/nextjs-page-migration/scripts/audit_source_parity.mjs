@@ -578,7 +578,7 @@ function normalizeUrl(url) {
 }
 
 /**
- * Masks comments and template-literal contents, optionally masking quoted strings too.
+ * Masks comments, regex literals and template contents, optionally quoted strings too.
  * @param {string} src - The module source text.
  * @param {boolean} preserveQuotedStrings - Keep single/double-quoted contents for literal extraction.
  * @return {string} The source with non-code contents replaced by spaces, preserving offsets.
@@ -587,6 +587,10 @@ function blankNonCodeText(src, preserveQuotedStrings = true) {
   const blank = (text) => text.replace(/[^\n]/g, " ");
   let out = "";
   let index = 0;
+  let canStartRegex = true;
+  let lastToken = "";
+  const controlParens = [];
+  const wordRe = /[A-Za-z_$][\w$]*/y;
   while (index < src.length) {
     const char = src[index];
     const next = src[index + 1];
@@ -604,6 +608,26 @@ function blankNonCodeText(src, preserveQuotedStrings = true) {
       index = stop;
       continue;
     }
+    if (char === "/" && canStartRegex) {
+      let cursor = index + 1;
+      let inClass = false;
+      while (cursor < src.length && src[cursor] !== "\n" && src[cursor] !== "\r") {
+        if (src[cursor] === "\\") { cursor += 2; continue; }
+        if (src[cursor] === "[") inClass = true;
+        else if (src[cursor] === "]") inClass = false;
+        else if (src[cursor] === "/" && !inClass) break;
+        cursor++;
+      }
+      if (src[cursor] === "/") {
+        cursor++;
+        while (/[A-Za-z]/.test(src[cursor] ?? "")) cursor++;
+        out += blank(src.slice(index, cursor));
+        index = cursor;
+        canStartRegex = false;
+        lastToken = "regex";
+        continue;
+      }
+    }
     if (char === "`" || char === '"' || char === "'") {
       let cursor = index + 1;
       while (cursor < src.length) {
@@ -617,8 +641,31 @@ function blankNonCodeText(src, preserveQuotedStrings = true) {
       }
       const body = src.slice(index + 1, Math.min(cursor, src.length));
       out += char + (char === "`" || !preserveQuotedStrings ? blank(body) : body) + (src[cursor] === char ? char : "");
-      index = Math.min(cursor + 1, src.length);
+      index = Math.min(cursor + (src[cursor] === char ? 1 : 0), src.length);
+      canStartRegex = false;
+      lastToken = "string";
       continue;
+    }
+    wordRe.lastIndex = index;
+    const word = wordRe.exec(src)?.[0];
+    if (word) {
+      out += word;
+      index += word.length;
+      canStartRegex = lastToken !== "." && /^(?:return|throw|case|delete|void|typeof|instanceof|in|of|yield|await|else|do)$/.test(word);
+      lastToken = word;
+      continue;
+    }
+    if ((char === "+" || char === "-") && next === char) {
+      out += char + next;
+      index += 2;
+      canStartRegex = false;
+      lastToken = char + next;
+      continue;
+    }
+    if (!/\s/.test(char)) {
+      if (char === "(") controlParens.push(/^(?:if|while|for|with|switch|catch)$/.test(lastToken));
+      canStartRegex = char === ")" ? (controlParens.pop() ?? false) : /[=(:,\[!&|?{};+\-*/%~^<>]/.test(char);
+      lastToken = char;
     }
     out += char;
     index += 1;
@@ -908,10 +955,9 @@ function readHtmlAttribute(attributes, name) {
 
 const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
 
-/** Resolve literal CLASSDEFS only within the supplied renderer scope. */
+/** Resolve CLASSDEFS in this scope: undefined = unused, null = unresolved, string = evaluated. */
 function rendererSuffix(literalSource) {
   const executable = blankNonCodeText(literalSource, false);
-  let suffix = "";
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
   const rendersWithSuffix = Array.from(executable.matchAll(/\bmermaid\.render\s*\(/g)).some(call => {
@@ -933,8 +979,8 @@ function rendererSuffix(literalSource) {
   // partial concatenation. A newline permits ASI only without an expression continuation.
   const complete = initializer && /^[ \t]*(?:;|$|[\r\n](?!\s*(?:[([`.+\-*/%<>=!&|^?:,\\]|\b(?:in|instanceof)\b)))/.test(initializerSource.slice(initializer[0].length));
   const literal = complete && initializer[1];
-  if (literal) suffix = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2])).join("");
-  return suffix;
+  if (!literal) return null;
+  return Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2])).join("");
 }
 
 /** Match static card selectors; complex/dynamic selectors are not guessed. */
@@ -951,10 +997,11 @@ function matchesCardSelector(tag, selector) {
  * Materialize display-only payloads scoped to their owning code/diagram card.
  * Scripts and comments are opaque while finding nested div boundaries; no source JS is executed.
  * @param {string} src - Original HTML.
- * @returns {string} HTML with visible code and Mermaid sources restored.
+ * @returns {{html: string, unresolvedMermaidSources: string[]}} Restored HTML and blocking unresolved contributions.
  */
 function materializePlainTextCards(src) {
   const scripts = [];
+  const unresolvedMermaidSources = [];
   const stashed = src.replace(/<!--[\s\S]*?-->|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
     (full, attributes, payload) => {
       if (attributes === undefined) return full.startsWith("<!--") ? "" : full;
@@ -1003,17 +1050,22 @@ function materializePlainTextCards(src) {
     } else {
       const renderer = scopes.find(scope => scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector)))
         ?? (scopes.length === 1 && scopes[0].selectors.length === 0 ? scopes[0] : undefined);
+      if (renderer?.suffix === null) unresolvedMermaidSources.push(`CLASSDEFS:${readHtmlAttribute(card.openingTag, "id") ?? `card-${marker[1]}`}`);
       const suffix = renderer?.suffix ?? "";
       content = content.replace(marker[0], () => `<div class="mermaid">${escape(payload + suffix)}</div>`);
     }
     const start = card.index + card.openingTag.length;
     result = result.slice(0, start) + content + result.slice(start + card.content.length);
   }
-  return result.replace(/<script data-audit-payload="(\d+)"><\/script>/g, (_full, index) => scripts[Number(index)].full);
+  return {
+    html: result.replace(/<script data-audit-payload="(\d+)"><\/script>/g, (_full, index) => scripts[Number(index)].full),
+    unresolvedMermaidSources: unresolvedMermaidSources.reverse(),
+  };
 }
 
 function inventoryHtml(src) {
-  src = materializePlainTextCards(src);
+  const materialized = materializePlainTextCards(src);
+  src = materialized.html;
   // Detached text/plain payloads are displayed via code.textContent, not HTML parsing.
   // Resolve by data-for/id rather than script order and escape literal markup before inventorying.
   // 開始タグの属性部は引用値を 1 単位で消費する。`[^>]*` だと title="a>b" の `>` で
@@ -1101,6 +1153,7 @@ function inventoryHtml(src) {
     tableRowTexts,
     paragraphTexts,
     mermaidSources: collectHtmlMermaidSources(src),
+    unresolvedMermaidSources: materialized.unresolvedMermaidSources,
     svgElements: collectSvgElements(body),
     calloutElements: collectMarkupCalloutElements(body),
     externalLinks: collectUrls(body),
@@ -1264,6 +1317,7 @@ function compare(source, page) {
   const mermaidSourcesMatch =
     source.mermaidSources.length === page.mermaidSources.length &&
     source.mermaidSources.every((value, index) => value === page.mermaidSources[index]);
+  const unresolvedMermaidSources = source.unresolvedMermaidSources ?? [];
 
   const counts = {
     listItems: { source: source.listItems, page: page.listItems },
@@ -1286,6 +1340,7 @@ function compare(source, page) {
     missingParagraphs.length > 0 ||
     missingSvgElements.length > 0 ||
     missingCalloutElements.length > 0 ||
+    unresolvedMermaidSources.length > 0 ||
     !mermaidSourcesMatch;
 
   return {
@@ -1299,6 +1354,7 @@ function compare(source, page) {
     missingSvgElements,
     missingCalloutElements,
     mermaidSourcesMatch,
+    unresolvedMermaidSources,
     sourceMermaidSources: source.mermaidSources,
     pageMermaidSources: page.mermaidSources,
     counts,
@@ -1455,6 +1511,9 @@ if (process.exitCode === undefined) {
           console.log(
             `\n❌ page.tsx に存在しないか改変された原本の callout/alert (${result.missingCalloutElements.length} 件)`
           );
+        }
+        if (result.unresolvedMermaidSources.length > 0) {
+          console.log(`\n❌ 実行時のCLASSDEFSを静的評価できません: ${result.unresolvedMermaidSources.join(", ")}`);
         }
         if (!result.mermaidSourcesMatch) {
           console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");

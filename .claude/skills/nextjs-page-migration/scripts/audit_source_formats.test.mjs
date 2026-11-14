@@ -458,9 +458,38 @@ test("accepts complete CLASSDEFS literals terminated by semicolons or ASI", () =
  }
  for (const tail of [' + dynamic;', '\n+ dynamic;', '\n.trim();', '\n[0];', '\n`tagged`;', '\n? "yes" : "no";', '\ninstanceof String;']) {
   const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}${tail}mermaid.render('id', src + CLASSDEFS);</script>`;
-  assert.equal(audit(source, page(chart)).status, 0, tail);
+  const result = audit(source, page(chart));
+  assert.equal(result.status, 1, tail);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0']);
   assert.equal(audit(source, page(chart + suffix)).status, 1, tail);
  }
+});
+
+test("distinguishes an empty CLASSDEFS literal from an unresolved runtime initializer", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(`${card}<script>const CLASSDEFS = ''; mermaid.render('id', src + CLASSDEFS);</script>`, page).status, 0);
+ for (const declaration of ['', 'const CLASSDEFS = dynamic;', 'const CLASSDEFS = buildStyles();', 'const CLASSDEFS = `dynamic ${value}`;']) {
+  const result = audit(`${card}<script>${declaration} mermaid.render('id', src + CLASSDEFS);</script>`, page);
+  assert.equal(result.status, 1, declaration);
+  assert.equal(result.data.blocking, true);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("masks regex literals before their quotes can hide CLASSDEFS or render calls", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const prefix of ['const quote = /"/;', "const quote = /'/;", 'const quote = /["/]/g;', String.raw`const quote = /\/'/;`, 'const ratio = total / count; const quote = /"/;', 'const quote = /mermaid.render(id, src + CLASSDEFS)/;']) {
+  const source = `${card}<script>${prefix} const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
+  assert.equal(audit(source, page(chart + suffix)).status, 0, prefix);
+  assert.equal(audit(source, page(chart)).status, 1, prefix);
+ }
+ const decoy = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const example = /mermaid.render(id, src + CLASSDEFS)/;</script>`;
+ assert.equal(audit(decoy, page(chart)).status, 0);
 });
 
 test("materializes selected card payloads through quoted angle brackets in empty code attributes", () => {
