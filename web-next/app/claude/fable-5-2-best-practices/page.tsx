@@ -3456,7 +3456,9 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     <span className="hljs-comment">
-                      {"# テキストだけでなく、中身のある thinking ブロックも描画する"}
+                      {
+                        "# call() 完了後にテキストと thinking の進捗を表示する（待機中の逐次更新ではない）"
+                      }
                     </span>
                   </span>
                   {"\n"}
