@@ -1,7 +1,7 @@
 # 月次更新プロンプト集
 
 > **用途**: 毎月最低 1 回、各画面の情報を最新状態に保つためのプロンプトテンプレート集。  
-> **最終更新**: 2026-11-13<br>
+> **最終更新**: 2026-11-14<br>
 > **次回予定**: 2026-11-01 以降
 
 ---
@@ -117,7 +117,7 @@ bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code �
 
 | # | URL | ページタイトル（概要） | 区分 | 確認日（registry `lastReviewed`） |
 |---|-----|----------------------|------|--------|
-| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | Home | 2026-11-13 |
+| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | Home | 2026-11-14 |
 | 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド | Providers / Claude | 2026-10-22 |
 | 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code | Providers / Claude | 2026-10-22 |
 | 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code | Providers / Claude | 2026-10-22 |

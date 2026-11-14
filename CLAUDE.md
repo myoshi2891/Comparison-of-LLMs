@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-14レビュー11コメント: 監査は未確定renderer対応とCLASSDEFS再代入を未解決として停止し、引用属性内の偽codeを除外。Hydrogenは非対応パラメータ・prefill除去・思考込みの出力見積り・会話別履歴へ訂正。月次Home確認日をregistryへ同期。Moonshotは定義リストの境界を保持。Fableは通常のツール例外を対応するエラー結果へ変換し、全結果バッチを保存して再開する。検証結果はdocs/PROGRESS.mdを参照。
+
 2026-11-14レビュー4件: 原本監査は未解決のCLASSDEFSを空文字と区別し、unresolvedMermaidSourcesとして完了判定を停止。コードのマスクは正規表現を認識して後続宣言の位置を保持。HydrogenはContributor Tierの改善利用と有料サービスの監視用保持を明記。Fableのagent_loopはツール結果バッチを次のAPI呼び出し前にcheckpointへ保存し、API失敗後も再開できる。ターン上限時の保存は維持。全体240 files／3074 tests・Fable対象74件・監査84件・型・lint657 files・HTML原本監査exit 0・管理文書等のMarkdown lintが成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-14追加レビュー5件: 原本監査はカード開始タグの引用属性を保持し、moduleごとのCLASSDEFSを静的カードセレクターで対応付ける。Hydrogenは必須機能を先に判定し、Long Decodeのフォアグラウンド／ステートレス／GenerateContent継続も案内。Fableのagent_loopは上限例外前に呼び出し元のcheckpointへツール結果込みの履歴を保存し、同じ辞書で再開できる。原本・JSX・対象コード契約を同期。全体240 files／3073 tests・対象73件・監査82件・型・lint657 files・HTML原本監査exit 0が成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。

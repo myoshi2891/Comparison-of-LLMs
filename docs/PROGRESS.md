@@ -6,6 +6,15 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 監査・移行ガイド・価格境界・ツール例外のレビュー11コメント（2026-11-14）
+
+- 11コメントを現行コードで確認し、すべて対応。Fableのツール例外に関する2コメントは同じ修正へ統合。監査3件・Moonshot1件・Fable1件の回帰テストを追加し、修正前失敗を実測。コミットは作成しない。
+- 監査は未対応・動的なセレクターや未確定のrenderer対応をunresolvedMermaidSourcesへ記録し、接尾辞なしと区別。対応済みrendererの接尾辞なしは維持。通常タグを引用属性ごと消費して本物の最初の空codeへpayloadを挿入。CLASSDEFSに追加の代入があれば、初期値で認定せず未解決として停止。
+- Hydrogenは非対応のfrequency_penalty／presence_penalty、candidate_count > 1、prefilled modelターンの除去を表・フロー・チェックリストへ反映。temperature／top_p／top_kの扱いは維持。出力見積りは思考と回答の合計を使い、会話ごとの履歴をstepへ渡して署名付きcontentを保持する。履歴分離と署名の同一性をモック検証し、全図を構文解析。
+- 月次一覧のHome確認日をregistryの2026-11-14へ同期。Moonshotは閉じdd／dlと次のdtを越えないよう境界を追加し、別レコードの入出力を組み合わせずフォールバックを保持。
+- Fableの通常のツール例外は対応するtool_resultへis_error:trueで変換し、成功・失敗を含む全バッチを保存してから続行。成功したターンの後に成功・失敗・成功が混在するバッチでもID・順序・完了結果を保持し、再開で重複実行しないことを検証。BaseExceptionによる中断・終了からの復旧は例の対象外と明記。HTML／Markdown・JSX・コード／トークン／要素ツリー契約へ同期。[公式のエラー結果仕様](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)とも照合。
+- 検証: 監査87件、pytest138件＋39 subtests、Fable対象3 files／75 tests、typecheck、lint657 files、HTML原本監査exit 0が成功。保存Markdownの既存lint34件は不変。フロント全体テストは実行中。ビルド・実API呼び出しは未実行。
+
 ## 未解決の図・正規表現・データ保持・チェックポイントのレビュー4件（2026-11-14）
 
 - 4指摘とも現行コードで有効と確認。監査は既存1契約を厳格化し、空の接尾辞と未解決の初期化子を区別する契約・正規表現内の引用符を扱う契約を追加。Fableは次のcall失敗時の履歴保持を実行する契約を追加。監査3件・Fable1件の修正前失敗を実測。
@@ -369,7 +378,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `b2bed25b`（レビュー4件の修正は未コミット）。
+- **最新実装 HEAD**: `52ccfc81`（レビュー11コメントの修正は未コミット）。
 - **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
@@ -845,7 +854,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: b2bed25b（レビュー4件の修正は未コミット。冒頭の同名節を参照）。
+最新実装HEAD: 52ccfc81（レビュー11コメントの修正は未コミット。冒頭の同名節を参照）。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
