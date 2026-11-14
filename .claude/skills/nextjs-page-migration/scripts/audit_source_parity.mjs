@@ -353,13 +353,13 @@ function extractTagContents(src, tag) {
  */
 function extractElementContents(src, predicate) {
   const results = [];
-  const openingRe = /<([A-Za-z][\w.-]*)\b[^>]*>/g;
+  const openingRe = /<([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
   let opening = openingRe.exec(src);
   while (opening !== null) {
     const openingTag = opening[0];
     if (!openingTag.endsWith("/>") && predicate(openingTag)) {
       const tag = opening[1];
-      const nestedRe = new RegExp(`<\\/?${tag}\\b[^>]*>`, "g");
+      const nestedRe = new RegExp(`<\\/?${tag}\\b(?:[^>"']|"[^"]*"|'[^']*')*>`, "g");
       nestedRe.lastIndex = openingRe.lastIndex;
       let depth = 1;
       let nested = nestedRe.exec(src);
@@ -908,24 +908,8 @@ function readHtmlAttribute(attributes, name) {
 
 const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
 
-/**
- * Materialize display-only payloads scoped to their owning code/diagram card.
- * Scripts and comments are opaque while finding nested div boundaries; no source JS is executed.
- * @param {string} src - Original HTML.
- * @returns {string} HTML with visible code and Mermaid sources restored.
- */
-function materializePlainTextCards(src) {
-  const scripts = [];
-  const stashed = src.replace(/<!--[\s\S]*?-->|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
-    (full, attributes, payload) => {
-      if (attributes === undefined) return full.startsWith("<!--") ? "" : full;
-      scripts.push({ full, attributes, payload });
-      return `<script data-audit-payload="${scripts.length - 1}"></script>`;
-    });
-  const literalSource = scripts.filter(script => {
-    const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
-    return !type || type === "module" || /^(?:text|application)\/(?:java|ecma)script$/.test(type);
-  }).map(script => blankNonCodeText(script.payload)).join("\n");
+/** Resolve literal CLASSDEFS only within the supplied renderer scope. */
+function rendererSuffix(literalSource) {
   const executable = blankNonCodeText(literalSource, false);
   let suffix = "";
   // Strings/comments are already masked. Balance parentheses so later ASI
@@ -940,17 +924,61 @@ function materializePlainTextCards(src) {
     }
     return false;
   });
-  if (rendersWithSuffix) {
-    // Locate the declaration in code, then read its literal from the offset-aligned view.
-    const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
-    const initializerSource = declaration && literalSource.slice(declaration.index);
-    const initializer = initializerSource && /^(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*"))*)/.exec(initializerSource);
-    // Check the remainder separately so a failed terminator cannot backtrack to a
-    // partial concatenation. A newline permits ASI only without an expression continuation.
-    const complete = initializer && /^[ \t]*(?:;|$|[\r\n](?!\s*(?:[([`.+\-*/%<>=!&|^?:,\\]|\b(?:in|instanceof)\b)))/.test(initializerSource.slice(initializer[0].length));
-    const literal = complete && initializer[1];
-    if (literal) suffix = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2])).join("");
-  }
+  if (!rendersWithSuffix) return undefined;
+  // Locate the declaration in code, then read its literal from the offset-aligned view.
+  const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
+  const initializerSource = declaration && literalSource.slice(declaration.index);
+  const initializer = initializerSource && /^(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*"))*)/.exec(initializerSource);
+  // Check the remainder separately so a failed terminator cannot backtrack to a
+  // partial concatenation. A newline permits ASI only without an expression continuation.
+  const complete = initializer && /^[ \t]*(?:;|$|[\r\n](?!\s*(?:[([`.+\-*/%<>=!&|^?:,\\]|\b(?:in|instanceof)\b)))/.test(initializerSource.slice(initializer[0].length));
+  const literal = complete && initializer[1];
+  if (literal) suffix = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2])).join("");
+  return suffix;
+}
+
+/** Match static card selectors; complex/dynamic selectors are not guessed. */
+function matchesCardSelector(tag, selector) {
+  if (!/^(?:[A-Za-z][\w-]*)?(?:[.#][\w-]+)*$/.test(selector) || !selector) return false;
+  const element = /^([A-Za-z][\w-]*)/.exec(selector)?.[1];
+  if (element && /^<([\w-]+)/.exec(tag)?.[1].toLowerCase() !== element.toLowerCase()) return false;
+  const classes = (readHtmlAttribute(tag, "class") ?? "").split(/\s+/);
+  return Array.from(selector.matchAll(/([.#])([\w-]+)/g)).every(([, kind, value]) =>
+    kind === "#" ? readHtmlAttribute(tag, "id") === value : classes.includes(value));
+}
+
+/**
+ * Materialize display-only payloads scoped to their owning code/diagram card.
+ * Scripts and comments are opaque while finding nested div boundaries; no source JS is executed.
+ * @param {string} src - Original HTML.
+ * @returns {string} HTML with visible code and Mermaid sources restored.
+ */
+function materializePlainTextCards(src) {
+  const scripts = [];
+  const stashed = src.replace(/<!--[\s\S]*?-->|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
+    (full, attributes, payload) => {
+      if (attributes === undefined) return full.startsWith("<!--") ? "" : full;
+      scripts.push({ full, attributes, payload });
+      return `<script data-audit-payload="${scripts.length - 1}"></script>`;
+    });
+  const executableScripts = scripts.filter(script => {
+    const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
+    return !type || type === "module" || /^(?:text|application)\/(?:java|ecma)script$/.test(type);
+  });
+  // Classic scripts share the global scope; each module has its own CLASSDEFS.
+  const scopes = [
+    executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module"),
+    ...executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() === "module").map(script => [script]),
+  ].map(group => {
+    const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n");
+    const executable = blankNonCodeText(literalSource, false);
+    const selectors = [];
+    for (const call of executable.matchAll(/\bdocument\.querySelector(?:All)?\s*\(/g)) {
+      const argument = /^\s*(['"])((?:[^\\]|\\.)*?)\1\s*\)/.exec(literalSource.slice(call.index + call[0].length));
+      if (argument) selectors.push(decodeQuotedEntryEscapes(argument[2]));
+    }
+    return { suffix: rendererSuffix(literalSource), selectors };
+  }).filter(scope => scope.suffix !== undefined);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const cards = extractElementContents(stashed, tag => {
     const cls = readHtmlAttribute(tag, "class") ?? "";
@@ -973,6 +1001,9 @@ function materializePlainTextCards(src) {
       // A selected data-code script must not be materialized again by inventoryHtml.
       if (content !== card.content) content = content.replace(marker[0], "");
     } else {
+      const renderer = scopes.find(scope => scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector)))
+        ?? (scopes.length === 1 && scopes[0].selectors.length === 0 ? scopes[0] : undefined);
+      const suffix = renderer?.suffix ?? "";
       content = content.replace(marker[0], () => `<div class="mermaid">${escape(payload + suffix)}</div>`);
     }
     const start = card.index + card.openingTag.length;

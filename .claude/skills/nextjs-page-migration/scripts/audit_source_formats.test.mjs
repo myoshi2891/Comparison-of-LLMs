@@ -491,3 +491,28 @@ test("ignores script-like text inside ordinary quoted tag attributes", () => {
   assert.equal(audit(source, '<pre><code>wrong</code></pre>').status, 1);
  }
 });
+
+test("discovers owning cards through quoted greater-than attributes", () => {
+ for (const quote of ['"', "'"]) {
+  for (const kind of ['code-block', 'diagram-card']) {
+   const value = kind === 'code-block' ? 'kept payload' : 'flowchart LR\nA --> B';
+   const display = kind === 'code-block' ? '<pre><code></code></pre>' : '';
+   const source = `<div title=${quote}a>b${quote} class="${kind}">${display}<script type="text/plain">${value}</script></div>`;
+   const page = kind === 'code-block' ? '<pre><code>kept payload</code></pre>' : `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+   assert.equal(audit(source, page).status, 0);
+   assert.equal(audit(source, '').status, 1);
+   if (kind === 'code-block') assert.deepEqual(audit(source, '').data.missingCodeBlocks, [value]);
+  }
+ }
+});
+
+test("resolves CLASSDEFS separately for renderer modules targeting different cards", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffixes = ['\nclassDef box fill:#fff;', '\nclassDef box fill:#000;'];
+ const cards = [0, 1].map(i => `<div id="card-${i}" class="diagram-card"><script type="text/plain">${chart}</script></div>`).join('');
+ const modules = suffixes.map((suffix, i) => `<script type="module">const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#card-${i}'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);</script>`).join('');
+ const page = values => values.map((value, i) => `const D${i} = ${JSON.stringify(chart + value)}; <MermaidDiagram chart={D${i}} />`).join('\n');
+ assert.equal(audit(cards + modules, page(suffixes)).status, 0);
+ assert.equal(audit(cards + modules, page([suffixes[0], suffixes[0]])).status, 1);
+ assert.equal(audit(cards + modules, page([...suffixes].reverse())).status, 1);
+});
