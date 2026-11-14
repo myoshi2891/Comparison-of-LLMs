@@ -649,3 +649,47 @@ test("does not certify an outer CLASSDEFS when a render binding is shadowed or o
  }
  assert.equal(audit(`${card}<script>${declaration} function draw() { ${render} }</script>`, page).status, 0);
 });
+
+test("keeps separately parsed scripts apart before a following IIFE", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)}`;
+ const iife = "(() => { mermaid.render('id', src + CLASSDEFS); })();";
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(`${card}<script>${declaration}</script><script>${iife}</script>`, page).status, 0);
+ assert.equal(audit(`${card}<script>${declaration}\n${iife}</script>`, page).status, 1);
+});
+
+test("only the diagram-source argument can contribute CLASSDEFS", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render(src + CLASSDEFS, src);</script>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(source, page(chart)).status, 0);
+ assert.equal(audit(source, page(chart + suffix)).status, 1);
+});
+
+test("handles parenthesized source contributions and blocks unsupported CLASSDEFS expressions", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const source = expression => `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render(makeId('a', 'b'), ${expression});</script>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ for (const expression of ['src + (CLASSDEFS)', '((src) + ((CLASSDEFS)))']) {
+  assert.equal(audit(source(expression), page(chart + suffix)).status, 0);
+  assert.equal(audit(source(expression), page(chart)).status, 1);
+ }
+ for (const expression of ['src.concat(CLASSDEFS)', 'src + transform(CLASSDEFS)']) {
+  const result = audit(source(expression), page(chart));
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("discovers mixed-case HTML card boundaries and inventories the payload", () => {
+ const source = '<DiV class="code-block"><pre><code></code></PRE><script type="text/plain">mixed case example</script></dIv>';
+ assert.equal(audit(source, '<pre><code>mixed case example</code></pre>').status, 0);
+ assert.deepEqual(audit(source, '').data.missingCodeBlocks, ['mixed case example']);
+});

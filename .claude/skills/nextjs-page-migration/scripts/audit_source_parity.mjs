@@ -359,13 +359,13 @@ function extractElementContents(src, predicate, includeNested = false) {
   while (opening !== null) {
     const openingTag = opening[0];
     if (!openingTag.endsWith("/>") && predicate(openingTag)) {
-      const tag = opening[1];
+      const tag = opening[1].toLowerCase();
       const nestedRe = /<!--[\s\S]*?-->|<(\/?)([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
       nestedRe.lastIndex = openingRe.lastIndex;
       let depth = 1;
       let nested = nestedRe.exec(src);
       while (nested !== null) {
-        if (nested[2] !== tag) {
+        if (nested[2]?.toLowerCase() !== tag) {
           nested = nestedRe.exec(src);
           continue;
         }
@@ -983,16 +983,58 @@ function rendererSuffix(literalSource) {
   const executable = blankNonCodeText(literalSource, false);
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
-  const renderUses = Array.from(executable.matchAll(/\bmermaid\.render\s*\(/g)).flatMap(call => {
+  const renderUses = [];
+  for (const call of executable.matchAll(/\bmermaid\.render\s*\(/g)) {
     const start = call.index + call[0].length;
-    let depth = 1;
+    const arguments_ = [];
+    const stack = ["("];
+    let argumentStart = start;
+    let complete = false;
     for (let end = start; end < executable.length; end++) {
-      if (executable[end] === "(") depth++;
-      if (executable[end] === ")") depth--;
-      if (depth === 0) return Array.from(executable.slice(start, end).matchAll(/\bsrc\s*\+\s*CLASSDEFS\b/g), use => ({ index: start + use.index + use[0].lastIndexOf("CLASSDEFS"), call: call.index }));
+      const char = executable[end];
+      if ("([{".includes(char)) stack.push(char);
+      else if (")]}".includes(char)) {
+        if (stack.pop() !== { ")": "(", "]": "[", "}": "{" }[char]) return null;
+        if (stack.length === 0) {
+          arguments_.push({ start: argumentStart, end });
+          complete = true;
+          break;
+        }
+      } else if (char === "," && stack.length === 1) {
+        arguments_.push({ start: argumentStart, end });
+        argumentStart = end + 1;
+      }
     }
-    return [];
-  });
+    if (!complete || arguments_.length < 2) return null;
+    const source = arguments_[1];
+    const expression = executable.slice(source.start, source.end);
+    const names = Array.from(expression.matchAll(/\bCLASSDEFS\b/g));
+    if (names.length === 0) continue;
+    const unwrap = value => {
+      value = value.trim();
+      while (value.startsWith("(")) {
+        let depth = 0;
+        let closing = -1;
+        for (let i = 0; i < value.length; i++) {
+          if (value[i] === "(") depth++;
+          if (value[i] === ")" && --depth === 0) { closing = i; break; }
+        }
+        if (closing !== value.length - 1) break;
+        value = value.slice(1, -1).trim();
+      }
+      return value;
+    };
+    const value = unwrap(expression);
+    let depth = 0;
+    const plus = [];
+    for (let i = 0; i < value.length; i++) {
+      if (value[i] === "(") depth++;
+      else if (value[i] === ")") depth--;
+      else if (value[i] === "+" && depth === 0) plus.push(i);
+    }
+    if (plus.length !== 1 || unwrap(value.slice(0, plus[0])) !== "src" || unwrap(value.slice(plus[0] + 1)) !== "CLASSDEFS") return null;
+    renderUses.push({ index: source.start + names[0].index, call: call.index });
+  }
   if (renderUses.length === 0) return undefined;
   // Locate the declaration in code, then read its literal from the offset-aligned view.
   const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
@@ -1068,7 +1110,7 @@ function materializePlainTextCards(src) {
     executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module"),
     ...executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() === "module").map(script => [script]),
   ].map(group => {
-    const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n");
+    const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n;\n");
     const executable = blankNonCodeText(literalSource, false);
     const selectors = [];
     const selectionCalls = Array.from(executable.matchAll(/\bdocument\.querySelector(?:All)?\s*\(/g));
