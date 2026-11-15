@@ -693,3 +693,27 @@ test("discovers mixed-case HTML card boundaries and inventories the payload", ()
  assert.equal(audit(source, '<pre><code>mixed case example</code></pre>').status, 0);
  assert.deepEqual(audit(source, '').data.missingCodeBlocks, ['mixed case example']);
 });
+
+test("rejects the base chart when a render template interpolates nonempty CLASSDEFS", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ for (const expression of ['`${src}${CLASSDEFS}`', 'src + `${CLASSDEFS}`', '`${src}${(CLASSDEFS)}`']) {
+  const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', ${expression});</script>`;
+  for (const value of [chart, chart + suffix]) {
+   const result = audit(source, `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`);
+   assert.equal(result.status, 1, expression);
+   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+  }
+ }
+});
+
+test("materializes empty code with whitespace before the closing tag delimiter", () => {
+ for (const closing of ['</code >', '</CODE\t>', '</code\n>']) {
+  const source = `<div class="code-block"><pre><code>${closing}</pre><script type="text/plain">print("kept")</script></div>`;
+  const empty = audit(source, '<pre><code></code></pre>');
+  assert.equal(empty.status, 1);
+  assert.deepEqual(empty.data.missingCodeBlocks, ['print("kept")']);
+  assert.equal(audit(source, '<pre><code>{\'print("kept")\'}</code></pre>').status, 0);
+ }
+});

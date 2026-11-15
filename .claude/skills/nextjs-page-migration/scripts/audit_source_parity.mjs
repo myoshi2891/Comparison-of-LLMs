@@ -979,7 +979,7 @@ function readHtmlAttribute(attributes, name) {
 const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
 
 /** Resolve CLASSDEFS in this scope: undefined = unused, null = unresolved, string = evaluated. */
-function rendererSuffix(literalSource) {
+function rendererSuffix(literalSource, rawSource) {
   const executable = blankNonCodeText(literalSource, false);
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
@@ -1008,6 +1008,13 @@ function rendererSuffix(literalSource) {
     if (!complete || arguments_.length < 2) return null;
     const source = arguments_[1];
     const expression = executable.slice(source.start, source.end);
+    // Template bodies are masked in both analysis views. Inspect their original,
+    // offset-aligned text so interpolated suffixes cannot certify the base chart.
+    // Evaluating these expressions is beyond this literal-only resolver.
+    for (const template of expression.matchAll(/`[^`]*`/g)) {
+      const start = source.start + template.index;
+      if (/(?:^|[^\\])(?:\\\\)*\$\{/.test(rawSource.slice(start, start + template[0].length))) return null;
+    }
     const names = Array.from(expression.matchAll(/\bCLASSDEFS\b/g));
     if (names.length === 0) continue;
     const unwrap = value => {
@@ -1110,6 +1117,7 @@ function materializePlainTextCards(src) {
     executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module"),
     ...executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() === "module").map(script => [script]),
   ].map(group => {
+    const rawSource = group.map(script => script.payload).join("\n;\n");
     const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n;\n");
     const executable = blankNonCodeText(literalSource, false);
     const selectors = [];
@@ -1118,7 +1126,7 @@ function materializePlainTextCards(src) {
       const argument = /^\s*(['"])((?:[^\\]|\\.)*?)\1\s*\)/.exec(literalSource.slice(call.index + call[0].length));
       if (argument) selectors.push(decodeQuotedEntryEscapes(argument[2]));
     }
-    return { suffix: rendererSuffix(literalSource), selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) };
+    return { suffix: rendererSuffix(literalSource, rawSource), selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) };
   }).filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const cards = extractElementContents(stashed, tag => {
@@ -1148,7 +1156,7 @@ function materializePlainTextCards(src) {
     if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
       // Consume every opening tag as a unit before looking for empty code,
       // so a span's quoted title cannot supply a fake <code></code> target.
-      const emptyCodeOrTag = new RegExp(String.raw`<code\b${htmlAttributesPattern}>\s*<\/code>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`, "gi");
+      const emptyCodeOrTag = new RegExp(String.raw`<code\b${htmlAttributesPattern}>\s*<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`, "gi");
       const code = Array.from(ownedContent.matchAll(emptyCodeOrTag)).find(match => match[1] !== undefined);
       if (code) {
         edits.push({ index: start + code.index, length: code[0].length, value: `<code${code[1]}>${escape(payload)}</code>` });
