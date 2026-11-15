@@ -22,13 +22,19 @@ _KIMI_K2_7_CODE = "Kimi K2.7 Code"
 # レコード終端・次モデルを越えず、outputより前では入力価格の$を許可する。
 _RECORD_GAP = r"(?:(?!</(?:p|div|tr|li|dl|section|article|nav|h[1-6])\b|<dt\b|\bkimi[-\s]?k)[\s\S]){0,80}?"
 _PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
+# cached と input の間には空白か、レコード境界ではないインラインタグ（span・br 等）を許す。
+_INLINE_SEP = r"(?:\s|<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)[^<>]*>)+"
+_CACHED_LABEL = rf"\bcached{_INLINE_SEP}input\b"
 # cached input の価格を探す間も output ラベルは越えない（output 価格を cached 扱いにしない）。
 _CACHED_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"(?!\boutput\b)[^$]")
 # cached inputの価格はひとまとまりで読み飛ばし、output以降へは進まない。
 _INPUT_PRICE_GAP = _RECORD_GAP.replace(
     r"[\s\S]",
-    rf"(?!\boutput\b)(?:\bcached\s+input{_CACHED_PRICE_GAP}\$[\d.]+(?![\d.])|(?!\bcached\s+input\b)[^$])",
+    rf"(?!\boutput\b)(?:{_CACHED_LABEL}{_CACHED_PRICE_GAP}\$[\d.]+(?![\d.])|(?!{_CACHED_LABEL})[^$])",
 )
+# 標準 output の価格は batch・cached など別フィールドのラベルを越えて探さない。
+_OUTPUT_LABEL = r"(?<!batch\s)(?<!cached\s)\boutput"
+_OUTPUT_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"(?!\b(?:batch|cached|cache|input)\b)[^$]")
 
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
 _FALLBACKS: dict[str, tuple[float, float]] = {
@@ -95,7 +101,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             rf"{key}{_INPUT_PRICE_GAP}\$([\d.]+)",
         ])
         out_price = extract_price(html, [
-            rf"{key}{_RECORD_GAP}output{_PRICE_GAP}\$([\d.]+)",
+            rf"{key}{_RECORD_GAP}{_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
         ])
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)
