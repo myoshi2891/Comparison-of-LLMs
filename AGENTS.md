@@ -45,7 +45,7 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ```bash
 (cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3075 tests pass（2026-11-15 レビュー11件修正後の実測）
 (cd web-next && bun run typecheck)   # OK（2026-11-15 実測）
-(cd web-next && bun run build)       # 2026-11-14成功（115静的ページ生成）。その後の変更は未実行
+(cd web-next && bun run build)       # 最後の成功: 2026-11-14（115静的ページ生成）。11月15日はポート権限制限で失敗、制限外の再試行も同じ失敗
 (cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-15 実測）
 (cd scraper && uv run pytest)        # 138 tests＋39 subtests pass（2026-11-14 実測）
 ```
