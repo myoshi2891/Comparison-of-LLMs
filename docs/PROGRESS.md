@@ -6,6 +6,15 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## スキャナー・承認経路・入力検証などのレビュー12件（2026-11-15）
+
+- 重複欄のHydrogen履歴例を含む12件すべてを現行コードで確認して修正。スキップなし。監査の既存fixtureを拡張し、MoonshotとFableの回帰テストを追加して修正前失敗を確認。コミットは作成しない。
+- 監査はobject式の閉じ波括弧と文ブロックを区別し、不明なslash分類は未解決とする。除算中のCLASSDEFS再代入で空の初期値を認定しない。srcの書き込み検査を共有し、src + CLASSDEFSでもrender前の再代入・複合代入・前置更新を拒否する。宣言の初期化だけを除外し、既存のmodule別正常fixtureを維持。
+- Carbonは不可逆操作の承認を実行前へ移動し、MAX_TOKENS時は本文を完了回答として表示せず警告。Hydrogenの2リクエストには代表ファイルを入力し、履歴例は候補なし／MAX_TOKENS時に履歴を保存しない。正常応答のcontent同一性・署名を保持。
+- Decisionsは高リスクをconfidence判定前に人間レビューへ送り、テキスト専用guardrailで画像・音声・混在など評価できない入力を拒否。有料枠でも監視目的の保持があることと送信前の保持期間・組織要件確認を明記。decisions_client.pyとして保存する例と別pytestモジュールのimportを対応付ける。
+- Moonshotは同一モデルの兄弟ddから両価格を抽出し、dt／dl境界による別レコードへの越境防止を維持。Fableのpause_turnは既に追記した応答履歴を加工せず再送し、他の非tool_use終了理由は従来どおり返す。HTML／Markdown原本・JSX・全文／構文トークン／構造契約を同期。
+- 検証: 全体Vitest240 files／3076 tests、監査100件、Fable対象76件、pytest139件＋39 subtests、型検査・Biome657 files、HTML原本監査exit 0、ガイド例モック、Mermaid24図解析が成功。Carbon／HydrogenのMarkdown lint成功。Decisionsの既存MD025 1件と保存Fable Markdownの既存34件は変更前後同一。ビルドはTurbopackの補助プロセスがローカルポートを開く際のOperation not permittedで失敗し、制限外の再実行でも同じ。実APIは呼び出していない。
+
 ## 初期化順序・別名ソース・不透明要素・履歴の追加レビュー4件（2026-11-15）
 
 - 4指摘とも現行コードで有効と確認。監査3契約とHydrogenの失敗時モックで修正前失敗を実測。コミットは作成しない。
@@ -899,6 +908,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
+今回のレビュー12件は未コミットで修正済み。冒頭のレビュー12件の節を参照。全体Vitest240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtests・型・Biome・HTML原本監査exit 0が成功。ビルドはTurbopackのローカルポート制限で失敗（再実行でも同じ）。
 最新実装HEAD: f73087cf（前回レビュー4件の記録同期。今回の追加レビュー4件の修正は未コミット。冒頭の追加レビュー4件の節を参照）。
 追加レビュー4件は監査100件・HTML原本監査exit 0・Hydrogenの生成失敗／再試行モック・変更Markdown lintが成功。初期化順序や別名ソースの寄与が不明なら未解決とし、textarea等の偽タグを不透明に保つ。Hydrogenは成功時だけ履歴を保存。アプリ全体の再検証は未実行。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。

@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-15レビュー12件: 原本監査はobject式後の除算と文ブロック後の正規表現を区別し、分類不明のslashとrender前のsrc再代入を未解決とする。Carbon／Decisionsは承認・リスク判定を実行前へ移動。Hydrogenはコード入力とMAX_TOKENS時の履歴不変を追加。Moonshotは兄弟ddの価格を取得し、Fableはpause_turnで応答履歴をそのまま再送する。全体240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtests・型・Biome・HTML監査が成功。ビルドはTurbopackのローカルポート制限で失敗。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-15追加レビュー4件: 原本監査はCLASSDEFSの初期化とrendererへ至る呼び出し順を確認し、別名経由の図ソースは確定できなければ未解決とする。textarea等のraw-text／RCDATA内のscript・カード様文字列は不透明に保ち、実payloadを保持。Hydrogenは一時履歴で生成を要求し、成功時だけ署名付き応答と入力を保存する。監査100件・FableのHTML原本監査exit 0・失敗／再試行モックが成功。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-15レビュー4件: 原本監査は図ソースのテンプレート補間を未解決として停止し、空codeの閉じタグ区切り前の空白も認識する。Hydrogenの履歴例はツールなしのテキスト専用と明記。Fableの費用例は集計キャッシュ書込のTTL未帰属分を非負に丸めて5分単価で加算し、原本・JSX・契約を同期。全体240 files／3075 tests・監査97件・Fable対象75件・型・lint657 files・HTML原本監査exit 0が成功。詳細はdocs/PROGRESS.mdを参照。
@@ -657,7 +659,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3075 tests pass、2026-11-15レビュー11件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3076 tests pass、2026-11-15レビュー12件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
