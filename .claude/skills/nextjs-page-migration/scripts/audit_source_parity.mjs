@@ -1115,10 +1115,11 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       if (!declarations.length) return undefined;
       const d = declarations[0];
       if (declarations.slice(1).some(other => pathAt(other.index).length === pathAt(d.index).length)) return undefined;
-      // A redeclaration in the same block, even after this use, can run first in a deferred call.
+      // A redeclaration in this block or a nested one, even after this use, can
+      // run first in a deferred call (a nested `var` writes the same binding).
       const declarationPath = pathAt(d.index);
       if (Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}\\s*=`, "g"))).some(other =>
-        other.index !== d.index && pathAt(other.index).join() === declarationPath.join())) return undefined;
+        other.index !== d.index && declarationPath.every((block, i) => pathAt(other.index)[i] === block))) return undefined;
       const initializers = declarationNames(name);
       if (Array.from(writeIndexes(name)).some(write => !initializers.has(write))) return undefined;
       const start = d.index + d[0].length;
