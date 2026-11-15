@@ -6,6 +6,15 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 隠れたrenderer・別名の初期化位置・ガイド例・料金範囲のレビュー14件（2026-11-16）
+
+- 13件を有効と確認して対応し、1件をスキップ。監査とMoonshotは修正前の誤認定・誤抽出を実測してからRed／Greenで修正した。
+- 監査（Red `508c453a` → Green `7e5ef1af`）: スラッシュ分類が不確実で、関数宣言後の正規表現内の引用符が`mermaid.render`を隠す3例で、修正前はstatus 0。原本に`mermaid.render`があり分類が不確実なスコープは保持して未解決とする。束縛は初期化位置を持ち、別名の初期化子内の参照はその位置で解決する（外側`#other`のscriptを内側`#chart`で認定していた誤りを解消）。入れ子の`let`／`const`はシャドーイングとして扱い、同一ブロックの再宣言と入れ子の`var`は引き続き未解決とする。
+- Moonshot（Red `d7227042` → Green `c868f02d`）: `cached`と`input`の間のインラインHTMLを読み飛ばし、$0.25を標準入力単価にしない。標準outputは`batch`・`cached`・`input`のラベルを越えて探さず、`batch output`も標準outputとして扱わない。fixture4例を追加。
+- ガイド: Robotics 2.5は画素座標の範囲制限、不正な点の破棄、宣言外ツールの拒否、実行直前の非常停止の再確認（物理インターロックは別に維持）、古い完了通知の消去と実送信時刻基準の1 FPS制御、Hugging Faceの利用条件と認証手順を追加（`8ed35843`）。Decisionsのガードレール例はfunction_responseを持つuserターンを飛ばす（`38cb4be1`）。Carbonはlong decodeにv1beta1と`max_output_tokens`のセグメント上限超過が必要で、自動継続は現行SDKで既定有効と訂正。料金表をグローバル標準料金と明記し、Priority PayGo・リージョン別料金の確認を促す（`ab2ed0ad`）。
+- スキップ: Carbonの`prefix_mismatch_behavior="DROP"`は公式のGet started with Gemini 4ページに記載があるため削除しない。料金ページは取得できず、Priority PayGo等の具体額は未確認のため記載していない。
+- 検証: 監査113件、全62件のHTML原本で原本側監査結果が修正前（`508c453a`）と同一、FableのHTML原本監査exit 0、pytest145件＋39 subtests、3ガイドのPythonコード例13件の構文解析、Roboticsの補助関数のモック実行、Carbonの9図解析とMarkdown lint 0件が成功。Roboticsの既存lint8件とDecisionsの既存MD025 1件は変更前後で同一。web-nextは無変更のため全体Vitest・型・Biome・ビルドは再実行していない（直前の全体実測は240 files／3077 tests、ビルドの最後の成功は2026-11-14）。
+
 ## src分割代入・遅延実行・dedent束縛・承認ゲート等のレビュー7件（2026-11-16）
 
 - 7件すべて現行コードで有効と確認して対応。監査の誤認定15件を修正前のstatus 0として個別に実測（関数内に閉じたdedent宣言のケースは追加で修正前0を確認）し、2回帰テストへまとめた（Red `8bfe080d` → Green `272714ac`）。完了前の再点検で、別ブロックの`var src`再宣言が修正後もstatus 0となる穴を見つけ、入れ子ブロックの再宣言も書き込みとして扱った（Red `e09b52c8` → Green `10755f9e`）。
@@ -487,7 +496,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `10755f9e`（2026-11-16のレビュー7件までの修正はコミット済み）。
+- **最新実装 HEAD**: `ab2ed0ad`（2026-11-16のレビュー14件までの修正はコミット済み）。
 - **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
@@ -963,12 +972,13 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-2026-11-16のレビュー7件は全件修正・コミット済み（実装HEAD 10755f9e）。監査111件・62原本の監査結果不変・pytest143件＋39 subtests・全体Vitest240 files／3077 tests成功。冒頭のレビュー7件の節を参照。
+2026-11-16のレビュー14件は13件修正・1件スキップ、コミット済み（実装HEAD ab2ed0ad）。監査113件・pytest145件＋39 subtests成功。冒頭のレビュー14件の節を参照。
+2026-11-16のレビュー7件も全件修正・コミット済み（当時の実装HEAD 10755f9e）。監査111件・62原本の監査結果不変・pytest143件＋39 subtests・全体Vitest240 files／3077 tests成功。冒頭のレビュー7件の節を参照。
 以前の追加レビュー5件も全件修正・コミット済み（当時の実装HEAD 4a02de85）。src束縛とpayload対応の検証・キャッシュ入力価格除外・pause_turn直後のcheckpoint保存・PDF上限を訂正。全体Vitest240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査exit 0成功。冒頭の追加レビュー5件の節を参照。
 最新のレビュー4件は3件修正・1件スキップ。コメントのみのcodeは既に拒否され、回帰テストを追加して監査104件成功。冒頭のレビュー4件の節を参照。ビルドは11月14日が最後の成功、11月15日は初回・再試行とも失敗。
 以前の追加レビュー7件も修正・コミット済み。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析成功の当時の記録は該当節を参照。
 以前のレビュー12件も修正・コミット済み。全体Vitest240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtestsの当時の記録は該当節を参照。ビルドはTurbopackのローカルポート制限で失敗（再実行でも同じ）。
-最新実装HEAD: 10755f9e（2026-11-16のレビュー7件までの修正はコミット済み）。
+最新実装HEAD: ab2ed0ad（2026-11-16のレビュー14件までの修正はコミット済み）。
 追加レビュー4件は監査100件・HTML原本監査exit 0・Hydrogenの生成失敗／再試行モック・変更Markdown lintが成功。初期化順序や別名ソースの寄与が不明なら未解決とし、textarea等の偽タグを不透明に保つ。Hydrogenは成功時だけ履歴を保存。アプリ全体の再検証は未実行。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
