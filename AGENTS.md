@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Updated 2026-11-15
+Updated 2026-11-16
 
 AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツール向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、AGENTS.md はその委譲 pointer として機能する。
@@ -43,11 +43,11 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3077 tests pass（2026-11-15 追加レビュー5件修正後の実測）
-(cd web-next && bun run typecheck)   # OK（2026-11-15 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3077 tests pass（2026-11-16 レビュー7件修正後の実測）
+(cd web-next && bun run typecheck)   # OK（2026-11-16 実測）
 (cd web-next && bun run build)       # 最後の成功: 2026-11-14（115静的ページ生成）。11月15日はポート権限制限で失敗、制限外の再試行も同じ失敗
-(cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-15 実測）
-(cd scraper && uv run pytest)        # 141 tests＋39 subtests pass（2026-11-15 実測）
+(cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-16 実測）
+(cd scraper && uv run pytest)        # 143 tests＋39 subtests pass（2026-11-16 実測）
 ```
 
 ## 次セッション再開プロンプト

@@ -2,9 +2,21 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-15**
+> - 最終更新日: **Updated 2026-11-16**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## src分割代入・遅延実行・dedent束縛・承認ゲート等のレビュー7件（2026-11-16）
+
+- 7件すべて現行コードで有効と確認して対応。監査の候補fixture17件が修正前にstatus 0（誤認定）となることを個別に実測し、2回帰テストへまとめた（Red `8bfe080d` → Green `272714ac`）。
+- 監査は`[src] = …`・`({src} = o)`・`({key: src} = o)`・`for (src of …)`の分割代入／ループ先頭をsrcへの書き込みとして扱う。`items[0] = src`のメンバー代入とプロパティ（`img.src`）は区別する。
+- render がコールバック内で遅延実行される場合、文書上は後ろの書き込みが先に走りうる。src・別名・カード参照への書き込み、同じブロックでの再宣言、scriptのtextContentへの書き込みと別名コピーは、render より前だけでなくスコープ全体で検出し、初期化子以外は未解決とする。
+- `dedent(...)`は、正規のhelper宣言がただ1つで、2つ目の（巻き上げで勝つ）宣言・代入・分割代入・引数や内側の変数による遮蔽がなく、宣言のブロックが全呼び出しを包含する場合だけ認定する。
+- 混在呼び出しfixtureへ一致するsrc初期化子を追加し、`if (suffixFree) return null;`を一時削除すると失敗することを確認（`c55328f4`）。
+- Moonshotのcached input分岐の価格探索も`output`ラベルを越えない。N/A入力でbatch価格を入力単価として公開していた2例を既存のfallbackペア回帰へ追加（Red `e93a1efe` → Green `9e07cfe6`）。
+- Fable 5.2の操作テストは、unmount後に切り離されたcheckboxへ`checked = true`と明示的なchangeを送る。共有DrawerTocObserverのchange解除を一時的に外すと2テストが失敗することを確認（`76e365e0`）。目次はrole `list`・名前「目次」で取得（`deffa248`）。
+- Carbon 12.2はタスク単位のリスク判定を残し、ツール呼び出しごとの承認ゲート（不可逆・外部コンテンツ由来・範囲外なら人間が承認）を通してから実行し、ログ後に次の呼び出しへ戻るループへ変更（`ec1be6b7`）。
+- 検証: 監査111件、全62件のHTML原本で原本側監査結果が修正前と同一、FableのHTML原本監査exit 0、pytest143件＋39 subtests、Fable対象69件、全体Vitest240 files／3077 tests、型検査、Biome657 files、Carbonの9図解析とMarkdown lintが成功。ビルドは今回未実行（最後の成功は2026-11-14）。
 
 ## 文書全体の選択・script本文更新・Cyber Permissive料金のレビュー3件（2026-11-15）
 
@@ -475,7 +487,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `4a02de85`（src束縛・キャッシュ入力価格・pause_turnのcheckpoint・PDF上限までの修正はコミット済み）。
+- **最新実装 HEAD**: `ec1be6b7`（2026-11-16のレビュー7件までの修正はコミット済み）。
 - **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
@@ -487,7 +499,7 @@
 - **ルート実数**: `page.tsx` 107件、registry 107エントリ（2026-11-13実測。Fable 5.2を追加）。
 - **動作検証**:
   - ビルド: 最後の成功は2026-11-14（115静的ページ生成）。2026-11-15の `bun run build` はTurbopackの補助プロセスがローカルポートを開く際のOperation not permittedで失敗し、制限外の再試行も同じ失敗。Fable 5.2移行時はユーザー指定により未実行だった。
-  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-15 実測）
+  - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-16 実測）
   - `bun run lint` ✅（Biome check / 657 files / 0 diagnostics。2026-11-15 実測）
 - **テストの実行状況**:
   - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3077 testsすべて成功**（2026-11-15追加レビュー5件修正後の実測）。型・lint657 filesも成功。
@@ -951,11 +963,12 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-追加レビュー5件は全件修正・コミット済み（実装HEAD 4a02de85、検証記録同期済み）。src束縛とpayload対応の検証・キャッシュ入力価格除外・pause_turn直後のcheckpoint保存・PDF上限を訂正。全体Vitest240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査exit 0成功。冒頭の追加レビュー5件の節を参照。
+2026-11-16のレビュー7件は全件修正・コミット済み（実装HEAD ec1be6b7）。監査111件・62原本の監査結果不変・pytest143件＋39 subtests・全体Vitest240 files／3077 tests成功。冒頭のレビュー7件の節を参照。
+以前の追加レビュー5件も全件修正・コミット済み（当時の実装HEAD 4a02de85）。src束縛とpayload対応の検証・キャッシュ入力価格除外・pause_turn直後のcheckpoint保存・PDF上限を訂正。全体Vitest240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査exit 0成功。冒頭の追加レビュー5件の節を参照。
 最新のレビュー4件は3件修正・1件スキップ。コメントのみのcodeは既に拒否され、回帰テストを追加して監査104件成功。冒頭のレビュー4件の節を参照。ビルドは11月14日が最後の成功、11月15日は初回・再試行とも失敗。
 以前の追加レビュー7件も修正・コミット済み。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析成功の当時の記録は該当節を参照。
 以前のレビュー12件も修正・コミット済み。全体Vitest240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtestsの当時の記録は該当節を参照。ビルドはTurbopackのローカルポート制限で失敗（再実行でも同じ）。
-最新実装HEAD: 4a02de85（src束縛・キャッシュ入力価格・pause_turnのcheckpoint・PDF上限までの修正はコミット済み）。
+最新実装HEAD: ec1be6b7（2026-11-16のレビュー7件までの修正はコミット済み）。
 追加レビュー4件は監査100件・HTML原本監査exit 0・Hydrogenの生成失敗／再試行モック・変更Markdown lintが成功。初期化順序や別名ソースの寄与が不明なら未解決とし、textarea等の偽タグを不透明に保つ。Hydrogenは成功時だけ履歴を保存。アプリ全体の再検証は未実行。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices

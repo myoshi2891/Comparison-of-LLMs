@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-15
+Updated 2026-11-16
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+2026-11-16レビュー7件: 原本監査はsrcの分割代入・for-of/in先頭を書き込みとして扱い、遅延実行のrenderに備えてsrc・別名・script textContentへの書き込みをスコープ全体で検出する。dedentは唯一の正規helperへ束縛される場合だけ認定。Moonshotのcached input探索もoutputを越えない。Carbonはツール呼び出しごとに承認ゲートを通す。Fable 5.2はunmount後のchangeを明示的に送り、目次をroleで取得。監査111件・62原本の監査結果不変・pytest143件＋39 subtests・全体240 files／3077 tests・型・Biome657 filesが成功。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-15追加レビュー3件: 原本監査はdocument.querySelectorの一意性を文書全体の要素で確認し、先行する非カードの一致を見逃さない。scriptのtextContentへの代入・複合代入・別名／クエリー経由の書き込みは、古いpayloadを認定せず未解決とする。Carbon料金表はCyber Permissiveの11月単価$4／$20を通常の導入単価から分離。監査109件・HTML原本監査exit 0・Markdown lintと既存料金の維持を確認。詳細はdocs/PROGRESS.mdを参照。
 
@@ -669,7 +671,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3077 tests pass、2026-11-15追加レビュー5件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3077 tests pass、2026-11-16レビュー7件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
