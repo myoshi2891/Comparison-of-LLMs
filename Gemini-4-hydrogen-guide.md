@@ -395,16 +395,17 @@ from google.genai import types
 
 # 呼び出し元で会話ごとに history=[] を作成し、対応する履歴を渡す。他の会話と共有しない。
 def step(client, history, user_msg):
-    history.append({"role": "user", "parts": [{"text": user_msg}]})
+    user_content = {"role": "user", "parts": [{"text": user_msg}]}
+    request_history = [*history, user_content]
     resp = client.models.generate_content(
         model="gemini-4-hydrogen",
-        contents=history,
+        contents=request_history,
         config=types.GenerateContentConfig(
             tools=[],
         ),
     )
     # 重要: 返却された content を加工せずそのまま履歴へ(署名の欠落・要約置換をしない)
-    history.append(resp.candidates[0].content)
+    history.extend([user_content, resp.candidates[0].content])
     return resp
 ```
 
