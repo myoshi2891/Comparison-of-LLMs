@@ -219,8 +219,10 @@ curl -X POST "https://generativelanguage.googleapis.com/v1beta/decisions" \
 ### 5-3. 数値で意思決定する(`noul` の閾値例)
 
 ```python
-def decide_refund(answer: dict) -> str:
+def decide_operation(answer: dict, operation: str) -> str:
     """noul は 0.01〜0.99 に収まるため、0.9 / 0.1 のような余裕ある閾値を使う。"""
+    if operation == "refund":
+        return "needs_review"  # 返金は確率・信頼度にかかわらず人間が判断する
     p = answer["noul"]
     if p >= 0.9:
         return "auto_approve"
@@ -364,7 +366,7 @@ Simon Willison は動画に対して「ドラゴンが映っているか」「�
 | Tier 2 | 5,000 | 4,000,000 | 無制限 |
 | Tier 3 | 15,000 | 10,000,000 | 無制限 |
 
-> 無料枠の入力は Google の製品改善に使われる可能性があり、有料枠は使われない、と料金ページに記載されていると報告されています。機密データは有料枠を使ってください。
+> 無料枠の入力は Google の製品改善に使われる可能性があります。通常の有料サービスでは製品改善に使われない条件がありますが、Contributor Tierやデータ共有へのオプトインなどで扱いが変わるため、有料枠でも一律に対象外とは限りません。機密データを送信する前に、適用される利用枠の[規約](https://ai.google.dev/gemini-api/terms)と[データ共有設定](https://ai.google.dev/gemini-api/docs/logs-policy)を確認してください。
 
 ---
 
