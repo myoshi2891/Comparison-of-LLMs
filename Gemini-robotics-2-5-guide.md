@@ -278,7 +278,10 @@ def parse_json_array(text: str) -> list[dict]:
 def to_pixel(point_yx: list[int], width: int, height: int) -> tuple[int, int]:
     """ER の [y, x](0-1000)を画像のピクセル座標 (x, y) に変換する。"""
     y_norm, x_norm = point_yx
-    return round(x_norm / 1000 * width), round(y_norm / 1000 * height)
+    # [1000, 1000] は round 後に width / height となり画像外を指すため、最終画素へ収める
+    px = min(max(round(x_norm / 1000 * width), 0), width - 1)
+    py = min(max(round(y_norm / 1000 * height), 0), height - 1)
+    return px, py
 ```
 
 ### 7.3 公式の 4 つのベストプラクティス ✅
@@ -301,12 +304,16 @@ def consensus_point(image_path: str, target: str, n: int = 5) -> tuple[float, fl
     for _ in range(n):
         try:
             items = ask_points_for(image_path, target)  # 1 点だけ返させる自作ラッパ
-        except (ValueError, KeyError):
+            if not items:
+                continue
+            point = items[0]["point"]
+            if not isinstance(point, (list, tuple)) or len(point) != 2:
+                continue  # 座標が欠けている・2 要素でない回は捨てる
+            y, x = point
+        except (ValueError, KeyError, TypeError, IndexError):
             continue  # 形式崩れの回は捨てる
-        if items:
-            y, x = items[0]["point"]
-            ys.append(y)
-            xs.append(x)
+        ys.append(y)
+        xs.append(x)
     if len(ys) < max(3, n // 2):  # 有効回答が少なすぎるなら採用しない
         return None
     return statistics.median(ys), statistics.median(xs)
@@ -376,10 +383,13 @@ gripper_decl = types.FunctionDeclaration(
     ),
 )
 tools = types.Tool(function_declarations=[move_decl, gripper_decl])
+ALLOWED_TOOLS = {decl.name for decl in tools.function_declarations}
 
 
 def validate(name: str, args: dict) -> str | None:
     """問題があれば拒否理由を返し、なければ None を返す。モデルの外で必ず実行する。"""
+    if name not in ALLOWED_TOOLS:
+        return f"{name} is not a declared tool"  # 宣言外の名前はロボット SDK へ渡さない
     if name == "move":
         x, y = args["x"], args["y"]
         if not (WORKSPACE["x"][0] <= x <= WORKSPACE["x"][1]):
@@ -412,6 +422,10 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
             if reason:
                 payload = {"status": "rejected", "reason": reason}
             else:
+                # 生成待ちの間に停止された場合に備え、実行直前にも再確認する。
+                # ソフトウェアの確認であり、独立した物理インターロックの代わりではない。
+                if estop_active():
+                    return "aborted: emergency stop"
                 payload = execute_on_robot(fc.name, dict(fc.args))  # 実行結果を返す
             results.append(types.Part.from_function_response(name=fc.name, response=payload))
         contents.append(types.Content(role="user", parts=results))
@@ -486,17 +500,21 @@ HEARTBEAT_TEXT = (
 )
 
 async def heartbeat(session, camera, turn_done: asyncio.Event, interval: float = 1.0):
+    """受信側は turn_complete を受け取ったときに turn_done.set() を呼ぶ。"""
     loop = asyncio.get_running_loop()
+    last_sent = None
     while True:
-        started = loop.time()
+        if last_sent is not None:
+            # 1 FPS 上限は、取得開始ではなく前のフレームを実際に送った時刻から数える
+            await asyncio.sleep(max(0.0, interval - (loop.time() - last_sent)))
         frame = await camera.latest_jpeg()
+        turn_done.clear()        # 古い完了通知で次のハートビートへ進まないよう、送信前に消す
         await session.send_realtime_input(
             video=types.Blob(data=frame, mime_type="image/jpeg")
         )
+        last_sent = loop.time()
         await session.send_realtime_input(text=HEARTBEAT_TEXT)
-        await turn_done.wait()   # 前のターンが終わるまで次を送らない
-        turn_done.clear()
-        await asyncio.sleep(max(0.0, interval - (loop.time() - started)))
+        await turn_done.wait()   # いま送ったターンが終わるまで次を送らない
 ```
 
 ### 9.4 ストリーミングのベストプラクティス
@@ -686,6 +704,11 @@ flowchart TB
 ### 13.3 ASIMOV-Jailbreak を自社パイプラインの回帰テストにする 💡
 
 公式は ASIMOV-Jailbreak を **誰でもダウンロードして使える** とし、Hugging Face で公開しています(`google/asimov_agentic`)。✅
+
+ダウンロードの前に、次の準備をします。
+
+1. Hugging Face にログインした状態でデータセットページを開き、利用条件(アクセス条件)が表示された場合は内容を確認して同意する。
+2. 同じアカウントのアクセストークンで認証する。`huggingface_hub` のログインコマンド(`hf auth login`、旧 CLI では `huggingface-cli login`)を使うか、環境変数 `HF_TOKEN` にトークンを設定する。トークンはコードに直書きしない。
 
 ```bash
 # 例: データセットを取得して、自社の指示パイプライン(入力審査→ER→検証層)に流す
