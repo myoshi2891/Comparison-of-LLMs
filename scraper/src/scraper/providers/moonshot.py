@@ -22,10 +22,12 @@ _KIMI_K2_7_CODE = "Kimi K2.7 Code"
 # レコード終端・次モデルを越えず、outputより前では入力価格の$を許可する。
 _RECORD_GAP = r"(?:(?!</(?:p|div|tr|li|dl|section|article|nav|h[1-6])\b|<dt\b|\bkimi[-\s]?k)[\s\S]){0,80}?"
 _PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
+# cached input の価格を探す間も output ラベルは越えない（output 価格を cached 扱いにしない）。
+_CACHED_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"(?!\boutput\b)[^$]")
 # cached inputの価格はひとまとまりで読み飛ばし、output以降へは進まない。
 _INPUT_PRICE_GAP = _RECORD_GAP.replace(
     r"[\s\S]",
-    rf"(?!\boutput\b)(?:\bcached\s+input{_PRICE_GAP}\$[\d.]+(?![\d.])|(?!\bcached\s+input\b)[^$])",
+    rf"(?!\boutput\b)(?:\bcached\s+input{_CACHED_PRICE_GAP}\$[\d.]+(?![\d.])|(?!\bcached\s+input\b)[^$])",
 )
 
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
