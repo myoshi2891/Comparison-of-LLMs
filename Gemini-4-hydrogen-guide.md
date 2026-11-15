@@ -389,7 +389,8 @@ flowchart TD
 履歴を圧縮するときは、以前の資料を削って後続のthought signatureだけを保持すると会話prefixが変わり、既定の `prefix_mismatch_behavior="ERROR"` ではHTTP 400になり得ます。対応する `ThinkingConfig` の `prefix_mismatch_behavior="DROP"` (Interactions APIでは `generation_config.prefix_mismatch_behavior="drop"`)を使って不一致の署名を破棄させるか、サポートされる新規履歴へのリセットを行ってください。変更していない履歴では引き続き署名をそのまま保持します([公式Hydrogenガイド](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-hydrogen))。
 
 ```python
-# マルチターンでは thought signature を含む履歴を丸ごと再送する(概念コード)
+# テキスト専用のマルチターン例: thought signature を含む履歴を丸ごと再送する
+# ツール呼び出しは扱わない。関数宣言や自動関数呼び出しを追加しないこと。
 from google.genai import types
 
 # 呼び出し元で会話ごとに history=[] を作成し、対応する履歴を渡す。他の会話と共有しない。
@@ -399,7 +400,7 @@ def step(client, history, user_msg):
         model="gemini-4-hydrogen",
         contents=history,
         config=types.GenerateContentConfig(
-            # tools=[...]  # 関数宣言はこのconfig内へ置く
+            tools=[],
         ),
     )
     # 重要: 返却された content を加工せずそのまま履歴へ(署名の欠落・要約置換をしない)
