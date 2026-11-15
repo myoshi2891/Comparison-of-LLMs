@@ -963,3 +963,63 @@ test("does not certify stale script textContent after observed writes", () => {
  const source = `${card}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); const src = script.textContent; mermaid.render('id', src);</script>`;
  assert.equal(audit(source, page).status, 0);
 });
+
+const canonicalDedent = `function dedent(text) {
+        var lines = text.replace(/^\\n+/, '').replace(/\\s+$/, '').split('\\n');
+        var min = Infinity;
+        lines.forEach(function (l) { if (!l.trim()) return; var m = l.match(/^[ \\t]*/)[0].length; if (m < min) min = m; });
+        if (!isFinite(min) || min === 0) return lines.join('\\n');
+        return lines.map(function (l) { return l.slice(min); }).join('\\n');
+      }`;
+
+test("treats destructuring and later writes to src or its sources as unresolved", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const init = `let src = ${JSON.stringify(chart)};`;
+ const select = `const card = document.querySelector('#chart'); const script = card.querySelector('script');`;
+ for (const body of [
+  // 分割代入・for...of は初期化子の値を書き換える。
+  `${init} [src] = ['flowchart LR\\nX --> Y']; mermaid.render('id', src);`,
+  `${init} [[src]] = [[other]]; mermaid.render('id', src);`,
+  `${init} ({ src } = other); mermaid.render('id', src);`,
+  `${init} ({ key: src } = other); mermaid.render('id', src);`,
+  `${init} for (src of others) {} mermaid.render('id', src);`,
+  // 遅延実行の render より前に、文書上は後ろの書き込みが走りうる。
+  `${init} function draw() { mermaid.render('id', src); } src = other; draw();`,
+  `${init} button.addEventListener('click', function () { mermaid.render('id', src); }); src = other;`,
+  `${select} const src = script.textContent; function draw() { mermaid.render('id', src); } script.textContent = other; draw();`,
+  `${select} function draw() { const src = script.textContent; mermaid.render('id', src); } script.textContent = other; draw();`,
+  `const card = document.querySelector('#chart'); function draw() { const src = card.querySelector('script').textContent; mermaid.render('id', src); } card = other; draw();`,
+ ]) {
+  const result = audit(`${card}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+ for (const body of [
+  `${init} mermaid.render('id', src);`,
+  `${init} items[0] = src; mermaid.render('id', src);`,
+  `${select} function draw() { const src = script.textContent; mermaid.render('id', src); } button.textContent = 'copy'; draw();`,
+ ]) assert.equal(audit(`${card}<script>${body}</script>`, page).status, 0, body);
+});
+
+test("requires the dedent call to bind the canonical helper", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const select = `const card = document.querySelector('#chart'); const script = card.querySelector('script');`;
+ const use = `${select} const src = dedent(script.textContent); mermaid.render('id', src);`;
+ for (const body of [
+  `${canonicalDedent} ${use} function dedent(t) { return 'x'; }`,
+  `${canonicalDedent} dedent = function (t) { return 'x'; }; ${use}`,
+  `${canonicalDedent} [dedent] = [other]; ${use}`,
+  `${canonicalDedent} function draw(dedent) { ${use} } draw(other);`,
+  `${canonicalDedent} function draw() { var dedent = other; ${use} } draw();`,
+  `function wrap() { ${canonicalDedent} } ${use}`,
+ ]) {
+  const result = audit(`${card}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+ assert.equal(audit(`${card}<script>${canonicalDedent} ${use}</script>`, page).status, 0);
+});
