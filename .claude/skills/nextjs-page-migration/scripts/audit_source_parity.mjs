@@ -1056,12 +1056,43 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
   blankNonCodeText(rawSource, false, resolution);
   if (resolution.uncertain || resolution.interpolation) return null;
   const executable = blankNonCodeText(literalSource, false);
-  const srcWasRewritten = (before, allowInitializer = false) => {
-    const code = executable.slice(0, before);
-    const initializers = new Set(Array.from(code.matchAll(/\b(?:const|let|var)\s+src\s*=/g),
-      declaration => declaration.index + declaration[0].indexOf("src")));
-    return Array.from(code.matchAll(/\bsrc\s*(?:=(?!=|>)|(?:\*\*|&&|\|\||\?\?|[+\-*/%&|^])=|\+\+|--)/g))
-      .some(write => !allowInitializer || !initializers.has(write.index)) || /(?:\+\+|--)\s*src\b/.test(code);
+  /**
+   * Collect every write to a binding anywhere in the scope: assignments, updates,
+   * for-of/in heads and destructuring targets. Callbacks may run after later
+   * statements, so source order before a render never proves the value.
+   */
+  const writeIndexes = name => {
+    const id = name.replace(/\$/g, "\\$");
+    const found = new Set();
+    for (const m of executable.matchAll(new RegExp(`(?<![\\w$.])${id}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) found.add(m.index);
+    for (const m of executable.matchAll(new RegExp(`(?:\\+\\+|--)\\s*${id}(?![\\w$])`, "g"))) found.add(m.index + m[0].length - name.length);
+    for (const m of executable.matchAll(new RegExp(`\\bfor\\s*\\(\\s*(?:(?:var|let|const)\\s+)?${id}\\s+(?:of|in)\\b`, "g"))) found.add(m.index + m[0].lastIndexOf(name));
+    for (const m of executable.matchAll(new RegExp(`(?<![\\w$.])${id}(?![\\w$])`, "g"))) {
+      // An object key names a property, not this binding.
+      if (/^\s*:/.test(executable.slice(m.index + name.length))) continue;
+      let depth = 0;
+      for (let i = m.index - 1; i >= 0; i--) {
+        const char = executable[i];
+        if (")]}".includes(char)) { depth++; continue; }
+        if (!"([{".includes(char)) continue;
+        if (depth) { depth--; continue; }
+        // Calls/grouping end the pattern; obj[key] = value writes a member.
+        if (char === "(" || (char === "[" && /[\w$)\]]\s*$/.test(executable.slice(0, i)))) break;
+        let close = i + 1;
+        for (let level = 1; close < executable.length; close++) {
+          if ("([{".includes(executable[close])) level++;
+          else if (")]}".includes(executable[close]) && --level === 0) break;
+        }
+        if (/^\s*(?:=(?!=|>)|(?:of|in)\b)/.test(executable.slice(close + 1))) { found.add(m.index); break; }
+      }
+    }
+    return found;
+  };
+  const declarationNames = name => new Set(Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}\\s*=`, "g")),
+    declaration => declaration.index + declaration[0].lastIndexOf(name)));
+  const srcWasRewritten = () => {
+    const initializers = declarationNames("src");
+    return Array.from(writeIndexes("src")).some(write => !initializers.has(write));
   };
   const srcIsPayload = before => {
     // A parameter, catch binding or destructuring can hide the card source.
@@ -1084,10 +1115,12 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       if (!declarations.length) return undefined;
       const d = declarations[0];
       if (declarations.slice(1).some(other => pathAt(other.index).length === pathAt(d.index).length)) return undefined;
-      const writes = new RegExp(`\\b${name}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
-      const initializers = new Set(declarations.map(entry => entry.index + entry[0].indexOf(name)));
-      if (Array.from(executable.slice(0, at).matchAll(writes)).some(write =>
-        pathAt(write.index).every((block, i) => callPath[i] === block) && !initializers.has(write.index))) return undefined;
+      // A redeclaration in the same block, even after this use, can run first in a deferred call.
+      const declarationPath = pathAt(d.index);
+      if (Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}\\s*=`, "g"))).some(other =>
+        other.index !== d.index && pathAt(other.index).join() === declarationPath.join())) return undefined;
+      const initializers = declarationNames(name);
+      if (Array.from(writeIndexes(name)).some(write => !initializers.has(write))) return undefined;
       const start = d.index + d[0].length;
       const end = executable.indexOf(";", start);
       if (end < 0 || end > at) return undefined;
@@ -1095,7 +1128,7 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       return rawSource.slice(start, end).trim();
     };
     const initial = binding("src");
-    if (initial === undefined || srcWasRewritten(before, true)) return false;
+    if (initial === undefined || srcWasRewritten()) return false;
     if (/^['"`]/.test(initial)) {
       if (skipQuoted(initial, 0) !== initial.length - 1) return false;
       const value = decodeQuotedEntryEscapes(initial.slice(1, -1), true);
@@ -1123,6 +1156,15 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       // Recognize the archived renderer's exact, whitespace-only normalization.
       const head = /\bfunction\s+dedent\(text\)\s*\{/.exec(executable);
       if (!head) return false;
+      // The call must bind this one declaration: no second (hoisted) declaration,
+      // parameter, variable or assignment may shadow or replace it, and its
+      // block must enclose every call.
+      const headPath = pathAt(head.index);
+      const references = Array.from(executable.matchAll(/(?<![\w$.])dedent(?![\w$])/g));
+      const declarationAt = head.index + head[0].indexOf("dedent");
+      if (references.some(reference => reference.index !== declarationAt &&
+        (!/^\s*\(/.test(executable.slice(reference.index + 6)) || /\bfunction\s+$/.test(executable.slice(0, reference.index)) ||
+          !headPath.every((block, i) => pathAt(reference.index)[i] === block)))) return false;
       let end = head.index + head[0].length, depth = 1;
       while (end < executable.length && depth) {
         if (executable[end] === "{") depth++;
@@ -1155,16 +1197,16 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       // Reassigned/conditional aliases can still have pointed to this script.
       // Any observed copy is enough to make a later write unresolved.
       const copies = new RegExp(`\\b${reference}\\s*=\\s*([^;]+);`, "g");
-      return Array.from(literalSource.slice(0, at).matchAll(copies))
+      return Array.from(literalSource.matchAll(copies))
         .some(copy => mayBeSelectedScript(copy[1].trim(), copy.index, next));
     };
     // Reading an element binding does not establish its current textContent.
     // Unresolved writes through the element, a DOM query or a known alias block certification.
+    // A deferred read may follow a write placed later in the source, so scan the whole scope.
     const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)\.textContent`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
-    const preceding = literalSource.slice(0, before);
-    return ![...preceding.matchAll(writes), ...preceding.matchAll(prefixWrites)]
+    return ![...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
       .some(write => mayBeSelectedScript(write[1], write.index));
   };
   // Strings/comments are already masked. Balance parentheses so later ASI
