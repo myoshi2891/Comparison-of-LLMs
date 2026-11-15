@@ -688,6 +688,63 @@ test("handles parenthesized source contributions and blocks unsupported CLASSDEF
  }
 });
 
+test("does not certify CLASSDEFS before an invocation initializes it", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const declaration = `var CLASSDEFS = ${JSON.stringify(suffix)};`;
+ const render = "mermaid.render('id', src + CLASSDEFS);";
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ for (const body of [
+  `draw(); ${declaration} function draw() { ${render} }`,
+  `const early = draw; early(); ${declaration} function draw() { ${render} }`,
+  `start(); ${declaration} function draw() { ${render} } function start() { draw(); }`,
+  `start(); ${declaration} function start() { const draw = () => ${render} draw(); }`,
+  `if (enabled) ${declaration} ${render}`,
+  `function draw() { ${declaration} ${render} } draw();`,
+ ]) {
+  // The last case initializes within draw before rendering and is established.
+  const result = audit(`${card}<script>${body}</script>`, page);
+  assert.equal(result.status, body.startsWith('function draw') ? 0 : 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, body.startsWith('function draw') ? [] : ['CLASSDEFS:chart']);
+ }
+});
+
+test("rejects omitted runtime suffixes passed through source aliases", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ for (const body of [
+  'const chart = src + CLASSDEFS; mermaid.render("id", chart);',
+  'const first = src + CLASSDEFS; const chart = first; mermaid.render("id", chart);',
+  'src += CLASSDEFS; mermaid.render("id", src);',
+  'const src = base + CLASSDEFS; mermaid.render("id", src);',
+  'mermaid.render("id", buildChart());',
+ ]) {
+  const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; ${body}</script>`;
+  const result = audit(source, `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("keeps raw-text and RCDATA decoy scripts and cards opaque", () => {
+ for (const tag of ['textarea', 'title', 'style', 'xmp', 'iframe', 'noembed', 'noframes', 'noscript']) {
+  for (const decoy of [
+   '<script type="text/plain">wrong</script>',
+   '</div><div class="code-block"><pre><code></code></pre><script type="text/plain">wrong</script>',
+   '<code></code><script type="text/plain" data-for="real">wrong</script>',
+  ]) {
+   const source = `<div class="code-block"><${tag}>${decoy}</${tag}><pre><code id="real"></code></pre><script type="text/plain">real payload</script></div>`;
+   const result = audit(source, '<pre><code>real payload</code></pre>');
+   assert.equal(result.status, 0, tag + decoy);
+   assert.deepEqual(result.data.counts.codeBlocks, {source: 1, page: 1});
+   assert.deepEqual(audit(source, '').data.missingCodeBlocks, ['real payload']);
+   assert.equal(audit(source, '<pre><code>wrong</code></pre>').status, 1);
+  }
+ }
+});
+
 test("discovers mixed-case HTML card boundaries and inventories the payload", () => {
  const source = '<DiV class="code-block"><pre><code></code></PRE><script type="text/plain">mixed case example</script></dIv>';
  assert.equal(audit(source, '<pre><code>mixed case example</code></pre>').status, 0);

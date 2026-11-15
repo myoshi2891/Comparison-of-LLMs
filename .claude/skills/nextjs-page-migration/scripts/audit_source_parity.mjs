@@ -1016,7 +1016,15 @@ function rendererSuffix(literalSource, rawSource) {
       if (/(?:^|[^\\])(?:\\\\)*\$\{/.test(rawSource.slice(start, start + template[0].length))) return null;
     }
     const names = Array.from(expression.matchAll(/\bCLASSDEFS\b/g));
-    if (names.length === 0) continue;
+    if (names.length === 0) {
+      // A source alias (including a rewritten src) may already carry CLASSDEFS.
+      // Only the base src and literal-only arguments are known suffix-free here;
+      // resolving arbitrary assignments/calls needs data-flow analysis.
+      const base = expression.trim();
+      if (base !== "src" && !/^(?:"[^"\r\n]*"|'[^'\r\n]*'|`[^`]*`)$/.test(base)) return null;
+      if (base === "src" && /\bsrc\s*(?:=(?!=|>)|(?:\*\*|&&|\|\||\?\?|[+\-*/%&|^])=|\+\+|--)/.test(executable)) return null;
+      continue;
+    }
     const unwrap = value => {
       value = value.trim();
       while (value.startsWith("(")) {
@@ -1079,6 +1087,48 @@ function rendererSuffix(literalSource, rawSource) {
   const complete = initializer && /^[ \t]*(?:;|$|[\r\n](?!\s*(?:[([`.+\-*/%<>=!&|^?:,\\]|\b(?:in|instanceof)\b)))/.test(initializerSource.slice(initializer[0].length));
   const literal = complete && initializer[1];
   if (!literal) return null;
+  const initializedAt = declaration.index + initializer[0].length;
+  // An unbraced conditional/loop may skip the initializer. Require an ordinary
+  // statement boundary rather than treating a lexical declaration as dominance.
+  const previous = executable.slice(0, declaration.index).trimEnd().at(-1);
+  if (previous !== undefined && !";{}".includes(previous)) return null;
+  // Source order inside a hoisted function is not execution order. Trace all
+  // references to enclosing named functions (including aliases and callers),
+  // rejecting any activation whose order relative to initialization is unknown.
+  const functions = Array.from(executable.matchAll(/\bfunction(?:\s+([A-Za-z_$][\w$]*))?\s*\([^(){}]*\)\s*\{|(?:\([^(){}]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g), head => {
+    const body = head.index + head[0].length - 1;
+    let depth = 1;
+    let end = body + 1;
+    while (end < executable.length && depth > 0) {
+      if (executable[end] === "{") depth++;
+      else if (executable[end] === "}") depth--;
+      end++;
+    }
+    return { start: head.index, body, end, name: head[1], nameIndex: head[1] ? head.index + head[0].indexOf(head[1], 8) : -1 };
+  });
+  // Unsupported callable syntax needs a parser to prove activation order.
+  if (/=>\s*(?!\s*\{)/.test(executable) || /\bclass\b/.test(executable) ||
+      Array.from(executable.matchAll(/\bfunction\b/g)).some(head => !functions.some(fn => fn.start === head.index))) return null;
+  const checked = new Set();
+  const active = new Set();
+  const followsInitialization = position => {
+    if (position < initializedAt) return false;
+    for (const fn of functions.filter(fn => fn.body < position && position < fn.end && !declarationPath.includes(fn.body))) {
+      if (checked.has(fn)) continue;
+      if (active.has(fn) || fn.start < initializedAt) return false;
+      active.add(fn);
+      if (fn.name) {
+        const references = executable.matchAll(new RegExp(`(?<![\\w$])${fn.name.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
+        for (const reference of references) {
+          if (reference.index !== fn.nameIndex && !followsInitialization(reference.index)) return false;
+        }
+      }
+      active.delete(fn);
+      checked.add(fn);
+    }
+    return true;
+  };
+  if (renderUses.some(use => !followsInitialization(use.call))) return null;
   const parts = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2], true));
   return parts.some(part => part === undefined) ? null : parts.join("");
 }
@@ -1101,9 +1151,17 @@ function matchesCardSelector(tag, selector) {
  */
 function materializePlainTextCards(src) {
   const scripts = [];
+  const opaqueElements = [];
   const unresolvedMermaidSources = [];
-  const stashed = src.replace(/<!--[\s\S]*?-->|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
-    (full, attributes, payload) => {
+  const stashed = src.replace(/<!--[\s\S]*?-->|<(style|xmp|iframe|noembed|noframes|noscript|textarea|title)\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)(?:<\/\1\s*>|$)|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
+    (full, opaqueTag, opaqueAttrs, opaqueContent, attributes, payload) => {
+      if (opaqueTag !== undefined) {
+        // Hide the whole element during script/card/code discovery. Restore its
+        // text with escaped angles so subsequent inventory scans stay opaque.
+        const content = /^(?:textarea|title)$/i.test(opaqueTag) ? opaqueContent : opaqueContent.replace(/&/g, "&amp;");
+        opaqueElements.push(`<${opaqueTag}${opaqueAttrs}>${content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</${opaqueTag}>`);
+        return `\u0000AUDITOPAQUE${opaqueElements.length - 1}\u0000`;
+      }
       if (attributes === undefined) return full.startsWith("<!--") ? "" : full;
       scripts.push({ full, attributes, payload });
       return `<script data-audit-payload="${scripts.length - 1}"></script>`;
@@ -1177,7 +1235,8 @@ function materializePlainTextCards(src) {
   let result = stashed;
   for (const edit of edits.sort((a, b) => b.index - a.index)) result = result.slice(0, edit.index) + edit.value + result.slice(edit.index + edit.length);
   return {
-    html: result.replace(/<script data-audit-payload="(\d+)"><\/script>/g, (_full, index) => scripts[Number(index)].full),
+    html: result.replace(/<script data-audit-payload="(\d+)"><\/script>/g, (_full, index) => scripts[Number(index)].full)
+      .replace(/\u0000AUDITOPAQUE(\d+)\u0000/g, (_full, index) => opaqueElements[Number(index)]),
     unresolvedMermaidSources: unresolvedMermaidSources.reverse(),
   };
 }
