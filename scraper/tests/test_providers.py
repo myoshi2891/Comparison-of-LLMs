@@ -526,6 +526,9 @@ class TestMoonshot:
             # cached input の価格読み飛ばしが output を越えると、後続の batch 価格を入力単価として拾う。
             "<p>Kimi K3 input N/A cached input N/A output $16.50 (batch $8.25)</p>",
             "<p>Kimi K3 cached input N/A output $16.50 (batch $8.25)</p>",
+            # 標準 output が欠ける場合、別フィールドの batch 価格を output として公開しない。
+            "<p>Kimi K3 input $3.25 output N/A batch $8.25</p>",
+            "<p>Kimi K3 input $3.25 output <span>N/A</span> batch output $8.25</p>",
         ],
     )
     def test_output_only_price_preserves_fallback_pair(self, html):
@@ -538,6 +541,9 @@ class TestMoonshot:
         for html in (
             '<p>Kimi K3 cached input $0.25 input $3.25 output $16.50</p>',
             '<dl><dt>Kimi K3</dt><dd>cached input $0.25</dd><dd>input $3.25</dd><dd>output $16.50</dd></dl>',
+            # cached と input の間のインライン HTML も cached ラベルとして読み飛ばす。
+            '<p>Kimi K3 <span>cached</span> input $0.25 input $3.25 output $16.50</p>',
+            '<td>Kimi K3</td><td>cached<br>input $0.25</td><td>input $3.25</td><td>output $16.50</td>',
         ):
             with patch("scraper.providers.moonshot.get_page_text", return_value=html):
                 model = _find(moonshot.scrape(), "Kimi K3")
