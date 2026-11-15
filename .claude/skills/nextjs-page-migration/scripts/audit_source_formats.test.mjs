@@ -338,7 +338,7 @@ test("materializes sibling text/plain code payloads without parsing literal mark
 test("collects sibling diagram payloads and concatenated runtime CLASSDEFS in document order", () => {
  const charts=['flowchart LR\nA --> B','flowchart TD\nB --> C','flowchart LR\nA --> B'];
  const suffix='\nclassDef hub fill:#fff;\nclassDef box color:#000;';
- const source=charts.map(s=>`<div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('')+`<script>var CLASSDEFS = '\\nclassDef hub fill:#fff;' + '\\nclassDef box color:#000;'; mermaid.render('x', src + CLASSDEFS);</script>`;
+ const source=charts.map(s=>`<div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('')+`<script>var CLASSDEFS = '\\nclassDef hub fill:#fff;' + '\\nclassDef box color:#000;'; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); }</script>`;
  const page=charts.map((s,i)=>`const D${i} = ${JSON.stringify(s+suffix)};`).join('\n')+charts.map((_,i)=>`<MermaidDiagram chart={D${i}} />`).join('');
  const result=audit(source,page);
  assert.equal(result.status,0);
@@ -349,7 +349,7 @@ test("collects sibling diagram payloads and concatenated runtime CLASSDEFS in do
 
 test("ignores commented cards and does not apply unrelated CLASSDEFS to diagrams", () => {
  const chart='flowchart LR\nA --> B';
- const source=`<!-- <div class="diagram-card"><script type="text/plain">flowchart TD\nWRONG --> WRONG</script></div> --><div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${chart}</script></div><script>var CLASSDEFS = 'unused'; mermaid.render('id',src);</script>`;
+ const source=`<!-- <div class="diagram-card"><script type="text/plain">flowchart TD\nWRONG --> WRONG</script></div> --><div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${chart}</script></div><script>const src = ${JSON.stringify(chart)}; var CLASSDEFS = 'unused'; mermaid.render('id',src);</script>`;
  const page=`const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
  assert.equal(audit(source,page).status,0);
  assert.equal(audit(source,'').status,1);
@@ -358,7 +358,7 @@ test("ignores commented cards and does not apply unrelated CLASSDEFS to diagrams
 test("keeps literal dollar replacement sequences in diagram payloads and suffixes", () => {
  const chart = 'flowchart LR\nA["$$x$$ $& $` $\u0027"] --> B';
  const suffix = '\nclassDef box fill:#fff; %% $$suffix$$ $& $` $\u0027';
- const source = `<div class="diagram-card"><script type="text/plain">${chart}</script></div><script>const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
+ const source = `<div class="diagram-card"><script type="text/plain">${chart}</script></div><script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
  const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
  assert.equal(audit(source, page).status, 0);
  assert.equal(audit(source, page.replace('$$x$$', '$x$')).status, 1);
@@ -375,7 +375,7 @@ test("restores CLASSDEFS only from uncommented executable scripts", () => {
  const chart = 'flowchart LR\nA --> B';
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const declaration = "const CLASSDEFS = '\\nclassDef box fill:#fff;';";
- const render = "mermaid.render('id', src + CLASSDEFS);";
+ const render = `const src = ${JSON.stringify(chart)}; mermaid.render('id', src + CLASSDEFS);`;
  const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
  for (const example of [
   `<!-- <script>${render}</script> -->`,
@@ -418,7 +418,7 @@ test("ignores quoted render examples and quoted CLASSDEFS declarations", () => {
  const suffix = '\nclassDef box fill:#fff;';
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)};`;
- const render = "mermaid.render('id', src + CLASSDEFS);";
+ const render = `const src = ${JSON.stringify(chart)}; mermaid.render('id', src + CLASSDEFS);`;
  const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
  for (const example of [JSON.stringify(render), "'mermaid.render(id, src + CLASSDEFS)'", '`mermaid.render(id, src + CLASSDEFS)`']) {
   const source = `${card}<script>${declaration}${example};</script>`;
@@ -451,13 +451,13 @@ test("accepts complete CLASSDEFS literals terminated by semicolons or ASI", () =
  const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
  for (const initializer of [JSON.stringify(suffix), `'\\nclassDef box ' +\n'fill:#fff;'`]) {
   for (const end of [';', '\n', ' // ASI\n']) {
-   const source = `${card}<script>const CLASSDEFS = ${initializer}${end}mermaid.render('id', src + CLASSDEFS);</script>`;
+   const source = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = ${initializer}${end}mermaid.render('id', src + CLASSDEFS);</script>`;
    assert.equal(audit(source, page(chart + suffix)).status, 0, initializer + end);
    assert.equal(audit(source, page(chart)).status, 1, initializer + end);
   }
  }
  for (const tail of [' + dynamic;', '\n+ dynamic;', '\n.trim();', '\n[0];', '\n`tagged`;', '\n? "yes" : "no";', '\ninstanceof String;']) {
-  const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}${tail}mermaid.render('id', src + CLASSDEFS);</script>`;
+  const source = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = ${JSON.stringify(suffix)}${tail}mermaid.render('id', src + CLASSDEFS);</script>`;
   const result = audit(source, page(chart));
   assert.equal(result.status, 1, tail);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0']);
@@ -469,9 +469,9 @@ test("distinguishes an empty CLASSDEFS literal from an unresolved runtime initia
  const chart = 'flowchart LR\nA --> B';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
- assert.equal(audit(`${card}<script>const CLASSDEFS = ''; mermaid.render('id', src + CLASSDEFS);</script>`, page).status, 0);
+ assert.equal(audit(`${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = ''; mermaid.render('id', src + CLASSDEFS);</script>`, page).status, 0);
  for (const declaration of ['', 'const CLASSDEFS = dynamic;', 'const CLASSDEFS = buildStyles();', 'const CLASSDEFS = `dynamic ${value}`;']) {
-  const result = audit(`${card}<script>${declaration} mermaid.render('id', src + CLASSDEFS);</script>`, page);
+  const result = audit(`${card}<script>const src = ${JSON.stringify(chart)}; ${declaration} mermaid.render('id', src + CLASSDEFS);</script>`, page);
   assert.equal(result.status, 1, declaration);
   assert.equal(result.data.blocking, true);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
@@ -484,14 +484,14 @@ test("masks regex literals before their quotes can hide CLASSDEFS or render call
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
  for (const prefix of ['const quote = /"/;', "const quote = /'/;", 'const quote = /["/]/g;', String.raw`const quote = /\/'/;`, 'const ratio = total / count; const quote = /"/;', 'const ratio = {} / total / count; const quote = /"/;', 'if (ready) {} /"/.test(text);', 'const quote = /mermaid.render(id, src + CLASSDEFS)/;']) {
-  const source = `${card}<script>${prefix} const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
+  const source = `${card}<script>const src = ${JSON.stringify(chart)}; ${prefix} const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
   assert.equal(audit(source, page(chart + suffix)).status, 0, prefix);
   assert.equal(audit(source, page(chart)).status, 1, prefix);
  }
- const decoy = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const example = /mermaid.render(id, src + CLASSDEFS)/;</script>`;
+ const decoy = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = ${JSON.stringify(suffix)}; const example = /mermaid.render(id, src + CLASSDEFS)/;</script>`;
  assert.equal(audit(decoy, page(chart)).status, 0);
  for (const expression of ['{} / (CLASSDEFS = "changed") / 2', 'function () {} / (CLASSDEFS = "changed") / 2']) {
-  const source = `${card}<script>let CLASSDEFS = ''; const ratio = ${expression}; mermaid.render('id', src + CLASSDEFS);</script>`;
+  const source = `${card}<script>const src = ${JSON.stringify(chart)}; let CLASSDEFS = ''; const ratio = ${expression}; mermaid.render('id', src + CLASSDEFS);</script>`;
   const result = audit(source, page(chart));
   assert.equal(result.status, 1, expression);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0']);
@@ -514,7 +514,7 @@ test("does not infer CLASSDEFS from code after a semicolon-free render call", ()
  const chart = 'flowchart LR\nA --> B';
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
- const source = `${card}<script>const CLASSDEFS = '\\nclassDef box fill:#fff;'; mermaid.render('id', src)\nconsume(src + CLASSDEFS)</script>`;
+ const source = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = '\\nclassDef box fill:#fff;'; mermaid.render('id', src)\nconsume(src + CLASSDEFS)</script>`;
  assert.equal(audit(source, page).status, 0);
  assert.equal(audit(source, '').status, 1);
 });
@@ -557,12 +557,12 @@ test("blocks unestablished renderer associations including unsupported card sele
  const card = `<div id="chart" class="diagram-card" data-chart><script type="text/plain">${chart}</script></div>`;
  const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
  for (const selector of ["'.diagram-card[data-chart]'", 'selector']) {
-  const source = `${card}<script>const CLASSDEFS = '\\nclassDef box fill:#fff;'; document.querySelectorAll(${selector}); mermaid.render('id', src + CLASSDEFS);</script>`;
+  const source = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = '\\nclassDef box fill:#fff;'; document.querySelectorAll(${selector}); mermaid.render('id', src + CLASSDEFS);</script>`;
   const result = audit(source, page);
   assert.equal(result.status, 1);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['renderer:chart']);
  }
- const noSuffix = `${card}<script>document.querySelector('#chart'); mermaid.render('id', src);</script>`;
+ const noSuffix = `${card}<script>const src = ${JSON.stringify(chart)}; document.querySelector('#chart'); mermaid.render('id', src);</script>`;
  assert.equal(audit(noSuffix, page).status, 0);
 });
 
@@ -581,7 +581,7 @@ test("does not certify the initializer when CLASSDEFS is later reassigned", () =
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
  for (const assignment of ["CLASSDEFS = 'different';", 'CLASSDEFS = dynamic;', "CLASSDEFS += 'extra';"]) {
-  const source = `${card}<script>let CLASSDEFS = ${JSON.stringify(suffix)}; ${assignment} mermaid.render('id', src + CLASSDEFS);</script>`;
+  const source = `${card}<script>const src = ${JSON.stringify(chart)}; let CLASSDEFS = ${JSON.stringify(suffix)}; ${assignment} mermaid.render('id', src + CLASSDEFS);</script>`;
   const result = audit(source, page);
   assert.equal(result.status, 1, assignment);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
@@ -614,12 +614,12 @@ test("decodes hexadecimal and Unicode CLASSDEFS escapes to runtime characters", 
   [String.raw`\nclassDef \u{62}ox fill:#fff;`, '\nclassDef box fill:#fff;'],
   [String.raw`\nclassDef box fill:#fff; %% \uD83D\uDE80`, '\nclassDef box fill:#fff; %% 🚀'],
  ]) {
-  const source = `${card}<script>const CLASSDEFS = '${raw}'; mermaid.render('id', src + CLASSDEFS);</script>`;
+  const source = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = '${raw}'; mermaid.render('id', src + CLASSDEFS);</script>`;
   assert.equal(audit(source, page(chart + suffix)).status, 0, raw);
   assert.equal(audit(source, page(chart + raw)).status, 1, raw);
  }
  for (const raw of [String.raw`\xG1`, String.raw`\uZZZZ`, String.raw`\u{110000}`, String.raw`\1`]) {
-  const source = `${card}<script>const CLASSDEFS = '${raw}'; mermaid.render('id', src + CLASSDEFS);</script>`;
+  const source = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = '${raw}'; mermaid.render('id', src + CLASSDEFS);</script>`;
   const result = audit(source, page(chart + raw));
   assert.equal(result.status, 1, raw);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
@@ -640,7 +640,7 @@ test("does not certify an outer CLASSDEFS when a render binding is shadowed or o
  const chart = 'flowchart LR\nA --> B';
  const suffix = '\nclassDef box fill:#fff;';
  const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)};`;
- const render = "mermaid.render('id', src + CLASSDEFS);";
+ const render = `const src = ${JSON.stringify(chart)}; mermaid.render('id', src + CLASSDEFS);`;
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
  for (const body of [
@@ -660,7 +660,7 @@ test("keeps separately parsed scripts apart before a following IIFE", () => {
  const chart = 'flowchart LR\nA --> B';
  const suffix = '\nclassDef box fill:#fff;';
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
- const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)}`;
+ const declaration = `const src = ${JSON.stringify(chart)}; const CLASSDEFS = ${JSON.stringify(suffix)}`;
  const iife = "(() => { mermaid.render('id', src + CLASSDEFS); })();";
  const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
  assert.equal(audit(`${card}<script>${declaration}</script><script>${iife}</script>`, page).status, 0);
@@ -671,7 +671,7 @@ test("only the diagram-source argument can contribute CLASSDEFS", () => {
  const chart = 'flowchart LR\nA --> B';
  const suffix = '\nclassDef box fill:#fff;';
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
- const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render(src + CLASSDEFS, src);</script>`;
+ const source = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render(src + CLASSDEFS, src);</script>`;
  const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
  assert.equal(audit(source, page(chart)).status, 0);
  assert.equal(audit(source, page(chart + suffix)).status, 1);
@@ -681,7 +681,7 @@ test("handles parenthesized source contributions and blocks unsupported CLASSDEF
  const chart = 'flowchart LR\nA --> B';
  const suffix = '\nclassDef box fill:#fff;';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
- const source = expression => `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render(makeId('a', 'b'), ${expression});</script>`;
+ const source = expression => `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render(makeId('a', 'b'), ${expression});</script>`;
  const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
  for (const expression of ['src + (CLASSDEFS)', '((src) + ((CLASSDEFS)))']) {
   assert.equal(audit(source(expression), page(chart + suffix)).status, 0);
@@ -699,7 +699,7 @@ test("does not certify CLASSDEFS before an invocation initializes it", () => {
  const suffix = '\nclassDef box fill:#fff;';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const declaration = `var CLASSDEFS = ${JSON.stringify(suffix)};`;
- const render = "mermaid.render('id', src + CLASSDEFS);";
+ const render = `const src = ${JSON.stringify(chart)}; mermaid.render('id', src + CLASSDEFS);`;
  const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
  for (const body of [
   `draw(); ${declaration} function draw() { ${render} }`,
@@ -789,7 +789,7 @@ test("verifies render literals against the owning card payload", () => {
  const other = 'flowchart LR\nX --> Y';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
- const unrelated = audit(`${card}<script>mermaid.render('id', 'src + CLASSDEFS');</script>`, page);
+ const unrelated = audit(`${card}<script>const src = ${JSON.stringify(chart)}; mermaid.render('id', 'src + CLASSDEFS');</script>`, page);
  assert.equal(unrelated.status, 1);
  assert.deepEqual(unrelated.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  for (const quote of ['"', "'", '`']) {
@@ -831,7 +831,7 @@ test("keeps executable template interpolations unresolved through scope discover
   assert.equal(result.status, 1, expression);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
- const literal = `${card}<script>const example = \`literal mermaid.render("id", src + CLASSDEFS)\`;</script>`;
+ const literal = `${card}<script>const src = ${JSON.stringify(chart)}; const example = \`literal mermaid.render("id", src + CLASSDEFS)\`;</script>`;
  assert.equal(audit(literal, page).status, 0);
 });
 
@@ -843,5 +843,37 @@ test("rejects comment-only migrated code instead of accepting an undisplayed car
   assert.equal(result.status, 1, comment);
   assert.deepEqual(result.data.missingCodeBlocks, [payload]);
   assert.equal(audit(source, `<pre><code>{${JSON.stringify(payload)}}</code></pre>`).status, 0);
+ }
+});
+
+test("rejects shadowed or unestablished src bindings and accepts the selected script initializer", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ for (const addition of ['', ' + CLASSDEFS']) {
+  const page = `const D = ${JSON.stringify(chart + (addition ? suffix : ''))}; <MermaidDiagram chart={D} />`;
+  for (const body of [
+   `mermaid.render('id', src${addition});`,
+   `function draw(src) { mermaid.render('id', src${addition}); } draw('other');`,
+   `const draw = (src) => { mermaid.render('id', src${addition}); }; draw('other');`,
+   `const draw = src => { mermaid.render('id', src${addition}); }; draw('other');`,
+   `const src = 'other'; mermaid.render('id', src${addition});`,
+   `const src = readUnknown(); mermaid.render('id', src${addition});`,
+   `const src = ${JSON.stringify(chart)}; function draw(src) { mermaid.render('id', src${addition}); }`,
+   `function unrelated() { const src = ${JSON.stringify(chart)}; } mermaid.render('id', src${addition});`,
+   `const card = document.querySelector('#other'); const src = card.querySelector('script').textContent; mermaid.render('id', src${addition});`,
+   `const card = document.querySelector('#chart'); function draw(card) { const src = card.querySelector('script').textContent; mermaid.render('id', src${addition}); }`,
+   `const card = document.querySelector('#chart'); card = other; const src = card.querySelector('script').textContent; mermaid.render('id', src${addition});`,
+  ]) {
+   const result = audit(`${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; ${body}</script>`, page);
+   assert.equal(result.status, 1, body);
+   assert.deepEqual(result.data.unresolvedMermaidSources, [body.includes("querySelector('#other')") ? 'renderer:chart' : 'CLASSDEFS:chart']);
+  }
+  const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#chart'); const src = card.querySelector('script[type="text/plain"]').textContent; mermaid.render('id', src${addition});</script>`;
+  assert.equal(audit(source, page).status, 0, addition);
+  const wrongScript = source.replace('<script type="text/plain">', '<script type="text/plain" data-for="other">flowchart LR\nX --> Y</script><script type="text/plain">');
+  const result = audit(wrongScript, page);
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
 });
