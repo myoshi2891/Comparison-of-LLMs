@@ -500,6 +500,8 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
         if data["stop_reason"] == "refusal":
             return data  # 12章の方針で処理する
         if data["stop_reason"] == "pause_turn":
+            if checkpoint is not None:
+                checkpoint["messages"] = messages
             continue
         if data["stop_reason"] != "tool_use":
             return data

@@ -94,6 +94,40 @@ for reason in ("end_turn", "refusal", "max_tokens"):
   );
 });
 
+it("agent_loopはpause_turnを次のAPI失敗前に保存し、同じ履歴で再開する", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+paused = {"stop_reason": "pause_turn", "content": [{"type": "thinking", "signature": "kept"}]}
+done = {"stop_reason": "end_turn", "content": []}
+checkpoint, requests = {}, []
+def call(body):
+    requests.append(copy.deepcopy(body))
+    if len(requests) == 1:
+        return paused
+    if len(requests) == 2:
+        assert checkpoint["messages"] == body["messages"]
+        raise RuntimeError("API failed")
+    return done
+scope = {"call": call}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+try:
+    scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=checkpoint)
+except RuntimeError as error:
+    assert str(error) == "API failed"
+else:
+    raise AssertionError("expected API failure")
+assert checkpoint["messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused["content"]}]
+assert checkpoint["messages"][-1]["content"] is paused["content"]
+assert scope["agent_loop"]("task", [], None, max_turns=1, checkpoint=checkpoint) is done
+assert requests[1]["messages"] == requests[2]["messages"]
+`,
+    examples()
+  );
+});
+
 it("agent_loopの各リクエストがトップレベルのキャッシュを有効にする", () => {
   python(
     `

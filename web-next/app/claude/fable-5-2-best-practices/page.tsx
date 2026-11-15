@@ -3277,6 +3277,22 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"            "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                checkpoint["}
+                    <span className="hljs-string">{'"messages"'}</span>
+                    {"] = messages"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
                     <span className="hljs-keyword">{"continue"}</span>
                   </span>
                   {"\n"}
