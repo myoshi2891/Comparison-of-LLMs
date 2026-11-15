@@ -809,7 +809,7 @@ test("does not apply a suffixed call to suffix-free calls in the same scope", ()
   'mermaid.render("a", src); mermaid.render("b", src + CLASSDEFS);',
   'mermaid.render("b", src + CLASSDEFS); mermaid.render("a", src);',
  ]) {
-  const source = `${cards}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; document.querySelector('#one'); document.querySelector('#two'); ${calls}</script>`;
+  const source = `${cards}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const src = ${JSON.stringify(chart)}; document.querySelector('#one'); document.querySelector('#two'); ${calls}</script>`;
   const page = ['D1', 'D2'].map(id => `const ${id} = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={${id}} />`).join('');
   const result = audit(source, page);
   assert.equal(result.status, 1);
