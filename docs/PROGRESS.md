@@ -6,6 +6,15 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 図ソース・テンプレート補間・ガイド例の追加レビュー7件（2026-11-15）
+
+- 7件すべて現行コードで有効と確認して最小修正。スキップなし。監査の追加3テストで修正前失敗を実測。既存fixtureで無関係な文字列をrenderするケースを正常とした期待値は、今回指定されたリテラル照合の仕様に合わせて拒否側へ移した。引用されたrenderの説明文字列は引き続き実行呼び出しと区別する。コミットは作成しない。
+- renderの文字列リテラルはエスケープを復号し、カードpayloadとの正規化一致を確認してからそのpayloadを実体化。接尾辞あり／なしの呼び出しが混在し、スコープ単位のセレクターではカードへの対応を特定できない場合は、すべて未解決とする。順序を逆にしたfixtureも検証。
+- テンプレートの静的本文だけをマスクし、実行される補間は再帰的に走査して位置・入れ子・式内の文字列を保持。解決できない補間を含むスコープはrendererフィルターで捨てず、未解決として完了判定を止める。静的なテンプレート内のrender様文字列は発見対象にしない。
+- Carbonの移行表とフローへfrequency_penalty・presence_penalty削除、candidate_count省略または1への調整を追加。既存samplingパラメータの確認を保持。HydrogenはMAX_TOKENS処理を維持し、STOPかつ有効なテキストcontentだけを履歴へ加工せず保存。SAFETYなど他の終了理由や空contentでは履歴を変更しない。バックグラウンド例は状態判定を変えず、全model_outputステップ内のtextを順序どおり連結。
+- Decisionsの入力種別を保持し、共有inputと全質問のinstructions・criteriaを合わせて最大262,144トークンと明記。Googleの移行資料・Interactions APIのstep定義・Decisionsの上限定義と照合。
+- 検証: 監査103件、FableのHTML原本監査exit 0、ガイド例の終了理由・履歴同一性・空content・複数model_outputのモック、Mermaid24図解析、Carbon／Hydrogen／管理文書のMarkdown lint、差分検査が成功。Decisionsの既存MD025 1件は不変。web-next・scraperの実装と依存・設定は無変更のため全体テスト・型・Biome・pytest・ビルドは再実行していない。直前の全体実測は240 files／3076 tests、pytest139件＋39 subtests。前回のビルドはTurbopackのローカルポート制限で失敗。実APIは呼び出していない。
+
 ## スキャナー・承認経路・入力検証などのレビュー12件（2026-11-15）
 
 - 重複欄のHydrogen履歴例を含む12件すべてを現行コードで確認して修正。スキップなし。監査の既存fixtureを拡張し、MoonshotとFableの回帰テストを追加して修正前失敗を確認。コミットは作成しない。
@@ -908,6 +917,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
+追加レビュー7件は未コミットで修正済み。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析成功。冒頭の追加レビュー7件の節を参照。web-next／scraperの実装は無変更で、全体検証は前回実測を維持。
 今回のレビュー12件は未コミットで修正済み。冒頭のレビュー12件の節を参照。全体Vitest240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtests・型・Biome・HTML原本監査exit 0が成功。ビルドはTurbopackのローカルポート制限で失敗（再実行でも同じ）。
 最新実装HEAD: f73087cf（前回レビュー4件の記録同期。今回の追加レビュー4件の修正は未コミット。冒頭の追加レビュー4件の節を参照）。
 追加レビュー4件は監査100件・HTML原本監査exit 0・Hydrogenの生成失敗／再試行モック・変更Markdown lintが成功。初期化順序や別名ソースの寄与が不明なら未解決とし、textarea等の偽タグを不透明に保つ。Hydrogenは成功時だけ履歴を保存。アプリ全体の再検証は未実行。

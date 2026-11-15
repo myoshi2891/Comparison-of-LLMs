@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-15追加レビュー7件: 原本監査はrenderのリテラル図ソースをカード本文と照合し、接尾辞あり／なしの呼び出しをカードへ対応付けられない場合は未解決とする。テンプレート補間の実行コードを発見対象に残し、未解決スコープを除外しない。Carbonの移行パラメータ、HydrogenのSTOP限定履歴保存と全model_output本文集約、Decisionsの質問込み262,144トークン上限を訂正。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析が成功。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-15レビュー12件: 原本監査はobject式後の除算と文ブロック後の正規表現を区別し、分類不明のslashとrender前のsrc再代入を未解決とする。Carbon／Decisionsは承認・リスク判定を実行前へ移動。Hydrogenはコード入力とMAX_TOKENS時の履歴不変を追加。Moonshotは兄弟ddの価格を取得し、Fableはpause_turnで応答履歴をそのまま再送する。全体240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtests・型・Biome・HTML監査が成功。ビルドはTurbopackのローカルポート制限で失敗。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-15追加レビュー4件: 原本監査はCLASSDEFSの初期化とrendererへ至る呼び出し順を確認し、別名経由の図ソースは確定できなければ未解決とする。textarea等のraw-text／RCDATA内のscript・カード様文字列は不透明に保ち、実payloadを保持。Hydrogenは一時履歴で生成を要求し、成功時だけ署名付き応答と入力を保存する。監査100件・FableのHTML原本監査exit 0・失敗／再試行モックが成功。詳細はdocs/PROGRESS.mdを参照。
