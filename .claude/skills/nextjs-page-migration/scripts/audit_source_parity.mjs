@@ -1074,24 +1074,24 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       }
       return path;
     };
-    const callPath = pathAt(before);
-    const binding = name => {
+    const binding = (name, at = before) => {
+      const callPath = pathAt(at);
       const hidden = new RegExp(`\\b(?:function\\b[^()]*|catch)\\s*\\([^)]*\\b${name}\\b|\\([^)]*\\b${name}\\b[^)]*\\)\\s*=>|\\b${name}\\s*=>`);
       if (hidden.test(executable) || /\bclass\b/.test(executable)) return undefined;
       const declarations = Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}\\s*=`, "g")))
-        .filter(d => d.index < before && pathAt(d.index).every((block, i) => callPath[i] === block));
+        .filter(d => d.index < at && pathAt(d.index).every((block, i) => callPath[i] === block));
       declarations.sort((a, b) => pathAt(b.index).length - pathAt(a.index).length);
       if (!declarations.length) return undefined;
       const d = declarations[0];
       if (declarations.slice(1).some(other => pathAt(other.index).length === pathAt(d.index).length)) return undefined;
       const writes = new RegExp(`\\b${name}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
       const initializers = new Set(declarations.map(entry => entry.index + entry[0].indexOf(name)));
-      if (Array.from(executable.slice(0, before).matchAll(writes)).some(write =>
+      if (Array.from(executable.slice(0, at).matchAll(writes)).some(write =>
         pathAt(write.index).every((block, i) => callPath[i] === block) && !initializers.has(write.index))) return undefined;
       const start = d.index + d[0].length;
       const end = executable.indexOf(";", start);
-      if (end < 0 || end > before) return undefined;
-      if (!initializerRunsBefore(executable, d.index, end, pathAt(d.index), [before])) return undefined;
+      if (end < 0 || end > at) return undefined;
+      if (!initializerRunsBefore(executable, d.index, end, pathAt(d.index), [at])) return undefined;
       return rawSource.slice(start, end).trim();
     };
     const initial = binding("src");
@@ -1103,15 +1103,15 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
     }
     // Only follow a selected card's text/plain script, optionally through an alias.
     const query = /^(\w+)\.querySelector\(\s*(['"])(.*?)\2\s*\)$/;
-    const scriptElement = value => {
+    const scriptElement = (value, at = before) => {
       const selected = query.exec(value);
       if (!selected || !/^script(?:\[type=['"]?text\/plain['"]?\])?$/.test(selected[3])) return false;
       if (!(selected[3] === "script" ? selectedScript.any : selectedScript.plain)) return false;
-      const owner = binding(selected[1]);
+      const owner = binding(selected[1], at);
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
       if (direct) return selectedScript.unique(direct[2]);
       const indexed = owner && /^(\w+)\[(\w+)\]$/.exec(owner);
-      const collection = indexed && binding(indexed[1]);
+      const collection = indexed && binding(indexed[1], at);
       const all = collection && /^document\.querySelectorAll\(\s*(['"])(.*?)\1\s*\)$/.exec(collection);
       // The supported indexed traversal visits the selected cards in order.
       return !!all && matchesCardSelector(cardTag, all[2]) &&
@@ -1141,7 +1141,31 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
     }
     if (!value.endsWith(".textContent")) return false;
     const element = value.slice(0, -12).trim();
-    return scriptElement(element) || (/^\w+$/.test(element) && scriptElement(binding(element) ?? ""));
+    const isSelectedScript = (reference, at = before, seen = new Set()) => {
+      if (scriptElement(reference, at)) return true;
+      if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
+      seen.add(reference);
+      return isSelectedScript(binding(reference, at) ?? "", at, seen);
+    };
+    if (!isSelectedScript(element)) return false;
+    const mayBeSelectedScript = (reference, at, seen = new Set()) => {
+      if (isSelectedScript(reference, at)) return true;
+      if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
+      const next = new Set(seen).add(reference);
+      // Reassigned/conditional aliases can still have pointed to this script.
+      // Any observed copy is enough to make a later write unresolved.
+      const copies = new RegExp(`\\b${reference}\\s*=\\s*([^;]+);`, "g");
+      return Array.from(literalSource.slice(0, at).matchAll(copies))
+        .some(copy => mayBeSelectedScript(copy[1].trim(), copy.index, next));
+    };
+    // Reading an element binding does not establish its current textContent.
+    // Unresolved writes through the element, a DOM query or a known alias block certification.
+    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)\.textContent`;
+    const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
+    const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
+    const preceding = literalSource.slice(0, before);
+    return ![...preceding.matchAll(writes), ...preceding.matchAll(prefixWrites)]
+      .some(write => mayBeSelectedScript(write[1], write.index));
   };
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
@@ -1285,17 +1309,23 @@ function matchesCardSelector(tag, selector) {
 function materializePlainTextCards(src) {
   const scripts = [];
   const opaqueElements = [];
+  const documentElements = [];
   const unresolvedMermaidSources = [];
   const stashed = src.replace(/<!--[\s\S]*?-->|<(style|xmp|iframe|noembed|noframes|noscript|textarea|title)\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)(?:<\/\1\s*>|$)|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
     (full, opaqueTag, opaqueAttrs, opaqueContent, attributes, payload) => {
       if (opaqueTag !== undefined) {
+        documentElements.push(`<${opaqueTag}${opaqueAttrs}>`);
         // Hide the whole element during script/card/code discovery. Restore its
         // text with escaped angles so subsequent inventory scans stay opaque.
         const content = /^(?:textarea|title)$/i.test(opaqueTag) ? opaqueContent : opaqueContent.replace(/&/g, "&amp;");
         opaqueElements.push(`<${opaqueTag}${opaqueAttrs}>${content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</${opaqueTag}>`);
         return `\u0000AUDITOPAQUE${opaqueElements.length - 1}\u0000`;
       }
-      if (attributes === undefined) return full.startsWith("<!--") ? "" : full;
+      if (attributes === undefined) {
+        if (/^<[A-Za-z]/.test(full)) documentElements.push(full);
+        return full.startsWith("<!--") ? "" : full;
+      }
+      documentElements.push(`<script${attributes}>`);
       scripts.push({ full, attributes, payload });
       return `<script data-audit-payload="${scripts.length - 1}"></script>`;
     });
@@ -1368,7 +1398,7 @@ function materializePlainTextCards(src) {
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
       const resolvedSuffix = renderer && rendererSuffix(renderer.literalSource, renderer.rawSource, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
-          unique: selector => matchesCardSelector(card.openingTag, selector) && cards.filter(candidate => matchesCardSelector(candidate.openingTag, selector)).length === 1 });
+          unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 });
       if (resolvedSuffix === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
       const suffix = resolvedSuffix ?? "";
       edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(payload + suffix)}</div>` });

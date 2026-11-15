@@ -919,3 +919,47 @@ test("uses descendant script order for runtime selection while retaining nearest
   assert.deepEqual(ownFirst.data.unresolvedMermaidSources, ['renderer:child']);
  }
 });
+
+test("requires document-wide uniqueness for selected card elements", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ for (const selector of ['#chart', '.diagram-card']) {
+  const runtime = `<script>const card = document.querySelector('${selector}'); const src = card.querySelector('script').textContent; mermaid.render('id', src);</script>`;
+  for (const decoy of [
+   '<section id="chart" class="diagram-card-other"></section>',
+   '<aside id="chart" class="diagram-card"></aside>',
+   '<textarea id="chart" class="diagram-card">text</textarea>',
+   '<script id="chart" class="diagram-card" type="text/plain">other</script>',
+  ]) {
+   if (selector === '.diagram-card' && decoy.includes('diagram-card-other')) continue;
+   const result = audit(decoy + card + runtime, page);
+   assert.equal(result.status, 1, selector + decoy);
+   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+  }
+  assert.equal(audit(card + runtime, page).status, 0);
+ }
+});
+
+test("does not certify stale script textContent after observed writes", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ for (const write of [
+  'script.textContent = "flowchart LR\\nX --> Y";',
+  'script.textContent += "changed";',
+  'const alias = script; alias.textContent = other;',
+  'let alias = script; if (enabled) alias = other; alias.textContent = other;',
+  'let alias; alias = script; alias.textContent = other;',
+  'card.querySelector("script").textContent = other;',
+  'if (enabled) { script.textContent = other; }',
+  'if (enabled) { const alias = script; alias.textContent = other; }',
+ ]) {
+  const source = `${card}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); ${write} const src = script.textContent; mermaid.render('id', src);</script>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 1, write);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+ const source = `${card}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); const src = script.textContent; mermaid.render('id', src);</script>`;
+ assert.equal(audit(source, page).status, 0);
+});
