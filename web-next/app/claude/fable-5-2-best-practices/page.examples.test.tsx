@@ -70,6 +70,30 @@ for usage, price in (
   );
 });
 
+it("agent_loopはpause_turnの履歴をそのまま再送し、他の終了理由は返す", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+for reason in ("end_turn", "refusal", "max_tokens"):
+    requests = []
+    paused = {"stop_reason": "pause_turn", "content": [{"type": "server_tool_use", "id": "s1", "name": "search", "input": {}}, {"type": "thinking", "signature": "kept"}]}
+    done = {"stop_reason": reason, "content": [{"type": "text", "text": "done"}]}
+    def call(body):
+        requests.append(copy.deepcopy(body))
+        return paused if len(requests) == 1 else done
+    def run_tool(*args):
+        raise AssertionError("pause_turn must not execute client tools")
+    scope = {"call": call}
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+    assert scope["agent_loop"]("task", [], run_tool, max_turns=2) is done
+    assert requests[1]["messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused["content"]}]
+`,
+    examples()
+  );
+});
+
 it("agent_loopの各リクエストがトップレベルのキャッシュを有効にする", () => {
   python(
     `

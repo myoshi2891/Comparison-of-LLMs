@@ -3270,6 +3270,21 @@ export default function Page() {
                     <span className="hljs-keyword">{"if"}</span>
                     {" data["}
                     <span className="hljs-string">{'"stop_reason"'}</span>
+                    {"] == "}
+                    <span className="hljs-string">{'"pause_turn"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"continue"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" data["}
+                    <span className="hljs-string">{'"stop_reason"'}</span>
                     {"] != "}
                     <span className="hljs-string">{'"tool_use"'}</span>
                     {":"}
