@@ -25,7 +25,7 @@ _PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
 # cached inputの価格はひとまとまりで読み飛ばし、output以降へは進まない。
 _INPUT_PRICE_GAP = _RECORD_GAP.replace(
     r"[\s\S]",
-    rf"(?!\boutput\b)(?:\bcached\s+input{_PRICE_GAP}\$[\d.]+|(?!\bcached\s+input\b)[^$])",
+    rf"(?!\boutput\b)(?:\bcached\s+input{_PRICE_GAP}\$[\d.]+(?![\d.])|(?!\bcached\s+input\b)[^$])",
 )
 
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）

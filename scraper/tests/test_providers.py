@@ -14,6 +14,7 @@ fallback パスしか通らない**。本ファイルは get_page_text / httpx.g
 from __future__ import annotations
 
 import logging
+import re
 from datetime import date, datetime
 from unittest.mock import MagicMock, patch
 
@@ -535,6 +536,14 @@ class TestMoonshot:
             assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
             assert model.provenance is not None
             assert model.provenance.origin == "scraped"
+
+    def test_cached_input_gap_cannot_stop_inside_a_price(self):
+        text = "Kimi K3 cached input $0.25 input $3.25 output $16.50"
+        gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}"
+        assert re.match(gap + r"(?=5 input)", text) is None
+        matched = re.match(gap + r"(?= input)", text)
+        assert matched is not None
+        assert matched.group() == "Kimi K3 cached input $0.25"
 
     def test_definition_list_extracts_sibling_definitions(self):
         html = "<dl><dt>Kimi K3</dt><dd>input $3.25</dd><dd>output $16.50</dd></dl>"
