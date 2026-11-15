@@ -232,7 +232,9 @@ it("unmountで全リスナー・inert・開状態を解除", () => {
   expect(s.inert).toBe(false);
   expect(r.classList.contains(styles.open)).toBe(false);
   fireEvent.click(b);
-  fireEvent.click(box);
+  // 切り離された input は click で change を発火しないため、状態を変えて明示的に送る。
+  box.checked = true;
+  fireEvent.change(box);
   fireEvent.scroll(window);
   expect(count.textContent).toBe("0");
   expect(remove.mock.calls.map((c) => c[0])).toEqual(expect.arrayContaining(["scroll", "resize"]));
@@ -441,7 +443,10 @@ it("unmount後は全リストのchangeリスナーを解除する", () => {
   const counts = ["chkCount", "bCount"].map((id) => document.getElementById(id) as HTMLElement);
   const bars = ["chkBar", "bBar"].map((id) => document.getElementById(id) as HTMLElement);
   unmount();
-  for (const box of boxes) fireEvent.click(box);
+  for (const box of boxes) {
+    box.checked = true;
+    fireEvent.change(box);
+  }
   expect(counts.map((e) => e.textContent)).toEqual(["0", "0"]);
   expect(bars.map((e) => e.style.width)).toEqual(["0%", "0%"]);
   expect(boxes.map((b) => b.closest("li")?.classList.contains(styles.done))).toEqual([
