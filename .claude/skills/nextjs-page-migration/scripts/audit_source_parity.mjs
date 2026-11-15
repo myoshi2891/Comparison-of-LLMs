@@ -604,15 +604,17 @@ function normalizeUrl(url) {
  * Masks comments, regex literals and template contents, optionally quoted strings too.
  * @param {string} src - The module source text.
  * @param {boolean} preserveQuotedStrings - Keep single/double-quoted contents for literal extraction.
+ * @param {{uncertain?: boolean}} resolution - Records ambiguous slash classification.
  * @return {string} The source with non-code contents replaced by spaces, preserving offsets.
  */
-function blankNonCodeText(src, preserveQuotedStrings = true) {
+function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}) {
   const blank = (text) => text.replace(/[^\n]/g, " ");
   let out = "";
   let index = 0;
   let canStartRegex = true;
   let lastToken = "";
   const controlParens = [];
+  const braces = [];
   const wordRe = /[A-Za-z_$][\w$]*/y;
   while (index < src.length) {
     const char = src[index];
@@ -631,7 +633,8 @@ function blankNonCodeText(src, preserveQuotedStrings = true) {
       index = stop;
       continue;
     }
-    if (char === "/" && canStartRegex) {
+    if (char === "/" && canStartRegex === null) resolution.uncertain = true;
+    if (char === "/" && canStartRegex === true) {
       let cursor = index + 1;
       let inClass = false;
       while (cursor < src.length && src[cursor] !== "\n" && src[cursor] !== "\r") {
@@ -687,8 +690,16 @@ function blankNonCodeText(src, preserveQuotedStrings = true) {
     }
     if (!/\s/.test(char)) {
       if (char === "(") controlParens.push(/^(?:if|while|for|with|switch|catch)$/.test(lastToken));
-      canStartRegex = char === ")" ? (controlParens.pop() ?? false) : /[=(:,\[!&|?{};+\-*/%~^<>]/.test(char);
-      lastToken = char;
+      if (char === "{") {
+        // Object expressions end an operand; statement blocks permit a new regex.
+        // Callable bodies and other ambiguous braces require a parser to decide.
+        braces.push(/^(?:=|\(|\[|,|:|return|yield)$/.test(lastToken) ? false
+          : /^(?:;|\{|else|try|finally|do|control-end)$/.test(lastToken) || lastToken === "" ? true : null);
+      }
+      const controlEnd = char === ")" && (controlParens.pop() ?? false);
+      canStartRegex = char === "}" ? (braces.pop() ?? null)
+        : char === ")" ? controlEnd : /[=(:,\[!&|?{;+\-*/%~^<>]/.test(char);
+      lastToken = controlEnd ? "control-end" : char;
     }
     out += char;
     index += 1;
@@ -980,7 +991,17 @@ const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
 
 /** Resolve CLASSDEFS in this scope: undefined = unused, null = unresolved, string = evaluated. */
 function rendererSuffix(literalSource, rawSource) {
+  const resolution = {};
+  blankNonCodeText(rawSource, false, resolution);
+  if (resolution.uncertain) return null;
   const executable = blankNonCodeText(literalSource, false);
+  const srcWasRewritten = (before, allowInitializer = false) => {
+    const code = executable.slice(0, before);
+    const initializers = new Set(Array.from(code.matchAll(/\b(?:const|let|var)\s+src\s*=/g),
+      declaration => declaration.index + declaration[0].indexOf("src")));
+    return Array.from(code.matchAll(/\bsrc\s*(?:=(?!=|>)|(?:\*\*|&&|\|\||\?\?|[+\-*/%&|^])=|\+\+|--)/g))
+      .some(write => !allowInitializer || !initializers.has(write.index)) || /(?:\+\+|--)\s*src\b/.test(code);
+  };
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
   const renderUses = [];
@@ -1022,7 +1043,7 @@ function rendererSuffix(literalSource, rawSource) {
       // resolving arbitrary assignments/calls needs data-flow analysis.
       const base = expression.trim();
       if (base !== "src" && !/^(?:"[^"\r\n]*"|'[^'\r\n]*'|`[^`]*`)$/.test(base)) return null;
-      if (base === "src" && /\bsrc\s*(?:=(?!=|>)|(?:\*\*|&&|\|\||\?\?|[+\-*/%&|^])=|\+\+|--)/.test(executable)) return null;
+      if (base === "src" && srcWasRewritten(call.index)) return null;
       continue;
     }
     const unwrap = value => {
@@ -1048,6 +1069,7 @@ function rendererSuffix(literalSource, rawSource) {
       else if (value[i] === "+" && depth === 0) plus.push(i);
     }
     if (plus.length !== 1 || unwrap(value.slice(0, plus[0])) !== "src" || unwrap(value.slice(plus[0] + 1)) !== "CLASSDEFS") return null;
+    if (srcWasRewritten(call.index, true)) return null;
     renderUses.push({ index: source.start + names[0].index, call: call.index });
   }
   if (renderUses.length === 0) return undefined;

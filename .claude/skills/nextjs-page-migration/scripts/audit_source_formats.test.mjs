@@ -483,13 +483,19 @@ test("masks regex literals before their quotes can hide CLASSDEFS or render call
  const suffix = '\nclassDef box fill:#fff;';
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
  const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
- for (const prefix of ['const quote = /"/;', "const quote = /'/;", 'const quote = /["/]/g;', String.raw`const quote = /\/'/;`, 'const ratio = total / count; const quote = /"/;', 'const quote = /mermaid.render(id, src + CLASSDEFS)/;']) {
+ for (const prefix of ['const quote = /"/;', "const quote = /'/;", 'const quote = /["/]/g;', String.raw`const quote = /\/'/;`, 'const ratio = total / count; const quote = /"/;', 'const ratio = {} / total / count; const quote = /"/;', 'if (ready) {} /"/.test(text);', 'const quote = /mermaid.render(id, src + CLASSDEFS)/;']) {
   const source = `${card}<script>${prefix} const CLASSDEFS = ${JSON.stringify(suffix)}; mermaid.render('id', src + CLASSDEFS);</script>`;
   assert.equal(audit(source, page(chart + suffix)).status, 0, prefix);
   assert.equal(audit(source, page(chart)).status, 1, prefix);
  }
  const decoy = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const example = /mermaid.render(id, src + CLASSDEFS)/;</script>`;
  assert.equal(audit(decoy, page(chart)).status, 0);
+ for (const expression of ['{} / (CLASSDEFS = "changed") / 2', 'function () {} / (CLASSDEFS = "changed") / 2']) {
+  const source = `${card}<script>let CLASSDEFS = ''; const ratio = ${expression}; mermaid.render('id', src + CLASSDEFS);</script>`;
+  const result = audit(source, page(chart));
+  assert.equal(result.status, 1, expression);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0']);
+ }
 });
 
 test("materializes selected card payloads through quoted angle brackets in empty code attributes", () => {
@@ -718,6 +724,9 @@ test("rejects omitted runtime suffixes passed through source aliases", () => {
   'const chart = src + CLASSDEFS; mermaid.render("id", chart);',
   'const first = src + CLASSDEFS; const chart = first; mermaid.render("id", chart);',
   'src += CLASSDEFS; mermaid.render("id", src);',
+  'src += "changed"; mermaid.render("id", src + CLASSDEFS);',
+  'let src = base; src = other; mermaid.render("id", src + CLASSDEFS);',
+  '++src; mermaid.render("id", src + CLASSDEFS);',
   'const src = base + CLASSDEFS; mermaid.render("id", src);',
   'mermaid.render("id", buildChart());',
  ]) {
