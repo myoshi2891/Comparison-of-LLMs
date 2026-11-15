@@ -991,6 +991,8 @@ test("treats destructuring and later writes to src or its sources as unresolved"
   `${select} const src = script.textContent; function draw() { mermaid.render('id', src); } script.textContent = other; draw();`,
   `${select} function draw() { const src = script.textContent; mermaid.render('id', src); } script.textContent = other; draw();`,
   `const card = document.querySelector('#chart'); function draw() { const src = card.querySelector('script').textContent; mermaid.render('id', src); } card = other; draw();`,
+  // 別ブロックの var 再宣言は関数スコープの同じ変数へ書き込む。
+  `var src = ${JSON.stringify(chart)}; function draw() { mermaid.render('id', src); } if (enabled) { var src = other; } draw();`,
  ]) {
   const result = audit(`${card}<script>${body}</script>`, page);
   assert.equal(result.status, 1, body);
