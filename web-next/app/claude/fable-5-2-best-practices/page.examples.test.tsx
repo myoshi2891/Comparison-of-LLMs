@@ -54,6 +54,17 @@ for mode, price in (("batch", 24), ("fast", 96)):
             pass
         else:
             raise AssertionError((mode, cached))
+for usage, price in (
+    ({"cache_creation_input_tokens": 1000000}, 10),
+    ({"cache_creation_input_tokens": 1000000, "cache_creation": {}}, 10),
+    ({"cache_creation_input_tokens": 1000000, "cache_creation": {
+        "ephemeral_5m_input_tokens": 200000, "ephemeral_1h_input_tokens": 300000}}, 11.8),
+    ({"cache_creation_input_tokens": 100000, "cache_creation": {
+        "ephemeral_5m_input_tokens": 200000, "ephemeral_1h_input_tokens": 300000}}, 6.8),
+    ({"cache_creation": {"ephemeral_5m_input_tokens": 200000,
+        "ephemeral_1h_input_tokens": 300000}, "cache_read_input_tokens": 1000000}, 7),
+):
+    assert math.isclose(scope["estimate_usd"](usage), price), (usage, price)
 `,
     examples()
   );

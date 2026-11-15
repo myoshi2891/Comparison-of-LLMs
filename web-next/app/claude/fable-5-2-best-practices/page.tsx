@@ -6743,6 +6743,20 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"    write_other = "}
+                    <span className="hljs-built_in">{"max"}</span>
+                    {"("}
+                    <span className="hljs-number">{"0"}</span>
+                    {", usage.get("}
+                    <span className="hljs-string">{'"cache_creation_input_tokens"'}</span>
+                    {", "}
+                    <span className="hljs-number">{"0"}</span>
+                    {") - write_5m - write_1h)"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"    write_5m += write_other"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"    cached = read "}
                     <span className="hljs-keyword">{"or"}</span>
                     {" write_5m "}

@@ -1122,6 +1122,8 @@ def estimate_usd(usage: dict, mode: str = "standard") -> float:
     read = usage.get("cache_read_input_tokens", 0)
     write_5m = cache.get("ephemeral_5m_input_tokens", 0)
     write_1h = cache.get("ephemeral_1h_input_tokens", 0)
+    write_other = max(0, usage.get("cache_creation_input_tokens", 0) - write_5m - write_1h)
+    write_5m += write_other
     cached = read or write_5m or write_1h or usage.get("cache_creation_input_tokens", 0)
     if cached and any(key not in r for key in ("cache_read", "cache_write_5m", "cache_write_1h")):
         raise ValueError("このモードのキャッシュ単価を確認・設定してから見積もってください")
