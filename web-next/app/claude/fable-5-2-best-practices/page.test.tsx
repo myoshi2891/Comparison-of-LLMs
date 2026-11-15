@@ -129,8 +129,8 @@ it("全リストの型・開始番号・全項目・入れ子を完全一致", (
   ).toEqual(expected.lists);
 });
 it("目次19リンクの文言・順序・アンカー解決・全ID一意性・初期選択", () => {
-  const { container, getByTestId } = render(<Page />);
-  const links = Array.from(getByTestId("sidebar-nav").querySelectorAll("a"));
+  const { container, getByRole } = render(<Page />);
+  const links = Array.from(getByRole("list", { name: "目次" }).querySelectorAll("a"));
   expect(links.map((e) => [e.getAttribute("href"), text(e)])).toEqual(expected.toc);
   expect(
     links.map(
