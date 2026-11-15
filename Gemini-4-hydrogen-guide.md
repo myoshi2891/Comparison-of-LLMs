@@ -204,10 +204,19 @@ from google.genai import types
 
 client = genai.Client()
 
+# 調査対象の代表コード。実運用では対象リポジトリのファイル本文に置き換える。
+repository_code = '''
+# app/orders.py
+def list_orders(db):
+    orders = db.execute("SELECT id, customer_id FROM orders").fetchall()
+    return [(order, db.execute("SELECT name FROM customers WHERE id = ?",
+                              (order[1],)).fetchone()) for order in orders]
+'''
+
 # thinking_level を明示する(表記・型はSDKバージョンにより異なるため公式ドキュメントで確認)
 resp = client.models.generate_content(
     model="gemini-4-hydrogen",
-    contents="このリポジトリのN+1クエリを特定し、最小差分で修正案を出して",
+    contents=f"次のリポジトリ抜粋のN+1クエリを特定し、最小差分で修正案を出して\n\n{repository_code}",
     config=types.GenerateContentConfig(
         thinking_config=types.ThinkingConfig(thinking_level="high"),
         max_output_tokens=32768,  # 出力切れ防止のため十分大きく
@@ -309,9 +318,19 @@ from google import genai
 
 client = genai.Client()
 
+# 移行対象の代表ファイル。旧API v1.complete(prompt) から新API v2.responses.create(input) へ移行する。
+repository_code = '''
+# app/summarize.py
+def summarize(client, text):
+    return client.v1.complete(prompt=text).text
+# app/translate.py
+def translate(client, text):
+    return client.v1.complete(prompt="Translate to Japanese: " + text).text
+'''
+
 interaction = client.interactions.create(
     model="gemini-4-hydrogen",
-    input="このモジュール群を新APIへ移行する差分をすべて出力して",
+    input=f"次のモジュール群をv1.complete(prompt)からv2.responses.create(input)へ移行する差分をすべて出力して\n\n{repository_code}",
     background=True,   # サーバー側継続を選択。フォアグラウンドのクライアント側継続も可能
     store=True,
     generation_config={"max_output_tokens": 262144, "thinking_level": "high"},
@@ -404,6 +423,10 @@ def step(client, history, user_msg):
             tools=[],
         ),
     )
+    if not resp.candidates:
+        raise RuntimeError("応答に候補がありません")
+    if resp.candidates[0].finish_reason == types.FinishReason.MAX_TOKENS:
+        raise RuntimeError("MAX_TOKENSで中断しました。履歴は保存せず、出力予算やタスク分割を見直して再実行してください")
     # 重要: 返却された content を加工せずそのまま履歴へ(署名の欠落・要約置換をしない)
     history.extend([user_content, resp.candidates[0].content])
     return resp

@@ -250,7 +250,12 @@ response = client.models.generate_content(
     ),
 )
 
-print(response.text)
+if not response.candidates:
+    raise RuntimeError("応答に候補がありません")
+if response.candidates[0].finish_reason == types.FinishReason.MAX_TOKENS:
+    print("警告: MAX_TOKENSで中断しました。回答は未完了です。出力予算やタスク分割を見直してください。")
+else:
+    print(response.text)
 print(response.usage_metadata)  # 思考トークンも課金対象なので必ず記録する
 ```
 
@@ -550,11 +555,11 @@ def estimate_cost(usage, rates):
 flowchart TD
     IN["外部コンテンツ<br/>Web PDF メール 顧客文書"] --> TR["信頼境界<br/>データとして扱い 指示として扱わない"]
     TR --> LP["ツール権限を最小化"]
-    LP --> RUN["Carbon がタスクを実行"]
-    RUN --> RISK{"不可逆な操作か<br/>金銭 データ削除 外部送信"}
+    LP --> RISK{"不可逆な操作か<br/>金銭 データ削除 外部送信"}
     RISK -- "はい" --> HU["人間の承認を必須にする"]
-    RISK -- "いいえ" --> LOG["全ツール呼び出しをログ記録"]
-    HU --> LOG
+    RISK -- "いいえ" --> RUN["Carbon がタスクを実行"]
+    HU -- "承認済み" --> RUN
+    RUN --> LOG["全ツール呼び出しをログ記録"]
     LOG --> AUD["定期的に監査"]
 ```
 

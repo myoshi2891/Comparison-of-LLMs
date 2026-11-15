@@ -238,15 +238,17 @@ Decisions API の最大の価値は、**答えそのものよりも `confidence`
 ```mermaid
 flowchart LR
     IN["入力 + 質問セット"] --> API["Decisions API<br/>150〜250 ms"]
-    API --> G{"confidence >= 0.7 ?"}
+    API --> RISK{"高リスクの操作?"}
+    RISK -->|"はい"| HUMAN["人間レビュー"]
+    RISK -->|"いいえ"| G{"confidence >= 0.7 ?"}
     G -->|"はい"| AUTO["自動処理"]
     G -->|"いいえ"| ESC["生成モデルで再判定"]
-    ESC --> G2{"高リスクの操作?"}
-    G2 -->|"はい"| HUMAN["人間レビュー"]
-    G2 -->|"いいえ"| AUTO2["生成モデルの結果で処理"]
+    ESC --> AUTO2["生成モデルの結果で処理"]
 ```
 
 ### 6-1. 実装例(REST + `httpx`)
+
+以下をアプリケーションの `decisions_client.py` として保存します。Step 13 の別pytestモジュールからも、このモジュールの `decide` をimportします。
 
 ```python
 import os
@@ -412,7 +414,14 @@ GUARD = {
 def screen_input(callback_context, llm_request):
     """ADK の before_model_callback の骨格(出典の考え方を簡略化した例)。"""
     last = next((c for c in reversed(llm_request.contents or []) if c.role == "user"), None)
-    text = "".join(p.text or "" for p in (last.parts if last else []) if getattr(p, "text", None))
+    parts = (last.parts or []) if last else []
+    # この骨格はテキスト専用。画像・音声・ファイル等は評価できないため、混在入力も拒否する。
+    if not parts or any(not getattr(p, "text", None) or any(
+        value is not None for key, value in p.model_dump(exclude_none=True).items()
+        if key != "text"
+    ) for p in parts):
+        return "BLOCKED"  # 実装では LlmResponse に未対応入力の説明を含めて返す
+    text = "".join(p.text for p in parts)
     if not text:
         return None
     ans = decide(text, GUARD)["answers"]["injection"]
@@ -470,7 +479,7 @@ GDE の検証(48件)で、緊急度の正解は **31/48** と比較対象5バッ
 | **入力による分類操作** | ユーザーの文章が自分自身の分類を誘導し得る(Google が警告) | 高リスクの操作(支払い承認など)は **人間のチェック** を残す |
 | **ガードレール自体の突破** | 判定器もモデルである以上、敵対入力で誤判定し得る | 多層防御(Decisions API + ルールベース + 権限分離)にする |
 | **安全フィルタ** | 入力が安全フィルタに引っかかると HTTP 400(`error.code` が `safety` / `prohibited_content` など) | エラーコードを分岐して処理し、`answers` を前提にしない |
-| **機密データ** | 無料枠の内容は製品改善に使われ得る | 本番・機密は有料枠 |
+| **機密データ** | 無料枠の内容は製品改善に使われ得る。有料枠で製品改善に使われない条件でも、Googleは不正利用監視のためプロンプトと応答を保持する場合がある | 送信前に[適用される保持期間](https://ai.google.dev/gemini-api/docs/usage-policies)と組織の要件を確認する |
 | **APIキー** | ヘッダ `x-goog-api-key` で認証 | サーバー側で保持し、クライアントに露出させない |
 
 ---
@@ -494,10 +503,11 @@ GDE の検証(48件)で、緊急度の正解は **31/48** と比較対象5バッ
 
 ## Step 13. 契約テストを用意する
 
-出力が壊れていないことを、CI で毎回確認します。
+出力が壊れていないことを、CI で毎回確認します。以下を `decisions_client.py` と同じディレクトリの `test_decisions.py` に保存します。
 
 ```python
 import pytest
+from decisions_client import decide
 
 QUESTIONS = {
     "is_defect": {"type": "noul", "instructions": "Does the message describe a hardware defect?"},
