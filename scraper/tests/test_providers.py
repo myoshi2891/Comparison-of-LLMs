@@ -525,6 +525,17 @@ class TestMoonshot:
         assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
         assert model.scrape_status == "fallback"
 
+    def test_standard_input_skips_cached_price(self):
+        for html in (
+            '<p>Kimi K3 cached input $0.25 input $3.25 output $16.50</p>',
+            '<dl><dt>Kimi K3</dt><dd>cached input $0.25</dd><dd>input $3.25</dd><dd>output $16.50</dd></dl>',
+        ):
+            with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+                model = _find(moonshot.scrape(), "Kimi K3")
+            assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+            assert model.provenance is not None
+            assert model.provenance.origin == "scraped"
+
     def test_definition_list_extracts_sibling_definitions(self):
         html = "<dl><dt>Kimi K3</dt><dd>input $3.25</dd><dd>output $16.50</dd></dl>"
         with patch("scraper.providers.moonshot.get_page_text", return_value=html):
