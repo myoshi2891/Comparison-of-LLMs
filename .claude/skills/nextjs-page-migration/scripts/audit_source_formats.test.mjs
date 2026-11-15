@@ -1025,3 +1025,35 @@ test("requires the dedent call to bind the canonical helper", () => {
  }
  assert.equal(audit(`${card}<script>${canonicalDedent} ${use}</script>`, page).status, 0);
 });
+
+test("keeps scopes whose renderer may be hidden by an uncertain slash", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const pre = `const CLASSDEFS = '\\nclassDef box fill:#fff;'; const src = ${JSON.stringify(chart)};`;
+ // 関数宣言後の正規表現を除算と見なすと、引用符が文字列として render を隠す。
+ for (const body of [
+  `function f() {}\n/'/.test(s); mermaid.render('id', src + CLASSDEFS);`,
+  `function f() {} /'/.test(s); mermaid.render('id', src + CLASSDEFS);`,
+  `function f() {}\n/"/.test(s); mermaid.render("id", src + CLASSDEFS);`,
+ ]) {
+  const result = audit(`${card}<script>${pre} ${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("resolves aliases at their initializer instead of the later reference", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const other = 'flowchart LR\nX --> Y';
+ const cards = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div><div id="other" class="diagram-card"><script type="text/plain">${other}</script></div>`;
+ const page = [chart, other].map((s, i) => `const D${i} = ${JSON.stringify(s)}; <MermaidDiagram chart={D${i}} />`).join('');
+ const draw = (inner) => `function draw() { const card = document.querySelector('${inner}'); const src = script.textContent; mermaid.render('id', src); } draw();`;
+ // script は外側の card（#other）で初期化され、内側の card は参照しない。
+ const result = audit(`${cards}<script>const card = document.querySelector('#other'); const script = card.querySelector('script'); ${draw('#chart')}</script>`, page);
+ assert.equal(result.status, 1);
+ assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ const mirrored = audit(`${cards}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); ${draw('#other')}</script>`, page);
+ assert.equal(mirrored.status, 1);
+ assert.deepEqual(mirrored.data.unresolvedMermaidSources, ['CLASSDEFS:other']);
+});
