@@ -26,7 +26,7 @@ Decisions API は、**固定の選択肢(クローズドセット)に対する�
 | --- | --- |
 | エンドポイント | `POST https://generativelanguage.googleapis.com/v1beta/decisions` |
 | モデルID | `gemini-decision-1` |
-| 入力 | テキスト / 画像 / 音声 / 動画 / PDF(共有 `input` は最大 256K トークン) |
+| 入力 | テキスト / 画像 / 音声 / 動画 / PDF(共有 `input` と全質問のinstructions・criteriaを含めて合計最大262,144トークン) |
 | 質問数 | 1リクエストあたり最大 1,000 問(独立して評価) |
 | 質問タイプ | `noul`(Yes/No)、`choice`(多肢選択)、`score`(順序付きルーブリック) |
 | 出力 | 値 + 確率 + `confidence`(0〜1)。**出力トークンは常に 0** |

@@ -353,6 +353,7 @@ flowchart TD
 | `thinking_budget` | レベルにマップされていた | Agent Platform では **HTTP 400**、Gemini API の開発者ガイドでは非推奨の警告 | `thinking_level` に置換 [S3] [S7] [S8] |
 | `thinking_level="MINIMAL"` | 対応 | **HTTP 400** | `LOW` を使用 [S7] [S8] |
 | `temperature` / `top_p` / `top_k` | 一部有効 | 無視され、警告 | 削除 [S3] [S7] |
+| `frequency_penalty` / `presence_penalty` / `candidate_count` | 既存設定に残る場合あり | 両penaltyと `candidate_count > 1` は非対応 | penaltyを削除し、`candidate_count` は省略または1へ調整してから移行 [S7] |
 | 明示的コンテキストキャッシュ | 対応するモデルあり | **Agent Platformでは非対応** | `cached_content` 参照を削除し、4,096トークン以上の共有・静的コンテンツをプロンプト先頭へ置いて暗黙的キャッシュを利用 [S7] |
 | `thought_signature` と会話履歴 | モデルごとの要件に従う | 過去のfunctionCall・最終textを含む署名付きPartを保持。並列呼び出しの署名は最初のfunctionCallだけ | 応答のContentとPartをそのまま再送し、署名を兄弟呼び出しへコピーしない。必要な署名の欠落・重複はHTTP 400の原因 [S7] |
 | 履歴の編集・prefill | 構成による | 署名は会話prefixに結び付く。prefilled modelターンは非対応 | prefillを削除してmodelターン末尾のまま送信しない。履歴圧縮では `ThinkingConfig` の `prefix_mismatch_behavior="DROP"` または対応する履歴リセットを使う [S7] |
@@ -371,7 +372,8 @@ flowchart TD
     SDK --> ID["モデルIDを gemini-4-carbon に変更"]
     ID --> TB["thinking_budget と MINIMAL を除去<br/>thinking_level に置換"]
     TB --> SP["temperature top_p top_k を削除"]
-    SP --> LD{"長い出力が必要か"}
+    SP --> NP["frequency_penalty presence_penalty を削除<br/>candidate_count は省略または1へ調整"]
+    NP --> LD{"長い出力が必要か"}
     LD -- "はい" --> LDON["long decode を設定"]
     LD -- "いいえ" --> EV
     LDON --> EV["自社評価セットで比較"]

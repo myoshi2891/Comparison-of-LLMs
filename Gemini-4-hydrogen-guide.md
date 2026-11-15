@@ -349,7 +349,13 @@ if interaction.status == "incomplete":
 if interaction.status != "completed":
     raise RuntimeError(f"Unexpected interaction status: {interaction.status}")
 
-text = interaction.output_text
+text = "".join(
+    content.text
+    for step in (interaction.steps or [])
+    if step.type == "model_output"
+    for content in (step.content or [])
+    if content.type == "text" and content.text is not None
+)
 ```
 
 [公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。
@@ -427,8 +433,15 @@ def step(client, history, user_msg):
         raise RuntimeError("応答に候補がありません")
     if resp.candidates[0].finish_reason == types.FinishReason.MAX_TOKENS:
         raise RuntimeError("MAX_TOKENSで中断しました。履歴は保存せず、出力予算やタスク分割を見直して再実行してください")
+    candidate = resp.candidates[0]
+    if candidate.finish_reason != types.FinishReason.STOP:
+        raise RuntimeError(f"応答は正常完了していません。履歴は保存しません: {candidate.finish_reason}")
+    if candidate.content is None or not candidate.content.parts or not any(
+        part.text for part in candidate.content.parts
+    ):
+        raise RuntimeError("応答に有効なテキストcontentがありません。履歴は保存しません")
     # 重要: 返却された content を加工せずそのまま履歴へ(署名の欠落・要約置換をしない)
-    history.extend([user_content, resp.candidates[0].content])
+    history.extend([user_content, candidate.content])
     return resp
 ```
 
