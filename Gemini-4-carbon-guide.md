@@ -103,12 +103,13 @@ flowchart LR
 
 ### 2.2 料金
 
-| 区分 | 入力（100万トークン） | キャッシュ入力 | 出力（100万トークン） |
+| 区分（グローバルエンドポイントの標準料金） | 入力（100万トークン） | キャッシュ入力 | 出力（100万トークン） |
 |---|---|---|---|
 | 導入価格（〜2026-11-30、通常の `gemini-4-carbon`） | $2.00 | $0.10 | $10.00 |
 | `gemini-4-carbon-cyber-permissive`（11月も導入割引なし） | $4.00 | $0.20 | $20.00 |
 | 標準価格（2026-12-01〜） | $4.00 | $0.20 | $20.00 |
 
+- 上表はグローバルエンドポイントの標準（Standard PayGo）料金です。Priority PayGo やリージョン指定（グローバル以外）のエンドポイントでは単価が高くなる場合があり、期間限定の優先料金が設定されることもあります。予算を立てる前に、利用する区分とリージョンの料金を[公式Agent Platform料金表](https://cloud.google.com/model-garden/pricing)で確認してください。
 - キャッシュ入力は入力単価の **95% 割引** です [S1]。
 - Cyber Permissiveは導入割引の対象外です（[公式Agent Platform料金表](https://cloud.google.com/model-garden/pricing)）。
 - Argon と同じ単価ですが、**Carbon は1タスクあたりのトークン消費が多くなりがち** なので、実コストは単価だけでは決まりません [S12] [S17]。
@@ -323,7 +324,8 @@ Carbon（と Argon）では、入力・思考・出力が **1つの 1M トーク
 | 項目 | 内容 | 出典 |
 |---|---|---|
 | 何をするか | 1回の生成を複数セグメントに分け、最大 1,048,576 トークン（入力を除く）まで継続する | [S6] |
-| 既定 | **無効**（明示的に有効化が必要） | [S21] |
+| 使う手順 | Agent Platform では **`v1beta1` エンドポイント**を使い（`v1` は非対応。Gen AI SDK は `http_options` で `api_version='v1'` を指定しない限り `v1beta1`）、`max_output_tokens` を1セグメントの上限（ストリーミング 65,536、非ストリーミング 32,768）より大きく設定する | [S6] [S7] |
+| 自動継続 | 現行 SDK では**既定で有効**（例: GenerateContent は Python `google-genai` 2.30.1 以上）。`v1` を使っている場合は SDK の更新や継続の有効化だけでは足りず、エンドポイントの変更が必要 | [S6] |
 | 向く用途 | 複数ファイルの差分生成、長大なテストスイート、長い証明、出力上限で打ち切られる評価ハーネス | [S3] [S6] |
 | 向かない用途 | 遅延に敏感なリクエスト（数分かかることがある） | [S6] [S21] |
 | 注意 | 古い SDK や OpenAI 互換レイヤーでは継続トークンで長い応答を取得できない | [S6] |
@@ -340,7 +342,7 @@ flowchart TD
     B -- "いいえ" --> C["通常の generate_content"]
     B -- "はい" --> D{"遅延に敏感か"}
     D -- "はい" --> E["タスクを分割して対応"]
-    D -- "いいえ" --> F["long decode を有効化<br/>SDK は最新版を使用"]
+    D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
     F --> G["累積トークンと課金を監視"]
 ```
 
@@ -362,7 +364,7 @@ flowchart TD
 | `thought_signature` と会話履歴 | モデルごとの要件に従う | 過去のfunctionCall・最終textを含む署名付きPartを保持。並列呼び出しの署名は最初のfunctionCallだけ | 応答のContentとPartをそのまま再送し、署名を兄弟呼び出しへコピーしない。必要な署名の欠落・重複はHTTP 400の原因 [S7] |
 | 履歴の編集・prefill | 構成による | 署名は会話prefixに結び付く。prefilled modelターンは非対応 | prefillを削除してmodelターン末尾のまま送信しない。履歴圧縮では `ThinkingConfig` の `prefix_mismatch_behavior="DROP"` または対応する履歴リセットを使う [S7] |
 | トークン課金 | 一部のみ課金 | **全トークン課金**（思考、内部ツール指示を含む） | 予算とアラートを再設計 [S7] |
-| 長い出力 | 上限内 | long decode が必要な場合あり | SDK更新と有効化 [S6] |
+| 長い出力 | 上限内 | long decode が必要な場合あり | `v1beta1` を使い、`max_output_tokens` をセグメント上限より大きく設定 [S6] |
 
 > **差異に注意**: `thinking_budget` の扱いは、Agent Platform のドキュメント（400エラー）と Gemini API の開発者ガイド（警告）で記述が異なります [S3] [S8]。**どちらの面でも通るよう、移行時に確実に削除** してください。
 
@@ -378,7 +380,7 @@ flowchart TD
     TB --> SP["temperature top_p top_k を削除"]
     SP --> NP["frequency_penalty presence_penalty を削除<br/>candidate_count は省略または1へ調整"]
     NP --> LD{"長い出力が必要か"}
-    LD -- "はい" --> LDON["long decode を設定"]
+    LD -- "はい" --> LDON["long decode を設定<br/>v1beta1 と max_output_tokens"]
     LD -- "いいえ" --> EV
     LDON --> EV["自社評価セットで比較"]
     EV --> CAN["一部トラフィックでカナリア配備"]
@@ -635,7 +637,7 @@ flowchart TD
 | `thinking_budget` を残したまま | HTTP 400 または警告 | `thinking_level` に置換 |
 | `MINIMAL` を指定 | HTTP 400 | `low` に変更 |
 | `temperature` を調整して品質を上げようとする | 効果なし | 削除し、プロンプトと `thinking_level` で制御 |
-| 出力が途中で切れる | `MAX_TOKENS` で不完全 | long decode と最新 SDK |
+| 出力が途中で切れる | `MAX_TOKENS` で不完全 | `v1beta1` で long decode を使い、`max_output_tokens` を上げる |
 | 導入価格のまま予算化 | 12月に請求が約2倍 | 標準価格で試算 |
 | 古い順位表を引用 | 現状と食い違う | 測定日を明記し一次ページで確認 |
 | 高い自律度で権限を広く与える | 想定外の操作や情報流出 | 最小権限と人間承認 |
