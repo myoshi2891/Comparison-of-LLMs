@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-15追加レビュー3件: 原本監査はdocument.querySelectorの一意性を文書全体の要素で確認し、先行する非カードの一致を見逃さない。scriptのtextContentへの代入・複合代入・別名／クエリー経由の書き込みは、古いpayloadを認定せず未解決とする。Carbon料金表はCyber Permissiveの11月単価$4／$20を通常の導入単価から分離。監査109件・HTML原本監査exit 0・Markdown lintと既存料金の維持を確認。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-15初期化順序等の追加レビュー5件: 原本監査はsrcとCLASSDEFSで初期化実行順序の証明を共有し、条件付き初期化・初期化前の呼び出しを未解決とする。実行時のscript選択は子カードを含む子孫順で照合し、payload所有は最寄りカードへ限定。Carbonのhigh採用前に品質を検証し、Moonshotのcached input金額を途中まで読み飛ばすバックトラックを防止。現在地と再開プロンプトの実装checkpointを4a02de85へ同期。監査107件・pytest141件＋39 subtests・HTML原本監査exit 0・24図解析が成功。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-15追加レビュー5件: 原本監査はsrcの引数遮蔽・未定義・未知の初期化を拒否し、可視の宣言とカードpayloadの対応を確認する。接尾辞なしでも検証済みtextContent初期化を認定。Moonshotはcached inputを除外して標準入力単価を選び、Fableのpause_turnは次のAPI呼び出し前にcheckpointへ履歴を保存。PDFのインライン上限50 MBとFiles APIへの案内を訂正。全体240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査が成功。詳細はdocs/PROGRESS.mdを参照。

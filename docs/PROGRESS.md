@@ -6,6 +6,14 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 文書全体の選択・script本文更新・Cyber Permissive料金のレビュー3件（2026-11-15）
+
+- 3件すべて現行コードで有効と確認して修正。監査2回帰テストで修正前失敗を実測。本セッションではコミットを作成しない。
+- document.querySelectorの一意性はcardsだけで数えず、文書全体の開始タグから確認。scriptやtextarea等の不透明要素自身の属性も保持し、内容の偽タグは数えない。先行する非カードが同じID／classに一致する場合は未解決とし、単一の正しいカードは維持。
+- scriptElementの宣言が正しくても、選択したscriptの現在のtextContentが同じとは認定しない。代入・複合代入・更新演算と、既知の別名／DOMクエリー経由の書き込みは未解決として停止。書き込み位置の可視範囲で別名を調べ、条件ブロック内の別名にも対応。変更なしの読み取りとFable原本の正常な描画経路は維持。
+- Carbonの通常モデルの導入価格$2／$10・標準価格$4／$20を保持し、gemini-4-carbon-cyber-permissiveは11月も割引なしの入力$4・キャッシュ入力$0.20・出力$20として別行へ分離。公式Agent Platform料金表のグローバル標準料金と割引対象外の注記を確認し、出典を追加。
+- 検証: 監査109件、FableのHTML原本監査exit 0、CarbonのMarkdown lint・通常料金の維持とCyber Permissive行の照合、変更管理文書のMarkdown lint、差分検査が成功。web-next・scraperの実装は無変更のため全体テスト・型・Biome・pytest・ビルドは再実行していない。直前の全体実測は240 files／3077 tests、pytest141件＋39 subtests。ビルドの最後の成功は11月14日、11月15日の初回・再試行は権限制限で失敗。
+
 ## 初期化実行順序・子カードscript・再開記録・品質判定のレビュー5件（2026-11-15）
 
 - 5件すべて現行コードで有効と確認して修正。監査2回帰テストとMoonshotの価格途中で走査を止める回帰テストで修正前失敗を実測。本セッションではコミットを作成しない。
