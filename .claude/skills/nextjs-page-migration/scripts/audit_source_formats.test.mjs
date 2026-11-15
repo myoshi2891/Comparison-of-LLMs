@@ -834,3 +834,14 @@ test("keeps executable template interpolations unresolved through scope discover
  const literal = `${card}<script>const example = \`literal mermaid.render("id", src + CLASSDEFS)\`;</script>`;
  assert.equal(audit(literal, page).status, 0);
 });
+
+test("rejects comment-only migrated code instead of accepting an undisplayed card payload", () => {
+ const payload = 'print("kept")';
+ for (const comment of ['<!-- placeholder -->', '<!-- <code></code> -->', '<!-- first -->\n<!-- second -->']) {
+  const source = `<div class="code-block"><pre><code>${comment}</code></pre><script type="text/plain">${payload}</script></div>`;
+  const result = audit(source, `<pre><code>${comment}</code></pre>`);
+  assert.equal(result.status, 1, comment);
+  assert.deepEqual(result.data.missingCodeBlocks, [payload]);
+  assert.equal(audit(source, `<pre><code>{${JSON.stringify(payload)}}</code></pre>`).status, 0);
+ }
+});
