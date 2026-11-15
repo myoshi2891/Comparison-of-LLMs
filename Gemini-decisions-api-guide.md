@@ -415,7 +415,12 @@ GUARD = {
 
 def screen_input(callback_context, llm_request):
     """ADK の before_model_callback の骨格(出典の考え方を簡略化した例)。"""
-    last = next((c for c in reversed(llm_request.contents or []) if c.role == "user"), None)
+    # ツール結果(function_response)を運ぶ user ロールはユーザー発話ではないため飛ばす。
+    last = next((
+        c for c in reversed(llm_request.contents or [])
+        if c.role == "user"
+        and not any(getattr(p, "function_response", None) for p in (c.parts or []))
+    ), None)
     parts = (last.parts or []) if last else []
     # この骨格はテキスト専用。画像・音声・ファイル等は評価できないため、混在入力も拒否する。
     if not parts or any(not getattr(p, "text", None) or any(
