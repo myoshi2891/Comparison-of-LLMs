@@ -6,6 +6,15 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## src束縛・PDF上限・キャッシュ価格・pause_turnの追加レビュー5件（2026-11-15）
+
+- 5件すべて現行コードで有効と確認して修正。監査・Moonshot・Fableの回帰テストで修正前失敗を確認。実装・原本・契約・PDF修正（178eab05／ce867b89／8e55869a／4a02de85）および検証記録の同期をカテゴリ別にコミット済み。
+- 監査はsrcの宣言の可視範囲と初期化を確認し、関数／arrow引数の遮蔽・未定義・未知の初期化・再代入を未解決とする。payloadと一致するリテラルや、選択カードのscriptのtextContentへの対応を検証し、接尾辞なしでも検証済み初期化を認定する。Fable原本のカード走査・既知のdedent本文を限定的に扱い、任意の関数は実行しない。既存fixtureの暗黙srcは明示的に一致する初期化へ変更し、元のCLASSDEFS・構文等の検証を維持。
+- Moonshotはcached inputのラベルと金額を読み飛ばし、標準入力とoutputを選択。Kimi K3の段落／兄弟ddで(3.25, 16.50)・success・scraped provenanceを検証し、他レコード境界・outputのみの場合のfallbackを維持。
+- Fableのpause_turnはcheckpointが指定された場合、既に追加した応答込みのmessagesを保存してからcontinueする。次のAPI失敗後に同じ履歴で再開でき、checkpointなしの従来動作も保持。HTML／Markdown原本・JSX・全文／構文トークン／構造契約へ同期。
+- DecisionsはインラインPDFを1リクエスト50 MBに訂正し、大きいPDFはFiles APIへ案内。その他のインライン内容の100 MB上限は維持し、公式Files API資料と照合。
+- 検証: 全体Vitest240 files／3077 tests、監査105件、Fable対象77件、pytest140件＋39 subtests、型・Biome657 files、HTML原本監査exit 0が成功。Decisionsの既存Markdown lint1件と保存Fable Markdownの既存34件は不変。ビルドは既知のTurbopackローカルポート権限制限があるため今回は再実行していない。最後の成功は11月14日、11月15日の初回・再試行は失敗。実APIは呼び出していない。
+
 ## コメントのみのcode・ビルド記録・返金・共有設定のレビュー4件（2026-11-15）
 
 - 3件を現行コードで有効と確認して修正。監査ロジックの指摘1件はスキップ: materializePlainTextCardsがコメントを先に除去するため、コメントだけのcodeは既に空として扱われ、原本payloadが復元される。表示payloadのない移行先が拒否される既存動作を、通常コメント・偽codeを含むコメント・複数コメントの回帰1テストで固定。実装変更は不要。
@@ -463,11 +472,11 @@
   - `bun run typecheck` ✅（`tsc --noEmit`。2026-11-15 実測）
   - `bun run lint` ✅（Biome check / 657 files / 0 diagnostics。2026-11-15 実測）
 - **テストの実行状況**:
-  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3075 testsすべて成功**（2026-11-15レビュー4件修正後の実測）。型・lint657 filesも成功。
+  - **フロントエンド (`web-next/`)**: `NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000` でVitest **240 files／3077 testsすべて成功**（2026-11-15追加レビュー5件修正後の実測）。型・lint657 filesも成功。
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run --offline pytest -q` で138件＋39 subtests成功（2026-11-14実測。UV_CACHE_DIRを一時領域へ指定）。
+  - **バックエンド (`scraper/`)**: `uv run pytest -q` で140件＋39 subtests成功（2026-11-15実測。UV_CACHE_DIRを一時領域へ指定）。
 
 ## 最近の追加内容
 
@@ -924,6 +933,7 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
+追加レビュー5件は全件修正・コミット済み（実装HEAD 4a02de85、検証記録同期済み）。src束縛とpayload対応の検証・キャッシュ入力価格除外・pause_turn直後のcheckpoint保存・PDF上限を訂正。全体Vitest240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査exit 0成功。冒頭の追加レビュー5件の節を参照。
 最新のレビュー4件は3件修正・1件スキップ。コメントのみのcodeは既に拒否され、回帰テストを追加して監査104件成功。冒頭のレビュー4件の節を参照。ビルドは11月14日が最後の成功、11月15日は初回・再試行とも失敗。
 追加レビュー7件は未コミットで修正済み。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析成功。冒頭の追加レビュー7件の節を参照。web-next／scraperの実装は無変更で、全体検証は前回実測を維持。
 今回のレビュー12件は未コミットで修正済み。冒頭のレビュー12件の節を参照。全体Vitest240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtests・型・Biome・HTML原本監査exit 0が成功。ビルドはTurbopackのローカルポート制限で失敗（再実行でも同じ）。

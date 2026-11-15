@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-15追加レビュー5件: 原本監査はsrcの引数遮蔽・未定義・未知の初期化を拒否し、可視の宣言とカードpayloadの対応を確認する。接尾辞なしでも検証済みtextContent初期化を認定。Moonshotはcached inputを除外して標準入力単価を選び、Fableのpause_turnは次のAPI呼び出し前にcheckpointへ履歴を保存。PDFのインライン上限50 MBとFiles APIへの案内を訂正。全体240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査が成功。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-15レビュー4件: コメントのみのcodeは現行監査で既に拒否されるためロジック変更をスキップし、回帰1テストを追加。監査104件・HTML監査exit 0。ビルド要約を最後の成功11月14日／11月15日の失敗と再試行失敗へ同期。Decisionsはrefundを常に人間レビューへ送り、非返金の閾値を保持。有料枠の規約・共有設定による改善利用の条件差を追記。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-15追加レビュー7件: 原本監査はrenderのリテラル図ソースをカード本文と照合し、接尾辞あり／なしの呼び出しをカードへ対応付けられない場合は未解決とする。テンプレート補間の実行コードを発見対象に残し、未解決スコープを除外しない。Carbonの移行パラメータ、HydrogenのSTOP限定履歴保存と全model_output本文集約、Decisionsの質問込み262,144トークン上限を訂正。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析が成功。詳細はdocs/PROGRESS.mdを参照。
@@ -663,7 +665,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3076 tests pass、2026-11-15レビュー12件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3077 tests pass、2026-11-15追加レビュー5件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
