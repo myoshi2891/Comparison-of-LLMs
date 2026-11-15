@@ -6,6 +6,14 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 初期化順序・別名ソース・不透明要素・履歴の追加レビュー4件（2026-11-15）
+
+- 4指摘とも現行コードで有効と確認。監査3契約とHydrogenの失敗時モックで修正前失敗を実測。コミットは作成しない。
+- CLASSDEFSは宣言位置・包含関係に加え、rendererを囲む関数の参照と呼び出し元を確認。初期化前の直接／別名／間接呼び出し、条件付き初期化、解析範囲外の構文は未解決とする。図ソースの別名や書き換え済みsrcも、寄与を確定できなければ接尾辞なしとして認定しない。
+- textarea・title・style・xmp・iframe・noembed・noframes・noscriptはscript収集とカード／空code探索の間は要素全体を退避し、後続の監査でも本文のタグ様文字列を解析しない。偽script・偽カード・偽codeが先行しても実際の兄弟payloadを保持する。
+- Hydrogenのstepは一時履歴をcontentsへ渡し、生成成功後にユーザー入力と返却contentをまとめて保存。失敗時の履歴不変、同じ入力での再試行、重複なし、署名付きcontentの同一性、会話間の分離をモック確認。
+- 検証: 監査100件、FableのHTML原本監査exit 0、Hydrogenのモック、変更Markdown4ファイルのlint、差分検査が成功。web-next・scraperの実装は無変更のため全体テスト・型・Biome・pytest・ビルドは再実行していない。直前の実測はweb240 files／3075 tests・pytest138件＋39 subtests。実APIは呼び出していない。
+
 ## テンプレート補間・空code・履歴例・費用例のレビュー4件（2026-11-15）
 
 - 4指摘とも現行コードで有効と確認して修正。監査2契約と費用例の追加ケースで修正前失敗を確認。コミットは作成しない。
@@ -415,7 +423,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `fa37f3f4`（レビュー11件の記録同期。今回のレビュー4件の修正は未コミット）。
+- **最新実装 HEAD**: `f73087cf`（前回レビュー4件の記録同期。今回の追加レビュー4件の修正は未コミット）。
 - **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
@@ -891,7 +899,8 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
-最新実装HEAD: fa37f3f4（レビュー11件の記録同期。今回のレビュー4件の修正は未コミット。冒頭のレビュー4件の節を参照）。
+最新実装HEAD: f73087cf（前回レビュー4件の記録同期。今回の追加レビュー4件の修正は未コミット。冒頭の追加レビュー4件の節を参照）。
+追加レビュー4件は監査100件・HTML原本監査exit 0・Hydrogenの生成失敗／再試行モック・変更Markdown lintが成功。初期化順序や別名ソースの寄与が不明なら未解決とし、textarea等の偽タグを不透明に保つ。Hydrogenは成功時だけ履歴を保存。アプリ全体の再検証は未実行。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
