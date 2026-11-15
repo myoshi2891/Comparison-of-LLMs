@@ -877,3 +877,45 @@ test("rejects shadowed or unestablished src bindings and accepts the selected sc
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
 });
+
+test("requires src initialization to execute before rendering", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const init = `var src = ${JSON.stringify(chart)};`;
+ for (const suffix of ['', ' + CLASSDEFS']) {
+  const render = `mermaid.render('id', src${suffix});`;
+  const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+  for (const body of [
+   `if (enabled) ${init} ${render}`,
+   `while (enabled) ${init} ${render}`,
+   `draw(); ${init} function draw() { ${render} }`,
+   `const early = draw; early(); ${init} function draw() { ${render} }`,
+  ]) {
+   const result = audit(`${card}<script>const CLASSDEFS = ''; ${body}</script>`, page);
+   assert.equal(result.status, 1, body);
+   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+  }
+  for (const body of [
+   `${init} ${render}`,
+   `function draw() { ${init} ${render} } draw();`,
+   `${init} function draw() { ${render} } draw();`,
+   `if (enabled) { ${init} ${render} }`,
+  ]) assert.equal(audit(`${card}<script>const CLASSDEFS = ''; ${body}</script>`, page).status, 0, body);
+ }
+});
+
+test("uses descendant script order for runtime selection while retaining nearest-card ownership", () => {
+ const parent = 'flowchart LR\nP --> Q';
+ const child = 'flowchart LR\nA --> B';
+ const page = [child, parent].map((s,i) => `const D${i} = ${JSON.stringify(s)}; <MermaidDiagram chart={D${i}} />`).join('');
+ for (const selector of ['script', 'script[type="text/plain"]']) {
+  const runtime = `<script>const card = document.querySelector('#parent'); const src = card.querySelector('${selector}').textContent; mermaid.render('id', src);</script>`;
+  const nested = `<div id="child" class="diagram-card"><script type="text/plain">${child}</script></div>`;
+  const own = `<script type="text/plain">${parent}</script>`;
+  const result = audit(`<div id="parent" class="diagram-card">${nested}${own}</div>${runtime}`, page);
+  assert.equal(result.status, 1, selector);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:parent', 'renderer:child']);
+  const ownFirst = audit(`<div id="parent" class="diagram-card">${own}${nested}</div>${runtime}`, page);
+  assert.deepEqual(ownFirst.data.unresolvedMermaidSources, ['renderer:child']);
+ }
+});

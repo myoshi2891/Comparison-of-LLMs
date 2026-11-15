@@ -1005,6 +1005,51 @@ function readHtmlAttribute(attributes, name) {
 
 const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
 
+/** Prove ordinary initialization and all enclosing callable activations precede rendering. */
+function initializerRunsBefore(executable, declarationIndex, initializedAt, declarationPath, positions) {
+  // An unbraced conditional/loop may skip the initializer. Require an ordinary
+  // statement boundary rather than treating a lexical declaration as dominance.
+  const previous = executable.slice(0, declarationIndex).trimEnd().at(-1);
+  if (previous !== undefined && !";{}".includes(previous)) return false;
+  // Source order inside a hoisted function is not execution order. Trace all
+  // references to enclosing named functions (including aliases and callers),
+  // rejecting any activation whose order relative to initialization is unknown.
+  const functions = Array.from(executable.matchAll(/\bfunction(?:\s+([A-Za-z_$][\w$]*))?\s*\([^(){}]*\)\s*\{|(?:\([^(){}]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g), head => {
+    const body = head.index + head[0].length - 1;
+    let depth = 1;
+    let end = body + 1;
+    while (end < executable.length && depth > 0) {
+      if (executable[end] === "{") depth++;
+      else if (executable[end] === "}") depth--;
+      end++;
+    }
+    return { start: head.index, body, end, name: head[1], nameIndex: head[1] ? head.index + head[0].indexOf(head[1], 8) : -1 };
+  });
+  // Unsupported callable syntax needs a parser to prove activation order.
+  if (/=>\s*(?!\s*\{)/.test(executable) || /\bclass\b/.test(executable) ||
+      Array.from(executable.matchAll(/\bfunction\b/g)).some(head => !functions.some(fn => fn.start === head.index))) return false;
+  const checked = new Set();
+  const active = new Set();
+  const followsInitialization = position => {
+    if (position < initializedAt) return false;
+    for (const fn of functions.filter(fn => fn.body < position && position < fn.end && !declarationPath.includes(fn.body))) {
+      if (checked.has(fn)) continue;
+      if (active.has(fn) || fn.start < initializedAt) return false;
+      active.add(fn);
+      if (fn.name) {
+        const references = executable.matchAll(new RegExp(`(?<![\\w$])${fn.name.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
+        for (const reference of references) {
+          if (reference.index !== fn.nameIndex && !followsInitialization(reference.index)) return false;
+        }
+      }
+      active.delete(fn);
+      checked.add(fn);
+    }
+    return true;
+  };
+  return positions.every(followsInitialization);
+}
+
 /** Resolve CLASSDEFS in this scope: undefined = unused, null = unresolved, string = evaluated. */
 function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScript) {
   const resolution = {};
@@ -1046,6 +1091,7 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       const start = d.index + d[0].length;
       const end = executable.indexOf(";", start);
       if (end < 0 || end > before) return undefined;
+      if (!initializerRunsBefore(executable, d.index, end, pathAt(d.index), [before])) return undefined;
       return rawSource.slice(start, end).trim();
     };
     const initial = binding("src");
@@ -1215,47 +1261,7 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
   const literal = complete && initializer[1];
   if (!literal) return null;
   const initializedAt = declaration.index + initializer[0].length;
-  // An unbraced conditional/loop may skip the initializer. Require an ordinary
-  // statement boundary rather than treating a lexical declaration as dominance.
-  const previous = executable.slice(0, declaration.index).trimEnd().at(-1);
-  if (previous !== undefined && !";{}".includes(previous)) return null;
-  // Source order inside a hoisted function is not execution order. Trace all
-  // references to enclosing named functions (including aliases and callers),
-  // rejecting any activation whose order relative to initialization is unknown.
-  const functions = Array.from(executable.matchAll(/\bfunction(?:\s+([A-Za-z_$][\w$]*))?\s*\([^(){}]*\)\s*\{|(?:\([^(){}]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g), head => {
-    const body = head.index + head[0].length - 1;
-    let depth = 1;
-    let end = body + 1;
-    while (end < executable.length && depth > 0) {
-      if (executable[end] === "{") depth++;
-      else if (executable[end] === "}") depth--;
-      end++;
-    }
-    return { start: head.index, body, end, name: head[1], nameIndex: head[1] ? head.index + head[0].indexOf(head[1], 8) : -1 };
-  });
-  // Unsupported callable syntax needs a parser to prove activation order.
-  if (/=>\s*(?!\s*\{)/.test(executable) || /\bclass\b/.test(executable) ||
-      Array.from(executable.matchAll(/\bfunction\b/g)).some(head => !functions.some(fn => fn.start === head.index))) return null;
-  const checked = new Set();
-  const active = new Set();
-  const followsInitialization = position => {
-    if (position < initializedAt) return false;
-    for (const fn of functions.filter(fn => fn.body < position && position < fn.end && !declarationPath.includes(fn.body))) {
-      if (checked.has(fn)) continue;
-      if (active.has(fn) || fn.start < initializedAt) return false;
-      active.add(fn);
-      if (fn.name) {
-        const references = executable.matchAll(new RegExp(`(?<![\\w$])${fn.name.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
-        for (const reference of references) {
-          if (reference.index !== fn.nameIndex && !followsInitialization(reference.index)) return false;
-        }
-      }
-      active.delete(fn);
-      checked.add(fn);
-    }
-    return true;
-  };
-  if (renderUses.some(use => !followsInitialization(use.call))) return null;
+  if (!initializerRunsBefore(executable, declaration.index, initializedAt, declarationPath, renderUses.map(use => use.call))) return null;
   const parts = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2], true));
   return parts.some(part => part === undefined) ? null : parts.join("");
 }
@@ -1356,8 +1362,9 @@ function materializePlainTextCards(src) {
         : (matching.length === 0 && scopes.length === 1 && !scopes[0].hasSelection ? scopes[0] : undefined);
       const cardId = readHtmlAttribute(card.openingTag, "id") ?? `card-${marker[1]}`;
       if (!renderer && scopes.length > 0) unresolvedMermaidSources.push(`renderer:${cardId}`);
-      const firstScript = /<script data-audit-payload="(\d+)"><\/script>/.exec(ownedContent);
-      const firstPlain = Array.from(ownedContent.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
+      // querySelector searches all descendants; ownership masking is only for payload selection.
+      const firstScript = /<script data-audit-payload="(\d+)"><\/script>/.exec(card.content);
+      const firstPlain = Array.from(card.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
       const resolvedSuffix = renderer && rendererSuffix(renderer.literalSource, renderer.rawSource, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
