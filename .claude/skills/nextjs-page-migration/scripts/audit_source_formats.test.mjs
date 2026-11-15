@@ -420,7 +420,7 @@ test("ignores quoted render examples and quoted CLASSDEFS declarations", () => {
  const declaration = `const CLASSDEFS = ${JSON.stringify(suffix)};`;
  const render = "mermaid.render('id', src + CLASSDEFS);";
  const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
- for (const example of [JSON.stringify(render), "'mermaid.render(id, src + CLASSDEFS)'", '`mermaid.render(id, src + CLASSDEFS)`', "mermaid.render('id', 'src + CLASSDEFS')"]) {
+ for (const example of [JSON.stringify(render), "'mermaid.render(id, src + CLASSDEFS)'", '`mermaid.render(id, src + CLASSDEFS)`']) {
   const source = `${card}<script>${declaration}${example};</script>`;
   assert.equal(audit(source, page(chart)).status, 0, example);
   assert.equal(audit(source, page(chart + suffix)).status, 1, example);
@@ -782,4 +782,55 @@ test("materializes empty code with whitespace before the closing tag delimiter",
   assert.deepEqual(empty.data.missingCodeBlocks, ['print("kept")']);
   assert.equal(audit(source, '<pre><code>{\'print("kept")\'}</code></pre>').status, 0);
  }
+});
+
+test("verifies render literals against the owning card payload", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const other = 'flowchart LR\nX --> Y';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const unrelated = audit(`${card}<script>mermaid.render('id', 'src + CLASSDEFS');</script>`, page);
+ assert.equal(unrelated.status, 1);
+ assert.deepEqual(unrelated.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ for (const quote of ['"', "'", '`']) {
+  const literal = value => quote + value.replace(/\n/g, '\\n') + quote;
+  assert.equal(audit(`${card}<script>mermaid.render('id', ${literal(chart)});</script>`, page).status, 0);
+  const result = audit(`${card}<script>mermaid.render('id', ${literal(other)});</script>`, page);
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("does not apply a suffixed call to suffix-free calls in the same scope", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const cards = ['one', 'two'].map(id => `<div id="${id}" class="diagram-card"><script type="text/plain">${chart}</script></div>`).join('');
+ for (const calls of [
+  'mermaid.render("a", src); mermaid.render("b", src + CLASSDEFS);',
+  'mermaid.render("b", src + CLASSDEFS); mermaid.render("a", src);',
+ ]) {
+  const source = `${cards}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; document.querySelector('#one'); document.querySelector('#two'); ${calls}</script>`;
+  const page = ['D1', 'D2'].map(id => `const ${id} = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={${id}} />`).join('');
+  const result = audit(source, page);
+  assert.equal(result.status, 1);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:one', 'CLASSDEFS:two']);
+ }
+});
+
+test("keeps executable template interpolations unresolved through scope discovery", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ for (const expression of [
+  '`text ${mermaid.render("id", src + CLASSDEFS)}`',
+  '`text ${`nested ${mermaid.render("id", src + CLASSDEFS)}`}`',
+  '`text ${renderChart()}`',
+  '`text ${({ key: "}" }, mermaid.render("id", src + CLASSDEFS))}`',
+ ]) {
+  const result = audit(`${card}<script>const CLASSDEFS = '\\nclassDef box fill:#fff;'; const result = ${expression};</script>`, page);
+  assert.equal(result.status, 1, expression);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+ const literal = `${card}<script>const example = \`literal mermaid.render("id", src + CLASSDEFS)\`;</script>`;
+ assert.equal(audit(literal, page).status, 0);
 });

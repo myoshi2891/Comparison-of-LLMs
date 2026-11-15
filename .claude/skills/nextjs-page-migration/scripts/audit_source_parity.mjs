@@ -601,13 +601,14 @@ function normalizeUrl(url) {
 }
 
 /**
- * Masks comments, regex literals and template contents, optionally quoted strings too.
+ * Masks comments, regex literals and template text, preserving executable interpolations.
  * @param {string} src - The module source text.
  * @param {boolean} preserveQuotedStrings - Keep single/double-quoted contents for literal extraction.
- * @param {{uncertain?: boolean}} resolution - Records ambiguous slash classification.
+ * @param {{uncertain?: boolean, interpolation?: boolean}} resolution - Records unresolved code.
+ * @param {boolean} stopAtClosingBrace - Stop at the end of a recursive interpolation scan.
  * @return {string} The source with non-code contents replaced by spaces, preserving offsets.
  */
-function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}) {
+function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, stopAtClosingBrace = false) {
   const blank = (text) => text.replace(/[^\n]/g, " ");
   let out = "";
   let index = 0;
@@ -619,6 +620,7 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}) {
   while (index < src.length) {
     const char = src[index];
     const next = src[index + 1];
+    if (stopAtClosingBrace && char === "}" && braces.length === 0) break;
     if (char === "/" && next === "/") {
       const lineEnd = src.indexOf("\n", index);
       const stop = lineEnd === -1 ? src.length : lineEnd;
@@ -656,17 +658,31 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}) {
     }
     if (char === "`" || char === '"' || char === "'") {
       let cursor = index + 1;
+      let maskedBody = "";
       while (cursor < src.length) {
         if (src[cursor] === "\\") {
+          maskedBody += blank(src.slice(cursor, cursor + 2));
           cursor += 2;
           continue;
         }
         if (src[cursor] === char) break;
         if (char !== "`" && src[cursor] === "\n") break;
+        if (char === "`" && src[cursor] === "$" && src[cursor + 1] === "{") {
+          // Interpolations execute code. Keep it offset-aligned for discovery,
+          // including nested templates, while declining to evaluate its effects.
+          resolution.interpolation = true;
+          const expression = blankNonCodeText(src.slice(cursor + 2), preserveQuotedStrings, resolution, true);
+          maskedBody += "${" + expression;
+          cursor += 2 + expression.length;
+          if (src[cursor] === "}") { maskedBody += "}"; cursor++; }
+          else resolution.uncertain = true;
+          continue;
+        }
+        maskedBody += blank(src[cursor]);
         cursor += 1;
       }
       const body = src.slice(index + 1, Math.min(cursor, src.length));
-      out += char + (char === "`" || !preserveQuotedStrings ? blank(body) : body) + (src[cursor] === char ? char : "");
+      out += char + (char === "`" ? maskedBody : !preserveQuotedStrings ? blank(body) : body) + (src[cursor] === char ? char : "");
       index = Math.min(cursor + (src[cursor] === char ? 1 : 0), src.length);
       canStartRegex = false;
       lastToken = "string";
@@ -990,10 +1006,10 @@ function readHtmlAttribute(attributes, name) {
 const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
 
 /** Resolve CLASSDEFS in this scope: undefined = unused, null = unresolved, string = evaluated. */
-function rendererSuffix(literalSource, rawSource) {
+function rendererSuffix(literalSource, rawSource, payload) {
   const resolution = {};
   blankNonCodeText(rawSource, false, resolution);
-  if (resolution.uncertain) return null;
+  if (resolution.uncertain || resolution.interpolation) return null;
   const executable = blankNonCodeText(literalSource, false);
   const srcWasRewritten = (before, allowInitializer = false) => {
     const code = executable.slice(0, before);
@@ -1005,6 +1021,7 @@ function rendererSuffix(literalSource, rawSource) {
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
   const renderUses = [];
+  let suffixFree = false;
   for (const call of executable.matchAll(/\bmermaid\.render\s*\(/g)) {
     const start = call.index + call[0].length;
     const arguments_ = [];
@@ -1044,6 +1061,12 @@ function rendererSuffix(literalSource, rawSource) {
       const base = expression.trim();
       if (base !== "src" && !/^(?:"[^"\r\n]*"|'[^'\r\n]*'|`[^`]*`)$/.test(base)) return null;
       if (base === "src" && srcWasRewritten(call.index)) return null;
+      if (base !== "src") {
+        const literal = rawSource.slice(source.start, source.end).trim();
+        const value = decodeQuotedEntryEscapes(literal.slice(1, -1), true);
+        if (value === undefined || normalizeMermaidSource(value) !== normalizeMermaidSource(payload)) return null;
+      }
+      suffixFree = true;
       continue;
     }
     const unwrap = value => {
@@ -1073,6 +1096,9 @@ function rendererSuffix(literalSource, rawSource) {
     renderUses.push({ index: source.start + names[0].index, call: call.index });
   }
   if (renderUses.length === 0) return undefined;
+  // Selector collection is scope-wide: it cannot associate mixed calls with
+  // individual cards. Preserve the ambiguity instead of applying one suffix to all.
+  if (suffixFree) return null;
   // Locate the declaration in code, then read its literal from the offset-aligned view.
   const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
   if (!declaration) return null;
@@ -1198,6 +1224,8 @@ function materializePlainTextCards(src) {
     ...executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() === "module").map(script => [script]),
   ].map(group => {
     const rawSource = group.map(script => script.payload).join("\n;\n");
+    const resolution = {};
+    blankNonCodeText(rawSource, false, resolution);
     const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n;\n");
     const executable = blankNonCodeText(literalSource, false);
     const selectors = [];
@@ -1206,7 +1234,7 @@ function materializePlainTextCards(src) {
       const argument = /^\s*(['"])((?:[^\\]|\\.)*?)\1\s*\)/.exec(literalSource.slice(call.index + call[0].length));
       if (argument) selectors.push(decodeQuotedEntryEscapes(argument[2]));
     }
-    return { suffix: rendererSuffix(literalSource, rawSource), selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) };
+    return { literalSource, rawSource, selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation };
   }).filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const cards = extractElementContents(stashed, tag => {
@@ -1249,8 +1277,9 @@ function materializePlainTextCards(src) {
         : (matching.length === 0 && scopes.length === 1 && !scopes[0].hasSelection ? scopes[0] : undefined);
       const cardId = readHtmlAttribute(card.openingTag, "id") ?? `card-${marker[1]}`;
       if (!renderer && scopes.length > 0) unresolvedMermaidSources.push(`renderer:${cardId}`);
-      if (renderer?.suffix === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
-      const suffix = renderer?.suffix ?? "";
+      const resolvedSuffix = renderer && rendererSuffix(renderer.literalSource, renderer.rawSource, payload);
+      if (resolvedSuffix === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
+      const suffix = resolvedSuffix ?? "";
       edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(payload + suffix)}</div>` });
     }
   }
