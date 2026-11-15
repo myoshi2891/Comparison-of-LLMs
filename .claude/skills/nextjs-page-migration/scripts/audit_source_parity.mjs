@@ -1105,7 +1105,9 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       }
       return path;
     };
-    const binding = (name, at = before) => {
+    // Resolve the binding visible at `at`, with the position its initializer runs.
+    // References inside that initializer resolve there, not at the later use.
+    const bindingAt = (name, at = before) => {
       const callPath = pathAt(at);
       const hidden = new RegExp(`\\b(?:function\\b[^()]*|catch)\\s*\\([^)]*\\b${name}\\b|\\([^)]*\\b${name}\\b[^)]*\\)\\s*=>|\\b${name}\\s*=>`);
       if (hidden.test(executable) || /\bclass\b/.test(executable)) return undefined;
@@ -1115,20 +1117,26 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       if (!declarations.length) return undefined;
       const d = declarations[0];
       if (declarations.slice(1).some(other => pathAt(other.index).length === pathAt(d.index).length)) return undefined;
-      // A redeclaration in this block or a nested one, even after this use, can
-      // run first in a deferred call (a nested `var` writes the same binding).
+      // A redeclaration in this block, or a nested `var` (function-scoped), can
+      // write this binding before a deferred use. Nested let/const only shadow it.
       const declarationPath = pathAt(d.index);
-      if (Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}\\s*=`, "g"))).some(other =>
-        other.index !== d.index && declarationPath.every((block, i) => pathAt(other.index)[i] === block))) return undefined;
+      if (Array.from(executable.matchAll(new RegExp(`\\b(const|let|var)\\s+${name}\\s*=`, "g"))).some(other => {
+        if (other.index === d.index) return false;
+        const otherPath = pathAt(other.index);
+        if (!declarationPath.every((block, i) => otherPath[i] === block)) return false;
+        return otherPath.length === declarationPath.length || other[1] === "var";
+      })) return undefined;
       const initializers = declarationNames(name);
       if (Array.from(writeIndexes(name)).some(write => !initializers.has(write))) return undefined;
       const start = d.index + d[0].length;
       const end = executable.indexOf(";", start);
       if (end < 0 || end > at) return undefined;
       if (!initializerRunsBefore(executable, d.index, end, pathAt(d.index), [at])) return undefined;
-      return rawSource.slice(start, end).trim();
+      return { value: rawSource.slice(start, end).trim(), at: start };
     };
-    const initial = binding("src");
+    const binding = (name, at = before) => bindingAt(name, at)?.value;
+    const initialBinding = bindingAt("src");
+    const initial = initialBinding?.value;
     if (initial === undefined || srcWasRewritten()) return false;
     if (/^['"`]/.test(initial)) {
       if (skipQuoted(initial, 0) !== initial.length - 1) return false;
@@ -1141,11 +1149,12 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       const selected = query.exec(value);
       if (!selected || !/^script(?:\[type=['"]?text\/plain['"]?\])?$/.test(selected[3])) return false;
       if (!(selected[3] === "script" ? selectedScript.any : selectedScript.plain)) return false;
-      const owner = binding(selected[1], at);
+      const ownerBinding = bindingAt(selected[1], at);
+      const owner = ownerBinding?.value;
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
       if (direct) return selectedScript.unique(direct[2]);
       const indexed = owner && /^(\w+)\[(\w+)\]$/.exec(owner);
-      const collection = indexed && binding(indexed[1], at);
+      const collection = indexed && binding(indexed[1], ownerBinding.at);
       const all = collection && /^document\.querySelectorAll\(\s*(['"])(.*?)\1\s*\)$/.exec(collection);
       // The supported indexed traversal visits the selected cards in order.
       return !!all && matchesCardSelector(cardTag, all[2]) &&
@@ -1188,9 +1197,11 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       if (scriptElement(reference, at)) return true;
       if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
       seen.add(reference);
-      return isSelectedScript(binding(reference, at) ?? "", at, seen);
+      const alias = bindingAt(reference, at);
+      return isSelectedScript(alias?.value ?? "", alias?.at ?? at, seen);
     };
-    if (!isSelectedScript(element)) return false;
+    // The src initializer evaluates `element` where it runs, not at the render call.
+    if (!isSelectedScript(element, initialBinding.at)) return false;
     const mayBeSelectedScript = (reference, at, seen = new Set()) => {
       if (isSelectedScript(reference, at)) return true;
       if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
@@ -1392,7 +1403,10 @@ function materializePlainTextCards(src) {
       const argument = /^\s*(['"])((?:[^\\]|\\.)*?)\1\s*\)/.exec(literalSource.slice(call.index + call[0].length));
       if (argument) selectors.push(decodeQuotedEntryEscapes(argument[2]));
     }
-    return { literalSource, rawSource, selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation };
+    // An uncertain slash may have masked a renderer as a string/regex. Keep the
+    // scope so rendererSuffix reports it unresolved instead of dropping it.
+    const maskedRenderer = resolution.uncertain && /\bmermaid\.render\b/.test(rawSource);
+    return { literalSource, rawSource, selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer };
   }).filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const cards = extractElementContents(stashed, tag => {
