@@ -6,6 +6,15 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 初期化実行順序・子カードscript・再開記録・品質判定のレビュー5件（2026-11-15）
+
+- 5件すべて現行コードで有効と確認して修正。監査2回帰テストとMoonshotの価格途中で走査を止める回帰テストで修正前失敗を実測。本セッションではコミットを作成しない。
+- srcの宣言位置・波括弧の可視範囲だけでなく、通常の文境界からの初期化と、rendererを囲む関数の起動順序を確認。既存CLASSDEFSの検証を共通化してsrcとカード参照の初期化にも適用し、条件付き初期化・初期化前の直接／別名呼び出しは未解決とする。直前の通常初期化・同じ関数内の初期化・同じ条件ブロック内の初期化は維持。
+- 実行時のfirstScript／firstPlainは子カードを含むcard.contentの子孫順で照合。ownedContentによる最寄りカードへのpayload所有判定は維持。親より先に子のscriptを選ぶ場合を拒否し、親のscriptが先なら親の対応を認定する。
+- 現在地・再開プロンプトの現在の実装checkpointを4a02de85へ統一し、そのcheckpointまでの修正がコミット済みであることを明記。f73087cfと当時の未コミット状態は日付付きの過去記録に限定。
+- Carbonはhighの結果が品質要件を満たすかを先に判定し、不合格は分割／別モデルへ送る。品質を満たした場合の既存のコスト・遅延判定は保持。Moonshotのcached input価格は全digit／period列を消費した後の境界を要求し、価格途中までのバックトラックを拒否。標準入力／outputとscraped provenanceの既存fixtureを保持。
+- 検証: 監査107件、pytest141件＋39 subtests、FableのHTML原本監査exit 0、Mermaid24図解析と品質分岐の検証、変更Markdown lint、差分検査が成功。web-nextの実装は無変更のため全体テスト・型・Biome・ビルドは再実行していない。直前のフロント全体実測は240 files／3077 tests。ビルドの最後の成功は11月14日、11月15日の初回・再試行は権限制限で失敗。
+
 ## src束縛・PDF上限・キャッシュ価格・pause_turnの追加レビュー5件（2026-11-15）
 
 - 5件すべて現行コードで有効と確認して修正。監査・Moonshot・Fableの回帰テストで修正前失敗を確認。実装・原本・契約・PDF修正（178eab05／ce867b89／8e55869a／4a02de85）および検証記録の同期をカテゴリ別にコミット済み。
@@ -42,6 +51,7 @@
 
 ## 初期化順序・別名ソース・不透明要素・履歴の追加レビュー4件（2026-11-15）
 
+- 当時の実装checkpointはf73087cfで、この追加レビュー4件の修正は当時未コミットだった。現在の実装checkpointは現在地と再開プロンプトを参照。
 - 4指摘とも現行コードで有効と確認。監査3契約とHydrogenの失敗時モックで修正前失敗を実測。コミットは作成しない。
 - CLASSDEFSは宣言位置・包含関係に加え、rendererを囲む関数の参照と呼び出し元を確認。初期化前の直接／別名／間接呼び出し、条件付き初期化、解析範囲外の構文は未解決とする。図ソースの別名や書き換え済みsrcも、寄与を確定できなければ接尾辞なしとして認定しない。
 - textarea・title・style・xmp・iframe・noembed・noframes・noscriptはscript収集とカード／空code探索の間は要素全体を退避し、後続の監査でも本文のタグ様文字列を解析しない。偽script・偽カード・偽codeが先行しても実際の兄弟payloadを保持する。
@@ -457,7 +467,7 @@
 
 - **フェーズ**: 保守・機能改善・品質強化フェーズ
 - **ブランチ**: `dev`
-- **最新実装 HEAD**: `f73087cf`（前回レビュー4件の記録同期。今回の追加レビュー4件の修正は未コミット）。
+- **最新実装 HEAD**: `4a02de85`（src束縛・キャッシュ入力価格・pause_turnのcheckpoint・PDF上限までの修正はコミット済み）。
 - **次の作業**: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（7ページとも未完了、ユーザー担当、localhost:3000）。各ページは個別の完了確認が得られるまで目視未確認として残す。2026-11-11の移行時はnpm・ビルド未実行。2026-11-12には `bun run build` が成功（114静的ページ生成）。
   - Fable 5.2 `/claude/fable-5-2-best-practices`: 288px目次・900px開閉・19章・点と番号・45表363行・19コード例・10図・9リスト41チェックの独立進捗を確認。
   - Codex `/codex/best-practices`: 目次のアンカー移動でヘッダー・免責バナー・モバイルバーに見出しが隠れないことを確認。
@@ -476,7 +486,7 @@
     - 過去のClaudeモデルガイド初回全体検証では2239件中registryの日付不変条件1件が失敗し、専用Red／Greenで修正済み。2026-11-05の全体2588件はすべて成功。Grok Bot移行の範囲では依存・設定・ロックを変更していないが、移行後の `b99b83dc` で `web-next/package.json` の devDependencies へ `postcss` を追加し、`web-next/bun.lock` も変更した（承認は未確認。本書の「postcss の devDependencies 追加」節を参照）。
     - `load(sourceHtml)` をモジュール初期化時に呼ぶ `governance/ai-governance/GuideContent.tsx` と
       `local-llm/finetuning-best-practices/GuideContent.tsx` は、import スモークでも読み込み可能であることを確認済み
-  - **バックエンド (`scraper/`)**: `uv run pytest -q` で140件＋39 subtests成功（2026-11-15実測。UV_CACHE_DIRを一時領域へ指定）。
+  - **バックエンド (`scraper/`)**: `uv run pytest -q` で141件＋39 subtests成功（2026-11-15実測。UV_CACHE_DIRを一時領域へ指定）。
 
 ## 最近の追加内容
 
@@ -935,9 +945,9 @@
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
 追加レビュー5件は全件修正・コミット済み（実装HEAD 4a02de85、検証記録同期済み）。src束縛とpayload対応の検証・キャッシュ入力価格除外・pause_turn直後のcheckpoint保存・PDF上限を訂正。全体Vitest240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査exit 0成功。冒頭の追加レビュー5件の節を参照。
 最新のレビュー4件は3件修正・1件スキップ。コメントのみのcodeは既に拒否され、回帰テストを追加して監査104件成功。冒頭のレビュー4件の節を参照。ビルドは11月14日が最後の成功、11月15日は初回・再試行とも失敗。
-追加レビュー7件は未コミットで修正済み。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析成功。冒頭の追加レビュー7件の節を参照。web-next／scraperの実装は無変更で、全体検証は前回実測を維持。
-今回のレビュー12件は未コミットで修正済み。冒頭のレビュー12件の節を参照。全体Vitest240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtests・型・Biome・HTML原本監査exit 0が成功。ビルドはTurbopackのローカルポート制限で失敗（再実行でも同じ）。
-最新実装HEAD: f73087cf（前回レビュー4件の記録同期。今回の追加レビュー4件の修正は未コミット。冒頭の追加レビュー4件の節を参照）。
+以前の追加レビュー7件も修正・コミット済み。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析成功の当時の記録は該当節を参照。
+以前のレビュー12件も修正・コミット済み。全体Vitest240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtestsの当時の記録は該当節を参照。ビルドはTurbopackのローカルポート制限で失敗（再実行でも同じ）。
+最新実装HEAD: 4a02de85（src束縛・キャッシュ入力価格・pause_turnのcheckpoint・PDF上限までの修正はコミット済み）。
 追加レビュー4件は監査100件・HTML原本監査exit 0・Hydrogenの生成失敗／再試行モック・変更Markdown lintが成功。初期化順序や別名ソースの寄与が不明なら未解決とし、textarea等の偽タグを不透明に保つ。Hydrogenは成功時だけ履歴を保存。アプリ全体の再検証は未実行。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices
