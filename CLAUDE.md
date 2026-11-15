@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-15レビュー4件: 原本監査は図ソースのテンプレート補間を未解決として停止し、空codeの閉じタグ区切り前の空白も認識する。Hydrogenの履歴例はツールなしのテキスト専用と明記。Fableの費用例は集計キャッシュ書込のTTL未帰属分を非負に丸めて5分単価で加算し、原本・JSX・契約を同期。全体240 files／3075 tests・監査97件・Fable対象75件・型・lint657 files・HTML原本監査exit 0が成功。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-15レビュー11件: 原本監査は独立scriptの文境界・render第2引数・括弧付きCLASSDEFS・HTMLタグの大小文字を扱う。Carbonは承認制御を試験運用の前へ移し、参照ラベルを保持した区切り修正でMarkdown lintを解消。Hydrogenはツール宣言をconfig経由へ訂正。Fableはstrictの入力検証とJSON応答を区別し、autoで未呼び出しの場合の扱いを原本・JSX・契約へ同期。ビルド最新実測は2026-11-14の115静的ページ成功で、以後の変更は未ビルド。全体240 files／3075 tests・監査95件・型・lint657 files・HTML原本監査exit 0が成功。検証結果はdocs/PROGRESS.mdを参照。
 
 2026-11-15レビュー8件: 原本監査の境界走査は他タグの引用属性とコメントを丸ごと消費し、同名タグの深さだけを更新。CLASSDEFSは宣言がrenderを囲む範囲にあるか確認し、引数・catch・その他の曖昧な参照は未解決として停止。Carbonは認証コードを入力へ追加し、署名／履歴・暗黙キャッシュの移行項目とツール入力トークン課金を訂正。Hydrogenはxhighの品質判定とMAX_TOKENSの拒否を追加。監査91件・HTML原本監査exit 0・コード例のモック・19図解析・Hydrogen等のMarkdown lintが成功。Carbonの既存参照ラベルlint47件は不変。アプリと依存・設定は無変更。詳細はdocs/PROGRESS.mdを参照。
