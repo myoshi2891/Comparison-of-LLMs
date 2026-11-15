@@ -519,8 +519,16 @@ class TestMoonshot:
             models = moonshot.scrape()
         _assert_all_fallback(models, moonshot._FALLBACKS, "Moonshot(Kimi)")
 
-    def test_output_only_price_preserves_fallback_pair(self):
-        html = "<p>Kimi K3 input unavailable</p><p>Kimi K3 output $16.50</p>"
+    @pytest.mark.parametrize(
+        "html",
+        [
+            "<p>Kimi K3 input unavailable</p><p>Kimi K3 output $16.50</p>",
+            # cached input の価格読み飛ばしが output を越えると、後続の batch 価格を入力単価として拾う。
+            "<p>Kimi K3 input N/A cached input N/A output $16.50 (batch $8.25)</p>",
+            "<p>Kimi K3 cached input N/A output $16.50 (batch $8.25)</p>",
+        ],
+    )
+    def test_output_only_price_preserves_fallback_pair(self, html):
         with patch("scraper.providers.moonshot.get_page_text", return_value=html):
             model = _find(moonshot.scrape(), "Kimi K3")
         assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
