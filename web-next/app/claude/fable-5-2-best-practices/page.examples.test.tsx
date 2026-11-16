@@ -44,6 +44,12 @@ for name in ("usd", "estimate_usd"):
     for ttl, price in (("5m", 10), ("1h", 16)):
         assert scope[name]({"cache_creation_input_tokens": 1000000,
             "cache_creation": {"ephemeral_" + ttl + "_input_tokens": 1000000}}) == price
+    # 集計値のみ・内訳が一部のみの場合も、残りを既定の5分書き込み単価で課金する
+    assert scope[name]({"cache_creation_input_tokens": 1000000}) == 10
+    assert math.isclose(scope[name]({"cache_creation_input_tokens": 1000000, "cache_creation": {
+        "ephemeral_5m_input_tokens": 200000, "ephemeral_1h_input_tokens": 300000}}), 11.8)
+    assert math.isclose(scope[name]({"cache_creation_input_tokens": 100000, "cache_creation": {
+        "ephemeral_5m_input_tokens": 200000, "ephemeral_1h_input_tokens": 300000}}), 6.8)
 for mode, price in (("batch", 24), ("fast", 96)):
     assert scope["estimate_usd"]({"input_tokens": 1000000, "output_tokens": 1000000}, mode) == price
     for cached in ({"cache_read_input_tokens": 1}, {"cache_creation_input_tokens": 1},

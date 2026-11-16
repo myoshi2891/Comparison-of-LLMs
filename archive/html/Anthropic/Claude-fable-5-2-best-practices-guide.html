@@ -1932,12 +1932,16 @@
               def usd(usage: dict) -> float:
                   """usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。"""
                   cache = usage.get("cache_creation") or {}
+                  write_5m = cache.get("ephemeral_5m_input_tokens", 0)
+                  write_1h = cache.get("ephemeral_1h_input_tokens", 0)
+                  # TTL 内訳に含まれない集計分は、既定の5分書き込み単価で課金する
+                  write_5m += max(0, usage.get("cache_creation_input_tokens", 0) - write_5m - write_1h)
                   return (
                       usage.get("input_tokens", 0) * PRICE["in"]
                       + usage.get("output_tokens", 0) * PRICE["out"]
                       + usage.get("cache_read_input_tokens", 0) * PRICE["cache_read"]
-                      + cache.get("ephemeral_5m_input_tokens", 0) * PRICE["cache_write_5m"]
-                      + cache.get("ephemeral_1h_input_tokens", 0) * PRICE["cache_write_1h"]
+                      + write_5m * PRICE["cache_write_5m"]
+                      + write_1h * PRICE["cache_write_1h"]
                   ) / 1_000_000
 
 
