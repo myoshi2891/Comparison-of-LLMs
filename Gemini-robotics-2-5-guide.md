@@ -296,6 +296,7 @@ def to_pixel(point_yx: list[int], width: int, height: int) -> tuple[int, int]:
 ### 7.4 コンセンサス(複数回問い合わせ)の実装例 💡
 
 ```python
+import math
 import statistics
 
 def consensus_point(image_path: str, target: str, n: int = 5) -> tuple[float, float] | None:
@@ -310,6 +311,10 @@ def consensus_point(image_path: str, target: str, n: int = 5) -> tuple[float, fl
             if not isinstance(point, (list, tuple)) or len(point) != 2:
                 continue  # 座標が欠けている・2 要素でない回は捨てる
             y, x = point
+            # 0〜1000 の有限な数値のみ採用（bool・NaN・inf・範囲外は捨てる）
+            if not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+                       and math.isfinite(v) and 0 <= v <= 1000 for v in (y, x)):
+                continue
         except (ValueError, KeyError, TypeError, IndexError):
             continue  # 形式崩れの回は捨てる
         ys.append(y)
@@ -426,7 +431,9 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
                 # ソフトウェアの確認であり、独立した物理インターロックの代わりではない。
                 if estop_active():
                     return "aborted: emergency stop"
-                payload = execute_on_robot(fc.name, dict(fc.args))  # 実行結果を返す
+                # 実行器は status に加え、実行後の最新観測（画像・状態）を payload に含めて返す契約とする。
+                # status のみだと次ターンのモデルは新しい観測を得られない。
+                payload = execute_on_robot(fc.name, dict(fc.args))
             results.append(types.Part.from_function_response(name=fc.name, response=payload))
         contents.append(types.Content(role="user", parts=results))
     return "aborted: step limit reached"
@@ -641,7 +648,7 @@ flowchart TD
 | **呼び出し粒度を先に選ばせる** | 粗い(2〜4 回)/ 確認つき(4〜7 回)/ 細かい視覚サーボ(8〜20 回) | レイテンシと精度のトレードオフを明示的に選ばせる |
 | **失敗時の復帰手順を書く** | 「`grasp_failed` なら再観測して回復する」 | 失敗を想定した設計 |
 | **出力形式を固定** | JSON スキーマ、タグで囲む、時刻形式を指定 | 後段の自動処理が楽 |
-| **ハード制約はコードで強制** | AGENTS.md に安全規則(R5 など)を置いて参照させる | 実機を動かす自己改善で人手の安全規則に従わせる |
+| **ハード制約はコードで強制** | R5 などの安全規則は、モデルとは独立したコマンド検証器・インターロックで実行前に強制する。AGENTS.md はモデルへの指針であり、強制手段ではない | 実機運用では人による安全監督を維持し、モデルが規則を無視しても動作を止められるようにする |
 
 ### 12.3 ハインドサイトラベリング用の最小プロンプト例 💡
 

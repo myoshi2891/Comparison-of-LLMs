@@ -356,6 +356,7 @@ text = "".join(
     for content in (step.content or [])
     if content.type == "text" and content.text is not None
 )
+print(text)  # 生成された差分を表示する
 ```
 
 [公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。

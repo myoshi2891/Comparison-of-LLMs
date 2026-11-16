@@ -509,8 +509,9 @@ Gemini API の Managed Agents でも `gemini-4-carbon` をモデルとして指�
 
 ```python
 # 100万トークンあたりの単価（USD）
-INTRO = {"in": 2.00, "cached": 0.10, "out": 10.00}      # 〜2026-11-30
-STANDARD = {"in": 4.00, "cached": 0.20, "out": 20.00}   # 2026-12-01〜
+INTRO = {"in": 2.00, "cached": 0.10, "out": 10.00}      # 標準 Carbon の導入価格（〜2026-11-30）
+STANDARD = {"in": 4.00, "cached": 0.20, "out": 20.00}   # 標準 Carbon の通常価格（2026-12-01〜）
+# サイバー用途（gemini-4-carbon-cyber-permissive）は11月も導入割引なしで $4.00 / $0.20 / $20.00（STANDARD と同額）
 
 
 def estimate_cost(usage, rates):
@@ -531,8 +532,8 @@ def estimate_cost(usage, rates):
     return ((prompt + tool_prompt) * rates["in"] + cached * rates["cached"] + output * rates["out"]) / 1_000_000
 
 
-# 使い方: 11月の請求額を12月価格で再計算して予算を立てる
-# cost_nov = estimate_cost(response.usage_metadata, INTRO)
+# 使い方: 標準 Carbon の11月の請求額を12月価格で再計算して予算を立てる
+# cost_nov = estimate_cost(response.usage_metadata, INTRO)  # cyber-permissive には STANDARD を使う
 # cost_dec = estimate_cost(response.usage_metadata, STANDARD)
 ```
 

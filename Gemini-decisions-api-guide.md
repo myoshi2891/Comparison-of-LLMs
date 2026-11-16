@@ -131,7 +131,7 @@ result = client.decisions.create(
 | `noul` | 値は **0.01〜0.99** に収まり、0 や 1 にはならない | 閾値に `1.0` や `0.99` 超を使わない。0.9 / 0.1 などで判定 |
 | `choice` | 選択肢キーは **アルファベット順にソート** されてからスコアリングされる | 「該当なし」は `other` のように末尾に来る名前にする(`none_of_the_above` は先頭に来る) |
 | `choice` | **該当なしでも必ず確率が選択肢に分配される** | `noul` でスコープ判定を併用するか、`confidence` で足切りする |
-| `score` | `score` は **レベル番号の加重平均**(例: 1.12 は「ほぼレベル1、少しレベル2」) | 最頻レベルは `probabilities` から取る |
+| `score` | `score` は **ゼロ始まりのレベル番号の加重平均**(例: 段階が Clean = 0、Minor = 1、Major = 2 のとき、1.12 は「ほぼ Minor(2番目の段階)、少し Major」) | 最頻レベルは `probabilities` から取る |
 | 全型 | モデルは **質問キー名を見ない** | 質問の意味はすべて `instructions` に完全な文で書く |
 
 ### 3-2. `confidence` の定義
@@ -383,7 +383,7 @@ Google が公開している社内事例と、開発者コミュニティの提�
 | **リアルタイムUI** | 200超の絵文字から反応を選ぶ(CC)、Stitch の即時ワイヤーフレーム | Google 公式ブログ |
 | **全件クロスエンコーダ検索** | LLM が生成したルーブリックで全文書をスコアし上位をヒットとする(高速・低コストなため、最終リランクだけでなく全件に使える) | HN コメント(開発者の提案) |
 
-### 9-1. ガードレール(ADK の `before_model_callback`)
+### 9-1. ガードレール(ADK の `before_agent_callback`)
 
 GDE の検証では、ユーザー入力を LLM に渡す前に `noul` 1問で判定し、プロンプトインジェクションを **LLM を呼ばずにブロック** しました(確率 0.98)。
 
@@ -413,14 +413,14 @@ GUARD = {
 }
 
 
-def screen_input(callback_context, llm_request):
-    """ADK の before_model_callback の骨格(出典の考え方を簡略化した例)。"""
-    # ツール結果(function_response)を運ぶ user ロールはユーザー発話ではないため飛ばす。
-    last = next((
-        c for c in reversed(llm_request.contents or [])
-        if c.role == "user"
-        and not any(getattr(p, "function_response", None) for p in (c.parts or []))
-    ), None)
+def screen_input(callback_context):
+    """ADK の before_agent_callback の骨格(出典の考え方を簡略化した例)。
+
+    ユーザーメッセージの入口で、元のユーザー入力(callback_context.user_content)だけを判定する。
+    llm_request.contents から user ロールを探すと、ツール結果やエージェント返信を
+    判定対象に取り違える恐れがあるため使わない。
+    """
+    last = callback_context.user_content
     parts = (last.parts or []) if last else []
     # この骨格はテキスト専用。画像・音声・ファイル等は評価できないため、混在入力も拒否する。
     if not parts or any(not getattr(p, "text", None) or any(
