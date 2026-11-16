@@ -1026,6 +1026,47 @@ test("requires the dedent call to bind the canonical helper", () => {
  assert.equal(audit(`${card}<script>${canonicalDedent} ${use}</script>`, page).status, 0);
 });
 
+test("does not accept helper variants that change whitespace inside literals", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const select = `const card = document.querySelector('#chart'); const script = card.querySelector('script');`;
+ const use = `${select} const src = dedent(script.textContent); mermaid.render('id', src);`;
+ for (const variant of [
+  // 結合区切り・分割区切りに空白を足す、正規表現リテラル内の空白を変える。
+  canonicalDedent.replaceAll(".join('", ".join(' "),
+  canonicalDedent.replace("split('", "split(' "),
+  canonicalDedent.replace("[ ", "[  "),
+ ]) {
+  assert.notEqual(variant, canonicalDedent);
+  const result = audit(`${card}<script>${variant} ${use}</script>`, page);
+  assert.equal(result.status, 1, variant);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+ assert.equal(audit(`${card}<script>${canonicalDedent.replace(/ {2,}/g, '  ')} ${use}</script>`, page).status, 0);
+});
+
+test("requires the indexed card read to run inside the matching loop", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const cls = "";
+ const loop = 'for (var i = 0; i < cards.length; i++) {';
+ const pick = "var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src);";
+ const cards = "var cards = document.querySelectorAll('.diagram-card');";
+ assert.equal(audit(`${card}<script>${cls} ${cards} ${loop} ${pick} }</script>`, page).status, 0);
+ for (const body of [
+  // 一致するループが別の場所にあるだけで、読み取りはループの外。
+  `${cls} ${cards} var i = 0; ${pick} ${loop} }`,
+  `${cls} ${cards} ${loop} } var i = 0; ${pick}`,
+  // ループ本体が一部だけを含む場合も、読み取りが本体の外なら認めない。
+  `${cls} ${cards} ${loop} var card = cards[i]; } var src = card.querySelector('script').textContent; mermaid.render('x', src);`,
+ ]) {
+  const result = audit(`${card}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+ }
+});
+
 test("keeps scopes whose renderer may be hidden by an uncertain slash", () => {
  const chart = 'flowchart LR\nA --> B';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;

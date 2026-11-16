@@ -751,6 +751,64 @@ function skipQuoted(code, start) {
 }
 
 /**
+ * Removes insignificant whitespace from code while keeping string, template and regex literals intact.
+ *
+ * Whitespace between two identifier characters collapses to one space. Returns `undefined` when the
+ * text cannot be compared safely (unterminated literal, comment), so callers must treat it as unresolved.
+ *
+ * @param {string} text - Source text to compact.
+ * @returns {string | undefined} Compacted text, or undefined when literals cannot be delimited.
+ */
+function compactCodePreservingLiterals(text) {
+  let out = "";
+  let prev = "";
+  let pendingSpace = false;
+  const emit = chunk => {
+    if (pendingSpace && /[\w$]/.test(out.at(-1) ?? "") && /[\w$]/.test(chunk[0])) out += " ";
+    pendingSpace = false;
+    out += chunk;
+  };
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === "'" || c === '"' || c === "`") {
+      const end = skipQuoted(text, i);
+      if (text[end] !== c) return undefined;
+      emit(text.slice(i, end + 1));
+      i = end;
+      prev = c;
+      continue;
+    }
+    if (c === "/") {
+      if (text[i + 1] === "/" || text[i + 1] === "*") return undefined;
+      if (!prev || "(,=:[!&|?{};".includes(prev)) {
+        let j = i + 1;
+        let inClass = false;
+        while (j < text.length && (inClass || text[j] !== "/")) {
+          if (text[j] === "\n") return undefined;
+          if (text[j] === "\\") j++;
+          else if (text[j] === "[") inClass = true;
+          else if (text[j] === "]") inClass = false;
+          j++;
+        }
+        if (j >= text.length) return undefined;
+        while (/[a-z]/i.test(text[j + 1] ?? "")) j++;
+        emit(text.slice(i, j + 1));
+        i = j;
+        prev = "/";
+        continue;
+      }
+    }
+    if (/\s/.test(c)) {
+      pendingSpace = true;
+      continue;
+    }
+    emit(c);
+    prev = c;
+  }
+  return out;
+}
+
+/**
  * Masks balanced type-parameter and type-argument lists while preserving source offsets.
  *
  * Arrow operators inside these lists are ignored so function-type syntax does not close the list.
@@ -1157,8 +1215,19 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       const collection = indexed && binding(indexed[1], ownerBinding.at);
       const all = collection && /^document\.querySelectorAll\(\s*(['"])(.*?)\1\s*\)$/.exec(collection);
       // The supported indexed traversal visits the selected cards in order.
-      return !!all && matchesCardSelector(cardTag, all[2]) &&
-        new RegExp(`for\\s*\\(\\s*var\\s+${indexed[2]}\\s*=\\s*0\\s*;\\s*${indexed[2]}\\s*<\\s*${indexed[1]}\\.length\\s*;\\s*${indexed[2]}\\+\\+\\s*\\)`).test(executable);
+      if (!all || !matchesCardSelector(cardTag, all[2])) return false;
+      // The card initializer and this read must both run inside the body of the same loop;
+      // a matching loop elsewhere in the scope proves nothing about this payload.
+      const loopHeader = new RegExp(`for\\s*\\(\\s*var\\s+${indexed[2]}\\s*=\\s*0\\s*;\\s*${indexed[2]}\\s*<\\s*${indexed[1]}\\.length\\s*;\\s*${indexed[2]}\\+\\+\\s*\\)\\s*\\{`, "g");
+      return Array.from(executable.matchAll(loopHeader)).some(loop => {
+        const open = loop.index + loop[0].length - 1;
+        let depth = 0, close = -1;
+        for (let k = open; k < executable.length; k++) {
+          if (executable[k] === "{") depth++;
+          else if (executable[k] === "}" && --depth === 0) { close = k; break; }
+        }
+        return close > open && [ownerBinding.at, at].every(position => position > open && position < close);
+      });
     };
     let value = initial;
     if (value.startsWith("dedent(")) {
@@ -1188,7 +1257,11 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
         if (!isFinite(min) || min === 0) return lines.join('\n');
         return lines.map(function (l) { return l.slice(min); }).join('\n');
       }`;
-      if (rawSource.slice(head.index, end).replace(/\s/g, "") !== canonical.replace(/\s/g, "")) return false;
+      // Whitespace inside string and regex literals is significant (e.g. a join delimiter), so
+      // compare token-aware; an uncomparable helper stays unresolved.
+      const actualCompact = compactCodePreservingLiterals(rawSource.slice(head.index, end));
+      const canonicalCompact = compactCodePreservingLiterals(canonical);
+      if (actualCompact === undefined || actualCompact !== canonicalCompact) return false;
       value = value.slice(7, -1).trim();
     }
     if (!value.endsWith(".textContent")) return false;
