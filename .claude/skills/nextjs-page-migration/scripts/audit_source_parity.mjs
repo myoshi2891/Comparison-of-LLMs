@@ -693,7 +693,9 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
     if (word) {
       out += word;
       index += word.length;
-      canStartRegex = lastToken !== "." && /^(?:return|throw|case|delete|void|typeof|instanceof|in|of|yield|await|else|do)$/.test(word);
+      canStartRegex = lastToken === "." ? false : /^(?:return|throw|case|delete|void|typeof|instanceof|in|yield|await|else|do)$/.test(word)
+        // `of` is an ordinary identifier outside a for head; leave its slash unresolved.
+        || (word === "of" ? null : false);
       lastToken = word;
       continue;
     }
@@ -1108,8 +1110,8 @@ function initializerRunsBefore(executable, declarationIndex, initializedAt, decl
   return positions.every(followsInitialization);
 }
 
-/** Resolve CLASSDEFS in this scope: undefined = unused, null = unresolved, string = evaluated. */
-function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScript) {
+/** Resolve the runtime Mermaid source in this scope: undefined = unused, null = unresolved, string = evaluated. */
+function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, cardTag, selectedScript) {
   const resolution = {};
   blankNonCodeText(rawSource, false, resolution);
   if (resolution.uncertain || resolution.interpolation) return null;
@@ -1169,7 +1171,7 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       const callPath = pathAt(at);
       const hidden = new RegExp(`\\b(?:function\\b[^()]*|catch)\\s*\\([^)]*\\b${name}\\b|\\([^)]*\\b${name}\\b[^)]*\\)\\s*=>|\\b${name}\\s*=>`);
       if (hidden.test(executable) || /\bclass\b/.test(executable)) return undefined;
-      const declarations = Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}\\s*=`, "g")))
+      const declarations = Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}(?![\\w$])`, "g")))
         .filter(d => d.index < at && pathAt(d.index).every((block, i) => callPath[i] === block));
       declarations.sort((a, b) => pathAt(b.index).length - pathAt(a.index).length);
       if (!declarations.length) return undefined;
@@ -1178,7 +1180,7 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       // A redeclaration in this block, or a nested `var` (function-scoped), can
       // write this binding before a deferred use. Nested let/const only shadow it.
       const declarationPath = pathAt(d.index);
-      if (Array.from(executable.matchAll(new RegExp(`\\b(const|let|var)\\s+${name}\\s*=`, "g"))).some(other => {
+      if (Array.from(executable.matchAll(new RegExp(`\\b(const|let|var)\\s+${name}(?![\\w$])`, "g"))).some(other => {
         if (other.index === d.index) return false;
         const otherPath = pathAt(other.index);
         if (!declarationPath.every((block, i) => otherPath[i] === block)) return false;
@@ -1186,7 +1188,10 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       })) return undefined;
       const initializers = declarationNames(name);
       if (Array.from(writeIndexes(name)).some(write => !initializers.has(write))) return undefined;
-      const start = d.index + d[0].length;
+      // The visible binding has no initializer: unresolved, never an outer declaration.
+      const equals = /^\s*=(?![=>])/.exec(executable.slice(d.index + d[0].length));
+      if (!equals) return undefined;
+      const start = d.index + d[0].length + equals[0].length;
       const end = executable.indexOf(";", start);
       if (end < 0 || end > at) return undefined;
       if (!initializerRunsBefore(executable, d.index, end, pathAt(d.index), [at])) return undefined;
@@ -1199,7 +1204,9 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
     if (/^['"`]/.test(initial)) {
       if (skipQuoted(initial, 0) !== initial.length - 1) return false;
       const value = decodeQuotedEntryEscapes(initial.slice(1, -1), true);
-      return value !== undefined && normalizeMermaidSource(value) === normalizeMermaidSource(payload);
+      return value !== undefined && normalizeMermaidSource(value) === normalizeMermaidSource(payload)
+        ? { base: value }
+        : false;
     }
     // Only follow a selected card's text/plain script, optionally through an alias.
     const query = /^(\w+)\.querySelector\(\s*(['"])(.*?)\2\s*\)$/;
@@ -1230,6 +1237,7 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       });
     };
     let value = initial;
+    let usesValidatedDedent = false;
     if (value.startsWith("dedent(")) {
       if (!value.endsWith(")")) return false;
       // Recognize the archived renderer's exact, whitespace-only normalization.
@@ -1263,6 +1271,7 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       const canonicalCompact = compactCodePreservingLiterals(canonical);
       if (actualCompact === undefined || actualCompact !== canonicalCompact) return false;
       value = value.slice(7, -1).trim();
+      usesValidatedDedent = true;
     }
     if (!value.endsWith(".textContent")) return false;
     const element = value.slice(0, -12).trim();
@@ -1292,7 +1301,9 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
     return ![...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
-      .some(write => mayBeSelectedScript(write[1], write.index));
+      .some(write => mayBeSelectedScript(write[1], write.index))
+      ? { base: usesValidatedDedent ? dedentedPayload : payload }
+      : false;
   };
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
@@ -1368,13 +1379,14 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
       else if (value[i] === "+" && depth === 0) plus.push(i);
     }
     if (plus.length !== 1 || unwrap(value.slice(0, plus[0])) !== "src" || unwrap(value.slice(plus[0] + 1)) !== "CLASSDEFS") return null;
-    if (!srcIsPayload(call.index)) return null;
-    renderUses.push({ index: source.start + names[0].index, call: call.index });
+    const resolvedSrc = srcIsPayload(call.index);
+    if (!resolvedSrc) return null;
+    renderUses.push({ index: source.start + names[0].index, call: call.index, base: resolvedSrc.base });
   }
   if (renderUses.length === 0) return undefined;
   // Selector collection is scope-wide: it cannot associate mixed calls with
   // individual cards. Preserve the ambiguity instead of applying one suffix to all.
-  if (suffixFree) return null;
+  if (suffixFree || renderUses.some(use => use.base !== renderUses[0].base)) return null;
   // Locate the declaration in code, then read its literal from the offset-aligned view.
   const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
   if (!declaration) return null;
@@ -1414,7 +1426,7 @@ function rendererSuffix(literalSource, rawSource, payload, cardTag, selectedScri
   const initializedAt = declaration.index + initializer[0].length;
   if (!initializerRunsBefore(executable, declaration.index, initializedAt, declarationPath, renderUses.map(use => use.call))) return null;
   const parts = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2], true));
-  return parts.some(part => part === undefined) ? null : parts.join("");
+  return parts.some(part => part === undefined) ? null : renderUses[0].base + parts.join("");
 }
 
 /** Match static card selectors; complex/dynamic selectors are not guessed. */
@@ -1526,12 +1538,11 @@ function materializePlainTextCards(src) {
       const firstScript = /<script data-audit-payload="(\d+)"><\/script>/.exec(card.content);
       const firstPlain = Array.from(card.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
-      const resolvedSuffix = renderer && rendererSuffix(renderer.literalSource, renderer.rawSource, payload, card.openingTag,
+      const resolvedSource = renderer && rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 });
-      if (resolvedSuffix === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
-      const suffix = resolvedSuffix ?? "";
-      edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(payload + suffix)}</div>` });
+      if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
+      edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(resolvedSource ?? script.payload)}</div>` });
     }
   }
   let result = stashed;

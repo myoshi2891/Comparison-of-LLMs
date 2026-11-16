@@ -1097,4 +1097,37 @@ test("resolves aliases at their initializer instead of the later reference", () 
  const mirrored = audit(`${cards}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); ${draw('#other')}</script>`, page);
  assert.equal(mirrored.status, 1);
  assert.deepEqual(mirrored.data.unresolvedMermaidSources, ['CLASSDEFS:other']);
+ for (const uninitialized of [
+  `const src = ${JSON.stringify(chart)}; function draw() { let src; mermaid.render('id', src); } draw();`,
+  `const card = document.querySelector('#chart'); const script = card.querySelector('script'); function draw() { let script; const src = script.textContent; mermaid.render('id', src); } draw();`,
+ ]) {
+  const shadowed = audit(`<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div><script>${uninitialized}</script>`, `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`);
+  assert.equal(shadowed.status, 1, uninitialized);
+  assert.deepEqual(shadowed.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ }
+});
+
+test("does not treat division after an ordinary of identifier as a regex literal", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const source = `${card}<script>let src = ${JSON.stringify(chart)}; const x = of / 2 + (src = other) / 2; mermaid.render('id', src);</script>`;
+ const result = audit(source, page);
+ assert.equal(result.status, 1);
+ assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+});
+
+test("preserves payload trailing newline before CLASSDEFS unless using the validated dedent helper", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = 'classDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}\n</script></div>`;
+ const select = `const card = document.querySelector('#chart'); const script = card.querySelector('script'); const CLASSDEFS = ${JSON.stringify(suffix)};`;
+ const rawSource = `${card}<script>${canonicalDedent} ${select} const src = script.textContent; mermaid.render('id', src + CLASSDEFS);</script>`;
+ const separateLines = `const D = ${JSON.stringify(`${chart}\n${suffix}`)}; <MermaidDiagram chart={D} />`;
+ const joinedLine = `const D = ${JSON.stringify(`${chart}${suffix}`)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(rawSource, separateLines).status, 0);
+ assert.equal(audit(rawSource, joinedLine).status, 1);
+ const dedentedSource = `${card}<script>${canonicalDedent} ${select} const src = dedent(script.textContent); mermaid.render('id', src + CLASSDEFS);</script>`;
+ assert.equal(audit(dedentedSource, joinedLine).status, 0);
+ assert.equal(audit(dedentedSource, separateLines).status, 1);
 });
