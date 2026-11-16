@@ -395,12 +395,27 @@ def validate(name: str, args: dict) -> str | None:
     """問題があれば拒否理由を返し、なければ None を返す。モデルの外で必ず実行する。"""
     if name not in ALLOWED_TOOLS:
         return f"{name} is not a declared tool"  # 宣言外の名前はロボット SDK へ渡さない
+    if not isinstance(args, dict):
+        return "args must be a dict"
     if name == "move":
-        x, y = args["x"], args["y"]
+        if set(args.keys()) != {"x", "y", "high"}:
+            return "move requires x, y, and high"
+        x, y, high = args["x"], args["y"], args["high"]
+        if not isinstance(high, bool):
+            return "high must be a boolean"
+        if isinstance(x, bool) or not isinstance(x, (int, float)):
+            return "x must be a number"
+        if isinstance(y, bool) or not isinstance(y, (int, float)):
+            return "y must be a number"
         if not (WORKSPACE["x"][0] <= x <= WORKSPACE["x"][1]):
             return f"x={x} is outside the allowed workspace"
         if not (WORKSPACE["y"][0] <= y <= WORKSPACE["y"][1]):
             return f"y={y} is outside the allowed workspace"
+    elif name == "setGripperState":
+        if set(args.keys()) != {"opened"}:
+            return "setGripperState requires opened"
+        if not isinstance(args["opened"], bool):
+            return "opened must be a boolean"
     return None
 
 
@@ -749,7 +764,7 @@ ai.google.dev の注意書きによると、ロボティクスモデルは動作
 | 200 | 192 | 92.3% 〜 98.0% |
 | 500 | 480 | 93.9% 〜 97.4% |
 
-> 📌 **試行 50 回で 48 回成功しても、真の成功率は 86% 台かもしれません。** 本番投入の判断には、少なくとも 100〜200 回以上の試行と区間の下限での判断が必要です。
+> 📌 **試行 50 回で 48 回成功しても、真の成功率は 86% 台かもしれません。** また、Wilson 区間の二項推定は**各試行が独立であること**を前提とします。本番投入の判断には、少なくとも 100〜200 回以上の**代表的な独立試行**を実施するか、同一シーンや同一の生産バッチ・部品ロットを共有する試行では**クラスタリング（試行間の相関）を考慮した分析**を行ったうえで、区間の下限を用いて判断してください。
 
 ```python
 import math

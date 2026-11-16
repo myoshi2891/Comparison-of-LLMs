@@ -330,7 +330,7 @@ Carbon（と Argon）では、入力・思考・出力が **1つの 1M トーク
 | 向かない用途 | 遅延に敏感なリクエスト（数分かかることがある） | [S6] [S21] |
 | 注意 | 古い SDK や OpenAI 互換レイヤーでは継続トークンで長い応答を取得できない | [S6] |
 | 注意 | `promptTokenCount` はターンを重ねて累積的に増える | [S21] |
-| データ保持 | `generateContent` / `streamGenerateContent` 経由の long decode は ZDR 対応 | [S21] |
+| データ保持 | `generateContent` / `streamGenerateContent` 経由の long decode は ZDR 対応と案内されているが、これらのメソッドを使うだけでゼロデータ保持（ZDR）が保証されるわけではない。Carbon 既定の永続キャッシュ（durable caching）、Agent Platform における派生キャッシュデータの最大24時間保持、グラウンディング利用時の保持など、プロジェクト設定と適用される保持条件を必ず確認する | [S6] [S7] [S21] |
 
 > **誤解しやすい点**: long decode は「回答を長くする」機能ではなく、**モデルが考える余地を増やして完結した回答を返させる** 機能です。推論の深さは `thinking_level` で制御します [S6]。
 
@@ -523,6 +523,8 @@ def estimate_cost(usage, rates):
     Google Searchの検索クエリなど、トークン以外のツール料金は含めない。
     実際の課金区分は公式料金ページで確認すること。
     """
+    if usage is None:
+        raise ValueError("usage_metadata is None; cannot estimate token cost")
     cached = getattr(usage, "cached_content_token_count", 0) or 0
     prompt = (getattr(usage, "prompt_token_count", 0) or 0) - cached
     tool_prompt = getattr(usage, "tool_use_prompt_token_count", 0) or 0

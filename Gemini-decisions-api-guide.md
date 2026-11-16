@@ -260,17 +260,17 @@ API = "https://generativelanguage.googleapis.com/v1beta"
 THRESHOLD = 0.7  # Google のドキュメントが例示する値。自社データで必ず再調整する
 
 
-def decide(input_text: str, questions: dict) -> dict:
-    r = httpx.post(
-        f"{API}/decisions",
-        headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"]},
-        json={
-            "model": "gemini-decision-1",
-            "input": input_text,
-            "questions": questions,
-        },
-        timeout=10.0,
-    )
+async def decide(input_text: str, questions: dict) -> dict:
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        r = await client.post(
+            f"{API}/decisions",
+            headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"]},
+            json={
+                "model": "gemini-decision-1",
+                "input": input_text,
+                "questions": questions,
+            },
+        )
     r.raise_for_status()
     return r.json()
 
@@ -413,7 +413,7 @@ GUARD = {
 }
 
 
-def screen_input(callback_context):
+async def screen_input(callback_context):
     """ADK の before_agent_callback の骨格(出典の考え方を簡略化した例)。
 
     ユーザーメッセージの入口で、元のユーザー入力(callback_context.user_content)だけを判定する。
@@ -431,7 +431,7 @@ def screen_input(callback_context):
     text = "".join(p.text for p in parts)
     if not text:
         return None
-    ans = decide(text, GUARD)["answers"]["injection"]
+    ans = (await decide(text, GUARD))["answers"]["injection"]
     if ans["noul"] >= 0.8:
         return "BLOCKED"  # 実際には LlmResponse を返してLLM呼び出しを省略する
     return None
@@ -513,6 +513,7 @@ GDE の検証(48件)で、緊急度の正解は **31/48** と比較対象5バッ
 出力が壊れていないことを、CI で毎回確認します。以下を `decisions_client.py` と同じディレクトリの `test_decisions.py` に保存します。
 
 ```python
+import asyncio
 import pytest
 from decisions_client import decide
 
@@ -531,7 +532,7 @@ QUESTIONS = {
 
 
 def test_decisions_contract():
-    res = decide("Audio cuts out on the left earcup.", QUESTIONS)
+    res = asyncio.run(decide("Audio cuts out on the left earcup.", QUESTIONS))
 
     assert res["usage"]["total_output_tokens"] == 0
     for ans in res["answers"].values():
