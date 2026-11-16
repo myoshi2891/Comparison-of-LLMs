@@ -544,6 +544,9 @@ class TestMoonshot:
             # cached と input の間のインライン HTML も cached ラベルとして読み飛ばす。
             '<p>Kimi K3 <span>cached</span> input $0.25 input $3.25 output $16.50</p>',
             '<td>Kimi K3</td><td>cached<br>input $0.25</td><td>input $3.25</td><td>output $16.50</td>',
+            # batch input の価格も標準入力として拾わない。
+            '<p>Kimi K3 batch input $1.60 input $3.25 output $16.50</p>',
+            '<dl><dt>Kimi K3</dt><dd>batch input $1.60</dd><dd>input $3.25</dd><dd>output $16.50</dd></dl>',
         ):
             with patch("scraper.providers.moonshot.get_page_text", return_value=html):
                 model = _find(moonshot.scrape(), "Kimi K3")
