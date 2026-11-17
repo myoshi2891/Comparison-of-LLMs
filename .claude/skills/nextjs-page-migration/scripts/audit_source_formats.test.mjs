@@ -1067,6 +1067,44 @@ test("requires the indexed card read to run inside the matching loop", () => {
  }
 });
 
+test("rejects traversal index writes inside the card loop body", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="diagram-card"><script type="text/plain">${s}</script></div>`).join('');
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)};`).join('\n') + charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join('');
+ const cards = "var cards = document.querySelectorAll('.diagram-card');";
+ const loop = 'for (var i = 0; i < cards.length; i++) {';
+ const render = "var src = card.querySelector('script').textContent; mermaid.render('x', src);";
+ assert.equal(audit(`${source}<script>${cards} ${loop} var card = cards[i]; ${render} }</script>`, page).status, 0);
+ for (const body of [
+  // 本体内の増分で2枚目のカードを読み飛ばす。
+  `${cards} ${loop} var card = cards[i]; i++; ${render} }`,
+  `${cards} ${loop} var card = cards[i]; i += 1; ${render} }`,
+  `${cards} ${loop} var card = cards[i]; ${render} i = cards.length; }`,
+ ]) {
+  const result = audit(`${source}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+ }
+});
+
+test("keeps ASI-relevant line terminators in the dedent helper comparison", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const select = `const card = document.querySelector('#chart'); const script = card.querySelector('script');`;
+ const use = `${select} const src = dedent(script.textContent); mermaid.render('id', src);`;
+ // return の直後の改行は自動セミコロン挿入で undefined を返す別関数になる。
+ const variant = canonicalDedent.replace("min === 0) return lines.join", "min === 0) return\n          lines.join");
+ assert.notEqual(variant, canonicalDedent);
+ const result = audit(`${card}<script>${variant} ${use}</script>`, page);
+ assert.equal(result.status, 1);
+ assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ assert.equal(audit(`${card}<script>${canonicalDedent} ${use}</script>`, page).status, 0);
+ // メソッドチェーン前の改行はASIに影響しないため、正規の別レイアウトとして認める。
+ const chained = canonicalDedent.replace("return lines.map(", "return lines\n          .map(");
+ assert.notEqual(chained, canonicalDedent);
+ assert.equal(audit(`${card}<script>${chained} ${use}</script>`, page).status, 0);
+});
+
 test("keeps scopes whose renderer may be hidden by an uncertain slash", () => {
  const chart = 'flowchart LR\nA --> B';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
