@@ -230,6 +230,43 @@ assert received[0] is not tool["input"]
   );
 });
 
+it("agent_loopはツール結果を独立したコピーで保存し、後の呼び出しで前の結果を変更させない", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+def tool(n):
+    return {"type": "tool_use", "id": "tool-" + str(n), "name": "read", "input": {"n": n}}
+replies = [{"stop_reason": "tool_use", "content": [tool(1), tool(2), tool(3)]},
+    {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}]
+requests = []
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return replies[len(requests) - 1]
+shared = [{"type": "text", "text": "v1"}]
+text = "plain text result"
+def run_tool(name, args):
+    if args["n"] == 3:
+        return text
+    shared[0]["text"] = "v" + str(args["n"])   # 共有オブジェクトを返し、次の呼び出しで書き換える
+    return shared
+scope = {"call": call, "copy": __import__("copy")}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+assert scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint) == replies[1]
+results = checkpoint["messages"][2]["content"]
+assert [r["content"] for r in results] == [[{"type": "text", "text": "v1"}], [{"type": "text", "text": "v2"}], text]
+assert results[0]["content"] is not results[1]["content"]
+assert results[2]["content"] is text
+shared[0]["text"] = "mutated later"
+assert results[0]["content"] == [{"type": "text", "text": "v1"}]
+assert requests[1]["messages"][2]["content"][0]["content"] == [{"type": "text", "text": "v1"}]
+`,
+    examples()
+  );
+});
+
 it("agent_loopは次のAPI呼び出しが失敗しても完了済みtool_resultを保存する", () => {
   python(
     `
