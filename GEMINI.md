@@ -323,7 +323,7 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ```bash
 (cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3077 tests pass（2026-11-16実測）
 (cd web-next && bun run typecheck)   # OK（2026-11-16 実測）
-# ビルド: 最後の成功は2026-11-14（115静的ページ生成）。2026-11-15の初回・再試行はTurbopackのローカルポート権限制限で失敗
+(cd web-next && bun run build)       # コミット前に必須（Antigravityサンドボックスを除く）。最後の成功は2026-11-14（115静的ページ生成）。2026-11-15の初回・再試行はTurbopackのローカルポート権限制限で失敗
 (cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-16 実測）
 (cd scraper && uv run pytest)        # 150件＋39 subtests成功（2026-11-17 実測）
 ```
