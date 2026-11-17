@@ -5,6 +5,7 @@ import postcss from "postcss";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { pageRegistry } from "@/lib/page-registry";
 import Page, { metadata } from "./page";
+import correctionContract from "./correction-contract.json";
 import styles from "./page.module.css";
 import expected from "./source-contract.json";
 import expectedTree from "./structure-contract.json";
@@ -384,6 +385,27 @@ it("原本110 CSS規則の全宣言・順序・media条件を一致（図寸法�
           .map((d) => d.map((v) => (typeof v === "string" ? normalize(v) : v))),
       }))
   );
+});
+it("Tailwind補正ブロックの全規則・全宣言・順序・media条件を完全一致", () => {
+  const source = css();
+  const marker = "/* Tailwind";
+  // 補正ブロックの開始位置が一意でないと、原本規則との境界が曖昧になる。
+  expect(source.indexOf(marker)).toBeGreaterThan(0);
+  expect(source.indexOf(marker)).toBe(source.lastIndexOf(marker));
+  const actual: unknown[] = [];
+  postcss.parse(source.slice(source.indexOf(marker))).walkRules((r) => {
+    actual.push({
+      selector: normalize(r.selector),
+      media: r.parent?.type === "atrule" ? (r.parent as postcss.AtRule).params : null,
+      declarations: r.nodes
+        .filter((n) => n.type === "decl")
+        .map((n) => {
+          const d = n as postcss.Declaration;
+          return [d.prop, normalize(d.value), !!d.important];
+        }),
+    });
+  });
+  expect(actual).toEqual(correctionContract);
 });
 /** 最終的な明示補正値を読む。 */
 function declarations(selector: string): Record<string, string> {
