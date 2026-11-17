@@ -359,7 +359,12 @@ flowchart TD
     GJOIN --> G["累積トークンと課金を監視"]
     CONT -- "MAX_TOKENS など" --> GERR["未完了として扱い 部分出力を採用しない"]
     API -- "Interactions 非ストリーミング" --> ACC["各hopの出力テキストとusageを順に蓄積"]
-    ACC --> IST{"status は何か<br/>requires_continuation を完了扱いにしない"}
+    ACC --> IST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
+    IST -- "requires_action" --> IACT["ツール呼び出しを承認ゲートに通す 12.2節"]
+    IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>このinteractionのidで結果を送る"]
+    IACT -- "拒否" --> IREJ["拒否をツール結果として送る<br/>実行はしない"]
+    IRUN --> ACC
+    IREJ --> ACC
     IST -- "requires_continuation store=True" --> ISS["previous_interaction_id と<br/>continuation_token で継続を送る"]
     IST -- "requires_continuation store=False" --> ISL["元の入力と同じモデル ツール 生成設定に<br/>continuation_token を付けて再送する"]
     ISS --> ACC
@@ -367,18 +372,26 @@ flowchart TD
     IST -- "completed" --> JOIN["蓄積した全hopの出力を結合して採用"]
     JOIN --> G
     IST -- "failed incomplete cancelled" --> ERR["例外として扱い 部分出力を採用しない"]
-    API -- "Interactions ストリーミング" --> SACC["受信イベントのテキストとusageを順に蓄積<br/>各イベントのevent_idをチェックポイントとして保存"]
+    API -- "Interactions ストリーミング" --> SACC["受信イベントのテキストを順に蓄積<br/>usageはhop内で累積値なので最新値だけ保持<br/>各イベントのevent_idをチェックポイントとして保存"]
     SACC --> SDROP{"ストリームが終了イベントの前に切断されたか"}
-    SDROP -- "はい" --> SRES["同じinteraction idと最後に保存したevent_idで再接続<br/>チェックポイント以前のイベントは追記しない"]
+    SDROP -- "はい store=True" --> SRES["同じinteraction idと最後に保存したevent_idで再接続<br/>チェックポイント以前のイベントは追記しない"]
+    SDROP -- "はい store=False" --> SSL["元の入力 モデル ツール 生成設定に<br/>チェックポイント時点のcontinuation_tokenを付けて再送<br/>チェックポイント以降に受信した出力は破棄して再生成分で置き換える"]
     SRES --> SACC
-    SDROP -- "いいえ 終了イベントを受信" --> SST{"status は何か<br/>requires_continuation を完了扱いにしない"}
+    SSL --> SACC
+    SDROP -- "いいえ 終了イベントを受信" --> SHOP["このhopの最終usageを確定し<br/>hopごとの最終値を合算する"]
+    SHOP --> SST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
+    SST -- "requires_action" --> SACT["ツール呼び出しを承認ゲートに通す 12.2節"]
+    SACT -- "承認" --> SRUN["クライアント側でツールを実行し<br/>このinteractionのidで結果を送る"]
+    SACT -- "拒否" --> SREJ["拒否をツール結果として送る<br/>実行はしない"]
+    SRUN --> SACC
+    SREJ --> SACC
     SST -- "requires_continuation" --> SCONT["continuation_token で次のhopをストリーミングで送る<br/>store=True は previous_interaction_id も付ける<br/>新しいhopのイベントを同じ蓄積に追記"]
     SCONT --> SACC
     SST -- "completed" --> JOIN
     SST -- "failed incomplete cancelled" --> ERR
 ```
 
-ストリーミングでは、受信済みイベントの `event_id` をチェックポイントとして永続化し、切断時は同じinteractionへ最後の `event_id` を指定して再接続します。再送されたイベントのうちチェックポイント以前のものは捨て、出力を二重に追記しないでください。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
+ストリーミングでは、受信済みイベントの `event_id` をチェックポイントとして永続化し、`store=True` の切断時は同じinteractionへ最後の `event_id` を指定して再接続します。再送されたイベントのうちチェックポイント以前のものは捨て、出力を二重に追記しないでください。`store=False` ではサーバーにinteractionが保存されないため、同じidでは再接続せず、元の入力にチェックポイント時点の `continuation_token` を付けて再送します。チェックポイント以降に受信済みの出力は再生成されるため破棄し、再送分で置き換えます(公式SDKはチェックポイント後に出力を受け取ってから切断された場合、重複を避けるため `ContinuationInterruptedError` を送出します)。usage はhop内で累積値なので各hopの最新値だけを保持し、hopごとの最終値を合算します。`requires_action` はモデルがツール呼び出しを求めた状態で、完了ではありません。12.2節の承認ゲートを通し、承認された場合だけクライアント側でツールを実行して、結果をこのinteractionの `id` で送ります。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
 
 ---
 

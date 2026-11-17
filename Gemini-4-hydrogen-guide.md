@@ -317,7 +317,10 @@ flowchart TD
     MODE -- "GenerateContent" --> GC["対応SDKの自動継続 またはRESTの継続ループ"]
     F --> G["ステータスをポーリング in_progress queued の間待機"]
     G --> H["completed を確認して output_text を取得 失敗や不完全終了は例外"]
-    FG --> ACC["各hopの出力テキストとusageを順に蓄積 最後のhopのoutput_textだけでは前半の継続分が欠落する"]
+    FG --> FGM{"継続方式は何か"}
+    FGM -- "SDKの自動継続" --> AUTO["interactions.create が返す統合済みの出力とusageをそのまま使う 最終hopをidで再取得しない getは最後のhopの出力しか返さない"]
+    AUTO --> AUTOD["返り値の status が completed か確認して採用 失敗や不完全終了は例外"]
+    FGM -- "自前ループ" --> ACC["各hopの出力テキストとusageを順に蓄積 最後のhopのoutput_textだけでは前半の継続分が欠落する"]
     ACC --> FGD["最終hopの status が completed か確認し 蓄積した全hopの出力を結合して採用 失敗や不完全終了は例外"]
     GC --> RESULT["全hopの応答とusageを集計し終了理由を確認"]
 ```
@@ -590,7 +593,7 @@ flowchart TD
 | 過少対応(under-service) | 最大 79% 減 |
 | 不整合な行動・タスクの近道 | ツール使用・コーディング評価で 12倍減 |
 | 権限境界の迂回 | 不可能・ブロックされたタスクで最大 2倍起きにくい |
-| 誠実性 | 社内エージェント誠実性評価で 96.7% |
+| 誠実性 | 社内エージェント誠実性評価で 94% |
 | 思考の可読性 | 20万ターン超の監査で、chain-of-thought の可読性 99.9%・欺瞞的な推論の編集ゼロ |
 | 間接プロンプトインジェクション | Gray Swan IPI ベンチマークで 2.3倍超の耐性 |
 | 誤拒否 | HealthBench Pro での誤拒否 0.4% 未満 |

@@ -482,11 +482,14 @@ async def handle_user_message(runner, user_id: str, session_id: str, message: ty
     拒否したメッセージでは run_async を呼ばないため、セッション履歴にも
     後続ターンの LLM リクエストにも含まれない。
     """
-    rejection = await screen_input(message)
+    # 最初の await より前に独立したスナップショットを作り、判定と実行の両方に同じものを渡す。
+    # 呼び出し元が判定中に message を書き換えても、未判定の内容が Runner へ届かない。
+    snapshot = message.model_copy(deep=True)
+    rejection = await screen_input(snapshot)
     if rejection is not None:
         yield rejection  # 定型応答はアプリ側で表示し、セッションへは保存しない
         return
-    async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=message):
+    async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=snapshot):
         yield event
 ```
 

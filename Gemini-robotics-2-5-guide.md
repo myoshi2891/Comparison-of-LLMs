@@ -368,17 +368,26 @@ from google.genai import types
 
 client = genai.Client()
 
-WORKSPACE = {"x": (-400, 400), "y": (-400, 500)}  # 例: 安全な作業領域(原点相対)
+# 例: 安全な作業領域。座標系はロボット基座標(単位 mm、原点はテーブル面上のロボット基部中心、
+# +x はロボットから見て右、+y はロボット基部からテーブル奥へ向かう方向)。
+# execute_on_robot も同じ座標系で解釈し、ER の正規化画像座標 [y, x](0〜1000)は事前にこの座標系へ変換する。
+WORKSPACE = {"x": (-400, 400), "y": (-400, 500)}
 MAX_STEPS = 15
 
 move_decl = types.FunctionDeclaration(
     name="move",
-    description="Moves the arm to the given coordinates relative to the origin.",
+    description=(
+        "Moves the gripper to (x, y) in the robot base frame, in millimeters. "
+        "Origin (0, 0) is the center of the robot base on the table surface; "
+        "+x points to the robot's right and +y points from the base toward the far edge of the table. "
+        f"Allowed range: x {WORKSPACE['x'][0]}..{WORKSPACE['x'][1]}, y {WORKSPACE['y'][0]}..{WORKSPACE['y'][1]}. "
+        "Do not pass normalized 0-1000 image coordinates."
+    ),
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "x": types.Schema(type=types.Type.INTEGER),
-            "y": types.Schema(type=types.Type.INTEGER),
+            "x": types.Schema(type=types.Type.INTEGER, description="Millimeters; +x is the robot's right."),
+            "y": types.Schema(type=types.Type.INTEGER, description="Millimeters; +y is away from the robot base."),
             "high": types.Schema(
                 type=types.Type.BOOLEAN,
                 description="True: lift above the scene. False: table level.",
@@ -462,17 +471,17 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
         calls = [p for p in candidate.content.parts if p.function_call]
         if not calls:
             return response.text  # モデルが関数を呼ばなくなったら完了
-        results, observation, halted = [], None, False
+        results, observation, skip_reason, limit_reached = [], None, None, False
         for part in calls:
             fc = part.function_call
-            if halted:
-                # 先行する動作が拒否・失敗したら、同じ応答の残りは実行せず ER に再計画させる。
+            if skip_reason is None and actions >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
+                # 上限に達しても即座に戻らず、残りの呼び出しを skipped として記録して履歴を揃える。
+                skip_reason, limit_reached = "step limit reached; this action was not executed", True
+            if skip_reason is not None:
+                # 先行する動作が拒否・失敗した場合や上限到達後は、同じ応答の残りを実行しない。
                 # 並列呼び出しの各 function_call には、順序どおり必ず 1 つずつ結果を返す。
-                payload = {"status": "skipped", "reason": "an earlier action in this response was rejected or failed"}
-                results.append(function_response_part(fc, payload))
+                results.append(function_response_part(fc, {"status": "skipped", "reason": skip_reason}))
                 continue
-            if actions >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
-                return "aborted: step limit reached"
             actions += 1
             # fc.args は省略され得るため、dict へ変換する前に検証する(変換は検証成功後のみ)。
             reason = validate(fc.name, fc.args)
@@ -489,12 +498,16 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
                 # 実行した動作ごとに観測を置き換える。画像がなければ古い観測を消し、
                 # 後続の動作が一部動いて失敗した場合に、前の動作の画像で再計画させない。
                 observation = image
-            halted = payload.get("status") != "ok"
+            if payload.get("status") != "ok":
+                skip_reason = "an earlier action in this response was rejected or failed"
             results.append(function_response_part(fc, payload))
         if observation is not None:
             # 最新観測は payload 内のバイト列や base64 文字列ではなく、画像パートとして次ターンに渡す。
             results.append(types.Part.from_bytes(data=observation, mime_type="image/jpeg"))
         contents.append(types.Content(role="user", parts=results))
+        if limit_reached:
+            # 実行済みの結果と skipped の記録を contents に残したまま中断し、呼び出し元へ完全な履歴を渡す。
+            return "aborted: step limit reached"
 ```
 
 ### 8.3 オーケストレーションのベストプラクティス
@@ -551,7 +564,7 @@ sequenceDiagram
 
 > **生成中に新しいプロンプトを送ると「割り込み」として扱われ、推論中のツール呼び出しが取り消されます。** タイマーだけでハートビートを送り続けると、モデルが取り消しループに陥り「反応しない」ように見えます。
 
-**対策**: 前のターンが `turn_complete` になるまで次のハートビートを送らない。公式の例では `asyncio.Event` で待機します。
+**対策**: 前のターンが `turn_complete` になるまで次のハートビートを送らない。公式の例では `asyncio.Event` で待機します。ハートビート以外にもプロンプトを送る経路がある場合は、下の例のように**全送信者で共有するターンゲート(`asyncio.Lock`)**を通し、生成中のターンへ割り込まないようにします。
 
 ```python
 import asyncio
@@ -564,9 +577,13 @@ HEARTBEAT_TEXT = (
     "If the overall goal is achieved, call 'reset'."
 )
 
-async def heartbeat(session, camera, turn_done: asyncio.Event, turn_timeout: float, interval: float = 1.0):
+async def heartbeat(session, camera, turn_gate: asyncio.Lock, turn_done: asyncio.Event,
+                    turn_timeout: float, interval: float = 1.0):
     """受信側は turn_complete を受け取ったときに turn_done.set() を呼ぶ。
 
+    turn_gate はプロンプトを送るすべての送信者(ユーザー指示の転送などを含む)で共有するロック。
+    各送信者は送信前に取得し、そのターンの turn_complete を受け取るまで保持する。
+    これにより、他の送信者のターンが生成中の間はハートビートが割り込まない。
     turn_timeout は 1 ターンの完了を待つ上限秒数(タスクの最長動作時間から決める)。
     """
     loop = asyncio.get_running_loop()
@@ -576,20 +593,23 @@ async def heartbeat(session, camera, turn_done: asyncio.Event, turn_timeout: flo
         if last_sent is not None:
             # 1 FPS 上限は、取得開始ではなく前のフレームを実際に送った時刻から数える
             await asyncio.sleep(max(0.0, interval - (loop.time() - last_sent)))
-        frame = await camera.latest_jpeg()
-        turn_done.clear()        # 古い完了通知で次のハートビートへ進まないよう、送信前に消す
-        await session.send_realtime_input(
-            video=types.Blob(data=frame, mime_type="image/jpeg")
-        )
-        last_sent = loop.time()
-        await session.send_realtime_input(text=HEARTBEAT_TEXT)
-        try:
-            # いま送ったターンが終わるまで次を送らない。受信側の終了やセッション切断で
-            # turn_complete が届かない場合に無期限に止まらないよう、待機に上限を設ける。
-            await asyncio.wait_for(turn_done.wait(), timeout=turn_timeout)
-        except asyncio.TimeoutError:
-            # 完了を確認できないまま次のターンは送らない。呼び出し側で再接続・停止を判断する。
-            raise RuntimeError("turn_complete not received; stop heartbeat and recover the session") from None
+        # 進行中のターン(他の送信者のものを含む)が turn_complete になるまで待ってから送る。
+        # ゲートを保持している間だけ turn_done を消すので、生成中のターンの完了通知を消さない。
+        async with turn_gate:
+            frame = await camera.latest_jpeg()
+            turn_done.clear()    # 古い完了通知で次のハートビートへ進まないよう、送信前に消す
+            await session.send_realtime_input(
+                video=types.Blob(data=frame, mime_type="image/jpeg")
+            )
+            last_sent = loop.time()
+            await session.send_realtime_input(text=HEARTBEAT_TEXT)
+            try:
+                # いま送ったターンが終わるまでゲートを離さない。受信側の終了やセッション切断で
+                # turn_complete が届かない場合に無期限に止まらないよう、待機に上限を設ける。
+                await asyncio.wait_for(turn_done.wait(), timeout=turn_timeout)
+            except asyncio.TimeoutError:
+                # 完了を確認できないまま次のターンは送らない。呼び出し側で再接続・停止を判断する。
+                raise RuntimeError("turn_complete not received; stop heartbeat and recover the session") from None
 ```
 
 ### 9.4 ストリーミングのベストプラクティス
