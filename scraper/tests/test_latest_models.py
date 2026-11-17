@@ -54,7 +54,8 @@ def test_carbon_promo_boundary(today, expected):
 
 
 @pytest.mark.parametrize("html", [
-    "<p>Kimi K3.1 Pro output $10</p>",
+    # 入出力の両方を持たせ、混成ペアの棄却ではなくモデル名ガードで K3.1 の価格を拒否することを確かめる。
+    "<p>Kimi K3.1 Pro input $2 output $10</p>",
     "<nav>Kimi K3</nav>" + "x" * 200 + "<p>Other output $0.95</p>",
     "<p>Kimi K3</p>\n<p>Other output $0.95</p>",
     "<tr><td>Kimi K3</td></tr>\n<tr><td>Other output $0.95</td></tr>",
