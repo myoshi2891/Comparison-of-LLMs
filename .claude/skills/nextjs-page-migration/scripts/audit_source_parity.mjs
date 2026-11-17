@@ -1075,15 +1075,9 @@ function readHtmlAttribute(attributes, name) {
 const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
 
 /** Prove ordinary initialization and all enclosing callable activations precede rendering. */
-function initializerRunsBefore(executable, declarationIndex, initializedAt, declarationPath, positions) {
-  // An unbraced conditional/loop may skip the initializer. Require an ordinary
-  // statement boundary rather than treating a lexical declaration as dominance.
-  const previous = executable.slice(0, declarationIndex).trimEnd().at(-1);
-  if (previous !== undefined && !";{}".includes(previous)) return false;
-  // Source order inside a hoisted function is not execution order. Trace all
-  // references to enclosing named functions (including aliases and callers),
-  // rejecting any activation whose order relative to initialization is unknown.
-  const functions = Array.from(executable.matchAll(/\bfunction(?:\s+([A-Za-z_$][\w$]*))?\s*\([^(){}]*\)\s*\{|(?:\([^(){}]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g), head => {
+/** Braced function bodies in source order: { start, body (open brace), end (after close), name, nameIndex }. */
+function functionBodies(executable) {
+  return Array.from(executable.matchAll(/\bfunction(?:\s+([A-Za-z_$][\w$]*))?\s*\([^(){}]*\)\s*\{|(?:\([^(){}]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g), head => {
     const body = head.index + head[0].length - 1;
     let depth = 1;
     let end = body + 1;
@@ -1094,6 +1088,42 @@ function initializerRunsBefore(executable, declarationIndex, initializedAt, decl
     }
     return { start: head.index, body, end, name: head[1], nameIndex: head[1] ? head.index + head[0].indexOf(head[1], 8) : -1 };
   });
+}
+
+/** Loop extents (keyword through body close) for braced for/while/do loops. */
+function loopExtents(executable) {
+  const close = (open, pair) => {
+    let depth = 0;
+    for (let k = open; k < executable.length; k++) {
+      if (executable[k] === pair[0]) depth++;
+      else if (executable[k] === pair[1] && --depth === 0) return k;
+    }
+    return -1;
+  };
+  const loops = [];
+  for (const head of executable.matchAll(/(?<![\w$.])(?:(for|while)\s*\(|do\s*\{)/g)) {
+    let open = head.index + head[0].length - 1;
+    if (head[1]) {
+      const paren = close(open, "()");
+      if (paren < 0) continue;
+      open = paren + 1 + (/^\s*/.exec(executable.slice(paren + 1))[0].length);
+      if (executable[open] !== "{") continue;
+    }
+    const end = close(open, "{}");
+    if (end > 0) loops.push({ start: head.index, open, end });
+  }
+  return loops;
+}
+
+function initializerRunsBefore(executable, declarationIndex, initializedAt, declarationPath, positions) {
+  // An unbraced conditional/loop may skip the initializer. Require an ordinary
+  // statement boundary rather than treating a lexical declaration as dominance.
+  const previous = executable.slice(0, declarationIndex).trimEnd().at(-1);
+  if (previous !== undefined && !";{}".includes(previous)) return false;
+  // Source order inside a hoisted function is not execution order. Trace all
+  // references to enclosing named functions (including aliases and callers),
+  // rejecting any activation whose order relative to initialization is unknown.
+  const functions = functionBodies(executable);
   // Unsupported callable syntax needs a parser to prove activation order.
   if (/=>\s*(?!\s*\{)/.test(executable) || /\bclass\b/.test(executable) ||
       Array.from(executable.matchAll(/\bfunction\b/g)).some(head => !functions.some(fn => fn.start === head.index))) return false;
@@ -1174,6 +1204,14 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       }
       return path;
     };
+    const functions = functionBodies(executable);
+    const loops = loopExtents(executable);
+    // A `var` declared in a loop is one binding shared by every iteration. A read from a
+    // callback created outside its declaring function sees whatever value the loop left
+    // there when the callback runs (the final card), so the per-iteration capture is unproven.
+    const sharedAcrossDeferredRead = (declarationIndex, at) => functions.some(fn =>
+      fn.body < at && at < fn.end && !(fn.body < declarationIndex && declarationIndex < fn.end) &&
+      loops.some(loop => loop.start <= declarationIndex && declarationIndex < loop.end));
     // Resolve the binding visible at `at`, with the position its initializer runs.
     // References inside that initializer resolve there, not at the later use.
     const bindingAt = (name, at = before) => {
@@ -1186,6 +1224,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (!declarations.length) return undefined;
       const d = declarations[0];
       if (declarations.slice(1).some(other => pathAt(other.index).length === pathAt(d.index).length)) return undefined;
+      if (/^var\b/.test(d[0]) && sharedAcrossDeferredRead(d.index, at)) return undefined;
       // A redeclaration in this block, or a nested `var` (function-scoped), can
       // write this binding before a deferred use. Nested let/const only shadow it.
       const declarationPath = pathAt(d.index);
@@ -1243,6 +1282,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           else if (executable[k] === "}" && --depth === 0) { close = k; break; }
         }
         if (close <= open || ![ownerBinding.at, at].every(position => position > open && position < close)) return false;
+        // The index is a loop-header `var`; reading it from a callback sees its final value.
+        if (sharedAcrossDeferredRead(loop.index + loop[0].indexOf("var"), ownerBinding.at)) return false;
+        // break/return/throw outside nested callbacks end the traversal early and may leave
+        // later selected cards unvisited. `continue` still advances to the next card.
+        const nested = functions.filter(fn => fn.body > open && fn.end <= close + 1);
+        if (Array.from(executable.slice(open, close).matchAll(/(?<![\w$.])(?:break|return|throw)(?![\w$])/g))
+          .some(exit => !nested.some(fn => fn.body < open + exit.index && open + exit.index < fn.end))) return false;
         // Any other write to the index inside the body skips or repeats cards, so the
         // in-order card-to-payload mapping is no longer proven.
         return !Array.from(writeIndexes(indexed[2])).some(write => write > open && write < close);

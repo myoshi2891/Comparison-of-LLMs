@@ -1086,6 +1086,47 @@ test("rejects traversal index writes inside the card loop body", () => {
  }
 });
 
+test("rejects deferred reads of shared var card bindings inside the card loop", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="diagram-card"><script type="text/plain">${s}</script></div>`).join('');
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)};`).join('\n') + charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join('');
+ const cards = "var cards = document.querySelectorAll('.diagram-card');";
+ const loop = 'for (var i = 0; i < cards.length; i++) {';
+ const read = "card.querySelector('script').textContent";
+ // let は反復ごとに束縛されるため、遅延コールバックでも各カードを読む。
+ assert.equal(audit(`${source}<script>${cards} ${loop} let card = cards[i]; setTimeout(function () { var src = ${read}; mermaid.render('x', src); }); }</script>`, page).status, 0);
+ for (const body of [
+  // 共有の var はコールバック実行時に最後のカードを指し、両図を最後のpayloadとして認定しかねない。
+  `${cards} ${loop} var card = cards[i]; setTimeout(function () { var src = ${read}; mermaid.render('x', src); }); }`,
+  `${cards} ${loop} var card = cards[i]; var src = ${read}; setTimeout(function () { mermaid.render('x', src); }); }`,
+  // コールバック内でインデックス（var）を読む場合も反復固有ではない。
+  `${cards} ${loop} setTimeout(function () { let card = cards[i]; let src = ${read}; mermaid.render('x', src); }); }`,
+ ]) {
+  const result = audit(`${source}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+ }
+});
+
+test("rejects early exits from the card loop body", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="diagram-card"><script type="text/plain">${s}</script></div>`).join('');
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)};`).join('\n') + charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join('');
+ const cards = "var cards = document.querySelectorAll('.diagram-card');";
+ const loop = 'for (var i = 0; i < cards.length; i++) {';
+ const render = "var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src);";
+ for (const body of [
+  // 1枚目の描画後に抜け、2枚目を訪問しない。
+  `${cards} ${loop} ${render} break; }`,
+  `${cards} function draw() { ${loop} ${render} return; } } draw();`,
+  `${cards} ${loop} ${render} throw new Error('stop'); }`,
+ ]) {
+  const result = audit(`${source}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+ }
+ // continue は次の添字へ進むため、全カードの訪問は維持される（Fable原本のガード節）。
+ assert.equal(audit(`${source}<script>${cards} ${loop} var card = cards[i]; var srcEl = card.querySelector('script'); if (!srcEl) continue; var src = srcEl.textContent; mermaid.render('x', src); }</script>`, page).status, 0);
+});
+
 test("keeps ASI-relevant line terminators in the dedent helper comparison", () => {
  const chart = 'flowchart LR\nA --> B';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
