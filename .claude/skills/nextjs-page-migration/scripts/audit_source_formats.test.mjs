@@ -1226,6 +1226,50 @@ test("does not treat division after an ordinary of identifier as a regex literal
  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
 });
 
+test("does not split a Unicode identifier into a keyword before a division", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ // πreturn は1つの識別子。return と誤認すると後続の除算が正規表現として src の書き込みを隠す。
+ for (const name of ['πreturn', 'élse', 'ℵtypeof']) {
+  const source = `${card}<script>let src = ${JSON.stringify(chart)}; const x = ${name} / 2 + (src = other) / 2; mermaid.render('id', src);</script>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 1, name);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], name);
+ }
+});
+
+test("keeps literal sources certifiable despite textContent writes in other scopes", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const writer = "<script type=\"module\">document.querySelector('#chart script').textContent = 'flowchart LR\\nX --> Y';</script>";
+ // リテラルのソースは DOM 書き込みの影響を受けないため認定できる。
+ for (const renderer of [
+  `const src = ${JSON.stringify(chart)}; mermaid.render('id', src);`,
+  `mermaid.render('id', ${JSON.stringify(chart)});`,
+ ]) {
+  const result = audit(`${card}${writer}<script type="module">${renderer}</script>`, page);
+  assert.equal(result.status, 0, renderer);
+  assert.deepEqual(result.data.unresolvedMermaidSources, [], renderer);
+ }
+ // payload を読むソースは引き続き未解決とする。
+ const domRead = "const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent; mermaid.render('id', src);";
+ const blocked = audit(`${card}${writer}<script type="module">${domRead}</script>`, page);
+ assert.equal(blocked.status, 1);
+ assert.deepEqual(blocked.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+});
+
+test("decodes entity-bearing text/plain payloads through the same path as TSX charts", () => {
+ const chart = 'flowchart LR\nA["x &amp; y &lt;b&gt;"] --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const renderer = "<script>const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent; mermaid.render('id', src);</script>";
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(`${card}${renderer}`, page(chart)).status, 0);
+ assert.equal(audit(`${card}${renderer}`, page(chart.replace("y", "z"))).status, 1);
+ assert.equal(audit(`${card}${renderer}`, page(chart.replace("&lt;b&gt;", "&lt;i&gt;"))).status, 1);
+});
+
 test("preserves payload trailing newline before CLASSDEFS unless using the validated dedent helper", () => {
  const chart = 'flowchart LR\nA --> B';
  const suffix = 'classDef box fill:#fff;';
