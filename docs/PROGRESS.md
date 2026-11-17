@@ -2,9 +2,19 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-17**
+> - 最終更新日: **Updated 2026-11-18**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## ラベル文脈・dedent組込み遮蔽・ツール結果の独立コピー等のレビュー15件（2026-11-18）
+
+- 15件のうち14件を有効と確認して対応。監査とFableはRed／Greenで修正した。
+- 監査（Red `2701e7ca` → Green `b5d2dbb2`）: ラベル直後の`{}`を`:`の後としてオブジェクト式に分類し、後続の`/"/`を除算と見なして引用符がrender呼び出しを隠していた（`outer: {} /"/…`で修正前はstatus 0）。`:`の後の`{`は文ブロックとオブジェクト式を区別できないため不確実とする。正規dedent helperは自由参照の`isFinite`・`Infinity`をhelper外で宣言・代入・引数束縛されると別の値を読むため、helper外に同名の出現があれば未解決とする。祖先`<pre>`の判定は属性値やコメント内の`<pre>`風文字列を数えず、コメントと引用属性付きタグを一単位で読む実タグだけで深さを数える。
+- Fable 5.2（Red `2cd94372` → Green `a1e5785e`）: agent_loop例で`run_tool`の戻り値をそのまま履歴へ保存していたため、ツールが共有オブジェクトを返して後で変更すると前のtool_resultまで書き換わった。戻り値を`copy.deepcopy`してから保存する（文字列は同一のまま）。原本HTML／Markdown・JSX・source／structure契約を同期。
+- ガイド（`f55abc6a`）: CarbonはInteractionsの非ストリーミング／ストリーミング両方に`requires_action`の承認ゲート経路を追加し、ストリームのusageはhop内の最新累積値を保持してhopごとの最終値を合算、`store=False`の切断は元の入力にチェックポイントの`continuation_token`を付けて再送しチェックポイント以降の出力を破棄する。Hydrogenは自動継続で`interactions.create`の統合済み結果を使う分岐を追加し、誠実性評価を公式ブログ記載の94%へ訂正。Decisionsは最初のawait前にメッセージのスナップショットを作り判定と実行に同じものを渡す。Roboticsは`move`の単位・軸・原点を宣言へ記述し、MAX_STEPS到達時は実行済み結果と残りのskippedを履歴へ残して中断、ハートビートは全送信者共有のターンゲートを取得してから送る。Carbon・Hydrogenの記述はGemini API Long Decode公式ページとHydrogen公式ブログで確認。
+- スキップ: structure-contract.jsonのS26行は原本の列ずれを意図的に保存した原本固定契約で、テストの`sourceCells`が訂正行だけを旧位置へ戻して照合する設計。描画は既に内容が空・取得状況・URLの順で、列対応テストも成功している。S26だけ契約を書き換えると他21行と不整合になり照合が壊れるため変更しない。
+- `bun audit`のCI失敗（picomatch ≤4.0.7、vitest／tinyglobby経由の推移的依存）は依存変更のためユーザー確認待ち。
+- 検証: 監査130件、全62件のHTML原本で原本側監査出力が修正前（HEAD `7e4b9187`）と同一、FableのHTML原本監査exit 0、Fable対象80件、全体Vitest240 files／3080 tests、型検査、変更ファイルのBiome、pytest150件＋39 subtests、4ガイドのPythonコード例の構文解析、Roboticsの`run_task`上限時の履歴（実行5件＋skipped5件）のモック実行、Carbon・Hydrogen・Roboticsの全図解析が成功。Markdown lintは変更前後で同一（Robotics既存8件・Decisions既存1件、他0件）。ビルドは今回未実行（最後の成功は2026-11-14）。
 
 ## ループ添字・ASI・batch output・ガイド例等のレビュー14件（2026-11-17）
 

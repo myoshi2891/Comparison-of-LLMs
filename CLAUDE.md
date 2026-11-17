@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-17
+Updated 2026-11-18
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+2026-11-18レビュー15件: 原本監査はラベル等の`:`直後の`{`を不確実なスラッシュ文脈とし、正規dedentはhelper外のisFinite／Infinity出現で未解決、祖先preは実タグのみで数える。Fable 5.2はツール結果をdeepcopyして保存（原本・JSX・契約を同期）。Carbonはrequires_action・store=Falseのストリーム復旧・hop別usage、Hydrogenは自動継続の統合結果と誠実性94%、Decisionsはメッセージのスナップショット、Roboticsは座標系・上限時の履歴・ターンゲートを訂正。S26契約は原本固定の設計のためスキップ。bun auditのpicomatchは依存変更のため確認待ち。監査130件・62原本の監査結果不変・全体240 files／3080 tests・pytest150件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-17レビュー14件: 原本監査はカードループ本体での添字書き込みを未解決とし、dedent比較でASIに影響する改行（return等の直後、++／--の直前）を保持する。Moonshotはbatch／cached outputを区切り幅・インラインタグによらず読み飛ばす。Robotics 2.5は関数呼び出し単位の上限・拒否／失敗後の停止・画像パートでの観測返却、Carbonは非ストリーミング32,768分岐とCONTINUATION継続、HydrogenはSTOP限定、Decisionsはtypes.Contentでのブロックへ訂正。READMEにjqを追加。監査119件・62原本の監査結果不変・pytest150件＋39 subtestsが成功。web-nextは無変更。詳細はdocs/PROGRESS.mdを参照。
 
@@ -675,7 +677,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3077 tests pass、2026-11-16レビュー7件修正後の実測（lint657 filesも成功）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3080 tests pass、2026-11-18レビュー15件修正後の実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
