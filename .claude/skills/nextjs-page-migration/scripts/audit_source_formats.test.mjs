@@ -498,6 +498,23 @@ test("masks regex literals before their quotes can hide CLASSDEFS or render call
  }
 });
 
+test("does not classify a block after a label colon as an object expression", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = value => `const D = ${JSON.stringify(value)}; <MermaidDiagram chart={D} />`;
+ // ラベル後の {} は文ブロック。後続の /"/ を除算と見なすと引用符が render を隠す。
+ for (const body of [
+  `outer: {} /"/.test(s); mermaid.render('id', src + CLASSDEFS); "x";`,
+  `outer: {} /'/.test(s); mermaid.render("id", src + CLASSDEFS); 'x';`,
+ ]) {
+  const source = `${card}<script>const src = ${JSON.stringify(chart)}; const CLASSDEFS = ${JSON.stringify(suffix)}; ${body}</script>`;
+  const result = audit(source, page(chart));
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0'], body);
+ }
+});
+
 test("materializes selected card payloads through quoted angle brackets in empty code attributes", () => {
  const value = 'print("<kept> &lt;")';
  for (const attributes of ['title="a>b"', "title='a>b'", 'title="<code>x>y"']) {
@@ -1056,6 +1073,25 @@ test("requires the dedent call to bind the canonical helper", () => {
  assert.equal(audit(`${card}<script>${canonicalDedent} ${use}</script>`, page).status, 0);
 });
 
+test("rejects the canonical dedent helper when isFinite or Infinity is shadowed", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const use = `const card = document.querySelector('#chart'); const script = card.querySelector('script'); const src = dedent(script.textContent); mermaid.render('id', src);`;
+ for (const body of [
+  `const isFinite = () => true; ${canonicalDedent} ${use}`,
+  `function isFinite() { return true; } ${canonicalDedent} ${use}`,
+  `function wrap(Infinity) { ${canonicalDedent} ${use} } wrap(0);`,
+  `function wrap() { var Infinity = 0; ${canonicalDedent} ${use} } wrap();`,
+  `isFinite = () => true; ${canonicalDedent} ${use}`,
+ ]) {
+  const result = audit(`${card}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], body);
+ }
+ assert.equal(audit(`${card}<script>${canonicalDedent} ${use}</script>`, page).status, 0);
+});
+
 test("does not accept helper variants that change whitespace inside literals", () => {
  const chart = 'flowchart LR\nA --> B';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
@@ -1288,6 +1324,15 @@ test("inventories materialized code cards without a pre element exactly once", (
  // pre を持つカードは二重に数えない。
  const withPre = `<div class="code-block"><pre><code></code></pre><script type="text/plain">${value}</script></div>`;
  assert.deepEqual(audit(withPre, page(value)).data.counts.codeBlocks, { source: 1, page: 1 });
+ // 属性値や内容の pre 風文字列は祖先 pre として数えない。
+ for (const decoy of ['<span title="<pre>"></span>', "<span title='<pre>'></span>", '<!-- <pre> -->']) {
+  const card = `<div class="code-block">${decoy}<code></code><script type="text/plain">${value}</script></div>`;
+  const result = audit(card, page(value));
+  assert.equal(result.status, 0, decoy);
+  assert.deepEqual(result.data.counts.codeBlocks, { source: 1, page: 1 }, decoy);
+ }
+ const closedDecoy = `<div class="code-block"><pre><span title="</pre>"></span><code></code></pre><script type="text/plain">${value}</script></div>`;
+ assert.deepEqual(audit(closedDecoy, page(value)).data.counts.codeBlocks, { source: 1, page: 1 });
 });
 
 test("decodes entity-bearing text/plain payloads through the same path as TSX charts", () => {
