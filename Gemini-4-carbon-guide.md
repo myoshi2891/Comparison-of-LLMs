@@ -348,10 +348,13 @@ flowchart TD
     D -- "はい" --> E["タスクを分割して対応"]
     D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
     F --> API{"どのAPIで呼び出すか"}
-    API -- "GenerateContent" --> CONT{"応答が CONTINUATION で終わったか<br/>現行 SDK は自動で継続する場合あり"}
-    CONT -- "はい" --> NEXT["continuation_token を付けて<br/>継続リクエストを送る"]
-    NEXT --> CONT
-    CONT -- "いいえ" --> G["累積トークンと課金を監視"]
+    API -- "GenerateContent" --> GACC["各セグメントの出力partsとusageを順に蓄積<br/>現行 SDK は自動で継続する場合あり"]
+    GACC --> CONT{"finishReason は何か"}
+    CONT -- "CONTINUATION" --> NEXT["元の contents systemInstruction tools<br/>maxOutputTokens をそのまま再送し<br/>continuation_token を付ける"]
+    NEXT --> GACC
+    CONT -- "STOP" --> GJOIN["蓄積した全セグメントのpartsを結合して採用"]
+    GJOIN --> G["累積トークンと課金を監視"]
+    CONT -- "MAX_TOKENS など" --> GERR["未完了として扱い 部分出力を採用しない"]
     API -- "Interactions 非ストリーミング" --> ACC["各hopの出力テキストとusageを順に蓄積"]
     ACC --> IST{"status は何か<br/>requires_continuation を完了扱いにしない"}
     IST -- "requires_continuation store=True" --> ISS["previous_interaction_id と<br/>continuation_token で継続を送る"]
@@ -587,7 +590,7 @@ flowchart TD
     RISK -- "はい" --> HU["タスク開始前に人間の承認を必須にする"]
     RISK -- "いいえ" --> RUN["Carbon がタスクを進め<br/>ツール呼び出しを要求"]
     HU -- "承認済み" --> RUN
-    RUN --> GATE{"呼び出しごとの承認ゲート<br/>不可逆か 外部コンテンツ由来か 範囲外か"}
+    RUN --> GATE{"呼び出しごとの承認ゲート<br/>本番デプロイか 不可逆か 外部コンテンツ由来か 範囲外か"}
     GATE -- "はい" --> HU2["この呼び出しを人間が承認"]
     GATE -- "いいえ" --> EXEC["最小権限の範囲で実行"]
     HU2 -- "承認済み" --> EXEC

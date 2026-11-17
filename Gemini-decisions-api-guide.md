@@ -402,6 +402,7 @@ sequenceDiagram
 ```
 
 ```python
+import httpx
 from google.genai import types
 
 from decisions_client import THRESHOLD, decide
@@ -440,14 +441,22 @@ async def screen_input(callback_context):
     text = "".join(p.text for p in parts)
     if not text:
         return None
-    ans = (await decide(text, GUARD))["answers"]["injection"]
+    try:
+        result = await decide(text, GUARD)
+    except httpx.HTTPStatusError as err:
+        # 安全フィルタ(error.code が safety / prohibited_content など)は HTTP 400 で返り、
+        # answers を持たない。判定できない入力は LLM へ渡さず定型文で止める。
+        if err.response.status_code == 400:
+            return blocked("このリクエストには対応できません。")
+        raise  # 認証・レート制限・サーバー障害などは握りつぶさず呼び出し元へ伝える
+    ans = result["answers"]["injection"]
     if ans["noul"] >= 0.8:
         return blocked("このリクエストには対応できません。")  # LLM呼び出しを省略する
     # 「注入ではない」と confidence >= THRESHOLD で判定できた場合だけ LLM へ渡す。
-    # それ以外は Step 6 の低信頼ルートとして人間レビューへ回し、LLM は呼ばない。
+    # それ以外は Step 6 の低信頼ルートとして LLM を呼ばずに止める。この骨格はレビュー
+    # キューへ登録しないため、応答でもレビューや後続対応を約束しない(登録はアプリ側で追加する)。
     if ans["noul"] >= 0.5 or ans["confidence"] < THRESHOLD:
-        # レビューキューへの登録はアプリ固有の処理で行う(この骨格では応答の保留のみ)。
-        return blocked("内容を確認するため、担当者のレビュー後に対応します。")
+        return blocked("このリクエストには現在対応できません。")
     return None
 ```
 

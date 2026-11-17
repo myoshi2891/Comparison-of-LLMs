@@ -303,6 +303,7 @@ Hydrogen は入力・思考・出力が**1つの 1,048,576 トークン窓を共
 - それを超える出力(複数ファイルのdiff、長大なテストスイート等)は **Long Decode** を使う
 - Interactions API は、`max_output_tokens` を 65,536 超に設定し、バックグラウンド実行またはフォアグラウンドのクライアント側継続を選べる。`background=True` は `store=True` が必要で、サーバーがhopを連結する。`background=False` では対応SDKの自動継続、または `automatic_continuation=False` と `continuation_token` を使う自前ループを利用する。自前ループでは各hopの出力を順に蓄積してから最終hopの状態を確認する(最後のinteractionの `output_text` だけを返すと、それ以前の継続分のテキストが欠落する)。`store=False` のステートレス実行も可能で、その場合は前回IDの代わりに元の入力を再送し、モデル・ツール・system instruction・生成設定を各hopで維持する([公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation))。
 - GenerateContent APIでも、対応する最新版SDKは `max_output_tokens > 65,536` で自動継続する。RESTや自前ループでは `CONTINUATION` と `continuation_token` を扱い、同じリクエストを継続する([公式GenerateContent Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode))。必要なSDKバージョンは両APIの公式資料で確認する。
+- Agent Platform(Google Cloud)経由では、Interactions・GenerateContentのどちらの継続も **`v1beta1` エンドポイント**で行う。`v1` はこの継続動作に非対応のため、SDKクライアントは `http_options` で `api_version='v1'` を指定せず、RESTの呼び出し元も `v1beta1` のパスを使う(Carbonガイドの Agent Platform 記載と同じ要件)。
 
 ```mermaid
 flowchart TD
@@ -518,7 +519,7 @@ flowchart TD
 
 1. **資料に識別子を振り、出力に「資料ID+ページ/時刻」の引用を必須化**する(捏造の検出が容易になる。設計判断)
 2. 表・グラフ中心の資料は、**抽出してほしい項目と単位を先に列挙**する
-3. 動画は「どの区間を見るか」を指定する。Googleは「特定フレームを検査するエージェント的動画理解」を強化したと説明
+3. 動画は「どの区間を見るか」を指定する。Googleは「特定フレームを検査するエージェント的動画理解」を強化したと説明。ただし区間の指定だけではエージェント的処理は有効にならず、動画入力は既定で静的処理になる。Interactions APIでは動画入力の `processing` を `agentic` に設定して初めてこの機能を使える(パラメータの表記は公式ドキュメントで確認)
 4. 出力は JSON スキーマで構造化し、**スキーマ検証→不一致だけ再質問**の自己修復ループにする
 5. 1Mトークンを使い切る前に、**不要資料を削る**(入力が多いほど課金と待ち時間が増える。出力と窓を共有する点も考慮)。会話prefixを変更する場合はStep 5の `prefix_mismatch_behavior="DROP"` または対応する履歴リセットを使い、変更前の署名だけを再利用しない
 

@@ -184,10 +184,10 @@ flowchart TD
     S["開発開始"] --> Q1{"GR 2.5 のパートナーアクセスがある?"}
     Q1 -->|"ある"| P1["GR 2.5 を対応ロボットで評価<br/>ER 2 と組み合わせる"]
     Q1 -->|"ない"| Q2{"ロボットは Apollo 2 / Franka Duo か?"}
-    Q2 -->|"違う"| Q3{"On-Device 2 のアーリーアクセスを申請済みか?"}
+    Q2 -->|"違う"| Q3{"On-Device 2 のアーリーアクセスが付与されているか?"}
     Q2 -->|"同じ"| W["待機リストに申請<br/>その間は ER 2 で計画層を構築"]
-    Q3 -->|"はい"| P2["On-Device 2 で新エンボディメントに適応<br/>200 例未満・数時間が目安"]
-    Q3 -->|"いいえ"| P3["ER 2 を計画層に<br/>下位は自社 VLA / 既存制御"]
+    Q3 -->|"付与済み"| P2["On-Device 2 で新エンボディメントに適応<br/>200 例未満・数時間が目安"]
+    Q3 -->|"申請中・未申請"| P3["ER 2 を計画層に<br/>下位は自社 VLA / 既存制御"]
     P1 --> OUT["設計は Step 2 へ"]
     W --> OUT
     P2 --> OUT
@@ -400,10 +400,12 @@ tools = types.Tool(function_declarations=[move_decl, gripper_decl])
 ALLOWED_TOOLS = {decl.name for decl in tools.function_declarations}
 
 
-def validate(name: str, args: dict) -> str | None:
+def validate(name: str, args: dict | None) -> str | None:
     """問題があれば拒否理由を返し、なければ None を返す。モデルの外で必ず実行する。"""
     if name not in ALLOWED_TOOLS:
         return f"{name} is not a declared tool"  # 宣言外の名前はロボット SDK へ渡さない
+    if args is None:
+        return "args are required"  # 引数なしの呼び出しも拒否として返し、ER に再計画させる
     if not isinstance(args, dict):
         return "args must be a dict"
     if name == "move":
@@ -464,7 +466,8 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
             if actions >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
                 return "aborted: step limit reached"
             actions += 1
-            reason = validate(fc.name, dict(fc.args))
+            # fc.args は省略され得るため、dict へ変換する前に検証する(変換は検証成功後のみ)。
+            reason = validate(fc.name, fc.args)
             if reason:
                 payload = {"status": "rejected", "reason": reason}
             else:
@@ -474,7 +477,7 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
                     return "aborted: emergency stop"
                 # 実行器は (構造化結果, 実行後の最新観測 JPEG のバイト列または None) を返す契約とする。
                 # 構造化結果は {"status": "ok" | "failed", ...} の JSON 互換 dict で、画像は含めない。
-                payload, image = execute_on_robot(fc.name, dict(fc.args))
+                payload, image = execute_on_robot(fc.name, dict(fc.args))  # 検証済みのため dict である
                 # 実行した動作ごとに観測を置き換える。画像がなければ古い観測を消し、
                 # 後続の動作が一部動いて失敗した場合に、前の動作の画像で再計画させない。
                 observation = image
@@ -553,9 +556,13 @@ HEARTBEAT_TEXT = (
     "If the overall goal is achieved, call 'reset'."
 )
 
-async def heartbeat(session, camera, turn_done: asyncio.Event, interval: float = 1.0):
-    """受信側は turn_complete を受け取ったときに turn_done.set() を呼ぶ。"""
+async def heartbeat(session, camera, turn_done: asyncio.Event, turn_timeout: float, interval: float = 1.0):
+    """受信側は turn_complete を受け取ったときに turn_done.set() を呼ぶ。
+
+    turn_timeout は 1 ターンの完了を待つ上限秒数(タスクの最長動作時間から決める)。
+    """
     loop = asyncio.get_running_loop()
+    interval = max(interval, 1.0)  # 1 FPS 上限を守るため、呼び出し側が 1 秒未満を渡しても 1 秒に丸める
     last_sent = None
     while True:
         if last_sent is not None:
@@ -568,7 +575,13 @@ async def heartbeat(session, camera, turn_done: asyncio.Event, interval: float =
         )
         last_sent = loop.time()
         await session.send_realtime_input(text=HEARTBEAT_TEXT)
-        await turn_done.wait()   # いま送ったターンが終わるまで次を送らない
+        try:
+            # いま送ったターンが終わるまで次を送らない。受信側の終了やセッション切断で
+            # turn_complete が届かない場合に無期限に止まらないよう、待機に上限を設ける。
+            await asyncio.wait_for(turn_done.wait(), timeout=turn_timeout)
+        except asyncio.TimeoutError:
+            # 完了を確認できないまま次のターンは送らない。呼び出し側で再接続・停止を判断する。
+            raise RuntimeError("turn_complete not received; stop heartbeat and recover the session") from None
 ```
 
 ### 9.4 ストリーミングのベストプラクティス
