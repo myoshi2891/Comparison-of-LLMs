@@ -617,14 +617,16 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
   const controlParens = [];
   const braces = [];
   // Consume whole Unicode identifiers (incl. \u escapes) so `πreturn` is never split into `return`.
-  const wordRe = /(?:[\p{ID_Start}$_]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})(?:[\p{ID_Continue}$‌‍]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})*/uy;
+  const wordRe = /(?:[\p{ID_Start}$_]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})(?:[\p{ID_Continue}$\u200C\u200D]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})*/uy;
   while (index < src.length) {
     const char = src[index];
     const next = src[index + 1];
     if (stopAtClosingBrace && char === "}" && braces.length === 0) break;
     if (char === "/" && next === "/") {
-      const lineEnd = src.indexOf("\n", index);
-      const stop = lineEnd === -1 ? src.length : lineEnd;
+      // JavaScript line terminators: LF, CR, LS (U+2028) and PS (U+2029). Code after any
+      // of them is executable and must stay visible (e.g. a following mermaid.render call).
+      const lineEnd = src.slice(index).search(/[\n\r\u2028\u2029]/);
+      const stop = lineEnd === -1 ? src.length : index + lineEnd;
       out += blank(src.slice(index, stop));
       index = stop;
       continue;
@@ -1595,7 +1597,13 @@ function materializePlainTextCards(src) {
       const emptyCodeOrTag = new RegExp(String.raw`<code\b${htmlAttributesPattern}>\s*<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`, "gi");
       const code = Array.from(ownedContent.matchAll(emptyCodeOrTag)).find(match => match[1] !== undefined);
       if (code) {
-        edits.push({ index: start + code.index, length: code[0].length, value: `<code${code[1]}>${escape(payload)}</code>` });
+        // Code blocks are inventoried by <pre>. A card that shows its code without a
+        // <pre> still displays a block, so wrap it once; cards already using <pre> are not wrapped.
+        const before = ownedContent.slice(0, code.index);
+        const insidePre = /^<pre\b/i.test(card.openingTag) ||
+          (before.match(/<pre\b/gi) ?? []).length > (before.match(/<\/pre\s*>/gi) ?? []).length;
+        const filled = `<code${code[1]}>${escape(payload)}</code>`;
+        edits.push({ index: start + code.index, length: code[0].length, value: insidePre ? filled : `<pre>${filled}</pre>` });
         // A selected data-code script must not be materialized again by inventoryHtml.
         edits.push({ index: start + marker.index, length: marker[0].length, value: "" });
       }

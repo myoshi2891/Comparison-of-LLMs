@@ -1260,6 +1260,36 @@ test("keeps literal sources certifiable despite textContent writes in other scop
  assert.deepEqual(blocked.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
 });
 
+test("ends line comments at CR, LS and PS so a following render stays executable", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const withSuffix = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ const withoutSuffix = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ // LF は既存どおり、CR・U+2028・U+2029 の直後の render も CLASSDEFS 付きで解決する。
+ for (const terminator of ['\n', '\r', '\u2028', '\u2029']) {
+  const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const src = ${JSON.stringify(chart)}; // note${terminator}mermaid.render('id', src + CLASSDEFS);</script>`;
+  assert.equal(audit(source, withSuffix).status, 0, JSON.stringify(terminator));
+  assert.equal(audit(source, withoutSuffix).status, 1, JSON.stringify(terminator));
+ }
+});
+
+test("inventories materialized code cards without a pre element exactly once", () => {
+ const value = 'print("kept")';
+ const page = code => `<pre><code>{${JSON.stringify(code)}}</code></pre>`;
+ const bare = `<div class="code-block"><code></code><script type="text/plain">${value}</script></div>`;
+ const match = audit(bare, page(value));
+ assert.equal(match.status, 0);
+ assert.deepEqual(match.data.counts.codeBlocks, { source: 1, page: 1 });
+ assert.equal(audit(bare, page('print("changed")')).status, 1);
+ const empty = audit(bare, '<div></div>');
+ assert.equal(empty.status, 1);
+ assert.deepEqual(empty.data.counts.codeBlocks, { source: 1, page: 0 });
+ // pre を持つカードは二重に数えない。
+ const withPre = `<div class="code-block"><pre><code></code></pre><script type="text/plain">${value}</script></div>`;
+ assert.deepEqual(audit(withPre, page(value)).data.counts.codeBlocks, { source: 1, page: 1 });
+});
+
 test("decodes entity-bearing text/plain payloads through the same path as TSX charts", () => {
  const chart = 'flowchart LR\nA["x &amp; y &lt;b&gt;"] --> B';
  const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
