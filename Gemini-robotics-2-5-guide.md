@@ -299,8 +299,12 @@ def to_pixel(point_yx: list[int], width: int, height: int) -> tuple[int, int]:
 import math
 import statistics
 
-def consensus_point(image_path: str, target: str, n: int = 5) -> tuple[float, float] | None:
-    """同じ対象を n 回ポイントさせ、[y, x] の中央値を返す。"""
+def consensus_point(image_path: str, target: str, max_spread: float, n: int = 5) -> tuple[float, float] | None:
+    """同じ対象を n 回ポイントさせ、点同士が一致したときだけ [y, x] の中央値を返す。
+
+    max_spread は中央値からの許容距離(0〜1000 の正規化単位)。一般的な既定値はないため、
+    把持の許容誤差など作業要件から決めて渡す。
+    """
     ys, xs = [], []
     for _ in range(n):
         try:
@@ -321,10 +325,15 @@ def consensus_point(image_path: str, target: str, n: int = 5) -> tuple[float, fl
         xs.append(x)
     if len(ys) < max(3, n // 2):  # 有効回答が少なすぎるなら採用しない
         return None
-    return statistics.median(ys), statistics.median(xs)
+    my, mx = statistics.median(ys), statistics.median(xs)
+    # 別々の物体を指した回が混ざると、中央値はどの物体にも乗らない座標になり得る。
+    # 有効な点がすべて中央値の許容範囲内に収まる場合だけ合意とみなす。
+    if any(math.hypot(y - my, x - mx) > max_spread for y, x in zip(ys, xs)):
+        return None
+    return my, mx
 ```
 
-> 💡 有効回答が少ない場合に `None` を返す点が重要です。**「答えが出ない」を「適当な座標で動く」に変換してはいけません。** 呼び出し側は `None` のとき再観測か人間への確認に分岐させます。
+> 💡 有効回答が少ない場合や、点同士が `max_spread` を超えて食い違う場合に `None` を返す点が重要です。**「答えが出ない」を「適当な座標で動く」に変換してはいけません。** 呼び出し側は `None` のとき再観測か人間への確認に分岐させます。
 
 ---
 
@@ -419,6 +428,11 @@ def validate(name: str, args: dict) -> str | None:
     return None
 
 
+def function_response_part(fc, payload: dict) -> types.Part:
+    # 呼び出しの id を(None の場合も含め)そのまま返し、並列呼び出しと結果を対応付ける。
+    return types.Part(function_response=types.FunctionResponse(id=fc.id, name=fc.name, response=payload))
+
+
 def run_task(contents: list, execute_on_robot, estop_active) -> str:
     # 上限はモデル応答の数ではなく、関数呼び出し(動作)の数で数える。
     # 1 応答に複数の呼び出しが並んでも、合計 MAX_STEPS 回を超えて実行しない。
@@ -445,7 +459,7 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
                 # 先行する動作が拒否・失敗したら、同じ応答の残りは実行せず ER に再計画させる。
                 # 並列呼び出しの各 function_call には、順序どおり必ず 1 つずつ結果を返す。
                 payload = {"status": "skipped", "reason": "an earlier action in this response was rejected or failed"}
-                results.append(types.Part.from_function_response(name=fc.name, response=payload))
+                results.append(function_response_part(fc, payload))
                 continue
             if actions >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
                 return "aborted: step limit reached"
@@ -461,10 +475,11 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
                 # 実行器は (構造化結果, 実行後の最新観測 JPEG のバイト列または None) を返す契約とする。
                 # 構造化結果は {"status": "ok" | "failed", ...} の JSON 互換 dict で、画像は含めない。
                 payload, image = execute_on_robot(fc.name, dict(fc.args))
-                if image is not None:
-                    observation = image
+                # 実行した動作ごとに観測を置き換える。画像がなければ古い観測を消し、
+                # 後続の動作が一部動いて失敗した場合に、前の動作の画像で再計画させない。
+                observation = image
             halted = payload.get("status") != "ok"
-            results.append(types.Part.from_function_response(name=fc.name, response=payload))
+            results.append(function_response_part(fc, payload))
         if observation is not None:
             # 最新観測は payload 内のバイト列や base64 文字列ではなく、画像パートとして次ターンに渡す。
             results.append(types.Part.from_bytes(data=observation, mime_type="image/jpeg"))

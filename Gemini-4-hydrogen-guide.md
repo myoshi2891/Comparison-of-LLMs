@@ -301,7 +301,7 @@ Hydrogen は入力・思考・出力が**1つの 1,048,576 トークン窓を共
 
 - 同期リクエストの出力は**既定で 65,536 トークン**
 - それを超える出力(複数ファイルのdiff、長大なテストスイート等)は **Long Decode** を使う
-- Interactions API は、`max_output_tokens` を 65,536 超に設定し、バックグラウンド実行またはフォアグラウンドのクライアント側継続を選べる。`background=True` は `store=True` が必要で、サーバーがhopを連結する。`background=False` では対応SDKの自動継続、または `automatic_continuation=False` と `continuation_token` を使う自前ループを利用する。`store=False` のステートレス実行も可能で、その場合は前回IDの代わりに元の入力を再送し、モデル・ツール・system instruction・生成設定を各hopで維持する([公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation))。
+- Interactions API は、`max_output_tokens` を 65,536 超に設定し、バックグラウンド実行またはフォアグラウンドのクライアント側継続を選べる。`background=True` は `store=True` が必要で、サーバーがhopを連結する。`background=False` では対応SDKの自動継続、または `automatic_continuation=False` と `continuation_token` を使う自前ループを利用する。自前ループでは各hopの出力を順に蓄積してから最終hopの状態を確認する(最後のinteractionの `output_text` だけを返すと、それ以前の継続分のテキストが欠落する)。`store=False` のステートレス実行も可能で、その場合は前回IDの代わりに元の入力を再送し、モデル・ツール・system instruction・生成設定を各hopで維持する([公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation))。
 - GenerateContent APIでも、対応する最新版SDKは `max_output_tokens > 65,536` で自動継続する。RESTや自前ループでは `CONTINUATION` と `continuation_token` を扱い、同じリクエストを継続する([公式GenerateContent Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode))。必要なSDKバージョンは両APIの公式資料で確認する。
 
 ```mermaid
@@ -316,7 +316,8 @@ flowchart TD
     MODE -- "GenerateContent" --> GC["対応SDKの自動継続 またはRESTの継続ループ"]
     F --> G["ステータスをポーリング in_progress queued の間待機"]
     G --> H["completed を確認して output_text を取得 失敗や不完全終了は例外"]
-    FG --> H
+    FG --> ACC["各hopの出力テキストとusageを順に蓄積 最後のhopのoutput_textだけでは前半の継続分が欠落する"]
+    ACC --> FGD["最終hopの status が completed か確認し 蓄積した全hopの出力を結合して採用 失敗や不完全終了は例外"]
     GC --> RESULT["全hopの応答とusageを集計し終了理由を確認"]
 ```
 
@@ -414,7 +415,7 @@ flowchart TD
 
 | # | プラクティス | 理由・根拠 |
 |---|---|---|
-| 1 | **読み取り系ツールは並列実行を許す設計**にする(ツール側の同時実行・レート制限を確認) | Hydrogenが並列バッチを前提に最適化されているため |
+| 1 | **読み取り系ツールは並列実行を許す設計**にする(ツール側の同時実行・レート制限を確認)。並列の関数呼び出しへの結果は、**全件を呼び出しと同じ順序で1つのuserターンにまとめて**返す。thought signatureは最初の関数呼び出しパートにだけ付いた状態を保持し、他のパートへ複製しない | Hydrogenが並列バッチを前提に最適化されているため。結果を別ターンへ分割したり署名を複製したりすると、署名の検証に失敗し得る |
 | 2 | **書き込み系は直列**にし、各書き込み後に検証コマンドを挟む | 外科的編集の利点を活かし、副作用の連鎖を防ぐ(設計判断) |
 | 3 | ツールのエラーメッセージは**モデルが読んで次の行動を選べる情報量**で返す | 失敗への適応が強化されているため |
 | 4 | プロンプトに「**不明点は推測せず、足りない情報を列挙する**」を明記する | 捏造低減の効果を最大化する(設計判断) |

@@ -347,10 +347,20 @@ flowchart TD
     B -- "はい" --> D{"遅延に敏感か"}
     D -- "はい" --> E["タスクを分割して対応"]
     D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
-    F --> CONT{"応答が CONTINUATION で終わったか<br/>現行 SDK は自動で継続する場合あり"}
+    F --> API{"どのAPIで呼び出すか"}
+    API -- "GenerateContent" --> CONT{"応答が CONTINUATION で終わったか<br/>現行 SDK は自動で継続する場合あり"}
     CONT -- "はい" --> NEXT["continuation_token を付けて<br/>継続リクエストを送る"]
     NEXT --> CONT
     CONT -- "いいえ" --> G["累積トークンと課金を監視"]
+    API -- "Interactions 非ストリーミング" --> ACC["各hopの出力テキストとusageを順に蓄積"]
+    ACC --> IST{"status は何か<br/>requires_continuation を完了扱いにしない"}
+    IST -- "requires_continuation store=True" --> ISS["previous_interaction_id と<br/>continuation_token で継続を送る"]
+    IST -- "requires_continuation store=False" --> ISL["元の入力と同じモデル ツール 生成設定に<br/>continuation_token を付けて再送する"]
+    ISS --> ACC
+    ISL --> ACC
+    IST -- "completed" --> JOIN["蓄積した全hopの出力を結合して採用"]
+    JOIN --> G
+    IST -- "failed incomplete cancelled" --> ERR["例外として扱い 部分出力を採用しない"]
 ```
 
 ---

@@ -404,7 +404,7 @@ sequenceDiagram
 ```python
 from google.genai import types
 
-from decisions_client import decide
+from decisions_client import THRESHOLD, decide
 
 GUARD = {
     "injection": {
@@ -443,6 +443,11 @@ async def screen_input(callback_context):
     ans = (await decide(text, GUARD))["answers"]["injection"]
     if ans["noul"] >= 0.8:
         return blocked("このリクエストには対応できません。")  # LLM呼び出しを省略する
+    # 「注入ではない」と confidence >= THRESHOLD で判定できた場合だけ LLM へ渡す。
+    # それ以外は Step 6 の低信頼ルートとして人間レビューへ回し、LLM は呼ばない。
+    if ans["noul"] >= 0.5 or ans["confidence"] < THRESHOLD:
+        # レビューキューへの登録はアプリ固有の処理で行う(この骨格では応答の保留のみ)。
+        return blocked("内容を確認するため、担当者のレビュー後に対応します。")
     return None
 ```
 
