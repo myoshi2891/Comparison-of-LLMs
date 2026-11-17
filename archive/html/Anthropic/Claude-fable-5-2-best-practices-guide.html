@@ -1914,6 +1914,7 @@
             <div class="cb-head">python</div>
             <pre><code class="language-python"></code></pre>
             <script type="text/plain">
+              import copy
               import os
               import time
 
@@ -2244,7 +2245,7 @@
                               result = {"type": "tool_result", "tool_use_id": block["id"]}
                               # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
                               try:
-                                  result["content"] = run_tool(block["name"], block["input"])
+                                  result["content"] = run_tool(block["name"], copy.deepcopy(block["input"]))
                               except Exception as error:
                                   result["content"] = f"{type(error).__name__}: {error}"
                                   result["is_error"] = True

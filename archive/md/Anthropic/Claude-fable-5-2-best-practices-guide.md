@@ -322,6 +322,7 @@ flowchart TD
 4. 結果を表にまとめ、運用ルールにする(例: 調査は high、レビューは medium、整形は low)。
 
 ```python
+import copy
 import os
 import time
 
@@ -516,7 +517,7 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                 result = {"type": "tool_result", "tool_use_id": block["id"]}
                 # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
                 try:
-                    result["content"] = run_tool(block["name"], block["input"])
+                    result["content"] = run_tool(block["name"], copy.deepcopy(block["input"]))
                 except Exception as error:
                     result["content"] = f"{type(error).__name__}: {error}"
                     result["is_error"] = True

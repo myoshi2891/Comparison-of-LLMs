@@ -91,7 +91,7 @@ for reason in ("end_turn", "refusal", "max_tokens"):
         return paused if len(requests) == 1 else done
     def run_tool(*args):
         raise AssertionError("pause_turn must not execute client tools")
-    scope = {"call": call}
+    scope = {"call": call, "copy": __import__("copy")}
     exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
     assert scope["agent_loop"]("task", [], run_tool, max_turns=2) is done
     assert requests[1]["messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused["content"]}]
@@ -117,7 +117,7 @@ def call(body):
         assert checkpoint["messages"] == body["messages"]
         raise RuntimeError("API failed")
     return done
-scope = {"call": call}
+scope = {"call": call, "copy": __import__("copy")}
 exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 try:
     scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=checkpoint)
@@ -167,7 +167,7 @@ def call(body):
 def run_tool(name, args):
     executed.append((name, args))
     return "file content"
-scope = {"call": call}
+scope = {"call": call, "copy": __import__("copy")}
 exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 checkpoint = {}
 try:
@@ -198,6 +198,38 @@ assert len(requests) == 2
   );
 });
 
+it("agent_loopはツールへ入力の独立したコピーを渡し、保存するassistant内容を変更させない", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+tool = {"type": "tool_use", "id": "tool-1", "name": "read", "input": {"path": "a.py", "opts": {"lines": [1]}}}
+reply = {"stop_reason": "tool_use", "content": [tool]}
+done = {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}
+requests = []
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return reply if len(requests) == 1 else done
+received = []
+def run_tool(name, args):
+    received.append(args)
+    args["path"] = "changed.py"          # コールバックが入力を書き換えても
+    args["opts"]["lines"].append(99)     # 入れ子まで含めて履歴へ波及しない
+    return "ok"
+scope = {"call": call, "copy": __import__("copy")}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+assert scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint) == done
+assistant = checkpoint["messages"][1]["content"][0]
+assert assistant["input"] == {"path": "a.py", "opts": {"lines": [1]}}
+assert requests[1]["messages"][1]["content"][0]["input"] == {"path": "a.py", "opts": {"lines": [1]}}
+assert received[0] is not tool["input"]
+`,
+    examples()
+  );
+});
+
 it("agent_loopは次のAPI呼び出しが失敗しても完了済みtool_resultを保存する", () => {
   python(
     `
@@ -222,7 +254,7 @@ def call(body):
 def run_tool(name, args):
     executed.append((name, args))
     return "file content"
-scope = {"call": call}
+scope = {"call": call, "copy": __import__("copy")}
 exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 try:
     scope["agent_loop"]("task", [], run_tool, max_turns=3, checkpoint=checkpoint)
@@ -259,7 +291,7 @@ def run_tool(name, args):
     if args["n"] == 3:
         raise OSError("read unavailable")
     return "result-" + str(args["n"])
-scope = {"call": call}
+scope = {"call": call, "copy": __import__("copy")}
 exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 try:
     scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint)

@@ -1996,6 +1996,11 @@ export default function Page() {
                 <code className="language-python">
                   <span className={styles.codeLine}>
                     <span className="hljs-keyword">{"import"}</span>
+                    {" copy"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    <span className="hljs-keyword">{"import"}</span>
                     {" os"}
                   </span>
                   {"\n"}
@@ -3395,9 +3400,9 @@ export default function Page() {
                     <span className="hljs-string">{'"content"'}</span>
                     {"] = run_tool(block["}
                     <span className="hljs-string">{'"name"'}</span>
-                    {"], block["}
+                    {"], copy.deepcopy(block["}
                     <span className="hljs-string">{'"input"'}</span>
-                    {"])"}
+                    {"]))"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
