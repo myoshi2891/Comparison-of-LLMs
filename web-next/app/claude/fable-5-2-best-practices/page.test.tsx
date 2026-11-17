@@ -194,6 +194,14 @@ it("10図の完全なソースと実行時追加classDef・テーマ・ラッパ
   }
 });
 it("原本全stylesheetのURL・SRI・crossoriginを保持", () => {
+  // 意図的な差分: Noto Sans JP はサイト共通の自前ホスト（public/fonts）を使い、
+  // Google Fonts へは Source Serif 4 だけを要求する。他の stylesheet は原本どおり。
+  const ORIGINAL_FONTS =
+    "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap";
+  const SELF_HOSTED_JP_FONTS =
+    "https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap";
+  const sheets = expected.stylesheets as (string | null)[][];
+  expect(sheets.filter(([href]) => href === ORIGINAL_FONTS)).toHaveLength(1);
   const { container } = render(<Page />);
   expect(
     Array.from(container.querySelectorAll('link[rel="stylesheet"]')).map((e) => [
@@ -201,7 +209,12 @@ it("原本全stylesheetのURL・SRI・crossoriginを保持", () => {
       e.getAttribute("integrity"),
       e.getAttribute("crossorigin"),
     ])
-  ).toEqual(expected.stylesheets);
+  ).toEqual(
+    sheets.map(([href, ...rest]) => [
+      href === ORIGINAL_FONTS ? SELF_HOSTED_JP_FONTS : href,
+      ...rest,
+    ])
+  );
 });
 it("9リスト41チェックの全文とリストごとの独立集計・取消し・バー幅", () => {
   const { container } = render(<Page />);
