@@ -765,13 +765,21 @@ function compactCodePreservingLiterals(text) {
   let out = "";
   let prev = "";
   let pendingSpace = false;
+  let pendingLine = false;
+  let ahead = "";
   const emit = chunk => {
-    if (pendingSpace && /[\w$]/.test(out.at(-1) ?? "") && /[\w$]/.test(chunk[0])) out += " ";
+    // A line terminator only changes automatic semicolon insertion inside restricted
+    // productions: after return/throw/break/continue/yield/async, or before postfix
+    // ++/--. Keep it distinguishable there; elsewhere it is ordinary whitespace.
+    if (pendingLine && (/(?:^|[^\w$])(?:return|throw|break|continue|yield|async)$/.test(out) || /^(?:\+\+|--)/.test(ahead))) out += "\n";
+    else if (pendingSpace && /[\w$]/.test(out.at(-1) ?? "") && /[\w$]/.test(chunk[0])) out += " ";
     pendingSpace = false;
+    pendingLine = false;
     out += chunk;
   };
   for (let i = 0; i < text.length; i++) {
     const c = text[i];
+    ahead = text.slice(i, i + 2);
     if (c === "'" || c === '"' || c === "`") {
       const end = skipQuoted(text, i);
       if (text[end] !== c) return undefined;
@@ -802,6 +810,7 @@ function compactCodePreservingLiterals(text) {
     }
     if (/\s/.test(c)) {
       pendingSpace = true;
+      if (/[\n\r\u2028\u2029]/.test(c)) pendingLine = true;
       continue;
     }
     emit(c);
@@ -1233,7 +1242,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (executable[k] === "{") depth++;
           else if (executable[k] === "}" && --depth === 0) { close = k; break; }
         }
-        return close > open && [ownerBinding.at, at].every(position => position > open && position < close);
+        if (close <= open || ![ownerBinding.at, at].every(position => position > open && position < close)) return false;
+        // Any other write to the index inside the body skips or repeats cards, so the
+        // in-order card-to-payload mapping is no longer proven.
+        return !Array.from(writeIndexes(indexed[2])).some(write => write > open && write < close);
       });
     };
     let value = initial;
