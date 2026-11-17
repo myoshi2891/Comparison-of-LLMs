@@ -554,6 +554,24 @@ class TestMoonshot:
             assert model.provenance is not None
             assert model.provenance.origin == "scraped"
 
+    @pytest.mark.parametrize(
+        "html",
+        [
+            # 複数空白・インラインタグで区切られた batch output を標準 output として拾わない。
+            "<p>Kimi K3 input $3.25 batch  output $8.25 output $16.50</p>",
+            "<p>Kimi K3 input $3.25 batch\n\toutput $8.25 output $16.50</p>",
+            "<p>Kimi K3 input $3.25 <span>batch</span> output $8.25 output $16.50</p>",
+            "<p>Kimi K3 input $3.25 batch<br> output $8.25 output $16.50</p>",
+            "<p>Kimi K3 input $3.25 cached  output $0.50 output $16.50</p>",
+        ],
+    )
+    def test_standard_output_skips_spaced_batch_output(self, html):
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+        assert model.provenance is not None
+        assert model.provenance.origin == "scraped"
+
     def test_cached_input_gap_cannot_stop_inside_a_price(self):
         text = "Kimi K3 cached input $0.25 input $3.25 output $16.50"
         gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}"
