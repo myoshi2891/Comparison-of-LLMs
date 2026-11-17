@@ -2,9 +2,17 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-16**
+> - 最終更新日: **Updated 2026-11-17**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## ループ添字・ASI・batch output・ガイド例等のレビュー14件（2026-11-17）
+
+- 14件すべてを現行コードで有効と確認して対応。監査とMoonshotは修正前の誤認定・誤抽出を実測してからRed／Greenで修正した。
+- 監査（Red `dcac7134` → Green `c850e0b4`）: カードのforループ本体で添字へ書き込む2枚カードの3例（`i++`・`i += 1`・`i = cards.length`）が修正前はstatus 0。本体内の添字書き込みを未解決とする。dedentの比較で`return`直後の改行が空白に畳まれ、ASIで`undefined`を返す別関数を正規と認定していた。改行は`return`・`throw`・`break`・`continue`・`yield`・`async`の直後と`++`／`--`の直前でのみ区別して保持する。最初に「`;{}`以外の後の改行をすべて保持」としたところFable原本のメソッドチェーン改行で認定が外れたため、ASIに影響する位置へ絞り、チェーン改行を認める正例を追加した。
+- Moonshot（Red `713d8e43` → Green `cf9c24c0`）: `batch  output`・改行とタブ・`<span>batch</span> output`・`batch<br> output`・`cached  output`の5例で修正前はbatch等の価格を標準outputとして取得。`batch|cached`＋空白／インラインタグ＋`output`を一塊で読み飛ばす探索ギャップに変更し、後続の標準output $16.50と入力$3.25の組とscraped出自を検証。
+- ガイド（`44ea0cb9`）: Robotics 2.5は関数呼び出し単位で15回の上限を各実行前に確認し、拒否・失敗後の同一応答内の呼び出しは実行せず`skipped`結果を順序どおり返す。最新観測は`Part.from_bytes`のJPEG画像パートで次ターンへ渡し、実行器は構造化結果と画像を分けて返す契約へ変更。Carbonは非ストリーミングRESTの32,768トークン分岐とCONTINUATIONでの継続リクエスト（SDKは自動継続の場合あり）を図に追加。HydrogenはSTOP以外の終了と空本文を拒否し、最終更新日をISO形式で見出し直下へ移動（日付は維持）。Decisionsは`decide`のimportを追加し、ブロック時は`types.Content`を返す。READMEのネイティブ前提条件にjqを追加。GEMINI.mdのビルド記録を11月14日の成功・11月15日の失敗へ訂正。
+- 検証: 監査119件（形式83・照合36）、全62件のHTML原本で原本側監査結果が修正前（HEAD `fef5b787`）と同一、FableのHTML原本監査exit 0、pytest150件＋39 subtests、4ガイドのPythonコード例の構文解析、Roboticsの`run_task`（拒否・失敗後の停止、画像パート、1応答10呼び出し×2での15回停止）とDecisionsガードのモック実行、CarbonとRoboticsの18図解析が成功。Markdown lintは変更前後で同一（Robotics既存8件・Decisions既存1件、他0件）。web-nextは無変更のため全体Vitest・型・Biome・ビルドは再実行していない（直前の全体実測は240 files／3077 tests、ビルドの最後の成功は2026-11-14）。
 
 ## 隠れたrenderer・別名の初期化位置・ガイド例・料金範囲のレビュー14件（2026-11-16）
 
@@ -972,13 +980,14 @@
 
 ```text
 AGENTS.md → CODEX.md → CLAUDE.md → docs/PROGRESS.md → Phase A–F計画の順で読む。
+2026-11-17のレビュー14件は全件修正・コミット済み（実装HEAD 44ea0cb9）。監査119件・62原本の監査結果不変・pytest150件＋39 subtests成功。冒頭のレビュー14件（2026-11-17）の節を参照。
 2026-11-16のレビュー14件は13件修正・1件スキップ、コミット済み（実装HEAD ab2ed0ad）。監査113件・pytest145件＋39 subtests成功。冒頭のレビュー14件の節を参照。
 2026-11-16のレビュー7件も全件修正・コミット済み（当時の実装HEAD 10755f9e）。監査111件・62原本の監査結果不変・pytest143件＋39 subtests・全体Vitest240 files／3077 tests成功。冒頭のレビュー7件の節を参照。
 以前の追加レビュー5件も全件修正・コミット済み（当時の実装HEAD 4a02de85）。src束縛とpayload対応の検証・キャッシュ入力価格除外・pause_turn直後のcheckpoint保存・PDF上限を訂正。全体Vitest240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査exit 0成功。冒頭の追加レビュー5件の節を参照。
 最新のレビュー4件は3件修正・1件スキップ。コメントのみのcodeは既に拒否され、回帰テストを追加して監査104件成功。冒頭のレビュー4件の節を参照。ビルドは11月14日が最後の成功、11月15日は初回・再試行とも失敗。
 以前の追加レビュー7件も修正・コミット済み。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析成功の当時の記録は該当節を参照。
 以前のレビュー12件も修正・コミット済み。全体Vitest240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtestsの当時の記録は該当節を参照。ビルドはTurbopackのローカルポート制限で失敗（再実行でも同じ）。
-最新実装HEAD: ab2ed0ad（2026-11-16のレビュー14件までの修正はコミット済み）。
+最新実装HEAD: 44ea0cb9（2026-11-17のレビュー14件までの修正はコミット済み）。
 追加レビュー4件は監査100件・HTML原本監査exit 0・Hydrogenの生成失敗／再試行モック・変更Markdown lintが成功。初期化順序や別名ソースの寄与が不明なら未解決とし、textarea等の偽タグを不透明に保つ。Hydrogenは成功時だけ履歴を保存。アプリ全体の再検証は未実行。
 次の作業: Fable 5.2・Codexベストプラクティス・Antigravity・Omni・Argon・Fable 5.1・Astraの目視確認（全てユーザー担当、各ページの完了確認まで目視未確認を維持する）。
 Fable 5.2: http://localhost:3000/claude/fable-5-2-best-practices

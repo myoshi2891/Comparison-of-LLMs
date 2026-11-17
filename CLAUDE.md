@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-16
+Updated 2026-11-17
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+2026-11-17レビュー14件: 原本監査はカードループ本体での添字書き込みを未解決とし、dedent比較でASIに影響する改行（return等の直後、++／--の直前）を保持する。Moonshotはbatch／cached outputを区切り幅・インラインタグによらず読み飛ばす。Robotics 2.5は関数呼び出し単位の上限・拒否／失敗後の停止・画像パートでの観測返却、Carbonは非ストリーミング32,768分岐とCONTINUATION継続、HydrogenはSTOP限定、Decisionsはtypes.Contentでのブロックへ訂正。READMEにjqを追加。監査119件・62原本の監査結果不変・pytest150件＋39 subtestsが成功。web-nextは無変更。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-16レビュー14件: 原本監査はスラッシュ分類が不確実でrendererが隠れうるスコープを未解決として保持し、別名は初期化子が実行される位置で解決する。入れ子のlet／constはシャドーイング扱い。Moonshotはcached入力ラベル内のインラインHTMLを読み飛ばし、標準outputをbatch等の別フィールドから拾わない。Robotics 2.5・Decisions・Carbonのコード例と手順を訂正し、Carbonのprefix_mismatch_behaviorは公式記載ありとしてスキップ。監査113件・62原本の監査結果不変・pytest145件＋39 subtestsが成功。web-nextは無変更。詳細はdocs/PROGRESS.mdを参照。
 

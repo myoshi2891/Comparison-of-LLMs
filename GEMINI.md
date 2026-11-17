@@ -1,9 +1,11 @@
 # GEMINI.md
 
-Updated 2026-11-16
+Updated 2026-11-17
 
 GEMINI.md は Gemini CLI / Gemini Code Assist 向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、GEMINI.md はその委譲 pointer として機能する。
+
+2026-11-17レビュー14件: 監査のループ添字・ASI改行、Moonshotのbatch output、Gemini 4ガイド例、README前提条件jqを修正。詳細はCLAUDE.md／docs/PROGRESS.mdを参照。
 
 2026-11-14追加レビュー: 最新ユーザー指示によりHomeのaddedAt／lastReviewedを価格データ更新日の2026-11-13へ同期。監査とHydrogen原稿の修正・検証結果はdocs/PROGRESS.mdを参照。
 
@@ -321,9 +323,9 @@ Vitest 185 files／1779 tests、typecheck・lint・pytest 104件が成功。復�
 ```bash
 (cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3077 tests pass（2026-11-16実測）
 (cd web-next && bun run typecheck)   # OK（2026-11-16 実測）
-# ビルドは今回ユーザー指定で未実行（過去: 2026-09-18 に89静的ページ生成）
+# ビルド: 最後の成功は2026-11-14（115静的ページ生成）。2026-11-15の初回・再試行はTurbopackのローカルポート権限制限で失敗
 (cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-16 実測）
-(cd scraper && uv run pytest)        # 145件＋39 subtests成功（2026-11-16 実測）
+(cd scraper && uv run pytest)        # 150件＋39 subtests成功（2026-11-17 実測）
 ```
 
 ## 次セッション再開プロンプト
