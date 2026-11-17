@@ -1531,7 +1531,7 @@ function materializePlainTextCards(src) {
     return !type || type === "module" || /^(?:text|application)\/(?:java|ecma)script$/.test(type);
   });
   // Classic scripts share the global scope; each module has its own CLASSDEFS.
-  const scopes = [
+  const allScopes = [
     executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module"),
     ...executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() === "module").map(script => [script]),
   ].map(group => {
@@ -1549,8 +1549,17 @@ function materializePlainTextCards(src) {
     // An uncertain slash may have masked a renderer as a string/regex. Keep the
     // scope so rendererSuffix reports it unresolved instead of dropping it.
     const maskedRenderer = resolution.uncertain && /\bmermaid\.render\b/.test(rawSource);
-    return { literalSource, rawSource, selectors, hasSelection: selectionCalls.length > 0, hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer };
-  }).filter(scope => scope.hasRenderer);
+    // Computed member calls (mermaid['render'](…), mermaid[name](…), mermaid?.render) are not
+    // traced by rendererSuffix; keep them as an unresolved renderer instead of certifying the base.
+    const computedRenderer = /\bmermaid\s*(?:\?\.\s*)?\[|\bmermaid\s*\?\.\s*render\b/.test(executable);
+    // Writes to any element's textContent (static or computed key). Which element is written
+    // cannot be resolved across scopes, so another scope's write may replace the payload.
+    const writesTextContent = /\.\s*textContent\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
+      /\[\s*(['"`])textContent\1\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(literalSource);
+    return { literalSource, rawSource, selectors, computedRenderer, writesTextContent, hasSelection: selectionCalls.length > 0,
+      hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer || computedRenderer };
+  });
+  const scopes = allScopes.filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const cards = extractElementContents(stashed, tag => {
     const cls = readHtmlAttribute(tag, "class") ?? "";
@@ -1596,9 +1605,12 @@ function materializePlainTextCards(src) {
       const firstScript = /<script data-audit-payload="(\d+)"><\/script>/.exec(card.content);
       const firstPlain = Array.from(card.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
-      const resolvedSource = renderer && rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
+      // A textContent write in another scope (even one without a renderer) may replace this
+      // payload before the read, so the original HTML payload is not certified.
+      const foreignWrite = renderer && allScopes.some(scope => scope !== renderer && scope.writesTextContent);
+      const resolvedSource = renderer && (renderer.computedRenderer || foreignWrite ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
-          unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 });
+          unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 }));
       if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
       edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(resolvedSource ?? script.payload)}</div>` });
     }

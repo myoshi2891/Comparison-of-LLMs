@@ -964,6 +964,36 @@ test("does not certify stale script textContent after observed writes", () => {
  assert.equal(audit(source, page).status, 0);
 });
 
+test("keeps computed mermaid render calls unresolved instead of certifying the base payload", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const head = "const CLASSDEFS = '\\nclassDef hub fill:#fff;'; const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent;";
+ for (const call of ["mermaid['render']('id', src + CLASSDEFS);", 'mermaid["render"]("id", src + CLASSDEFS);', 'mermaid[name]("id", src + CLASSDEFS);']) {
+  const result = audit(`${card}<script>${head} ${call}</script>`, page);
+  assert.equal(result.status, 1, call);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], call);
+ }
+});
+
+test("checks payload textContent writes across separate module scopes", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const renderer = "const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent; mermaid.render('id', src);";
+ const writer = "document.querySelector('#chart script').textContent = 'flowchart LR\\nX --> Y';";
+ for (const [writerType, rendererType] of [['module', 'module'], ['module', ''], ['', 'module']]) {
+  const tag = type => (type ? `<script type="${type}">` : '<script>');
+  // 書き込み側にレンダラーがなくても、別スコープの読み取りに影響し得る。
+  const source = `${card}${tag(writerType)}${writer}</script>${tag(rendererType)}${renderer}</script>`;
+  const result = audit(source, page);
+  assert.equal(result.status, 1, source);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], source);
+ }
+ // textContent を書き込まない別モジュールは認定を妨げない。
+ assert.equal(audit(`${card}<script type="module">console.log('ready');</script><script type="module">${renderer}</script>`, page).status, 0);
+});
+
 const canonicalDedent = `function dedent(text) {
         var lines = text.replace(/^\\n+/, '').replace(/\\s+$/, '').split('\\n');
         var min = Infinity;
