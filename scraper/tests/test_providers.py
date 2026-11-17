@@ -547,6 +547,13 @@ class TestMoonshot:
             # batch input の価格も標準入力として拾わない。
             '<p>Kimi K3 batch input $1.60 input $3.25 output $16.50</p>',
             '<dl><dt>Kimi K3</dt><dd>batch input $1.60</dd><dd>input $3.25</dd><dd>output $16.50</dd></dl>',
+            # cache-hit の入力価格が cache-miss より前にあっても、標準入力は cache-miss を選ぶ。
+            '<p>Kimi K3 input (cache hit) $0.25 input (cache miss) $3.25 output $16.50</p>',
+            '<td>Kimi K3</td><td>Cache Hit $0.25</td><td>Cache Miss $3.25</td><td>Output $16.50</td>',
+            '<p>Kimi K3 cache-hit input $0.25 cache-miss input $3.25 output $16.50</p>',
+            '<p>Kimi K3 <span>cache</span> <span>hit</span> input $0.25 input $3.25 output $16.50</p>',
+            # cache-hit・cached・batch が同じレコードに並んでも標準入力だけを選ぶ。
+            '<p>Kimi K3 cache hit $0.25 cached input $0.2 batch input $1.6 input $3.25 output $16.50</p>',
         ):
             with patch("scraper.providers.moonshot.get_page_text", return_value=html):
                 model = _find(moonshot.scrape(), "Kimi K3")
