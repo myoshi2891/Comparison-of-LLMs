@@ -713,8 +713,9 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
       if (char === "(") controlParens.push(/^(?:if|while|for|with|switch|catch)$/.test(lastToken));
       if (char === "{") {
         // Object expressions end an operand; statement blocks permit a new regex.
-        // Callable bodies and other ambiguous braces require a parser to decide.
-        braces.push(/^(?:=|\(|\[|,|:|return|yield)$/.test(lastToken) ? false
+        // A colon may end a label or case (statement block) or a property/ternary
+        // (object expression), so it stays ambiguous like callable bodies.
+        braces.push(/^(?:=|\(|\[|,|return|yield)$/.test(lastToken) ? false
           : /^(?:;|\{|else|try|finally|do|control-end)$/.test(lastToken) || lastToken === "" ? true : null);
       }
       const controlEnd = char === ")" && (controlParens.pop() ?? false);
@@ -1331,6 +1332,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const actualCompact = compactCodePreservingLiterals(rawSource.slice(head.index, end));
       const canonicalCompact = compactCodePreservingLiterals(canonical);
       if (actualCompact === undefined || actualCompact !== canonicalCompact) return false;
+      // The helper reads isFinite and Infinity as free names. Any other occurrence may
+      // declare, assign or bind (as a parameter) a shadowing name, so it stays unresolved.
+      if (Array.from(executable.matchAll(/(?<![\w$.])(?:isFinite|Infinity)(?![\w$])/g))
+        .some(reference => reference.index < head.index || reference.index >= end)) return false;
       value = value.slice(7, -1).trim();
       usesValidatedDedent = true;
     }
@@ -1600,8 +1605,14 @@ function materializePlainTextCards(src) {
         // Code blocks are inventoried by <pre>. A card that shows its code without a
         // <pre> still displays a block, so wrap it once; cards already using <pre> are not wrapped.
         const before = ownedContent.slice(0, code.index);
-        const insidePre = /^<pre\b/i.test(card.openingTag) ||
-          (before.match(/<pre\b/gi) ?? []).length > (before.match(/<\/pre\s*>/gi) ?? []).length;
+        // Count real pre tags only: comments and whole tags (with quoted attributes) are
+        // consumed as units, so tag-like text in attribute values cannot change the depth.
+        let preDepth = 0;
+        for (const tag of before.matchAll(/<!--[\s\S]*?-->|<(\/?)([A-Za-z][\w:-]*)(?:[^>"']|"[^"]*"|'[^']*')*>/g)) {
+          if (tag[2]?.toLowerCase() !== "pre") continue;
+          preDepth = tag[1] ? Math.max(0, preDepth - 1) : preDepth + 1;
+        }
+        const insidePre = /^<pre\b/i.test(card.openingTag) || preDepth > 0;
         const filled = `<code${code[1]}>${escape(payload)}</code>`;
         edits.push({ index: start + code.index, length: code[0].length, value: insidePre ? filled : `<pre>${filled}</pre>` });
         // A selected data-code script must not be materialized again by inventoryHtml.
