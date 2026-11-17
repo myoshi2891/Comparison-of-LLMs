@@ -35,6 +35,12 @@ _INPUT_PRICE_GAP = _RECORD_GAP.replace(
 )
 # 標準 output の価格は batch・cached など別フィールドのラベルを越えて探さない。
 _OUTPUT_LABEL = r"(?<!batch\s)(?<!cached\s)\boutput"
+# batch/cached output は区切りの空白・インラインタグの量によらず一塊で読み飛ばす。
+# 途中で止まれないため、直後の output を標準ラベルとして誤認しない。
+_OTHER_OUTPUT_LABEL = rf"\b(?:batch|cached){_INLINE_SEP}output\b"
+_OUTPUT_LABEL_GAP = _RECORD_GAP.replace(
+    r"[\s\S]", rf"(?:{_OTHER_OUTPUT_LABEL}|(?!{_OTHER_OUTPUT_LABEL})[\s\S])"
+)
 _OUTPUT_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"(?!\b(?:batch|cached|cache|input)\b)[^$]")
 
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
@@ -102,7 +108,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             rf"{key}{_INPUT_PRICE_GAP}\$([\d.]+)",
         ])
         out_price = extract_price(html, [
-            rf"{key}{_RECORD_GAP}{_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
+            rf"{key}{_OUTPUT_LABEL_GAP}{_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
         ])
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)
