@@ -1,8 +1,9 @@
 # Gemini 4 Hydrogen 完全ガイド(中級〜上級者向け・ステップバイステップ版)
 
+(最終更新日: 2026-11-15)
+
 > **対象読者**: Gemini API / Google AI Studio / Antigravity で実プロダクトやエージェントを構築・運用している中級〜上級エンジニア
 > **情報基準日**: 2026年11月13日(Gemini 4 Hydrogen 発表の翌日)
-> **最終更新日**: 2026年11月15日
 > **注意**: 発表直後のため、Google公式情報(ブログ・ドキュメント・モデルカード)と第三者記事・個人検証を明確に区別して記載しています。第三者情報には「(第三者)」、推奨設計のうち筆者の設計判断には「(設計判断)」と付けています。数値・価格は必ず公式ページで再確認してください。
 
 ---
@@ -226,8 +227,16 @@ resp = client.models.generate_content(
 )
 if not resp.candidates:
     raise RuntimeError("応答に候補がありません")
-if resp.candidates[0].finish_reason == types.FinishReason.MAX_TOKENS:
+candidate = resp.candidates[0]
+if candidate.finish_reason == types.FinishReason.MAX_TOKENS:
     raise RuntimeError("MAX_TOKENSで中断しました。出力予算・Long Decode・タスク分割を見直して再実行してください")
+if candidate.finish_reason != types.FinishReason.STOP:
+    # SAFETY・RECITATION などで止まった応答は、部分的な本文があっても採用しない
+    raise RuntimeError(f"応答は正常完了していません: {candidate.finish_reason}")
+if candidate.content is None or not candidate.content.parts or not any(
+    part.text for part in candidate.content.parts
+):
+    raise RuntimeError("応答に有効なテキストがありません")
 print(resp.text)
 ```
 

@@ -402,6 +402,10 @@ sequenceDiagram
 ```
 
 ```python
+from google.genai import types
+
+from decisions_client import decide
+
 GUARD = {
     "injection": {
         "type": "noul",
@@ -411,6 +415,11 @@ GUARD = {
         ),
     }
 }
+
+
+def blocked(message: str) -> types.Content:
+    """before_agent_callback が types.Content を返すと、ADK はエージェント(LLM)を実行せずにそれを応答とする。"""
+    return types.Content(role="model", parts=[types.Part(text=message)])
 
 
 async def screen_input(callback_context):
@@ -427,13 +436,13 @@ async def screen_input(callback_context):
         value is not None for key, value in p.model_dump(exclude_none=True).items()
         if key != "text"
     ) for p in parts):
-        return "BLOCKED"  # 実装では LlmResponse に未対応入力の説明を含めて返す
+        return blocked("テキスト以外の入力には対応していません。テキストで送信してください。")
     text = "".join(p.text for p in parts)
     if not text:
         return None
     ans = (await decide(text, GUARD))["answers"]["injection"]
     if ans["noul"] >= 0.8:
-        return "BLOCKED"  # 実際には LlmResponse を返してLLM呼び出しを省略する
+        return blocked("このリクエストには対応できません。")  # LLM呼び出しを省略する
     return None
 ```
 

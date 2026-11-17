@@ -340,11 +340,11 @@ flowchart TD
     CALL --> HAS{"関数呼び出しがある?"}
     HAS -->|"ない"| DONE["完了報告を受け取る"]
     HAS -->|"ある"| CHK{"検証層を通過?"}
-    CHK -->|"拒否"| REJ["拒否理由を関数結果として返す"]
+    CHK -->|"拒否"| REJ["拒否理由を関数結果として返す<br/>同じ応答の残りの呼び出しは実行しない"]
     CHK -->|"許可"| EXEC["ロボット SDK で実行"]
-    EXEC --> RES["結果と最新観測を返す"]
+    EXEC --> RES["結果と最新観測の画像を返す<br/>失敗なら残りの呼び出しは実行しない"]
     REJ --> LIM
-    RES --> LIM{"最大ステップ未満?"}
+    RES --> LIM{"実行した動作数が上限未満?"}
     LIM -->|"はい"| CALL
     LIM -->|"いいえ"| ABORT["安全に中断して人間へ通知"]
 ```
@@ -420,7 +420,10 @@ def validate(name: str, args: dict) -> str | None:
 
 
 def run_task(contents: list, execute_on_robot, estop_active) -> str:
-    for step in range(1, MAX_STEPS + 1):
+    # 上限はモデル応答の数ではなく、関数呼び出し(動作)の数で数える。
+    # 1 応答に複数の呼び出しが並んでも、合計 MAX_STEPS 回を超えて実行しない。
+    actions = 0
+    while True:
         if estop_active():  # 非常停止が入っていればモデルに問い合わせずに終了
             return "aborted: emergency stop"
         response = client.models.generate_content(
@@ -435,9 +438,18 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
         calls = [p for p in response.candidates[0].content.parts if p.function_call]
         if not calls:
             return response.text  # モデルが関数を呼ばなくなったら完了
-        results = []
+        results, observation, halted = [], None, False
         for part in calls:
             fc = part.function_call
+            if halted:
+                # 先行する動作が拒否・失敗したら、同じ応答の残りは実行せず ER に再計画させる。
+                # 並列呼び出しの各 function_call には、順序どおり必ず 1 つずつ結果を返す。
+                payload = {"status": "skipped", "reason": "an earlier action in this response was rejected or failed"}
+                results.append(types.Part.from_function_response(name=fc.name, response=payload))
+                continue
+            if actions >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
+                return "aborted: step limit reached"
+            actions += 1
             reason = validate(fc.name, dict(fc.args))
             if reason:
                 payload = {"status": "rejected", "reason": reason}
@@ -446,12 +458,17 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
                 # ソフトウェアの確認であり、独立した物理インターロックの代わりではない。
                 if estop_active():
                     return "aborted: emergency stop"
-                # 実行器は status に加え、実行後の最新観測（画像・状態）を payload に含めて返す契約とする。
-                # status のみだと次ターンのモデルは新しい観測を得られない。
-                payload = execute_on_robot(fc.name, dict(fc.args))
+                # 実行器は (構造化結果, 実行後の最新観測 JPEG のバイト列または None) を返す契約とする。
+                # 構造化結果は {"status": "ok" | "failed", ...} の JSON 互換 dict で、画像は含めない。
+                payload, image = execute_on_robot(fc.name, dict(fc.args))
+                if image is not None:
+                    observation = image
+            halted = payload.get("status") != "ok"
             results.append(types.Part.from_function_response(name=fc.name, response=payload))
+        if observation is not None:
+            # 最新観測は payload 内のバイト列や base64 文字列ではなく、画像パートとして次ターンに渡す。
+            results.append(types.Part.from_bytes(data=observation, mime_type="image/jpeg"))
         contents.append(types.Content(role="user", parts=results))
-    return "aborted: step limit reached"
 ```
 
 ### 8.3 オーケストレーションのベストプラクティス

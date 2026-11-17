@@ -1,6 +1,6 @@
 # LLM-Studies (AI Model Cost Calculator & AI Studies Hub)
 
-最終更新日: 2026-11-14
+最終更新日: 2026-11-17
 
 [![Next.js](https://img.shields.io/badge/Next.js-16_App_Router-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react)](https://react.dev/)
@@ -164,6 +164,7 @@ make test
 - [Python 3.12+](https://www.python.org/)
 - [uv](https://docs.astral.sh/uv/)
 - [Bun](https://bun.sh/)
+- [jq](https://jqlang.org/)（フロントエンドテストが、ガイド内の PostToolUse フック例を実行する際に使用）
 
 ```bash
 # 1. バックエンド（スクレイパー）のセットアップ
