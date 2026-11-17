@@ -3398,11 +3398,11 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                    result["}
                     <span className="hljs-string">{'"content"'}</span>
-                    {"] = run_tool(block["}
+                    {"] = copy.deepcopy(run_tool(block["}
                     <span className="hljs-string">{'"name"'}</span>
                     {"], copy.deepcopy(block["}
                     <span className="hljs-string">{'"input"'}</span>
-                    {"]))"}
+                    {"])))"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
