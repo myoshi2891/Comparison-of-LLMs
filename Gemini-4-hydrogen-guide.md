@@ -89,7 +89,7 @@ flowchart TB
 
 | 消費オプション | 入力 | 出力(思考トークン含む) | キャッシュ |
 |---|---|---|---|
-| 無料階層(Free tier) | 無料 | 無料 | 非対応(Batch / Flex も有料階層のみ。レート制限・データ利用条件は公式料金表で確認) |
+| 無料階層(Free tier) | 無料 | 無料 | 暗黙キャッシュは対応(無料のため割引額はなし。Batch / Flex は有料階層のみ。レート制限・データ利用条件は公式料金表で確認) |
 | Standard(有料階層) | $1.50 | $7.50 | $0.075(暗黙のみ) |
 | Batch(有料階層) | $0.75 | $3.75 | $0.0375 |
 | Flex(有料階層) | $0.75 | $3.75 | $0.0375 |
@@ -196,7 +196,7 @@ flowchart TD
 
 ### 2-4. 実装上の要点
 
-- Gemini 4 系では `thinking_budget` を指定すると **HTTP 400** になります。`thinking_level` を使ってください(Google Cloud ドキュメント)。
+- `thinking_budget` の扱いは提供面で異なります。Agent Platform(Google Cloud)では指定すると **HTTP 400** になり、Gemini API の GenerateContent ガイドでは単独で使った場合に警告を出してレベルへ対応付けると説明されています。どちらの面でも `thinking_level` を使ってください(Carbonガイドの移行表と同じ整理)。
 - `thinking_level="MINIMAL"` も Gemini 4 では **HTTP 400**。代わりに `LOW` を使います。
 - Interactions API では `"low" / "medium" / "high" / "xhigh"` と小文字表記、Vertex 側のサンプルでは大文字(`LOW` など)が使われる箇所があります。SDK・APIごとの表記は公式ドキュメントで確認してください。
 
@@ -273,7 +273,7 @@ flowchart TD
 
 | 領域 | Gemini 3.x | Gemini 4(Hydrogen) | 対応 |
 |---|---|---|---|
-| `thinking_budget` | level に変換される場合あり | **HTTP 400** | `thinking_level` へ置換 |
+| `thinking_budget` | level に変換される場合あり | Agent Platform では **HTTP 400**。Gemini API の GenerateContent では単独使用時に警告とレベルへの対応付け | `thinking_level` へ置換 |
 | `thinking_level="MINIMAL"` | サポート | **HTTP 400** | `LOW` を使用 |
 | `temperature` / `top_p` / `top_k` | 一部無視 | 無視(削除が公式要件) | リクエストから削除。再現性は別手段で担保 |
 | `frequency_penalty` / `presence_penalty` | モデルによる | **非対応** | リクエストから削除 |
@@ -291,7 +291,7 @@ flowchart TD
 
 1. **まず同一プロンプトで比較**: 指示文を変えずに 3.8 Flash と並べ、差分が「モデル差」なのか「指示の曖昧さ」なのか切り分ける
 2. **再試行率と総トークンを見る**: 単価ではなく「1タスク完了あたりのコスト」で比較する。Google は 2〜2.8倍高速・トークン使用 12〜23% 減という**パートナー初期検証値**を公表しています(ワークロード依存なので自社計測が必須)
-3. **旧パラメータの残骸を grep**: `thinking_budget`、`temperature`、`MINIMAL`、`frequency_penalty`、`presence_penalty`、`candidate_count > 1` の残存はHTTP 400または無視の原因になる
+3. **旧パラメータの残骸を grep**: `thinking_budget`、`temperature`、`MINIMAL`、`frequency_penalty`、`presence_penalty`、`candidate_count > 1` の残存はHTTP 400・警告・無視の原因になる
 
 ---
 
@@ -480,7 +480,14 @@ flowchart TD
     W2 --> V
     V --> R{"再計画条件に該当するか"}
     R -- "はい" --> P
-    R -- "いいえ" --> OUT["統合して完了"]
+    R -- "いいえ" --> INT["統合"]
+    INT --> IV["統合後の検証 Hydrogen テスト実行と差分確認"]
+    IV --> IOK{"統合後の検証に合格したか"}
+    IOK -- "はい" --> OUT["完了"]
+    IOK -- "いいえ" --> IR{"再計画条件に該当するか"}
+    IR -- "はい" --> P
+    IR -- "いいえ" --> FIX["ワーカー Hydrogen で修正"]
+    FIX --> IV
 ```
 
 ### 6-2. 自前で分業を組むときの設計(設計判断)
@@ -567,7 +574,7 @@ flowchart TD
 | thinking level 最適化 | 評価(Step 2)に基づき、タスク種別ごとに `low`〜`high` を振り分ける。`xhigh` は例外運用 |
 | 暗黙キャッシュ前提の構造化(設計判断) | 明示的キャッシュが使えないため、**システム指示・ツール定義・参照資料を常にプロンプトの先頭に同じ順序で固定**し、可変部(ユーザー入力)を末尾に置く |
 | 出力の上限管理 | `max_output_tokens` を用途別に設定(暴走・無限ループ対策) |
-| グラウンディング課金 | Google検索グラウンディングは無料枠なし(無料階層)。有料階層では月5,000検索の無料枠をGemini 3以降のモデル間で共有し、超過分は1,000検索あたり$14、日次上限あり。Geminiリクエスト数ではなく検索クエリ数で課金され、1回のGeminiリクエストが複数の課金対象検索を起こし得る(第三者記事が公式を引用。要確認。[公式料金表](https://ai.google.dev/gemini-api/docs/pricing)) |
+| グラウンディング課金 | Google検索グラウンディングは無料階層では利用できず、対象の有料階層が必要。有料階層では月5,000検索の無料枠をGemini 3以降のモデル間で共有し、超過分は1,000検索あたり$14、日次上限あり。Geminiリクエスト数ではなく検索クエリ数で課金され、1回のGeminiリクエストが複数の課金対象検索を起こし得る(第三者記事が公式を引用。要確認。[公式料金表](https://ai.google.dev/gemini-api/docs/pricing)) |
 | データの扱い | 無料階層の内容はGoogleの製品改善に使われる。通常の有料サービスでは原則として製品改善に使われないが、**Paid Contributor Tierの内容は製品・モデルの改善に利用される**。有料サービスでも不正利用監視のためプロンプト・応答が保持され得る。機密データを送信する前に、適用される階層・最新の保持方針・ログとデータ共有の設定を確認する([公式データ共有方針](https://ai.google.dev/gemini-api/docs/logs-policy#contributor-tier)、[有料サービス規約](https://ai.google.dev/gemini-api/terms#data-use-paid)) |
 | モデル分業 | 計画だけ上位モデル、実行は Hydrogen(Step 6) |
 
@@ -632,7 +639,7 @@ flowchart TD
 | # | アンチパターン | 問題 | 対策 |
 |---|---|---|---|
 | 1 | 全リクエストを `xhigh` に固定 | 単純タスクで遅く高い。逓減も大きい | 評価に基づき level を振り分け(Step 2) |
-| 2 | `thinking_budget` / `MINIMAL` を残す | HTTP 400 | `thinking_level`(`LOW`〜`XHIGH`)に置換 |
+| 2 | `thinking_budget` / `MINIMAL` を残す | `MINIMAL` は HTTP 400。`thinking_budget` は Agent Platform で HTTP 400、Gemini API の GenerateContent では警告とレベルへの対応付け | `thinking_level`(`LOW`〜`XHIGH`)に置換 |
 | 3 | `temperature` で再現性を担保しようとする | 無視される | 出力スキーマ・評価・リトライは同一結果や再現性を保証するものではないが、一貫性を高める品質管理として組み合わせる |
 | 4 | `max_output_tokens` を小さく据え置く | 思考で枠を使い切り、回答が途中で切れる | 十分大きく設定して評価 |
 | 5 | thought signature を捨てる/要約に置換 | マルチターン・関数呼び出しが壊れる | content をそのまま履歴に戻す |
@@ -691,7 +698,7 @@ flowchart TD
 | # | ベストプラクティス | 根拠・補足 | ソースURL |
 |---|---|---|---|
 | 1 | **評価は4 level × 十分大きい `max_output_tokens`** で実施し、品質基準を満たす最低 level を採用 | Googleの level 選択ガイダンス(第三者記事が公式ページを引用) | https://teamorouter.com/blogs/gemini-4-hydrogen-api |
-| 2 | `thinking_budget` / `MINIMAL` は Gemini 4 で 400。`thinking_level` へ移行 | Google Cloud 公式ドキュメント | https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/thinking |
+| 2 | `MINIMAL` は Gemini 4 で 400、`thinking_budget` は Agent Platform で 400(Gemini API の GenerateContent では警告)。`thinking_level` へ移行 | Google Cloud 公式ドキュメント | https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/thinking |
 | 3 | Hydrogen の既定は HIGH、XHIGH は Hydrogen のみ対応 | Google Cloud 公式ドキュメント | https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/get-started-with-gemini-4 |
 | 4 | Gemini 4 は `temperature` / `top_p` / `top_k` を無視 | 同上 | https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/get-started-with-gemini-4 |
 | 5 | thought signature を含む履歴を保持する | Argon向けマイグレーションガイド(Gemini 4 共通の要件) | https://ai.google.dev/gemini-api/docs/generate-content/latest-model |

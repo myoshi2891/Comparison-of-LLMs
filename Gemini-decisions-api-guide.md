@@ -383,9 +383,9 @@ Google が公開している社内事例と、開発者コミュニティの提�
 | **リアルタイムUI** | 200超の絵文字から反応を選ぶ(CC)、Stitch の即時ワイヤーフレーム | Google 公式ブログ |
 | **全件クロスエンコーダ検索** | LLM が生成したルーブリックで全文書をスコアし上位をヒットとする(高速・低コストなため、最終リランクだけでなく全件に使える) | HN コメント(開発者の提案) |
 
-### 9-1. ガードレール(ADK の `before_agent_callback`)
+### 9-1. ガードレール(ADK の Runner 呼び出し前)
 
-GDE の検証では、ユーザー入力を LLM に渡す前に `noul` 1問で判定し、プロンプトインジェクションを **LLM を呼ばずにブロック** しました(確率 0.98)。
+GDE の検証では、ユーザー入力を LLM に渡す前に `noul` 1問で判定し、プロンプトインジェクションを **LLM を呼ばずにブロック** しました(確率 0.98)。検証記事は `before_agent_callback` を使っていますが、ADK の Runner は新しいユーザーメッセージをセッションへ追加してからエージェントを実行します。コールバックで拒否しても、そのメッセージはセッション履歴に残り、後続ターンの LLM リクエストに含まれ得ます。以下では **`runner.run_async` を呼ぶ前に判定し、許可したメッセージだけを Runner へ渡す** ことで、拒否したメッセージをセッションへ書き込みません。
 
 ```mermaid
 sequenceDiagram
@@ -407,6 +407,21 @@ from google.genai import types
 
 from decisions_client import THRESHOLD, decide
 
+# 安全フィルタによる拒否を示す error.code。公式ドキュメントで最新の値を確認して追加する。
+SAFETY_ERROR_CODES = {"safety", "prohibited_content"}
+
+
+def error_code(response: httpx.Response) -> str | None:
+    """エラー応答本文の error.code を返す。JSON でない・形が違う場合は None。"""
+    try:
+        body = response.json()
+    except ValueError:
+        return None
+    error = body.get("error") if isinstance(body, dict) else None
+    code = error.get("code") if isinstance(error, dict) else None
+    return code if isinstance(code, str) else None
+
+
 GUARD = {
     "injection": {
         "type": "noul",
@@ -419,19 +434,18 @@ GUARD = {
 
 
 def blocked(message: str) -> types.Content:
-    """before_agent_callback が types.Content を返すと、ADK はエージェント(LLM)を実行せずにそれを応答とする。"""
+    """拒否時にユーザーへ返す定型応答。セッションには保存しない。"""
     return types.Content(role="model", parts=[types.Part(text=message)])
 
 
-async def screen_input(callback_context):
-    """ADK の before_agent_callback の骨格(出典の考え方を簡略化した例)。
+async def screen_input(message: types.Content | None) -> types.Content | None:
+    """Runner へ渡す前に、元のユーザー入力だけを判定する(出典の考え方を簡略化した例)。
 
-    ユーザーメッセージの入口で、元のユーザー入力(callback_context.user_content)だけを判定する。
-    llm_request.contents から user ロールを探すと、ツール結果やエージェント返信を
-    判定対象に取り違える恐れがあるため使わない。
+    拒否する場合は定型応答を、許可する場合は None を返す。
+    セッション内の contents から user ロールを探すと、ツール結果やエージェント返信を
+    判定対象に取り違える恐れがあるため、受け取った新しいメッセージだけを見る。
     """
-    last = callback_context.user_content
-    parts = (last.parts or []) if last else []
+    parts = (message.parts or []) if message else []
     # この骨格はテキスト専用。画像・音声・ファイル等は評価できないため、混在入力も拒否する。
     if not parts or any(not getattr(p, "text", None) or any(
         value is not None for key, value in p.model_dump(exclude_none=True).items()
@@ -445,10 +459,12 @@ async def screen_input(callback_context):
         result = await decide(text, GUARD)
     except httpx.HTTPStatusError as err:
         # 安全フィルタ(error.code が safety / prohibited_content など)は HTTP 400 で返り、
-        # answers を持たない。判定できない入力は LLM へ渡さず定型文で止める。
-        if err.response.status_code == 400:
+        # answers を持たない。安全フィルタの拒否だけを LLM へ渡さず定型文で止める。
+        if err.response.status_code == 400 and error_code(err.response) in SAFETY_ERROR_CODES:
             return blocked("このリクエストには対応できません。")
-        raise  # 認証・レート制限・サーバー障害などは握りつぶさず呼び出し元へ伝える
+        # コンテキスト上限超過などその他の 400、認証・レート制限・サーバー障害は
+        # 握りつぶさず呼び出し元へ伝え、原因を区別できるようにする。
+        raise
     ans = result["answers"]["injection"]
     if ans["noul"] >= 0.8:
         return blocked("このリクエストには対応できません。")  # LLM呼び出しを省略する
@@ -458,6 +474,20 @@ async def screen_input(callback_context):
     if ans["noul"] >= 0.5 or ans["confidence"] < THRESHOLD:
         return blocked("このリクエストには現在対応できません。")
     return None
+
+
+async def handle_user_message(runner, user_id: str, session_id: str, message: types.Content):
+    """許可したメッセージだけを Runner へ渡し、ADK のイベントを順に返す。
+
+    拒否したメッセージでは run_async を呼ばないため、セッション履歴にも
+    後続ターンの LLM リクエストにも含まれない。
+    """
+    rejection = await screen_input(message)
+    if rejection is not None:
+        yield rejection  # 定型応答はアプリ側で表示し、セッションへは保存しない
+        return
+    async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=message):
+        yield event
 ```
 
 ### 9-2. 8つのルールを1回で判定する(Google Cloud コミュニティの例)

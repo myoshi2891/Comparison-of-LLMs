@@ -450,8 +450,16 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
                 thinking_config=types.ThinkingConfig(thinking_level="low"),
             ),
         )
-        contents.append(response.candidates[0].content)
-        calls = [p for p in response.candidates[0].content.parts if p.function_call]
+        # プロンプトがブロックされると候補が返らない。索引する前に確認し、履歴には追加しない。
+        candidate = response.candidates[0] if response.candidates else None
+        if candidate is None or candidate.content is None or not candidate.content.parts:
+            feedback = response.prompt_feedback
+            if feedback is not None and feedback.block_reason:
+                return f"aborted: prompt blocked ({feedback.block_reason})"
+            reason = candidate.finish_reason if candidate is not None else "no candidate"
+            return f"aborted: no usable candidate ({reason})"
+        contents.append(candidate.content)
+        calls = [p for p in candidate.content.parts if p.function_call]
         if not calls:
             return response.text  # モデルが関数を呼ばなくなったら完了
         results, observation, halted = [], None, False
@@ -782,7 +790,18 @@ flowchart TB
 pip install datasets
 python - <<'PY'
 from datasets import load_dataset
-ds = load_dataset("google/asimov_agentic")
+from huggingface_hub import list_repo_files
+
+REPO = "google/asimov_agentic"
+# リポジトリ内の全ファイルではなく、ASIMOV-Jailbreak の Parquet だけを読み込む。
+# ファイル名は推測で固定せず一覧から特定し、1件に絞れなければ止める。
+files = [
+    f for f in list_repo_files(REPO, repo_type="dataset")
+    if f.endswith(".parquet") and "jailbreak" in f.lower()
+]
+if len(files) != 1:
+    raise SystemExit(f"ASIMOV-Jailbreak の Parquet を1件に特定できません: {files}")
+ds = load_dataset(REPO, data_files=files[0])
 print(ds)  # 分割名や列は実際の構成を確認してから使うこと
 PY
 ```

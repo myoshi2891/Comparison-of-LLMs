@@ -255,11 +255,14 @@ response = client.models.generate_content(
 
 if not response.candidates:
     raise RuntimeError("応答に候補がありません")
-if response.candidates[0].finish_reason == types.FinishReason.MAX_TOKENS:
-    print("警告: MAX_TOKENSで中断しました。回答は未完了です。出力予算やタスク分割を見直してください。")
-else:
-    print(response.text)
-print(response.usage_metadata)  # 思考トークンも課金対象なので必ず記録する
+finish_reason = response.candidates[0].finish_reason
+print(response.usage_metadata)  # 思考トークンも課金対象なので、失敗時も必ず記録する
+if finish_reason == types.FinishReason.MAX_TOKENS:
+    raise RuntimeError("MAX_TOKENSで中断しました。回答は未完了です。出力予算やタスク分割を見直してください。")
+if finish_reason != types.FinishReason.STOP:
+    # SAFETY・RECITATION などで止まった応答は、欠落や途中までの本文を表示せず失敗として扱う
+    raise RuntimeError(f"応答は正常完了していません: {finish_reason}")
+print(response.text)
 ```
 
 ### 5.3 チェックポイント
@@ -348,7 +351,7 @@ flowchart TD
     D -- "はい" --> E["タスクを分割して対応"]
     D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
     F --> API{"どのAPIで呼び出すか"}
-    API -- "GenerateContent" --> GACC["各セグメントの出力partsとusageを順に蓄積<br/>現行 SDK は自動で継続する場合あり"]
+    API -- "GenerateContent" --> GACC["各セグメントの出力partsを順に蓄積<br/>SDKの自動継続のusageは累積値なので合算せず最後の値を使う<br/>自前RESTループではセグメントごとのusageを合算する"]
     GACC --> CONT{"finishReason は何か"}
     CONT -- "CONTINUATION" --> NEXT["元の contents systemInstruction tools<br/>maxOutputTokens をそのまま再送し<br/>continuation_token を付ける"]
     NEXT --> GACC
@@ -364,7 +367,18 @@ flowchart TD
     IST -- "completed" --> JOIN["蓄積した全hopの出力を結合して採用"]
     JOIN --> G
     IST -- "failed incomplete cancelled" --> ERR["例外として扱い 部分出力を採用しない"]
+    API -- "Interactions ストリーミング" --> SACC["受信イベントのテキストとusageを順に蓄積<br/>各イベントのevent_idをチェックポイントとして保存"]
+    SACC --> SDROP{"ストリームが終了イベントの前に切断されたか"}
+    SDROP -- "はい" --> SRES["同じinteraction idと最後に保存したevent_idで再接続<br/>チェックポイント以前のイベントは追記しない"]
+    SRES --> SACC
+    SDROP -- "いいえ 終了イベントを受信" --> SST{"status は何か<br/>requires_continuation を完了扱いにしない"}
+    SST -- "requires_continuation" --> SCONT["continuation_token で次のhopをストリーミングで送る<br/>store=True は previous_interaction_id も付ける<br/>新しいhopのイベントを同じ蓄積に追記"]
+    SCONT --> SACC
+    SST -- "completed" --> JOIN
+    SST -- "failed incomplete cancelled" --> ERR
 ```
+
+ストリーミングでは、受信済みイベントの `event_id` をチェックポイントとして永続化し、切断時は同じinteractionへ最後の `event_id` を指定して再接続します。再送されたイベントのうちチェックポイント以前のものは捨て、出力を二重に追記しないでください。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
 
 ---
 
@@ -585,18 +599,22 @@ def estimate_cost(usage, rates):
 ```mermaid
 flowchart TD
     IN["外部コンテンツ<br/>Web PDF メール 顧客文書"] --> TR["信頼境界<br/>データとして扱い 指示として扱わない"]
-    TR --> LP["ツール権限を最小化"]
+    TR --> FLAG["外部コンテンツ読み込み済みフラグを記録<br/>タスク入力に外部コンテンツがあれば true"]
+    FLAG --> LP["ツール権限を最小化"]
     LP --> RISK{"タスクに不可逆な操作を含むか<br/>金銭 データ削除 外部送信"}
     RISK -- "はい" --> HU["タスク開始前に人間の承認を必須にする"]
     RISK -- "いいえ" --> RUN["Carbon がタスクを進め<br/>ツール呼び出しを要求"]
     HU -- "承認済み" --> RUN
-    RUN --> GATE{"呼び出しごとの承認ゲート<br/>本番デプロイか 不可逆か 外部コンテンツ由来か 範囲外か"}
+    RUN --> GATE{"呼び出しごとの承認ゲート<br/>本番デプロイか 不可逆か 範囲外か<br/>または外部コンテンツ読み込み済みフラグが true か"}
     GATE -- "はい" --> HU2["この呼び出しを人間が承認"]
     GATE -- "いいえ" --> EXEC["最小権限の範囲で実行"]
     HU2 -- "承認済み" --> EXEC
     HU2 -- "拒否" --> RUN
     EXEC --> LOG["全ツール呼び出しをログ記録"]
-    LOG --> NEXT{"タスク完了か"}
+    LOG --> READ{"ツール結果に外部コンテンツを含むか"}
+    READ -- "はい" --> SET["フラグを true にする<br/>以降は範囲内 可逆 非由来の操作も承認対象"]
+    READ -- "いいえ" --> NEXT
+    SET --> NEXT{"タスク完了か"}
     NEXT -- "いいえ" --> RUN
     NEXT -- "はい" --> AUD["定期的に監査"]
 ```
