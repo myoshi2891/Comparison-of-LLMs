@@ -616,7 +616,8 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
   let lastToken = "";
   const controlParens = [];
   const braces = [];
-  const wordRe = /[A-Za-z_$][\w$]*/y;
+  // Consume whole Unicode identifiers (incl. \u escapes) so `πreturn` is never split into `return`.
+  const wordRe = /(?:[\p{ID_Start}$_]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})(?:[\p{ID_Continue}$‌‍]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})*/uy;
   while (index < src.length) {
     const char = src[index];
     const next = src[index + 1];
@@ -1150,7 +1151,7 @@ function initializerRunsBefore(executable, declarationIndex, initializedAt, decl
 }
 
 /** Resolve the runtime Mermaid source in this scope: undefined = unused, null = unresolved, string = evaluated. */
-function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, cardTag, selectedScript) {
+function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, cardTag, selectedScript, foreignDomWrite = false) {
   const resolution = {};
   blankNonCodeText(rawSource, false, resolution);
   if (resolution.uncertain || resolution.interpolation) return null;
@@ -1332,6 +1333,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       usesValidatedDedent = true;
     }
     if (!value.endsWith(".textContent")) return false;
+    // A textContent write in another scope (even one without a renderer) may replace this
+    // DOM-backed payload before the read. Literal sources above are unaffected.
+    if (foreignDomWrite) return false;
     const element = value.slice(0, -12).trim();
     const isSelectedScript = (reference, at = before, seen = new Set()) => {
       if (scriptElement(reference, at)) return true;
@@ -1605,14 +1609,16 @@ function materializePlainTextCards(src) {
       const firstScript = /<script data-audit-payload="(\d+)"><\/script>/.exec(card.content);
       const firstPlain = Array.from(card.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
-      // A textContent write in another scope (even one without a renderer) may replace this
-      // payload before the read, so the original HTML payload is not certified.
-      const foreignWrite = renderer && allScopes.some(scope => scope !== renderer && scope.writesTextContent);
-      const resolvedSource = renderer && (renderer.computedRenderer || foreignWrite ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
+      // Cross-scope textContent writes only invalidate DOM-backed (payload-reading) sources.
+      const foreignWrite = Boolean(renderer) && allScopes.some(scope => scope !== renderer && scope.writesTextContent);
+      const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
-          unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 }));
+          unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 },
+        foreignWrite));
       if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
-      edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(resolvedSource ?? script.payload)}</div>` });
+      // Serialize the entity-decoded chart: inventory decodes the HTML escape layer once, so the
+      // result equals normalizeMermaidSource's decoding of the raw chart, as for TSX charts.
+      edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(decodeEntities(resolvedSource ?? script.payload))}</div>` });
     }
   }
   let result = stashed;
