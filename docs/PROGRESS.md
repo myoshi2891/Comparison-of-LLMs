@@ -6,6 +6,16 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## 読取scriptの特定・エスケープ識別子・名前空間付き振り分け等のレビュー15件（2026-11-18 再追加）
+
+- 15件のうち14件を有効と確認して対応（未コミット）。監査・Moonshot・FableはRed／Greenで修正した。
+- 監査: payloadの読取時点は、`querySelector`を含む全scriptではなく、読取位置を含むscriptの文書位置で判定する（payloadより前の無関係なqueryで修正前はstatus 1）。`\u0073rc`のようなエスケープ識別子は文字列照合の束縛解析で同一性を確定できないため未解決とする（修正前は書き込みを見逃してstatus 0）。template内の要素は文書セレクターの一意性に数えず、template要素自体は残す。Red 3件を追加。
+- Moonshot: cache-hitラベル末尾のinputが後戻りで外れ、cache-hit価格を標準入力として拾っていた。inputが続く場合は必ずラベルに含める。cache-hitのみのフィクスチャ2件を追加し、fallbackのペアを維持することを確認。
+- Fable 5.2: agent_loopのツール振り分けを、ツールセットのメンバーは`(toolset_name, name)`、通常のカスタムツールは`name`のままにした（browser／computerの同名ツールを区別）。原本HTML／Markdown・JSX・source／structure契約・highlight.jsトークン（152件）を同期。
+- ガイド: CarbonはMAX_TOKENSで`continuation_token`がある場合に蓄積を保持して上限を引き上げ再開、ステートレスの切断時は中断hopの最新usageを保持（なければ不明と記録）、試算の`tool_use_prompt_token_count`は検索グラウンディング分を区別できないため含めたまま上振れ見積りと明記。Hydrogenはポーリング前にinteraction idを保存して再開・取り消しに使い、mediumは別途の評価で基準を満たす場合だけ選ぶ。DecisionsはStep 9用にADKの別環境を作る手順を追加。Roboticsは非常停止時に実行済みの結果と残りのskippedを履歴へ残し、画像由来のmoveは1ターン1回として新しい観測で再計画させる。
+- スキップ: `bun audit`のCI失敗（picomatch ≤4.0.7、vitest／tinyglobby経由の推移的依存）は依存変更のため引き続きユーザー確認待ち。
+- 検証: 監査135件（形式99・照合36）、archive／legacyのHTML原本66件で原本側監査出力が修正前（HEAD `a81266a6`）と同一、FableのHTML原本監査exit 0、Fable対象82件、全体Vitest240 files／3082 tests、型検査、Biome658 files、pytest152件＋39 subtests、4ガイドのPythonコード例の構文解析とMermaid33図の解析、Robotics（同一ターン2回目のmoveのskip・非常停止時の履歴）とDecisionsガードのモック実行が成功。Markdown lintは変更前後で同一（Robotics既存8件・Decisions既存1件、他0件）。ビルドは今回未実行（最後の成功は2026-11-14）。
+
 ## template内script・payload読取時点・toolset_name・auth key等のレビュー16件（2026-11-18 追加）
 
 - 16件のうち15件を有効と確認して対応（未コミット）。監査・Moonshot・FableはRed／Greenで修正した。

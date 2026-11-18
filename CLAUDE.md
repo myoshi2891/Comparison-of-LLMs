@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-18再追加レビュー15件: 原本監査はpayloadを読むscript自体の位置で読取時点を判定し、エスケープ識別子を未解決とし、template内の要素を文書セレクターに数えない。Moonshotはcache-hit inputを後戻りで分割しない。Fable 5.2のagent_loopは(toolset_name, name)で振り分ける（原本・JSX・契約・トークンを同期）。Carbon・Hydrogen・Decisions・Roboticsの手順とコード例を訂正。bun auditは確認待ち。監査135件・原本66件の監査結果不変・全体240 files／3082 tests・pytest152件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-18追加レビュー16件: 原本監査はtemplate内のscriptをrenderer対象から除外し、classic scriptがpayloadより前で読む場合は未解決とする。Moonshotは価格なしのcachedが標準inputを飲み込まない。Fable 5.2のagent_loopはtoolset_nameを返し、失敗後の後続computer操作を実行しない（原本・JSX・契約・トークンを同期）。Carbon・Hydrogen・Decisions・Roboticsのコード例と手順を訂正。bun auditのpicomatchは依存変更のため確認待ち。監査132件・原本66件の監査結果不変・全体240 files／3081 tests・pytest150件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-18レビュー15件: 原本監査はラベル等の`:`直後の`{`を不確実なスラッシュ文脈とし、正規dedentはhelper外のisFinite／Infinity出現で未解決、祖先preは実タグのみで数える。Fable 5.2はツール結果をdeepcopyして保存（原本・JSX・契約を同期）。Carbonはrequires_action・store=Falseのストリーム復旧・hop別usage、Hydrogenは自動継続の統合結果と誠実性94%、Decisionsはメッセージのスナップショット、Roboticsは座標系・上限時の履歴・ターンゲートを訂正。S26契約は原本固定の設計のためスキップ。bun auditのpicomatchは依存変更のため確認待ち。監査130件・62原本の監査結果不変・全体240 files／3080 tests・pytest150件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
@@ -679,7 +681,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3081 tests pass、2026-11-18追加レビュー16件修正後の実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3082 tests pass、2026-11-18再追加レビュー15件修正後の実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
