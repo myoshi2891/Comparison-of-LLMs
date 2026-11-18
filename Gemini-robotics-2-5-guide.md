@@ -495,7 +495,7 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
         if not calls:
             return response.text  # モデルが関数を呼ばなくなったら完了
         results, observation, skip_reason, limit_reached = [], None, None, False
-        estopped, moved = False, False
+        estopped, moved, executed, executor_error = False, False, False, None
         for part in calls:
             fc = part.function_call
             if skip_reason is None and actions >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
@@ -529,7 +529,15 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
                     continue
                 # 実行器は (構造化結果, 実行後の最新観測 JPEG のバイト列または None) を返す契約とする。
                 # 構造化結果は {"status": "ok" | "failed", ...} の JSON 互換 dict で、画像は含めない。
-                payload, image = execute_on_robot(fc.name, robot_args)  # 基座標 mm へ変換・検査済み
+                try:
+                    payload, image = execute_on_robot(fc.name, robot_args)  # 基座標 mm へ変換・検査済み
+                except Exception as err:
+                    # 例外では動作がどこまで進んだか分からない。先行する完了済みの結果は捨てず、
+                    # この呼び出しを uncertain として記録し、残りは skipped にして復旧フローへ戻す。
+                    executor_error = f"{type(err).__name__}: {err}"
+                    payload = {"status": "uncertain", "reason": f"executor error ({executor_error}); the action may have partially run"}
+                    image = None
+                executed = True
                 # 実行した動作ごとに観測を置き換える。画像がなければ古い観測を消し、
                 # 後続の動作が一部動いて失敗した場合に、前の動作の画像で再計画させない。
                 observation = image
@@ -544,9 +552,16 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
         if estopped:
             # 完了した動作の結果・skipped の記録・最新観測を contents に残し、呼び出し元が復旧に使えるようにする。
             return "aborted: emergency stop"
+        if executor_error is not None:
+            # 完了済みの結果・uncertain・skipped の記録を contents に残し、呼び出し元が状態を確認して復旧する。
+            return f"aborted: executor error ({executor_error})"
         if limit_reached:
             # 実行済みの結果と skipped の記録を contents に残したまま中断し、呼び出し元へ完全な履歴を渡す。
             return "aborted: step limit reached"
+        if executed and observation is None:
+            # 最後に実行した動作の後の観測がない。contents に残る以前の画像で次の計画をさせず、
+            # 呼び出し元が新しい観測を撮影して contents に追加してから再開する。
+            return "aborted: no fresh observation after the last action"
 ```
 
 ### 8.3 オーケストレーションのベストプラクティス

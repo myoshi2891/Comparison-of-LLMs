@@ -57,9 +57,10 @@ flowchart TD
 1. Google AI Studio で発行した Gemini API キー
 2. Python SDK を使う場合は `google-genai` **3.2 以降**(`client.decisions.create(...)`)
 3. SDK を使わない場合は REST(`x-goog-api-key` ヘッダ)
+4. Step 6 の REST クライアントで使う `httpx` と、Step 13 の契約テストを実行する `pytest`(どちらもこの環境に入れる)
 
 ```bash
-pip install -U "google-genai>=3.2"
+pip install -U "google-genai>=3.2" httpx pytest
 export GEMINI_API_KEY="あなたのAPIキー"
 ```
 
@@ -250,7 +251,7 @@ flowchart LR
 
 ### 6-1. 実装例(REST + `httpx`)
 
-以下をアプリケーションの `decisions_client.py` として保存します。Step 13 の別pytestモジュールからも、このモジュールの `decide` をimportします。
+以下をアプリケーションの `decisions_client.py` として保存します。Step 13 の別pytestモジュールからも、このモジュールの `decide` をimportします。このコードは Step 2 の環境で実行します(`httpx` は Step 2 でインストール済み。Step 9 の ADK 用の別環境に入れた `httpx` はこの環境では使えません)。
 
 ```python
 import os
@@ -616,6 +617,12 @@ def test_decisions_contract():
 
     assert 0.01 <= res["answers"]["is_defect"]["noul"] <= 0.99
     assert res["answers"]["department"]["choice"] in {"billing", "technical", "other"}
+```
+
+Step 2 の環境で、2 つのファイルがあるディレクトリから実行します。テストは実際の API を呼ぶため、`GEMINI_API_KEY` が必要です(入力トークン分が課金されます)。
+
+```bash
+python -m pytest test_decisions.py -q
 ```
 
 ---

@@ -343,6 +343,9 @@ Carbon（と Argon）では、入力・思考・出力が **1つの 1M トーク
 flowchart TD
     A["1回の応答で必要な出力量"] --> M{"呼び出し方式"}
     M -- "ストリーミング" --> B{"64K トークンを超えるか<br/>または思考で上限に達しがちか"}
+    M -- "非ストリーミング SDK<br/>5章の generate_content" --> SB{"64K トークンを超えるか<br/>または思考で上限に達しがちか"}
+    SB -- "いいえ" --> C
+    SB -- "はい" --> D
     M -- "非ストリーミング REST" --> NB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
     NB -- "いいえ" --> C
     NB -- "はい" --> D
@@ -376,12 +379,12 @@ flowchart TD
     IST -- "completed" --> JOIN["蓄積した全hopの出力を結合して採用"]
     JOIN --> G
     IST -- "failed incomplete cancelled" --> ERR["例外として扱い 部分出力を採用しない"]
-    API -- "Interactions ストリーミング" --> SACC["受信イベントのテキストを順に蓄積<br/>usageはhop内で累積値なので最新値だけ保持<br/>各イベントのevent_idをチェックポイントとして保存"]
+    API -- "Interactions ストリーミング" --> SACC["受信イベントのテキストを順に蓄積<br/>usageはhop内で累積値なので最新値だけ保持<br/>event_idは受信位置のカーソルとしてだけ保存<br/>continuation_tokenを受け取ったらチェックポイントとして別に保存"]
     SACC --> SDROP{"ストリームが終了イベントの前に切断されたか"}
-    SDROP -- "はい store=True" --> SRES["同じinteraction idと最後に保存したevent_idで再接続<br/>チェックポイント以前のイベントは追記しない"]
-    SDROP -- "はい store=False" --> SUSE["中断したhopで最後に受け取ったusageを<br/>そのhopの値として保持し 合算に含める<br/>受け取っていなければ usage 不明と記録"]
-    SUSE --> SCP{"チェックポイントを保存済みか"}
-    SCP -- "はい" --> SSL["元の入力 モデル ツール 生成設定に<br/>チェックポイント時点のcontinuation_tokenを付けて再送<br/>チェックポイント以降に受信した出力は破棄して再生成分で置き換える"]
+    SDROP -- "はい" --> SUSE["中断したhopで最後に受け取ったusageを<br/>そのhopの値として保持し 合算に含める<br/>受け取っていなければ usage 不明と記録"]
+    SUSE --> SCP{"continuation_tokenを保存済みか<br/>event_idだけでは再開しない"}
+    SCP -- "はい store=True" --> SRES["同じinteraction idに保存済みcontinuation_tokenを付けて再開<br/>event_idは重複除去のカーソルとしてだけ使い<br/>カーソル以前のイベントは追記しない"]
+    SCP -- "はい store=False" --> SSL["元の入力 モデル ツール 生成設定に<br/>保存済みのcontinuation_tokenを付けて再送<br/>チェックポイント以降に受信した出力は破棄して再生成分で置き換える"]
     SCP -- "いいえ" --> SRST["未チェックポイントの出力をすべて破棄し<br/>continuation_tokenを付けずに元のリクエストを最初から再送"]
     SRES --> SACC
     SSL --> SACC
@@ -396,17 +399,17 @@ flowchart TD
     SST -- "requires_continuation" --> SAUTO{"SDKの自動継続を無効にしたか<br/>automatic_continuation=False"}
     SAUTO -- "いいえ 既定の自動継続" --> SWAIT["自前では次のhopを送らない<br/>SDKのストリームが継続するイベントを同じ蓄積に追記"]
     SWAIT --> SACC
-    SAUTO -- "はい 自前ループ" --> SCONT["continuation_token で次のhopをストリーミングで送る<br/>store=True は previous_interaction_id も付ける<br/>新しいhopのイベントを同じ蓄積に追記"]
+    SAUTO -- "はい 自前ループ" --> SCONT["continuation_token で次のhopをストリーミングで送る<br/>store=True は previous_interaction_id も付ける<br/>store=False は毎hop 元の入力 モデル ツール 生成設定を再送する<br/>新しいhopのイベントを同じ蓄積に追記"]
     SCONT --> SACC
     SST -- "completed" --> JOIN
     SST -- "failed incomplete cancelled" --> ERR
 ```
 
-ストリーミングでは、受信済みイベントの `event_id` をチェックポイントとして永続化し、`store=True` の切断時は同じinteractionへ最後の `event_id` を指定して再接続します。再送されたイベントのうちチェックポイント以前のものは捨て、出力を二重に追記しないでください。`store=False` ではサーバーにinteractionが保存されないため、同じidでは再接続せず、元の入力にチェックポイント時点の `continuation_token` を付けて再送します。最初のチェックポイントを保存する前に切断された場合は、受信済みの出力をすべて破棄し、`continuation_token` を付けずに元のリクエストを最初からやり直します。終了イベントを受け取れなかったhopも課金され得るため、そのhopで最後に受け取ったusageを保持して合算に含め、一度も受け取っていなければ「usage不明」と記録して請求額で確認します。チェックポイント以降に受信済みの出力は再生成されるため破棄し、再送分で置き換えます(公式SDKはチェックポイント後に出力を受け取ってから切断された場合、重複を避けるため `ContinuationInterruptedError` を送出します)。usage はhop内で累積値なので各hopの最新値だけを保持し、hopごとの最終値を合算します。
+ストリーミングでは、`event_id` と `continuation_token` を別々の値として保存します。`event_id` は受信位置を示すカーソルにすぎず、再開の根拠にはしません。再開のチェックポイントは、受信した `continuation_token` です。切断時に `continuation_token` を保存済みなら、`store=True` では同じinteractionへ保存済みの `continuation_token` を付けて再開し、再送されたイベントのうちカーソル(`event_id`)以前のものは捨てて、出力を二重に追記しないでください。`store=False` ではサーバーにinteractionが保存されないため、同じidでは再接続せず、元の入力にチェックポイント時点の `continuation_token` を付けて再送します。`continuation_token` をまだ保存していない状態で切断された場合は、`store` の値にかかわらず `event_id` だけで再開しようとせず、受信済みの出力をすべて破棄し、`continuation_token` を付けずに元のリクエストを最初からやり直します。終了イベントを受け取れなかったhopも課金され得るため、そのhopで最後に受け取ったusageを保持して合算に含め、一度も受け取っていなければ「usage不明」と記録して請求額で確認します。チェックポイント以降に受信済みの出力は再生成されるため破棄し、再送分で置き換えます(公式SDKはチェックポイント後に出力を受け取ってから切断された場合、重複を避けるため `ContinuationInterruptedError` を送出します)。usage はhop内で累積値なので各hopの最新値だけを保持し、hopごとの最終値を合算します。
 
 GenerateContentで `MAX_TOKENS` に達した応答に `continuation_token` が付いている場合は、蓄積済みのpartsを保持したまま `max_output_tokens`(hopをまたいだ累積の上限)を引き上げ、同じトークンで再開します。`STOP` になるまで部分出力は採用せず、トークンがない場合は未完了として扱います(再開の可否と引数は[公式Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode)で確認してください)。
 
-`requires_action` はモデルがツール呼び出しを求めた状態で、完了ではありません。12.2節の承認ゲートを通し、承認された場合だけクライアント側でツールを実行します。`store=True` では結果をこのinteractionの `id` で送り、`store=False` ではサーバーがツール呼び出しの履歴を復元できないため、元の入力・返されたmodelのsteps・`function_result` を次のリクエストにまとめて送ります。`continuation_token` を使う手動の継続は、SDKの自動継続を `automatic_continuation=False` で無効にした自前ループに限ります。自動継続が有効なままでは、SDKのストリームが次のhopを続けるため、自前で別のhopを開始しないでください。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
+`requires_action` はモデルがツール呼び出しを求めた状態で、完了ではありません。12.2節の承認ゲートを通し、承認された場合だけクライアント側でツールを実行します。`store=True` では結果をこのinteractionの `id` で送り、`store=False` ではサーバーがツール呼び出しの履歴を復元できないため、元の入力・返されたmodelのsteps・`function_result` を次のリクエストにまとめて送ります。`continuation_token` を使う手動の継続は、SDKの自動継続を `automatic_continuation=False` で無効にした自前ループに限ります。`store=False` の自前ループでは、サーバーに前のhopが残らないため、hopごとに元の入力・モデル・ツール・生成設定を毎回再送し、`continuation_token` を付けます(`store=True` は従来どおり `previous_interaction_id` を付けます)。自動継続が有効なままでは、SDKのストリームが次のhopを続けるため、自前で別のhopを開始しないでください。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
 
 ---
 

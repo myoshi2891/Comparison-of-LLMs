@@ -303,7 +303,7 @@ Hydrogen は入力・思考・出力が**1つの 1,048,576 トークン窓を共
 
 - 同期リクエストの出力は**既定で 65,536 トークン**
 - それを超える出力(複数ファイルのdiff、長大なテストスイート等)は **Long Decode** を使う
-- Interactions API は、`max_output_tokens` を 65,536 超に設定し、バックグラウンド実行またはフォアグラウンドのクライアント側継続を選べる。`background=True` は `store=True` が必要で、サーバーがhopを連結する。`background=False` では対応SDKの自動継続、または `automatic_continuation=False` と `continuation_token` を使う自前ループを利用する。自前ループでは各hopの出力を順に蓄積してから最終hopの状態を確認する(最後のinteractionの `output_text` だけを返すと、それ以前の継続分のテキストが欠落する)。`store=False` のステートレス実行も可能で、その場合は前回IDの代わりに元の入力を再送し、モデル・ツール・system instruction・生成設定を各hopで維持する([公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation))。
+- Interactions API は、`max_output_tokens` を 65,536 超に設定し、バックグラウンド実行またはフォアグラウンドのクライアント側継続を選べる。`background=True` は `store=True` が必要で、サーバーがhopを連結する。`background=False` では対応SDKの自動継続、または `automatic_continuation=False` と `continuation_token` を使う自前ループを利用する。自前ループでは各hopの出力を順に蓄積してから最終hopの状態を確認する(最後のinteractionの `output_text` だけを返すと、それ以前の継続分のテキストが欠落する)。`store=False` のステートレス実行も可能で、その場合は前回IDの代わりに元の入力を再送し、モデル・ツール・system instruction・生成設定を各hopで維持する([公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation))。SDKの自動継続中に接続が切れて `ContinuationInterruptedError` が送出された場合は、リクエストを最初からやり直さない。例外の `partial_interaction`(受信済みの出力とusage)を保持し、例外が持つinteraction IDと `continuation_token` で再開して、再開分を後ろへ結合する(最初から再送すると受信済みの出力が重複し、その分も再度課金される。属性名は公式SDKで確認する)。
 - GenerateContent APIでも、対応する最新版SDKは `max_output_tokens > 65,536` で自動継続する。RESTや自前ループでは `CONTINUATION` と `continuation_token` を扱い、同じリクエストを継続する([公式GenerateContent Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode))。必要なSDKバージョンは両APIの公式資料で確認する。
 - Agent Platform(Google Cloud)経由では、Interactions・GenerateContentのどちらの継続も **`v1beta1` エンドポイント**で行う。`v1` はこの継続動作に非対応のため、SDKクライアントは `http_options` で `api_version='v1'` を指定せず、RESTの呼び出し元も `v1beta1` のパスを使う(Carbonガイドの Agent Platform 記載と同じ要件)。
 
@@ -321,7 +321,11 @@ flowchart TD
     G --> H["completed を確認して output_text を取得 失敗や不完全終了は例外"]
     FG --> FGM{"継続方式は何か"}
     FGM -- "SDKの自動継続" --> AUTO["interactions.create が返す統合済みの出力とusageをそのまま使う 最終hopをidで再取得しない getは最後のhopの出力しか返さない"]
-    AUTO --> AUTOD["返り値の status が completed か確認して採用 失敗や不完全終了は例外"]
+    AUTO --> AINT{"自動継続の途中で ContinuationInterruptedError が送出されたか"}
+    AINT -- "いいえ" --> AUTOD["返り値の status が completed か確認して採用 失敗や不完全終了は例外"]
+    AINT -- "はい" --> ARES["例外の partial_interaction を保持し 例外が持つ interaction ID と continuation_token で再開する 最初からやり直さない"]
+    ARES --> AJOIN["partial_interaction の出力とusageに 再開分を順に結合する"]
+    AJOIN --> AUTOD
     FGM -- "自前ループ" --> ACC["各hopの出力テキストとusageを順に蓄積 最後のhopのoutput_textだけでは前半の継続分が欠落する"]
     ACC --> FGD["最終hopの status が completed か確認し 蓄積した全hopの出力を結合して採用 失敗や不完全終了は例外"]
     GC --> RESULT["全hopの応答とusageを集計し終了理由を確認"]
