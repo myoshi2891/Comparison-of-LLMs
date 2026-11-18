@@ -252,17 +252,23 @@ function collectSvgElements(src) {
   return (src.match(/<svg\b[\s\S]*?<\/svg>/gi) ?? []).map(normalizeSvgElement);
 }
 
+// アイコンフォントのクラス（ti-alert-triangle、fa-warning、icon-alert 等）。<i> の callout 判定から除く。
+const ICON_CLASS_TOKEN_RE = /(^|[\s"'{])(?:ti|fa[a-z]?|bi|mdi|icon)-[\w-]*/gi;
+
 /**
  * Collects callout and alert elements from markup source.
  * @param {string} src - The markup source to inspect.
  * @returns {Array} The normalized callout and alert elements found in the source.
  */
 function collectMarkupCalloutElements(src) {
-  return extractElementContents(src, (openingTag) =>
-    !/^<i\b/i.test(openingTag) && /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
-      openingTag
-    )
-  ).map(({ openingTag, content }) => normalizeCalloutElement(openingTag, content));
+  return extractElementContents(src, (openingTag) => {
+    // <i> はアイコン用途が多いため、ti-alert-triangle 等のアイコンクラスのトークンだけを除いて判定する。
+    // 明示的な callout／alert クラスや variant 属性を持つ <i> は棚卸し対象に残す。
+    const tag = /^<i\b/i.test(openingTag) ? openingTag.replace(ICON_CLASS_TOKEN_RE, "$1") : openingTag;
+    return /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
+      tag
+    );
+  }).map(({ openingTag, content }) => normalizeCalloutElement(openingTag, content));
 }
 
 /**

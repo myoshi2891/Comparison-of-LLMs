@@ -371,6 +371,15 @@ test("does not classify alert icon names as callout content",()=>{
  assert.equal(audit('<div class="callout">Keep warning</div>','<div>Keep warning</div>').status,1);
 });
 
+test("keeps i elements with explicit callout classes or variants as callouts",()=>{
+ const source='<i class="ti ti-alert-triangle"></i><i class="callout warning">Mind the gap</i><i data-variant="warning">Check twice</i>';
+ const page='<i className={styles.icon}></i><i className={`${styles.callout} ${styles.warning}`}>Mind the gap</i><i data-variant="warning">Check twice</i>';
+ const result=audit(source,page);
+ assert.equal(result.status,0);
+ assert.deepEqual(result.data.counts.calloutElements,{source:2,page:2});
+ assert.equal(audit(source,'<i className={styles.icon}></i><i>Mind the gap</i><i data-variant="warning">Check twice</i>').status,1);
+});
+
 test("restores CLASSDEFS only from uncommented executable scripts", () => {
  const chart = 'flowchart LR\nA --> B';
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
