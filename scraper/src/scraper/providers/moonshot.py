@@ -27,9 +27,10 @@ _INLINE_SEP = r"(?:\s|<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)[
 # batch input と cache-hit の入力（"input (cache hit)" / "cache hit input"）も標準入力
 # ではないため、cached input と同様に価格ごと読み飛ばす。標準入力は cache-miss 側を選ぶ。
 # "cache-hit input" のように後ろへ続く input もラベルの一部として読む（価格探索の禁止語に当たらないように）。
+# input が続く場合は必ず含め、後戻りで input を手放して cache-hit 価格を標準入力にしない。
 _CACHED_LABEL = (
     rf"(?:\b(?:cached|batch){_INLINE_SEP}input\b"
-    rf"|\bcache(?:-|{_INLINE_SEP})?hit\b(?:{_INLINE_SEP}input\b)?)"
+    rf"|\bcache(?:-|{_INLINE_SEP})?hit\b(?:{_INLINE_SEP}input\b|(?!{_INLINE_SEP}input\b)))"
 )
 # cached input の価格を探す間も output・標準 input のラベルは越えない
 # （output 価格や、cached が N/A のときの標準 input 価格を cached 扱いにしない）。

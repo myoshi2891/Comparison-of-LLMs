@@ -526,6 +526,9 @@ class TestMoonshot:
             # cached input の価格読み飛ばしが output を越えると、後続の batch 価格を入力単価として拾う。
             "<p>Kimi K3 input N/A cached input N/A output $16.50 (batch $8.25)</p>",
             "<p>Kimi K3 cached input N/A output $16.50 (batch $8.25)</p>",
+            # cache-hit 入力だけのレコードで、ラベル末尾の input を手放して cache-hit 価格を標準入力にしない。
+            "<p>Kimi K3 cache hit input $0.25 output $16.50</p>",
+            "<p>Kimi K3 <span>cache</span> <span>hit</span> input $0.25 output $16.50</p>",
             # 標準 output が欠ける場合、別フィールドの batch 価格を output として公開しない。
             "<p>Kimi K3 input $3.25 output N/A batch $8.25</p>",
             "<p>Kimi K3 input $3.25 output <span>N/A</span> batch output $8.25</p>",
