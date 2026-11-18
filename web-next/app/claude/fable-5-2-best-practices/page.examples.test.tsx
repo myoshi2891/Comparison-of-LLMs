@@ -279,11 +279,12 @@ custom = {"type": "tool_use", "id": "u1", "name": "read", "input": {"n": 0}}
 replies = [{"stop_reason": "tool_use", "content": [computer(1), computer(2), custom, computer(3)]},
     {"stop_reason": "tool_use", "content": [computer(4), computer(5)]},
     {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}]
-requests, executed = [], []
+requests, executed, names = [], [], []
 def call(body):
     requests.append(copy.deepcopy(body))
     return replies[len(requests) - 1]
 def run_tool(name, args):
+    names.append(name)
     executed.append(args["n"])
     if args["n"] == 2:
         raise RuntimeError("click failed")
@@ -294,6 +295,8 @@ checkpoint = {}
 assert scope["agent_loop"]("task", [], run_tool, max_turns=3, checkpoint=checkpoint) == replies[2]
 # 失敗した操作より後のコンピュータ操作(3)は実行しないが、独立したカスタムツール(0)は実行する
 assert executed == [1, 2, 0, 4, 5]
+# ツールセットのメンバーは (toolset_name, name) で、通常のカスタムツールは name だけで振り分ける
+assert names == [("computer", "click"), ("computer", "click"), "read", ("computer", "click"), ("computer", "click")]
 first = checkpoint["messages"][2]["content"]
 assert [r["tool_use_id"] for r in first] == ["c1", "c2", "u1", "c3"]
 assert [r.get("toolset_name") for r in first] == ["computer", "computer", None, "computer"]
@@ -306,6 +309,35 @@ assert first[3] == {"type": "tool_result", "tool_use_id": "c3", "toolset_name": 
 second = checkpoint["messages"][4]["content"]
 assert [(r["content"], r.get("is_error")) for r in second] == [("ok 4", None), ("ok 5", None)]
 assert all(r["toolset_name"] == "computer" for r in second)
+`,
+    examples()
+  );
+});
+
+it("agent_loopは同名のツールをtoolset_nameで区別して振り分ける", () => {
+  python(
+    `
+import ast, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+blocks = [{"type": "tool_use", "id": "b1", "name": "screenshot", "toolset_name": "browser", "input": {}},
+    {"type": "tool_use", "id": "c1", "name": "screenshot", "toolset_name": "computer", "input": {}},
+    {"type": "tool_use", "id": "u1", "name": "screenshot", "input": {}}]
+replies = [{"stop_reason": "tool_use", "content": blocks}, {"stop_reason": "end_turn", "content": []}]
+seen = []
+def call(body):
+    seen.append(len(seen))
+    return replies[len(seen) - 1]
+executors = {("browser", "screenshot"): lambda a: "browser", ("computer", "screenshot"): lambda a: "computer",
+    "screenshot": lambda a: "custom"}
+def run_tool(name, args):
+    return executors[name](args)
+scope = {"call": call, "copy": __import__("copy")}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint)
+results = checkpoint["messages"][2]["content"]
+assert [(r["content"], r.get("toolset_name")) for r in results] == [("browser", "browser"), ("computer", "computer"), ("custom", None)]
 `,
     examples()
   );

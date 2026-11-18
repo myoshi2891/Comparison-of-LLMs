@@ -3460,6 +3460,36 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                "}
                     <span className="hljs-comment">
+                      {"# ツールセットのメンバーは別のツールセットに同名のツールがあり得るため、"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-comment">
+                      {"# (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                tool_key = (block["}
+                    <span className="hljs-string">{'"toolset_name"'}</span>
+                    {"], block["}
+                    <span className="hljs-string">{'"name"'}</span>
+                    {"]) "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-string">{'"toolset_name"'}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" block "}
+                    <span className="hljs-keyword">{"else"}</span>
+                    {" block["}
+                    <span className="hljs-string">{'"name"'}</span>
+                    {"]"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-comment">
                       {
                         "# 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。"
                       }
@@ -3475,9 +3505,7 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                    result["}
                     <span className="hljs-string">{'"content"'}</span>
-                    {"] = copy.deepcopy(run_tool(block["}
-                    <span className="hljs-string">{'"name"'}</span>
-                    {"], copy.deepcopy(block["}
+                    {"] = copy.deepcopy(run_tool(tool_key, copy.deepcopy(block["}
                     <span className="hljs-string">{'"input"'}</span>
                     {"])))"}
                   </span>

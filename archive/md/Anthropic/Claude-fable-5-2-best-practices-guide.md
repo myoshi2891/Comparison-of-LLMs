@@ -525,9 +525,12 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                     result["is_error"] = True
                     results.append(result)
                     continue
+                # ツールセットのメンバーは別のツールセットに同名のツールがあり得るため、
+                # (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。
+                tool_key = (block["toolset_name"], block["name"]) if "toolset_name" in block else block["name"]
                 # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
                 try:
-                    result["content"] = copy.deepcopy(run_tool(block["name"], copy.deepcopy(block["input"])))
+                    result["content"] = copy.deepcopy(run_tool(tool_key, copy.deepcopy(block["input"])))
                 except Exception as error:
                     result["content"] = f"{type(error).__name__}: {error}"
                     result["is_error"] = True
