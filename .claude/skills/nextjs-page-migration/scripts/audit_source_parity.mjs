@@ -694,6 +694,9 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
     wordRe.lastIndex = index;
     const word = wordRe.exec(src)?.[0];
     if (word) {
+      // An escaped spelling (\u0073rc) names the same binding as its decoded form, which the
+      // textual binding analysis cannot match without shifting offsets: leave it unresolved.
+      if (word.includes("\\")) resolution.uncertain = true;
       out += word;
       index += word.length;
       canStartRegex = lastToken === "." ? false : /^(?:return|throw|case|delete|void|typeof|instanceof|in|yield|await|else|do)$/.test(word)
@@ -1267,7 +1270,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (!selected || !/^script(?:\[type=['"]?text\/plain['"]?\])?$/.test(selected[3])) return false;
       if (!(selected[3] === "script" ? selectedScript.any : selectedScript.plain)) return false;
       // A classic script that runs before the payload is parsed reads nothing: unresolved.
-      if (!selectedScript.available) return false;
+      if (!selectedScript.availableAt(at)) return false;
       const ownerBinding = bindingAt(selected[1], at);
       const owner = ownerBinding?.value;
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
@@ -1526,7 +1529,7 @@ function materializePlainTextCards(src) {
   const stashed = src.replace(/<!--[\s\S]*?-->|<(style|xmp|iframe|noembed|noframes|noscript|textarea|title)\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)(?:<\/\1\s*>|$)|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
     (full, opaqueTag, opaqueAttrs, opaqueContent, attributes, payload) => {
       if (opaqueTag !== undefined) {
-        documentElements.push(`<${opaqueTag}${opaqueAttrs}>`);
+        if (templateDepth === 0) documentElements.push(`<${opaqueTag}${opaqueAttrs}>`);
         // Hide the whole element during script/card/code discovery. Restore its
         // text with escaped angles so subsequent inventory scans stay opaque.
         const content = /^(?:textarea|title)$/i.test(opaqueTag) ? opaqueContent : opaqueContent.replace(/&/g, "&amp;");
@@ -1534,12 +1537,14 @@ function materializePlainTextCards(src) {
         return `\u0000AUDITOPAQUE${opaqueElements.length - 1}\u0000`;
       }
       if (attributes === undefined) {
-        if (/^<[A-Za-z]/.test(full)) documentElements.push(full);
+        // Template content is a separate fragment: keep the <template> element itself but do not
+        // count its descendants as document elements for selector uniqueness.
+        if (/^<[A-Za-z]/.test(full) && templateDepth === 0) documentElements.push(full);
         const template = /^<(\/?)template(?![\w:-])/i.exec(full);
         if (template) templateDepth = template[1] ? Math.max(0, templateDepth - 1) : templateDepth + 1;
         return full.startsWith("<!--") ? "" : full;
       }
-      documentElements.push(`<script${attributes}>`);
+      if (templateDepth === 0) documentElements.push(`<script${attributes}>`);
       scripts.push({ full, attributes, payload, index: scripts.length, inTemplate: templateDepth > 0 });
       return `<script data-audit-payload="${scripts.length - 1}"></script>`;
     });
@@ -1557,12 +1562,15 @@ function materializePlainTextCards(src) {
     const rawSource = group.map(script => script.payload).join("\n;\n");
     // Classic scripts run while the parser reaches them; module scripts run after parsing.
     const classic = group.every(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module");
-    // Positions where a classic script reads the DOM. A card payload parsed after such a
-    // script does not exist yet when that script runs.
-    const readPositions = classic
-      ? group.filter(script => /querySelector/.test(script.payload))
-        .map(script => stashed.indexOf(`<script data-audit-payload="${script.index}"></script>`))
-      : [];
+    // Each classic script's span in the joined source and its document position, so the
+    // script that performs a given read can be found from the read's offset.
+    let offset = 0;
+    const segments = group.map(script => {
+      const segment = { start: offset, end: offset + script.payload.length,
+        documentPosition: stashed.indexOf(`<script data-audit-payload="${script.index}"></script>`) };
+      offset = segment.end + "\n;\n".length;
+      return segment;
+    });
     const resolution = {};
     blankNonCodeText(rawSource, false, resolution);
     const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n;\n");
@@ -1583,7 +1591,7 @@ function materializePlainTextCards(src) {
     // cannot be resolved across scopes, so another scope's write may replace the payload.
     const writesTextContent = /\.\s*textContent\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
       /\[\s*(['"`])textContent\1\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(literalSource);
-    return { literalSource, rawSource, selectors, computedRenderer, readPositions, writesTextContent, hasSelection: selectionCalls.length > 0,
+    return { literalSource, rawSource, selectors, computedRenderer, classic, segments, writesTextContent, hasSelection: selectionCalls.length > 0,
       hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer || computedRenderer };
   });
   const scopes = allScopes.filter(scope => scope.hasRenderer);
@@ -1648,8 +1656,10 @@ function materializePlainTextCards(src) {
       const foreignWrite = Boolean(renderer) && allScopes.some(scope => scope !== renderer && scope.writesTextContent);
       const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
-          // Every DOM-reading classic script must come after this payload in document order.
-          available: renderer.readPositions.every(position => position > start + marker.index),
+          // The classic script that performs the read must come after this payload in document
+          // order; module scripts run after parsing. Unrelated earlier queries do not matter.
+          availableAt: at => !renderer.classic || renderer.segments.some(segment =>
+            segment.start <= at && at <= segment.end && segment.documentPosition > start + marker.index),
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 },
         foreignWrite));
       if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);

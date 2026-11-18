@@ -1388,3 +1388,41 @@ test("ignores renderer scripts inside uninstantiated template content", () => {
  // template の外にある実行される renderer は従来どおり照合する。
  assert.equal(audit(source, page.replace('fill:#fff', 'fill:#eee')).status, 1);
 });
+
+test("keeps a classic renderer valid when an unrelated earlier script runs a query before the payload", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card" id="card-0"><script type="text/plain">${chart}</script></div>`;
+ const reader = `const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#card-0'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ // payload より前の無関係な query は、payload を読む script の位置を変えない。
+ const unrelated = `<script>var nav = document.querySelector('#nav');</script>`;
+ assert.equal(audit(`${unrelated}${card}<script>${reader}</script>`, page).status, 0);
+ // payload を読む script 自体が前にある場合は従来どおり未解決。
+ assert.equal(audit(`<script>${reader}</script>${card}`, page).status, 1);
+});
+
+test("treats escaped identifier spellings in renderer code as unresolved", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card" id="card-0"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ const reader = write => `const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#card-0'); let src = card.querySelector('script').textContent;${write} mermaid.render('id', src + CLASSDEFS);`;
+ assert.equal(audit(`${card}<script>${reader('')}</script>`, page).status, 0);
+ // src は src と同じ束縛。書き込みを見逃して payload を認定しない。
+ const escaped = audit(`${card}<script>${reader(" \\u0073rc = 'flowchart LR\\\\nX --> Y';")}</script>`, page);
+ assert.equal(escaped.status, 1);
+ assert.ok(JSON.stringify(escaped.data).includes("card-0"));
+});
+
+test("does not count elements inside template content as document selector matches", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card" id="card-0"><script type="text/plain">${chart}</script></div>`;
+ const reader = `const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#card-0'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ // template の中身は文書に含まれないため、document.querySelector の一意性を崩さない。
+ assert.equal(audit(`<template><div id="card-0"></div></template>${card}<script>${reader}</script>`, page).status, 0);
+ // 文書内に同じ id が実在する場合は従来どおり未解決。
+ assert.equal(audit(`<div id="card-0"></div>${card}<script>${reader}</script>`, page).status, 1);
+});
