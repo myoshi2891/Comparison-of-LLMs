@@ -6,6 +6,16 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
+## template内script・payload読取時点・toolset_name・auth key等のレビュー16件（2026-11-18 追加）
+
+- 16件のうち15件を有効と確認して対応（未コミット）。監査・Moonshot・FableはRed／Greenで修正した。
+- 監査: `<template>`の中身は実行されないため、内部のscriptをrenderer対象から除外する（同じカードを選ぶtemplate内rendererで修正前はstatus 1）。classic scriptはパース中に実行されるため、DOMを読むclassic scriptがカードのpayloadより前にある場合は未解決とする。payloadの後に置いた同等のrendererとmodule scriptは有効なまま。Red 2件を追加。
+- Moonshot: cachedの価格がN/Aのとき、cached価格の探索が後続の標準`input`ラベルと価格を飲み込み、入力がfallbackへ落ちていた。cached価格の探索は`input`ラベルを越えず、価格なしのcachedはラベルだけを読み飛ばす（価格が続く場合は使えない）。`cache-hit input`は後続のinputまでラベルとして読む。混成ケースを既存フィクスチャの隣に追加。
+- Fable 5.2: 6.4のagent_loop例でツールセットのメンバーへの結果に`toolset_name`を返し（公式要件）、同じターンで先行するcomputer操作が失敗したら後続のcomputer操作を実行せず`Not executed: an earlier computer action in this turn failed`のエラー結果を返す。独立したカスタムツールと成功したバッチは従来どおり。原本HTML／Markdown・JSX・source／structure契約（highlight.js11.12.0のトークンを再生成。修正前コードで既存123トークンと一致することを確認）を同期。
+- ガイド: Carbonは候補なしでもusageを先に記録し、ツール結果の送り方を`store`で分け（`store=False`は元の入力・modelのsteps・function_resultを再送）、`continuation_token`の手動継続は`automatic_continuation=False`の自前ループに限定、最初のチェックポイント前の切断は出力を破棄してトークンなしで再送。Hydrogenは`prefix_mismatch_behavior`をPython `google-genai`で確認済みとして案内せず、新規履歴へのリセットを推奨。Decisionsは拒否もADKの`Event`（`event.content`）で返し、`other`が末尾に来るとの記述を削除。Roboticsは標準APIキーのauth keyへの移行（制限付き標準キーも2026年9月以降は不可）、正規化画像座標を校正済み`image_to_base`で基座標mmへ変換してから境界検査・実行、映像送信間隔をセッション全体で共有、ターン待機のタイムアウト／キャンセル時はゲートを離す前にセッションを使用不可にする。
+- スキップ: `bun audit`のCI失敗（picomatch ≤4.0.7、vitest／tinyglobby経由の推移的依存）は依存変更のため引き続きユーザー確認待ち。
+- 検証: 監査132件（形式96・照合36）、archive／legacyのHTML原本66件で原本側監査出力が修正前（HEAD `a81266a6`）と同一、FableのHTML原本監査exit 0、Fable対象81件、全体Vitest240 files／3081 tests、型検査、Biome658 files、pytest150件＋39 subtests、4ガイドのPythonコード例の構文解析とMermaid33図の解析、Roboticsの`run_task`（校正外の拒否・範囲外の拒否・変換後の実行）とハートビート（共有間隔・タイムアウト／キャンセル後の送信拒否）、Decisionsガードのモック実行が成功。Markdown lintは変更前後で同一（Robotics既存8件・Decisions既存1件、他0件）。ビルドは今回未実行（最後の成功は2026-11-14）。
+
 ## ラベル文脈・dedent組込み遮蔽・ツール結果の独立コピー等のレビュー15件（2026-11-18）
 
 - 15件のうち14件を有効と確認して対応。監査とFableはRed／Greenで修正した。
