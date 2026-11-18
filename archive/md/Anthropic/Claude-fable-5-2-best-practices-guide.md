@@ -512,15 +512,26 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
             return data
 
         results = []
+        computer_failed = False  # このターンで先行するコンピュータ操作が失敗したか
         for block in data["content"]:
             if block["type"] == "tool_use":
                 result = {"type": "tool_result", "tool_use_id": block["id"]}
+                # ツールセットのメンバーへの結果には同じ toolset_name を返す(欠落・不一致は拒否される)
+                if "toolset_name" in block:
+                    result["toolset_name"] = block["toolset_name"]
+                if block.get("toolset_name") == "computer" and computer_failed:
+                    # 後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す
+                    result["content"] = "Not executed: an earlier computer action in this turn failed"
+                    result["is_error"] = True
+                    results.append(result)
+                    continue
                 # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
                 try:
                     result["content"] = copy.deepcopy(run_tool(block["name"], copy.deepcopy(block["input"])))
                 except Exception as error:
                     result["content"] = f"{type(error).__name__}: {error}"
                     result["is_error"] = True
+                    computer_failed = computer_failed or block.get("toolset_name") == "computer"
                 results.append(result)
         messages.append({"role": "user", "content": results})
         if checkpoint is not None:

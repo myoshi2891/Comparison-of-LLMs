@@ -267,6 +267,50 @@ assert requests[1]["messages"][2]["content"][0]["content"] == [{"type": "text", 
   );
 });
 
+it("agent_loopはツールセットの結果にtoolset_nameを返し、失敗後の後続のコンピュータ操作を実行しない", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+def computer(n):
+    return {"type": "tool_use", "id": "c" + str(n), "name": "click", "toolset_name": "computer", "input": {"n": n}}
+custom = {"type": "tool_use", "id": "u1", "name": "read", "input": {"n": 0}}
+replies = [{"stop_reason": "tool_use", "content": [computer(1), computer(2), custom, computer(3)]},
+    {"stop_reason": "tool_use", "content": [computer(4), computer(5)]},
+    {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}]
+requests, executed = [], []
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return replies[len(requests) - 1]
+def run_tool(name, args):
+    executed.append(args["n"])
+    if args["n"] == 2:
+        raise RuntimeError("click failed")
+    return "ok " + str(args["n"])
+scope = {"call": call, "copy": __import__("copy")}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+assert scope["agent_loop"]("task", [], run_tool, max_turns=3, checkpoint=checkpoint) == replies[2]
+# 失敗した操作より後のコンピュータ操作(3)は実行しないが、独立したカスタムツール(0)は実行する
+assert executed == [1, 2, 0, 4, 5]
+first = checkpoint["messages"][2]["content"]
+assert [r["tool_use_id"] for r in first] == ["c1", "c2", "u1", "c3"]
+assert [r.get("toolset_name") for r in first] == ["computer", "computer", None, "computer"]
+assert "toolset_name" not in first[2]
+assert first[0] == {"type": "tool_result", "tool_use_id": "c1", "toolset_name": "computer", "content": "ok 1"}
+assert first[1]["is_error"] is True and first[2] == {"type": "tool_result", "tool_use_id": "u1", "content": "ok 0"}
+assert first[3] == {"type": "tool_result", "tool_use_id": "c3", "toolset_name": "computer", "is_error": True,
+    "content": "Not executed: an earlier computer action in this turn failed"}
+# 失敗は次のターンへ持ち越さず、成功したバッチはすべて実行して結果を返す
+second = checkpoint["messages"][4]["content"]
+assert [(r["content"], r.get("is_error")) for r in second] == [("ok 4", None), ("ok 5", None)]
+assert all(r["toolset_name"] == "computer" for r in second)
+`,
+    examples()
+  );
+});
+
 it("agent_loopは次のAPI呼び出しが失敗しても完了済みtool_resultを保存する", () => {
   python(
     `

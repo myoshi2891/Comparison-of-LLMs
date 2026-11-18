@@ -3349,6 +3349,15 @@ export default function Page() {
                   <span className={styles.codeLine}>{"        results = []"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"        computer_failed = "}
+                    <span className="hljs-literal">{"False"}</span>
+                    {"  "}
+                    <span className="hljs-comment">
+                      {"# このターンで先行するコンピュータ操作が失敗したか"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"        "}
                     <span className="hljs-keyword">{"for"}</span>
                     {" block "}
@@ -3378,6 +3387,74 @@ export default function Page() {
                     {": block["}
                     <span className="hljs-string">{'"id"'}</span>
                     {"]}"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-comment">
+                      {
+                        "# ツールセットのメンバーへの結果には同じ toolset_name を返す(欠落・不一致は拒否される)"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-string">{'"toolset_name"'}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" block:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    result["}
+                    <span className="hljs-string">{'"toolset_name"'}</span>
+                    {"] = block["}
+                    <span className="hljs-string">{'"toolset_name"'}</span>
+                    {"]"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" block.get("}
+                    <span className="hljs-string">{'"toolset_name"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"computer"'}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" computer_failed:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-comment">
+                      {"# 後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    result["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"] = "}
+                    <span className="hljs-string">
+                      {'"Not executed: an earlier computer action in this turn failed"'}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    result["}
+                    <span className="hljs-string">{'"is_error"'}</span>
+                    {"] = "}
+                    <span className="hljs-literal">{"True"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    results.append(result)"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-keyword">{"continue"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3435,6 +3512,15 @@ export default function Page() {
                     <span className="hljs-string">{'"is_error"'}</span>
                     {"] = "}
                     <span className="hljs-literal">{"True"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    computer_failed = computer_failed "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" block.get("}
+                    <span className="hljs-string">{'"toolset_name"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"computer"'}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
