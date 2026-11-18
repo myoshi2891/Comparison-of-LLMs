@@ -1266,6 +1266,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const selected = query.exec(value);
       if (!selected || !/^script(?:\[type=['"]?text\/plain['"]?\])?$/.test(selected[3])) return false;
       if (!(selected[3] === "script" ? selectedScript.any : selectedScript.plain)) return false;
+      // A classic script that runs before the payload is parsed reads nothing: unresolved.
+      if (!selectedScript.available) return false;
       const ownerBinding = bindingAt(selected[1], at);
       const owner = ownerBinding?.value;
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
@@ -1519,6 +1521,8 @@ function materializePlainTextCards(src) {
   const opaqueElements = [];
   const documentElements = [];
   const unresolvedMermaidSources = [];
+  // <template> content is inert until a script instantiates it; its scripts never run in place.
+  let templateDepth = 0;
   const stashed = src.replace(/<!--[\s\S]*?-->|<(style|xmp|iframe|noembed|noframes|noscript|textarea|title)\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)(?:<\/\1\s*>|$)|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
     (full, opaqueTag, opaqueAttrs, opaqueContent, attributes, payload) => {
       if (opaqueTag !== undefined) {
@@ -1531,13 +1535,17 @@ function materializePlainTextCards(src) {
       }
       if (attributes === undefined) {
         if (/^<[A-Za-z]/.test(full)) documentElements.push(full);
+        const template = /^<(\/?)template(?![\w:-])/i.exec(full);
+        if (template) templateDepth = template[1] ? Math.max(0, templateDepth - 1) : templateDepth + 1;
         return full.startsWith("<!--") ? "" : full;
       }
       documentElements.push(`<script${attributes}>`);
-      scripts.push({ full, attributes, payload });
+      scripts.push({ full, attributes, payload, index: scripts.length, inTemplate: templateDepth > 0 });
       return `<script data-audit-payload="${scripts.length - 1}"></script>`;
     });
   const executableScripts = scripts.filter(script => {
+    // Scripts inside uninstantiated template content are not renderers for document cards.
+    if (script.inTemplate) return false;
     const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
     return !type || type === "module" || /^(?:text|application)\/(?:java|ecma)script$/.test(type);
   });
@@ -1547,6 +1555,14 @@ function materializePlainTextCards(src) {
     ...executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() === "module").map(script => [script]),
   ].map(group => {
     const rawSource = group.map(script => script.payload).join("\n;\n");
+    // Classic scripts run while the parser reaches them; module scripts run after parsing.
+    const classic = group.every(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module");
+    // Positions where a classic script reads the DOM. A card payload parsed after such a
+    // script does not exist yet when that script runs.
+    const readPositions = classic
+      ? group.filter(script => /querySelector/.test(script.payload))
+        .map(script => stashed.indexOf(`<script data-audit-payload="${script.index}"></script>`))
+      : [];
     const resolution = {};
     blankNonCodeText(rawSource, false, resolution);
     const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n;\n");
@@ -1567,7 +1583,7 @@ function materializePlainTextCards(src) {
     // cannot be resolved across scopes, so another scope's write may replace the payload.
     const writesTextContent = /\.\s*textContent\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
       /\[\s*(['"`])textContent\1\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(literalSource);
-    return { literalSource, rawSource, selectors, computedRenderer, writesTextContent, hasSelection: selectionCalls.length > 0,
+    return { literalSource, rawSource, selectors, computedRenderer, readPositions, writesTextContent, hasSelection: selectionCalls.length > 0,
       hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer || computedRenderer };
   });
   const scopes = allScopes.filter(scope => scope.hasRenderer);
@@ -1632,6 +1648,8 @@ function materializePlainTextCards(src) {
       const foreignWrite = Boolean(renderer) && allScopes.some(scope => scope !== renderer && scope.writesTextContent);
       const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
+          // Every DOM-reading classic script must come after this payload in document order.
+          available: renderer.readPositions.every(position => position > start + marker.index),
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 },
         foreignWrite));
       if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);

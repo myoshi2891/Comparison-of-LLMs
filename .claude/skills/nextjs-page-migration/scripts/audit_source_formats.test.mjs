@@ -1359,3 +1359,32 @@ test("preserves payload trailing newline before CLASSDEFS unless using the valid
  assert.equal(audit(dedentedSource, joinedLine).status, 0);
  assert.equal(audit(dedentedSource, separateLines).status, 1);
 });
+
+test("treats a classic renderer that reads its card payload before the payload is parsed as unresolved", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card" id="card-0"><script type="text/plain">${chart}</script></div>`;
+ const reader = `const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#card-0'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ // classic script はパース中に実行されるため、後ろにある payload をまだ読めない。
+ const early = audit(`<script>${reader}</script>${card}`, page);
+ assert.equal(early.status, 1);
+ assert.ok(JSON.stringify(early.data).includes("CLASSDEFS:card-0"));
+ // payload の後に置いた同等の renderer は有効なまま。
+ assert.equal(audit(`${card}<script>${reader}</script>`, page).status, 0);
+ // module script は文書のパース後に実行されるため、前に置いても payload を読める。
+ assert.equal(audit(`<script type="module">${reader}</script>${card}`, page).status, 0);
+});
+
+test("ignores renderer scripts inside uninstantiated template content", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card" id="card-0"><script type="text/plain">${chart}</script></div>`;
+ const reader = s => `const CLASSDEFS = ${JSON.stringify(s)}; const card = document.querySelector('#card-0'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ // template の中身は実行されないため、同じカードを選ぶ renderer として数えない。
+ const source = `${card}<template><script>${reader('\nclassDef other fill:#000;')}</script></template><script>${reader(suffix)}</script>`;
+ assert.equal(audit(source, page).status, 0);
+ // template の外にある実行される renderer は従来どおり照合する。
+ assert.equal(audit(source, page.replace('fill:#fff', 'fill:#eee')).status, 1);
+});
