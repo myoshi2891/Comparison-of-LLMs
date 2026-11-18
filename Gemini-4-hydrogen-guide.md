@@ -118,7 +118,9 @@ flowchart TD
     Q3 -- "いいえ" --> HYD
     HYD --> Q5{"high で品質が足りないか"}
     Q5 -- "はい" --> XH["xhigh を試す それでも不足なら Carbon / Argon に計画を任せる"]
-    Q5 -- "いいえ" --> DONE["high または medium で運用"]
+    Q5 -- "いいえ" --> Q6{"medium でも品質基準を満たすか 別途評価して確認"}
+    Q6 -- "はい" --> MED["medium で運用"]
+    Q6 -- "いいえ" --> HIGH["high で運用"]
 ```
 
 **モデル比較表**
@@ -351,9 +353,13 @@ interaction = client.interactions.create(
     generation_config={"max_output_tokens": 262144, "thinking_level": "high"},
 )
 
+# ポーリング前にIDを保存する。get が失敗・中断しても、同じジョブを再開・取り消しできる。
+interaction_id = interaction.id
+print(f"interaction id: {interaction_id}")  # 実運用ではジョブ管理のDB等へ保存する
+
 while interaction.status in ("in_progress", "queued"):
     time.sleep(5)
-    interaction = client.interactions.get(id=interaction.id)
+    interaction = client.interactions.get(id=interaction_id)
 
 if interaction.status == "failed":
     raise RuntimeError(f"Interaction failed: {interaction.id}")
@@ -375,6 +381,8 @@ print(text)  # 生成された差分を表示する
 ```
 
 [公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。
+
+ポーリング中にプロセスが落ちたり `interactions.get` が失敗したりしても、`create` をやり直すと**別のジョブ**が始まり、課金も二重になります。保存しておいた `interaction_id` で `client.interactions.get(id=interaction_id)` から状態確認を再開してください。不要になったジョブは、同じIDに対してAPIリファレンスのキャンセル操作を使って止めます(メソッド名・対応SDKバージョンは[Interactions APIリファレンス](https://ai.google.dev/api/interactions-api)で確認)。
 
 **Long Decode の運用ルール**
 

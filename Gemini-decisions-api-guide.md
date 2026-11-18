@@ -401,6 +401,15 @@ sequenceDiagram
     end
 ```
 
+このコードは ADK を使うため、**Step 2 の SDK 環境(`google-genai>=3.2`)とは別の仮想環境**で実行します。`google-adk` 2.x は `google-genai` 3 未満を要求するので、同じ環境に入れると依存関係が衝突します。Decisions API はこの環境では SDK ではなく REST(`decisions_client.py` の `httpx`)で呼びます。Step 2 の環境はそのまま残してください。
+
+```bash
+# Step 2 とは別の環境を作る(Step 2 の環境には google-adk を入れない)
+python -m venv .venv-adk
+source .venv-adk/bin/activate
+pip install -U google-adk httpx
+```
+
 ```python
 import httpx
 from google.adk.events import Event

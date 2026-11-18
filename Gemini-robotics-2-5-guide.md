@@ -495,11 +495,16 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
         if not calls:
             return response.text  # モデルが関数を呼ばなくなったら完了
         results, observation, skip_reason, limit_reached = [], None, None, False
+        estopped, moved = False, False
         for part in calls:
             fc = part.function_call
             if skip_reason is None and actions >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
                 # 上限に達しても即座に戻らず、残りの呼び出しを skipped として記録して履歴を揃える。
                 skip_reason, limit_reached = "step limit reached; this action was not executed", True
+            if skip_reason is None and fc.name == "move" and moved:
+                # move の座標はこの応答を生成したときの画像に基づく。1 回動いた後のシーンとカメラ姿勢では
+                # 古い座標になり得るため、画像由来の動作は 1 ターン 1 回とし、新しい観測で再計画させる。
+                skip_reason = "a fresh observation is required before another image-based move; this action was not executed"
             if skip_reason is not None:
                 # 先行する動作が拒否・失敗した場合や上限到達後は、同じ応答の残りを実行しない。
                 # 並列呼び出しの各 function_call には、順序どおり必ず 1 つずつ結果を返す。
@@ -518,13 +523,17 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
                 # 生成待ちの間に停止された場合に備え、実行直前にも再確認する。
                 # ソフトウェアの確認であり、独立した物理インターロックの代わりではない。
                 if estop_active():
-                    return "aborted: emergency stop"
+                    # 実行済みの結果を捨てずに、この呼び出しと残りを skipped として記録してから中断する。
+                    skip_reason, estopped = "emergency stop; this action was not executed", True
+                    results.append(function_response_part(fc, {"status": "skipped", "reason": skip_reason}))
+                    continue
                 # 実行器は (構造化結果, 実行後の最新観測 JPEG のバイト列または None) を返す契約とする。
                 # 構造化結果は {"status": "ok" | "failed", ...} の JSON 互換 dict で、画像は含めない。
                 payload, image = execute_on_robot(fc.name, robot_args)  # 基座標 mm へ変換・検査済み
                 # 実行した動作ごとに観測を置き換える。画像がなければ古い観測を消し、
                 # 後続の動作が一部動いて失敗した場合に、前の動作の画像で再計画させない。
                 observation = image
+                moved = moved or fc.name == "move"
             if payload.get("status") != "ok":
                 skip_reason = "an earlier action in this response was rejected or failed"
             results.append(function_response_part(fc, payload))
@@ -532,6 +541,9 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
             # 最新観測は payload 内のバイト列や base64 文字列ではなく、画像パートとして次ターンに渡す。
             results.append(types.Part.from_bytes(data=observation, mime_type="image/jpeg"))
         contents.append(types.Content(role="user", parts=results))
+        if estopped:
+            # 完了した動作の結果・skipped の記録・最新観測を contents に残し、呼び出し元が復旧に使えるようにする。
+            return "aborted: emergency stop"
         if limit_reached:
             # 実行済みの結果と skipped の記録を contents に残したまま中断し、呼び出し元へ完全な履歴を渡す。
             return "aborted: step limit reached"

@@ -311,7 +311,7 @@ flowchart TD
 
 ### 6.3 思考トークンの落とし穴
 
-- Gemini 4 では **思考トークンや、グラウンディング利用時の内部ツール指示・関数宣言も含め、モデルが処理した全トークンが課金対象** です [S7]。
+- Gemini 4 では **思考トークンや、グラウンディング利用時の内部ツール指示・関数宣言も含め、モデルが処理した全トークンが課金対象** です [S7]。ただし Google 検索グラウンディングが提供した入力トークンは入力課金の対象外と料金表に記載されています([公式Agent Platform料金表](https://cloud.google.com/vertex-ai/generative-ai/pricing))。11.2節の試算はこの分を区別せず含めるため、グラウンディング利用時は実際より高めに出ます。
 - 思考が長くなって出力上限に達し、回答が途中で切れる問題が起こり得ます。Argon の long decode ガイドは、無効のままだと `MAX_TOKENS` による不完全な生成が増える可能性を指摘しています [S21]。次章で対策します。
 
 ---
@@ -357,7 +357,11 @@ flowchart TD
     NEXT --> GACC
     CONT -- "STOP" --> GJOIN["蓄積した全セグメントのpartsを結合して採用"]
     GJOIN --> G["累積トークンと課金を監視"]
-    CONT -- "MAX_TOKENS など" --> GERR["未完了として扱い 部分出力を採用しない"]
+    CONT -- "MAX_TOKENS" --> MTOK{"continuation_token が返されたか"}
+    MTOK -- "はい" --> RAISE["蓄積したpartsを保持し<br/>max_output_tokens を累積の上限として引き上げ<br/>同じ continuation_token で再開<br/>STOP までは部分出力を採用しない"]
+    RAISE --> GACC
+    MTOK -- "いいえ" --> GERR["未完了として扱い 部分出力を採用しない"]
+    CONT -- "SAFETY など" --> GERR
     API -- "Interactions 非ストリーミング" --> ACC["各hopの出力テキストとusageを順に蓄積"]
     ACC --> IST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
     IST -- "requires_action" --> IACT["ツール呼び出しを承認ゲートに通す 12.2節"]
@@ -375,7 +379,8 @@ flowchart TD
     API -- "Interactions ストリーミング" --> SACC["受信イベントのテキストを順に蓄積<br/>usageはhop内で累積値なので最新値だけ保持<br/>各イベントのevent_idをチェックポイントとして保存"]
     SACC --> SDROP{"ストリームが終了イベントの前に切断されたか"}
     SDROP -- "はい store=True" --> SRES["同じinteraction idと最後に保存したevent_idで再接続<br/>チェックポイント以前のイベントは追記しない"]
-    SDROP -- "はい store=False" --> SCP{"チェックポイントを保存済みか"}
+    SDROP -- "はい store=False" --> SUSE["中断したhopで最後に受け取ったusageを<br/>そのhopの値として保持し 合算に含める<br/>受け取っていなければ usage 不明と記録"]
+    SUSE --> SCP{"チェックポイントを保存済みか"}
     SCP -- "はい" --> SSL["元の入力 モデル ツール 生成設定に<br/>チェックポイント時点のcontinuation_tokenを付けて再送<br/>チェックポイント以降に受信した出力は破棄して再生成分で置き換える"]
     SCP -- "いいえ" --> SRST["未チェックポイントの出力をすべて破棄し<br/>continuation_tokenを付けずに元のリクエストを最初から再送"]
     SRES --> SACC
@@ -397,7 +402,11 @@ flowchart TD
     SST -- "failed incomplete cancelled" --> ERR
 ```
 
-ストリーミングでは、受信済みイベントの `event_id` をチェックポイントとして永続化し、`store=True` の切断時は同じinteractionへ最後の `event_id` を指定して再接続します。再送されたイベントのうちチェックポイント以前のものは捨て、出力を二重に追記しないでください。`store=False` ではサーバーにinteractionが保存されないため、同じidでは再接続せず、元の入力にチェックポイント時点の `continuation_token` を付けて再送します。最初のチェックポイントを保存する前に切断された場合は、受信済みの出力をすべて破棄し、`continuation_token` を付けずに元のリクエストを最初からやり直します。チェックポイント以降に受信済みの出力は再生成されるため破棄し、再送分で置き換えます(公式SDKはチェックポイント後に出力を受け取ってから切断された場合、重複を避けるため `ContinuationInterruptedError` を送出します)。usage はhop内で累積値なので各hopの最新値だけを保持し、hopごとの最終値を合算します。`requires_action` はモデルがツール呼び出しを求めた状態で、完了ではありません。12.2節の承認ゲートを通し、承認された場合だけクライアント側でツールを実行します。`store=True` では結果をこのinteractionの `id` で送り、`store=False` ではサーバーがツール呼び出しの履歴を復元できないため、元の入力・返されたmodelのsteps・`function_result` を次のリクエストにまとめて送ります。`continuation_token` を使う手動の継続は、SDKの自動継続を `automatic_continuation=False` で無効にした自前ループに限ります。自動継続が有効なままでは、SDKのストリームが次のhopを続けるため、自前で別のhopを開始しないでください。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
+ストリーミングでは、受信済みイベントの `event_id` をチェックポイントとして永続化し、`store=True` の切断時は同じinteractionへ最後の `event_id` を指定して再接続します。再送されたイベントのうちチェックポイント以前のものは捨て、出力を二重に追記しないでください。`store=False` ではサーバーにinteractionが保存されないため、同じidでは再接続せず、元の入力にチェックポイント時点の `continuation_token` を付けて再送します。最初のチェックポイントを保存する前に切断された場合は、受信済みの出力をすべて破棄し、`continuation_token` を付けずに元のリクエストを最初からやり直します。終了イベントを受け取れなかったhopも課金され得るため、そのhopで最後に受け取ったusageを保持して合算に含め、一度も受け取っていなければ「usage不明」と記録して請求額で確認します。チェックポイント以降に受信済みの出力は再生成されるため破棄し、再送分で置き換えます(公式SDKはチェックポイント後に出力を受け取ってから切断された場合、重複を避けるため `ContinuationInterruptedError` を送出します)。usage はhop内で累積値なので各hopの最新値だけを保持し、hopごとの最終値を合算します。
+
+GenerateContentで `MAX_TOKENS` に達した応答に `continuation_token` が付いている場合は、蓄積済みのpartsを保持したまま `max_output_tokens`(hopをまたいだ累積の上限)を引き上げ、同じトークンで再開します。`STOP` になるまで部分出力は採用せず、トークンがない場合は未完了として扱います(再開の可否と引数は[公式Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode)で確認してください)。
+
+`requires_action` はモデルがツール呼び出しを求めた状態で、完了ではありません。12.2節の承認ゲートを通し、承認された場合だけクライアント側でツールを実行します。`store=True` では結果をこのinteractionの `id` で送り、`store=False` ではサーバーがツール呼び出しの履歴を復元できないため、元の入力・返されたmodelのsteps・`function_result` を次のリクエストにまとめて送ります。`continuation_token` を使う手動の継続は、SDKの自動継続を `automatic_continuation=False` で無効にした自前ループに限ります。自動継続が有効なままでは、SDKのストリームが次のhopを続けるため、自前で別のhopを開始しないでください。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
 
 ---
 
@@ -572,7 +581,9 @@ def estimate_cost(usage, rates):
 
     前提: prompt_token_count にはキャッシュ分が含まれ、
     思考トークンは出力と同単価で課金されるものとして扱う。
-    tool_use_prompt_token_count は通常の入力単価で加算する。
+    tool_use_prompt_token_count はすべて通常の入力単価で加算する。Google 検索グラウンディングが
+    提供した入力トークンは課金対象外だが、usage_metadata でその分を区別する方法を確認できて
+    いないため除外しない(グラウンディング利用時は実際より高めの見積りになる)。
     Google Searchの検索クエリなど、トークン以外のツール料金は含めない。
     実際の課金区分は公式料金ページで確認すること。
     """
@@ -587,6 +598,7 @@ def estimate_cost(usage, rates):
     return ((prompt + tool_prompt) * rates["in"] + cached * rates["cached"] + output * rates["out"]) / 1_000_000
 
 
+# 注意: 検索グラウンディングで提供されたトークンも tool_use_prompt_token_count に含めて課金扱いにする上振れ見積り
 # 使い方: 標準 Carbon の11月の請求額を12月価格で再計算して予算を立てる
 # cost_nov = estimate_cost(response.usage_metadata, INTRO)  # cyber-permissive には STANDARD を使う
 # cost_dec = estimate_cost(response.usage_metadata, STANDARD)
