@@ -20,7 +20,11 @@ _KIMI_K2_7_CODE_HIGHSPEED = "Kimi K2.7 Code Highspeed"
 _KIMI_K2_7_CODE = "Kimi K2.7 Code"
 
 # レコード終端・次モデルを越えず、outputより前では入力価格の$を許可する。
-_RECORD_GAP = r"(?:(?!</(?:p|div|tr|li|dl|section|article|nav|h[1-6])\b|<dt\b|\bkimi[-\s]?k)[\s\S]){0,80}?"
+# 次モデル名は "<span>Kimi</span> <span>K2.6</span>" のようにインラインタグで区切られても境界とみなす。
+_RECORD_GAP = (
+    r"(?:(?!</(?:p|div|tr|li|dl|section|article|nav|h[1-6])\b|<dt\b"
+    r"|\bkimi(?:[-\s]|<[^<>]*>)*k)[\s\S]){0,80}?"
+)
 _PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
 # cached と input の間には空白か、レコード境界ではないインラインタグ（span・br 等）を許す。
 _INLINE_SEP = r"(?:\s|<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)[^<>]*>)+"
@@ -48,8 +52,17 @@ _OUTPUT_LABEL = r"(?<!batch\s)(?<!cached\s)\boutput"
 # batch/cached output は区切りの空白・インラインタグの量によらず一塊で読み飛ばす。
 # 途中で止まれないため、直後の output を標準ラベルとして誤認しない。
 _OTHER_OUTPUT_LABEL = rf"\b(?:batch|cached){_INLINE_SEP}output\b"
+# batch/cached input のラベルを越えるのは、その後ろ（output より前）に標準 input
+# （"input" または "Cache Miss"）が続く場合だけ。続かなければそのレコードは batch/cached の行であり、
+# 後続の output は標準 output ではない。
+_STD_INPUT_AHEAD = _RECORD_GAP.replace(
+    r"[\s\S]", rf"(?!\boutput\b)(?:{_CACHED_LABEL}|(?!{_CACHED_LABEL})[\s\S])"
+)
 _OUTPUT_LABEL_GAP = _RECORD_GAP.replace(
-    r"[\s\S]", rf"(?:{_OTHER_OUTPUT_LABEL}|(?!{_OTHER_OUTPUT_LABEL})[\s\S])"
+    r"[\s\S]",
+    rf"(?:{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL}"
+    rf"(?={_STD_INPUT_AHEAD}(?:\binput\b|\bcache(?:-|{_INLINE_SEP})?miss\b))"
+    rf"|(?!{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
 )
 _OUTPUT_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"(?!\b(?:batch|cached|cache|input)\b)[^$]")
 

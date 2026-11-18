@@ -584,6 +584,28 @@ class TestMoonshot:
         assert model.provenance is not None
         assert model.provenance.origin == "scraped"
 
+    def test_next_model_split_by_inline_tags_is_a_boundary(self):
+        # インライン HTML で区切られた次モデル名（Kimi K2.6）を越えて、その価格を K3 の output にしない。
+        html = (
+            "<div>Kimi K3 input $3.25 <span>Kimi</span> <span>K2.6</span> "
+            "input $0.95 output $4.00</div>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+        assert model.scrape_status == "fallback"
+
+    def test_batch_input_row_output_is_not_standard_output(self):
+        # batch input 行の output は batch 単価。標準 output は標準 input の行から選ぶ。
+        html = (
+            "<p>Kimi K3 batch input $1.60 output $8.25</p>"
+            "<p>Kimi K3 input $3.25 output $16.50</p>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert model.price_out != 8.25
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
     def test_cached_input_gap_cannot_stop_inside_a_price(self):
         text = "Kimi K3 cached input $0.25 input $3.25 output $16.50"
         gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}"
