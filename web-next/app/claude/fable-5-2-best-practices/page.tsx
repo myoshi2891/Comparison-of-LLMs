@@ -7494,7 +7494,7 @@ export default function Page() {
                       {" リクエストに "}
                       <code>{'fallbacks: "default"'}</code>
                       {
-                        " を指定すると、拒否された依頼をカテゴリ別の推奨モデルで再試行する。Claude API と Google Cloud の Anthropic 管理版で利用可 "
+                        " を指定し、さらにベータヘッダ anthropic-beta: server-side-fallback-2026-07-01(この資料の call() では betas 引数)でオプトインすると、拒否された依頼をカテゴリ別の推奨モデルで再試行する。ヘッダなしの fallbacks だけでは有効にならない。Claude API と Google Cloud の Anthropic 管理版で利用可 "
                       }
                     </td>
                     <td>
@@ -7669,7 +7669,9 @@ export default function Page() {
                   ": 出力が出る前の拒否が課金されるかは、カテゴリで異なります。レート制限には必ず算入されます。フォールバックでモデルを切り替えると、プロンプトキャッシュと Fable 5.2 の思考が失われますが、"
                 }
                 <strong>{"fallback credit"}</strong>
-                {" がキャッシュの切替コストを払い戻します "}
+                {
+                  " がキャッシュの切替コストを払い戻します。ただし、モデルを変えて再送するだけでは払い戻されません。サーバー側フォールバックと SDK ミドルウェアは credit を自動で扱いますが、raw HTTP の自前リトライでは、拒否される元のリクエストから fallback-credit-2026-07-01 ヘッダでオプトインし、拒否の stop_details に返る fallback_credit_token を再試行のリクエストに渡す必要があります "
+                }
                 <span className={[styles.tag, styles.official].join(" ")}>{"公式"}</span>
                 {" ("}
                 <a className={styles["src-link"]} href="#S3">

@@ -1245,7 +1245,7 @@ flowchart TD
 
 | 方法 | 内容 | 確度 |
 | --- | --- | --- |
-| サーバー側フォールバック(ベータ) | リクエストに `fallbacks: "default"` を指定すると、拒否された依頼をカテゴリ別の推奨モデルで再試行する。Claude API と Google Cloud の Anthropic 管理版で利用可 | 公式 (S3) |
+| サーバー側フォールバック(ベータ) | リクエストに `fallbacks: "default"` を指定し、さらにベータヘッダ anthropic-beta: server-side-fallback-2026-07-01(この資料の call() では betas 引数)でオプトインすると、拒否された依頼をカテゴリ別の推奨モデルで再試行する。ヘッダなしの fallbacks だけでは有効にならない。Claude API と Google Cloud の Anthropic 管理版で利用可 | 公式 (S3) |
 | SDK ミドルウェア | クライアント側で再試行する | 公式 (S3) |
 | 自前のリトライ | `stop_reason` と `category` を見て自分で切り替える | 公式 (S3) |
 
@@ -1268,7 +1268,7 @@ def handle_response(data: dict, retry_on_other_model):
     raise RuntimeError(f"拒否されました: category={category}")
 ```
 
-> **課金とキャッシュ**: 出力が出る前の拒否が課金されるかは、カテゴリで異なります。レート制限には必ず算入されます。フォールバックでモデルを切り替えると、プロンプトキャッシュと Fable 5.2 の思考が失われますが、**fallback credit** がキャッシュの切替コストを払い戻します [公式] (S3, S42)。
+> **課金とキャッシュ**: 出力が出る前の拒否が課金されるかは、カテゴリで異なります。レート制限には必ず算入されます。フォールバックでモデルを切り替えると、プロンプトキャッシュと Fable 5.2 の思考が失われますが、**fallback credit** がキャッシュの切替コストを払い戻します。ただし、モデルを変えて再送するだけでは払い戻されません。サーバー側フォールバックと SDK ミドルウェアは credit を自動で扱いますが、raw HTTP の自前リトライでは、拒否される元のリクエストから fallback-credit-2026-07-01 ヘッダでオプトインし、拒否の stop_details に返る fallback_credit_token を再試行のリクエストに渡す必要があります [公式] (S3, S42)。
 
 ### 12.4 データ保持とプライバシー
 
