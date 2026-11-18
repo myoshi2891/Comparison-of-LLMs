@@ -129,7 +129,7 @@ result = client.decisions.create(
 | 型 | 挙動 | 対処 |
 | --- | --- | --- |
 | `noul` | 値は **0.01〜0.99** に収まり、0 や 1 にはならない | 閾値に `1.0` や `0.99` 超を使わない。0.9 / 0.1 などで判定 |
-| `choice` | 選択肢キーは **アルファベット順にソート** されてからスコアリングされる | 「該当なし」は `other` のように末尾に来る名前にする(`none_of_the_above` は先頭に来る) |
+| `choice` | 選択肢キーは **アルファベット順にソート** されてからスコアリングされる | 「該当なし」は `other` のように位置に意味を持たせない名前にする。ソート後の順序はほかのキー名で決まるため、末尾に来るとは限らない。順序に依存せず、説明文で「どれにも当てはまらない場合」と定義する |
 | `choice` | **該当なしでも必ず確率が選択肢に分配される** | `noul` でスコープ判定を併用するか、`confidence` で足切りする |
 | `score` | `score` は **ゼロ始まりのレベル番号の加重平均**(例: 段階が Clean = 0、Minor = 1、Major = 2 のとき、1.12 は「ほぼ Minor(2番目の段階)、少し Major」) | 最頻レベルは `probabilities` から取る |
 | 全型 | モデルは **質問キー名を見ない** | 質問の意味はすべて `instructions` に完全な文で書く |
@@ -403,6 +403,7 @@ sequenceDiagram
 
 ```python
 import httpx
+from google.adk.events import Event
 from google.genai import types
 
 from decisions_client import THRESHOLD, decide
@@ -434,8 +435,16 @@ GUARD = {
 
 
 def blocked(message: str) -> types.Content:
-    """拒否時にユーザーへ返す定型応答。セッションには保存しない。"""
+    """拒否時にユーザーへ返す定型応答の本文。セッションには保存しない。"""
     return types.Content(role="model", parts=[types.Part(text=message)])
+
+
+def rejection_event(content: types.Content) -> Event:
+    """許可時の run_async と同じ ADK の Event 型で拒否を返す。本文は event.content で読める。
+
+    SessionService.append_event を呼ばないため、セッション履歴には保存されない。
+    """
+    return Event(author="input_guardrail", content=content)
 
 
 async def screen_input(message: types.Content | None) -> types.Content | None:
@@ -477,7 +486,7 @@ async def screen_input(message: types.Content | None) -> types.Content | None:
 
 
 async def handle_user_message(runner, user_id: str, session_id: str, message: types.Content):
-    """許可したメッセージだけを Runner へ渡し、ADK のイベントを順に返す。
+    """許可したメッセージだけを Runner へ渡し、ADK の Event を順に返す(拒否時も Event)。
 
     拒否したメッセージでは run_async を呼ばないため、セッション履歴にも
     後続ターンの LLM リクエストにも含まれない。
@@ -487,7 +496,9 @@ async def handle_user_message(runner, user_id: str, session_id: str, message: ty
     snapshot = message.model_copy(deep=True)
     rejection = await screen_input(snapshot)
     if rejection is not None:
-        yield rejection  # 定型応答はアプリ側で表示し、セッションへは保存しない
+        # 許可時と同じ Event 型で返し、呼び出し側は event.content を同じ経路で表示できる。
+        # append_event を呼ばないため、定型応答はセッションへ保存されない。
+        yield rejection_event(rejection)
         return
     async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=snapshot):
         yield event

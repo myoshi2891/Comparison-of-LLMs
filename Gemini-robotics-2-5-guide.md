@@ -196,7 +196,7 @@ flowchart TD
 
 | 経路 | 使えるもの | 条件・注意 |
 |---|---|---|
-| 公開 API | **ER 2**(`gemini-robotics-er-2-preview` / `-streaming-preview`) | プレビュー。Gemini API キーが必要。制限なしの API キーは 403 になる ✅ |
+| 公開 API | **ER 2**(`gemini-robotics-er-2-preview` / `-streaming-preview`) | プレビュー。Gemini API キーが必要。制限なしの API キーは 403 になる ✅。従来の標準 API キーを使っている場合は、サービスアカウントに紐づく **auth key へ移行**する。既存の標準キーを Gemini API に制限するだけでは 2026年9月以降は使えなくなるため不十分([公式: auth key への移行](https://ai.google.dev/gemini-api/docs/api-key#migrate-to-auth-key)) |
 | 企業向け | Gemini Enterprise Agent Platform(ER 2 の private preview) | ✅ |
 | アーリーアクセス | **VLA / On-Device 2**(トラステッドテスターのフォーム経由) | 100 以上のトラステッドテスターと待機リストがあると記載 📰 |
 | パートナー | **GR 2.5** | Agile、Apptronik、Mercedes-Benz が名指しされている ✅ |
@@ -363,37 +363,41 @@ flowchart TD
 以下は公式の「pick and place」例(`move` と `setGripperState` の 2 関数)を土台に、**実行前の検証層**と**観測の返却**を足した例です。
 
 ```python
+import math
+
 from google import genai
 from google.genai import types
 
 client = genai.Client()
 
 # 例: 安全な作業領域。座標系はロボット基座標(単位 mm、原点はテーブル面上のロボット基部中心、
-# +x はロボットから見て右、+y はロボット基部からテーブル奥へ向かう方向)。
-# execute_on_robot も同じ座標系で解釈し、ER の正規化画像座標 [y, x](0〜1000)は事前にこの座標系へ変換する。
+# +x はロボットから見て右、+y はロボット基部からテーブル奥へ向かう方向)。execute_on_robot もこの座標系で解釈する。
+# モデルは画像しか見ていないため、基座標の mm を直接出力させない。move は ER の正規化画像座標 [y, x](0〜1000)
+# を受け取り、呼び出し側が用意したキャリブレーション済みの変換 image_to_base で基座標へ写してから実行する。
+# 変換できない点(未校正・カメラ姿勢の変化・テーブル面外など)は実行せず拒否する。
 WORKSPACE = {"x": (-400, 400), "y": (-400, 500)}
 MAX_STEPS = 15
 
 move_decl = types.FunctionDeclaration(
     name="move",
     description=(
-        "Moves the gripper to (x, y) in the robot base frame, in millimeters. "
-        "Origin (0, 0) is the center of the robot base on the table surface; "
-        "+x points to the robot's right and +y points from the base toward the far edge of the table. "
-        f"Allowed range: x {WORKSPACE['x'][0]}..{WORKSPACE['x'][1]}, y {WORKSPACE['y'][0]}..{WORKSPACE['y'][1]}. "
-        "Do not pass normalized 0-1000 image coordinates."
+        "Moves the gripper to the point shown at normalized image coordinates [y, x] (0-1000) "
+        "in the most recent camera image, where [0, 0] is the top-left corner. "
+        "The robot converts this point to its own base frame with a calibrated mapping; "
+        "points outside the calibrated area or the safe workspace are rejected. "
+        "Do not pass millimeters or robot-base coordinates."
     ),
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "x": types.Schema(type=types.Type.INTEGER, description="Millimeters; +x is the robot's right."),
-            "y": types.Schema(type=types.Type.INTEGER, description="Millimeters; +y is away from the robot base."),
+            "y": types.Schema(type=types.Type.INTEGER, description="Normalized image row, 0 (top) to 1000 (bottom)."),
+            "x": types.Schema(type=types.Type.INTEGER, description="Normalized image column, 0 (left) to 1000 (right)."),
             "high": types.Schema(
                 type=types.Type.BOOLEAN,
                 description="True: lift above the scene. False: table level.",
             ),
         },
-        required=["x", "y", "high"],
+        required=["y", "x", "high"],
     ),
 )
 gripper_decl = types.FunctionDeclaration(
@@ -410,7 +414,11 @@ ALLOWED_TOOLS = {decl.name for decl in tools.function_declarations}
 
 
 def validate(name: str, args: dict | None) -> str | None:
-    """問題があれば拒否理由を返し、なければ None を返す。モデルの外で必ず実行する。"""
+    """引数の形を検査し、問題があれば拒否理由を返す。モデルの外で必ず実行する。
+
+    move はここでは正規化画像座標の範囲だけを確かめる。基座標への写像はキャリブレーションの役割で、
+    この検査はその代わりにならない(作業領域の境界は変換後に to_robot_args で検査する)。
+    """
     if name not in ALLOWED_TOOLS:
         return f"{name} is not a declared tool"  # 宣言外の名前はロボット SDK へ渡さない
     if args is None:
@@ -418,19 +426,16 @@ def validate(name: str, args: dict | None) -> str | None:
     if not isinstance(args, dict):
         return "args must be a dict"
     if name == "move":
-        if set(args.keys()) != {"x", "y", "high"}:
-            return "move requires x, y, and high"
-        x, y, high = args["x"], args["y"], args["high"]
+        if set(args.keys()) != {"y", "x", "high"}:
+            return "move requires y, x, and high"
+        y, x, high = args["y"], args["x"], args["high"]
         if not isinstance(high, bool):
             return "high must be a boolean"
-        if isinstance(x, bool) or not isinstance(x, (int, float)):
-            return "x must be a number"
-        if isinstance(y, bool) or not isinstance(y, (int, float)):
-            return "y must be a number"
-        if not (WORKSPACE["x"][0] <= x <= WORKSPACE["x"][1]):
-            return f"x={x} is outside the allowed workspace"
-        if not (WORKSPACE["y"][0] <= y <= WORKSPACE["y"][1]):
-            return f"y={y} is outside the allowed workspace"
+        for label, v in (("y", y), ("x", x)):
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+                return f"{label} must be a finite number"
+            if not 0 <= v <= 1000:
+                return f"{label}={v} is outside normalized image coordinates 0..1000"
     elif name == "setGripperState":
         if set(args.keys()) != {"opened"}:
             return "setGripperState requires opened"
@@ -439,12 +444,30 @@ def validate(name: str, args: dict | None) -> str | None:
     return None
 
 
+def to_robot_args(name: str, args: dict, image_to_base) -> tuple[dict | None, str | None]:
+    """検証済みの引数を実行器の座標系(ロボット基座標 mm)へ変換し、作業領域を検査する。
+
+    image_to_base(y, x) は呼び出し側が用意する、校正済みのカメラ→ロボット変換
+    (ハンドアイキャリブレーションとテーブル面の高さから求める)。観測画像を撮ったカメラ姿勢に対して
+    校正が有効な場合だけ (x_mm, y_mm) を返し、変換できない場合は None を返す契約とする。
+    """
+    if name != "move":
+        return args, None
+    mapped = image_to_base(args["y"], args["x"])
+    if mapped is None:
+        return None, "no calibrated image-to-robot mapping for this point; the action was not executed"
+    x_mm, y_mm = mapped
+    if not (WORKSPACE["x"][0] <= x_mm <= WORKSPACE["x"][1] and WORKSPACE["y"][0] <= y_mm <= WORKSPACE["y"][1]):
+        return None, f"target ({x_mm:.0f} mm, {y_mm:.0f} mm) is outside the allowed workspace"
+    return {"x": x_mm, "y": y_mm, "high": args["high"]}, None
+
+
 def function_response_part(fc, payload: dict) -> types.Part:
     # 呼び出しの id を(None の場合も含め)そのまま返し、並列呼び出しと結果を対応付ける。
     return types.Part(function_response=types.FunctionResponse(id=fc.id, name=fc.name, response=payload))
 
 
-def run_task(contents: list, execute_on_robot, estop_active) -> str:
+def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> str:
     # 上限はモデル応答の数ではなく、関数呼び出し(動作)の数で数える。
     # 1 応答に複数の呼び出しが並んでも、合計 MAX_STEPS 回を超えて実行しない。
     actions = 0
@@ -485,6 +508,10 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
             actions += 1
             # fc.args は省略され得るため、dict へ変換する前に検証する(変換は検証成功後のみ)。
             reason = validate(fc.name, fc.args)
+            robot_args = None
+            if not reason:
+                # 画像由来の目標は、校正済みの変換で基座標へ写して境界を検査してからだけ実行器へ渡す
+                robot_args, reason = to_robot_args(fc.name, dict(fc.args), image_to_base)
             if reason:
                 payload = {"status": "rejected", "reason": reason}
             else:
@@ -494,7 +521,7 @@ def run_task(contents: list, execute_on_robot, estop_active) -> str:
                     return "aborted: emergency stop"
                 # 実行器は (構造化結果, 実行後の最新観測 JPEG のバイト列または None) を返す契約とする。
                 # 構造化結果は {"status": "ok" | "failed", ...} の JSON 互換 dict で、画像は含めない。
-                payload, image = execute_on_robot(fc.name, dict(fc.args))  # 検証済みのため dict である
+                payload, image = execute_on_robot(fc.name, robot_args)  # 基座標 mm へ変換・検査済み
                 # 実行した動作ごとに観測を置き換える。画像がなければ古い観測を消し、
                 # 後続の動作が一部動いて失敗した場合に、前の動作の画像で再計画させない。
                 observation = image
@@ -564,7 +591,7 @@ sequenceDiagram
 
 > **生成中に新しいプロンプトを送ると「割り込み」として扱われ、推論中のツール呼び出しが取り消されます。** タイマーだけでハートビートを送り続けると、モデルが取り消しループに陥り「反応しない」ように見えます。
 
-**対策**: 前のターンが `turn_complete` になるまで次のハートビートを送らない。公式の例では `asyncio.Event` で待機します。ハートビート以外にもプロンプトを送る経路がある場合は、下の例のように**全送信者で共有するターンゲート(`asyncio.Lock`)**を通し、生成中のターンへ割り込まないようにします。
+**対策**: 前のターンが `turn_complete` になるまで次のハートビートを送らない。公式の例では `asyncio.Event` で待機します。ハートビート以外にもプロンプトを送る経路がある場合は、下の例のように**全送信者で共有するターンゲート(`asyncio.Lock`)**を通し、生成中のターンへ割り込まないようにします。映像フレームを送る経路も、ハートビートを含めて**セッション全体で 1 つの送信間隔制御(`send_frame`)**を通し、1 FPS 上限を合計で守ります。完了を確認できないままタイムアウト・キャンセルしたセッションは、ゲートを離す前に使用不可とし、再接続などで復旧するまで送信を拒否します。
 
 ```python
 import asyncio
@@ -577,38 +604,70 @@ HEARTBEAT_TEXT = (
     "If the overall goal is achieved, call 'reset'."
 )
 
-async def heartbeat(session, camera, turn_gate: asyncio.Lock, turn_done: asyncio.Event,
-                    turn_timeout: float, interval: float = 1.0):
-    """受信側は turn_complete を受け取ったときに turn_done.set() を呼ぶ。
+class LiveSessionState:
+    """1 つの Live セッションを使うすべての送信者で共有する状態。
 
-    turn_gate はプロンプトを送るすべての送信者(ユーザー指示の転送などを含む)で共有するロック。
-    各送信者は送信前に取得し、そのターンの turn_complete を受け取るまで保持する。
-    これにより、他の送信者のターンが生成中の間はハートビートが割り込まない。
-    turn_timeout は 1 ターンの完了を待つ上限秒数(タスクの最長動作時間から決める)。
+    - turn_gate: プロンプト(テキスト・音声)を送る全送信者で共有するロック。各送信者は送信前に取得し、
+      そのターンの turn_complete を受け取るまで保持する。生成中のターンへ割り込まないため。
+    - send_frame: ハートビートを含むすべての映像送信者が通る唯一のフレーム送信経路。
+      1 FPS 上限をセッション全体で守る(送信者ごとに間隔を数えると合計で上限を超える)。
+    - usable: 完了を確認できないターンが残ったら False にする。再接続などの復旧で新しいセッションの
+      LiveSessionState を作り直すまで、すべての送信を拒否する。
+    受信側は turn_complete を受け取ったときに turn_done.set() を呼ぶ。
     """
-    loop = asyncio.get_running_loop()
-    interval = max(interval, 1.0)  # 1 FPS 上限を守るため、呼び出し側が 1 秒未満を渡しても 1 秒に丸める
-    last_sent = None
-    while True:
-        if last_sent is not None:
-            # 1 FPS 上限は、取得開始ではなく前のフレームを実際に送った時刻から数える
-            await asyncio.sleep(max(0.0, interval - (loop.time() - last_sent)))
-        # 進行中のターン(他の送信者のものを含む)が turn_complete になるまで待ってから送る。
-        # ゲートを保持している間だけ turn_done を消すので、生成中のターンの完了通知を消さない。
-        async with turn_gate:
-            frame = await camera.latest_jpeg()
-            turn_done.clear()    # 古い完了通知で次のハートビートへ進まないよう、送信前に消す
-            await session.send_realtime_input(
+
+    def __init__(self, session, min_frame_interval: float = 1.0):
+        self.session = session
+        self.turn_gate = asyncio.Lock()
+        self.turn_done = asyncio.Event()
+        self._frame_lock = asyncio.Lock()
+        # 1 FPS 上限を守るため、1 秒未満が渡されても 1 秒に丸める
+        self.min_frame_interval = max(min_frame_interval, 1.0)
+        self._last_frame_sent: float | None = None
+        self.usable = True
+
+    def ensure_usable(self) -> None:
+        if not self.usable:
+            raise RuntimeError("live session is unusable; recover or reconnect before sending")
+
+    async def send_frame(self, frame: bytes) -> None:
+        loop = asyncio.get_running_loop()
+        async with self._frame_lock:  # 全映像送信者で 1 つのタイムスタンプを共有して読み書きする
+            self.ensure_usable()
+            if self._last_frame_sent is not None:
+                # 間隔は取得開始ではなく、前のフレームを実際に送った時刻から数える
+                await asyncio.sleep(max(0.0, self.min_frame_interval - (loop.time() - self._last_frame_sent)))
+            self.ensure_usable()  # 待機中に使用不可になった場合は送らない
+            await self.session.send_realtime_input(
                 video=types.Blob(data=frame, mime_type="image/jpeg")
             )
-            last_sent = loop.time()
-            await session.send_realtime_input(text=HEARTBEAT_TEXT)
+            self._last_frame_sent = loop.time()
+
+
+async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
+    """turn_timeout は 1 ターンの完了を待つ上限秒数(タスクの最長動作時間から決める)。
+
+    フレームの送信間隔は state.send_frame が全送信者共通で守るため、ここでは数えない。
+    """
+    while True:
+        # 進行中のターン(他の送信者のものを含む)が turn_complete になるまで待ってから送る。
+        # ゲートを保持している間だけ turn_done を消すので、生成中のターンの完了通知を消さない。
+        async with state.turn_gate:
+            state.ensure_usable()  # 使用不可のセッションには送らない
+            frame = await camera.latest_jpeg()
+            state.turn_done.clear()    # 古い完了通知で次のハートビートへ進まないよう、送信前に消す
+            await state.send_frame(frame)
+            await state.session.send_realtime_input(text=HEARTBEAT_TEXT)
             try:
                 # いま送ったターンが終わるまでゲートを離さない。受信側の終了やセッション切断で
                 # turn_complete が届かない場合に無期限に止まらないよう、待機に上限を設ける。
-                await asyncio.wait_for(turn_done.wait(), timeout=turn_timeout)
-            except asyncio.TimeoutError:
-                # 完了を確認できないまま次のターンは送らない。呼び出し側で再接続・停止を判断する。
+                await asyncio.wait_for(state.turn_done.wait(), timeout=turn_timeout)
+            except (asyncio.TimeoutError, asyncio.CancelledError) as exc:
+                # 未完了のターンが残っている。ゲートを離す前に使用不可にし、待っていた他の送信者が
+                # 未完了のターンへ割り込めないようにする。復旧は呼び出し側の再接続・停止の経路で行う。
+                state.usable = False
+                if isinstance(exc, asyncio.CancelledError):
+                    raise
                 raise RuntimeError("turn_complete not received; stop heartbeat and recover the session") from None
 ```
 
@@ -880,7 +939,7 @@ def wilson_interval(successes: int, trials: int, z: float = 1.96) -> tuple[float
 1. **シャドーモード**: 最初はロボットを動かさず、ER の判断だけを記録して人間の作業と突き合わせる。
 2. **失敗動画を捨てない。** Argon の「失敗動画から原因を仮説化し、シミュレーションと実機で検証する」ループ(✅ 公式)を日常運用に組み込む。
 3. **バージョン固定と回帰テスト**: ER 1.6 の終了のように、プレビューのモデルは入れ替わります。✅ モデル ID を設定ファイルに外出しし、**固定のテストシナリオ**を CI に置く。
-4. **API キーを制限する**: 制限なしのキーは 403 になる。✅
+4. **API キーを auth key へ移行する**: 制限なしのキーは 403 になる。✅ 従来の標準キーは制限を付けても 2026年9月以降は使えなくなるため、サービスアカウントに紐づく auth key へ移行する。✅
 5. **コストの把握**: 動画入力や高い thinking は計算コストが増える。✅ 料金は公式の価格ページで確認する。
 
 ---
@@ -971,7 +1030,7 @@ def wilson_interval(successes: int, trials: int, z: float = 1.96) -> tuple[float
 ### 計画・アクセス
 - [ ] GR 2.5 のパートナーアクセスの有無を確認した(なければ ER 2 + 抽象化された VLA で設計)
 - [ ] ER 1.6 のモデル ID が残っていないことを確認した(2026-08-31 終了)
-- [ ] API キーに制限を設定した(制限なしは 403)
+- [ ] 標準 API キーを auth key へ移行した(制限なしは 403、制限付きの標準キーも 2026年9月以降は不可)
 
 ### 実装
 - [ ] ER の座標 `[y, x]`(0〜1000)の変換関数を 1 か所に集約し、画像上に描画して確認した

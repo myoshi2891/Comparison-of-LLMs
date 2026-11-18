@@ -427,7 +427,7 @@ flowchart TD
 | 6 | 状態を持つ会話は Interactions API の `store=true` + `previous_interaction_id` を検討 | 署名を含む状態をサーバー側で保持できる(第三者記事が公式を引用) |
 | 7 | 「無関係なファイルは変更しない」「変更ファイル一覧を最後に出す」をシステム指示に入れる | 差分レビューを容易にし、過剰変更を検知する(設計判断) |
 
-履歴を圧縮するときは、以前の資料を削って後続のthought signatureだけを保持すると会話prefixが変わり、既定の `prefix_mismatch_behavior="ERROR"` ではHTTP 400になり得ます。対応する `ThinkingConfig` の `prefix_mismatch_behavior="DROP"` (Interactions APIでは `generation_config.prefix_mismatch_behavior="drop"`)を使って不一致の署名を破棄させるか、サポートされる新規履歴へのリセットを行ってください。変更していない履歴では引き続き署名をそのまま保持します([公式Hydrogenガイド](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-hydrogen))。
+履歴を圧縮するときは、以前の資料を削って後続のthought signatureだけを保持すると会話prefixが変わり、署名の検証に失敗してHTTP 400になり得ます。圧縮が必要な場合は、**サポートされる新規履歴へのリセット**(要約などを新しいuserターンとして渡し、古い署名を持ち込まない)を使ってください。Agent Platformのドキュメントには不一致の署名を破棄させる `prefix_mismatch_behavior` の記載がありますが、Python `google-genai` の `ThinkingConfig` でこのフィールドを使えるリリースと使い方は本ガイドでは確認できていません。使う場合は、導入済みSDKの型定義(例: `types.ThinkingConfig.model_fields`)とリリースノートで対応を確認してからにしてください。変更していない履歴では引き続き署名をそのまま保持します([公式Hydrogenガイド](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/guides/gemini-4-hydrogen))。
 
 ```python
 # テキスト専用のマルチターン例: thought signature を含む履歴を丸ごと再送する
@@ -531,7 +531,7 @@ flowchart TD
 2. 表・グラフ中心の資料は、**抽出してほしい項目と単位を先に列挙**する
 3. 動画は「どの区間を見るか」を指定する。Googleは「特定フレームを検査するエージェント的動画理解」を強化したと説明。ただし区間の指定だけではエージェント的処理は有効にならず、動画入力は既定で静的処理になる。Interactions APIでは動画入力の `processing` を `agentic` に設定して初めてこの機能を使える(パラメータの表記は公式ドキュメントで確認)
 4. 出力は JSON スキーマで構造化し、**スキーマ検証→不一致だけ再質問**の自己修復ループにする
-5. 1Mトークンを使い切る前に、**不要資料を削る**(入力が多いほど課金と待ち時間が増える。出力と窓を共有する点も考慮)。会話prefixを変更する場合はStep 5の `prefix_mismatch_behavior="DROP"` または対応する履歴リセットを使い、変更前の署名だけを再利用しない
+5. 1Mトークンを使い切る前に、**不要資料を削る**(入力が多いほど課金と待ち時間が増える。出力と窓を共有する点も考慮)。会話prefixを変更する場合はStep 5の新規履歴へのリセットを使い、変更前の署名だけを再利用しない
 
 ---
 
