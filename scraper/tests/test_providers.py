@@ -540,6 +540,8 @@ class TestMoonshot:
     def test_standard_input_skips_cached_price(self):
         for html in (
             '<p>Kimi K3 cached input $0.25 input $3.25 output $16.50</p>',
+            # cached が価格なし（N/A）でも、後続の標準 input ラベルと価格を cached 扱いで飲み込まない。
+            '<p>Kimi K3 cached input N/A input $3.25 output $16.50</p>',
             '<dl><dt>Kimi K3</dt><dd>cached input $0.25</dd><dd>input $3.25</dd><dd>output $16.50</dd></dl>',
             # cached と input の間のインライン HTML も cached ラベルとして読み飛ばす。
             '<p>Kimi K3 <span>cached</span> input $0.25 input $3.25 output $16.50</p>',
