@@ -6,17 +6,17 @@
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
 
-## カード走査の全反復実行・モジュール書き込み順・Fable図の判断分岐等の追加レビュー20件（2026-11-19）
+## カード走査の全反復実行・モジュール書き込み順・Fable図の判断分岐等の追加レビュー22件（2026-11-19）
 
-- 20件すべてを現行コードで有効と確認して対応。監査・Moonshot・共有目次・Fable 5.2はRed／Greenで修正し、ガイドは文書修正、テスト強化はテストのみのコミットとした。
-- 監査: カード走査（`for (var i = 0; …)`）は、カードの束縛・payloadの読取・`mermaid.render`が全反復で実行される場合だけ認定する。`if (i === 0)`等の添字条件、`&&`・`||`・三項演算子、括弧なしの`if`、`else`ブロック、反復固有の値の`continue`は未解決。全カード共通のフラグ（`!mermaidReady`）と、選択済みscript・カード内に実在する要素のnullガード（`!host || !srcEl`）は維持し、Fable原本は引き続き認定される（判定を無効化するとFableの10図が未解決になることで感度を確認）。同期実行されるclassicの読取は非asyncのモジュールの書き込みより先に終わるため認定し、コールバック内・`await`後の読取とasyncモジュールは未解決。既存のテンプレートキー書き込みテストは、書き込みが先行し得るasyncモジュールへ変更して意図を維持。`script[type=text/plain]`（引用符なし）と引用符の不一致を拒否、直接の`document.querySelector`はカード解析後の実行を要求、`obj.if(`を制御構文の頭としない、`type`・`setAttribute('type')`等のscript種別の書き込みを構造的編集とする。`references/source-parity-audit.md`に終了コード1の2原因（内容の欠落・レンダラー解析の未解決）と対処を明記。Red 6件と既存1件の期待値更新。
+- 22件すべてを現行コードで有効と確認して対応。監査・Moonshot・共有目次・Fable 5.2はRed／Greenで修正し、ガイドは文書修正、テスト強化はテストのみのコミットとした。
+- 監査: カード走査（`for (var i = 0; …)`）は、カードの束縛・payloadの読取・`mermaid.render`が全反復で実行される場合だけ認定する。`if (i === 0)`等の添字条件、`&&`・`||`・三項演算子、括弧なしの`if`、`else`ブロック、反復固有の値の`continue`は未解決。ガードの条件にメンバー・添字参照（`state.ready`）を含む場合と、条件の変数がループ外の関数内で書き換えられる場合も、反復ごとに変わり得るため未解決（完了後の確認で検出し、Red 1件を追加）。全カード共通のフラグ（`!mermaidReady`）と、選択済みscript・カード内に実在する要素のnullガード（`!host || !srcEl`）は維持し、Fable原本は引き続き認定される（判定を無効化するとFableの10図が未解決になることで感度を確認）。同期実行されるclassicの読取は非asyncのモジュールの書き込みより先に終わるため認定し、コールバック内・`await`後の読取とasyncモジュールは未解決。既存のテンプレートキー書き込みテストは、書き込みが先行し得るasyncモジュールへ変更して意図を維持。`script[type=text/plain]`（引用符なし）と引用符の不一致を拒否、直接の`document.querySelector`はカード解析後の実行を要求、`obj.if(`を制御構文の頭としない、`type`・`setAttribute('type')`等のscript種別の書き込みを構造的編集とする。`references/source-parity-audit.md`に終了コード1の2原因（内容の欠落・レンダラー解析の未解決）と対処を明記。Red 7件と既存1件の期待値更新。`.claude/rules/tdd-mandatory-cycle.md`とSKILL.mdの終了コードの注記も2原因へ揃えた。
 - Moonshot: 標準inputの先読み（`_STD_INPUT_AHEAD`）がタグ属性内の`input`に一致し、batch行のoutputを標準outputとして拾っていた。完結したタグを丸ごと読み飛ばす分岐へ変更。完全なペアの回帰2件と後戻りの時間上限1件を追加し、既存のbatch行テストは維持。
 - 共有目次（DrawerTocObserver）: resize時にメニューのフォーカスを記録し、`update()`で選択を確定した後に現在のセクションの目次リンク（なければ先頭）へ移す。目次内のフォーカスは動かさない。解除後のTab keydownが既定動作を止めないことを解除テストで確認。
 - Fable 5.2: 図2はFable・ハイブリッド構成もevalsに合格した場合だけ「そのまま運用」へ進み、不合格は選定へ戻る。図8は継続の希望ではなく明示的な運用方針がある場合だけフォールバックし、未決定なら拒否のまま終端。概要は「フォールバックを明示的に有効にした場合に限り」と限定。図9とトラブル表は、追記のみ（今後の予防）と、既に無効なブロックの復旧（生成時のプレフィックスへ戻すか新しい会話）を区別。疎通確認は200に加え`stop_reason`が`end_turn`で`model`が要求モデルであることを確認。drop_blockの例は既存リクエストへ統合する`thinking`フィールドだけを示す。RATESは公式の倍率（5分書込1.25倍・1時間書込2倍・読取0.025倍、Batch・fastに重ねて適用）からbatch（$0.10／$5／$8）とfast（$0.40／$20／$32）のキャッシュ単価を追加し、Global API価格と明記、単価未設定モードの拒否は維持。モバイルの目次ボタンはTablerが読めなくてもページ内CSSで☰を描く（補正契約に1規則追加）。原本HTML／Markdown・JSX・source／structure／correction契約を同期。変更した2コードブロックのトークンは、同じブロック内の同一構文に対するhighlight.js 11.12.0の既存トークンを踏襲（SRI一致のビルドの実行は許可されなかった）。
 - カバレッジ: 目次テストの遅い区間を実測（全ページ内リンクごとの属性セレクター検索が1.5秒）し、収集済みIDのSetで照合。カバレッジ計測下で3.3秒→1.7秒。
 - registry: Homeの日付テストを固定日付ではなく価格スナップショットの`generated_at`と比較。
 - ガイド: Roboticsは`run_task`でSTOP以外の終了理由（MAX_TOKENS等）を、本文の返却・呼び出しの実行・履歴追加の前に中断。Carbonは呼び出しごとの承認ゲートでデータ削除と外部送信を可逆性によらず常に承認対象とする。Hydrogenは出力の上限をコンテキスト枠から最初の入力トークン数を引いた残りとし、残りがなければコンテキスト上限のエラーにする。
-- 検証: 監査150件（形式114・照合36）、Fable以外の61原本で原本側監査出力が修正前と同一（Fableは内容変更のため差分、未解決0）、FableのHTML原本監査exit 0、Fable対象98件、全体Vitest241 files／3098 tests（`--maxWorkers=1 --testTimeout=30000`）、型検査、変更パスのBiome、pytest159件＋39 subtests、FableとCarbonの図解析（29図）、Robotics・HydrogenのPythonコード例の構文解析、Fableの費用例の実行（1.63／3.26）が成功。Markdown lintは変更前後で同一（Fable既存34件・Robotics既存8件、他0件）。CIと同じ既定設定の`bun run test:coverage`もexit 0（全行96.71%）。ビルドは今回未実行（最後の成功は2026-11-14）。
+- 検証: 監査151件（形式115・照合36）、Fable以外の61原本で原本側監査出力が修正前と同一（Fableは内容変更のため差分、未解決0）、FableのHTML原本監査exit 0、Fable対象98件、全体Vitest241 files／3098 tests（`--maxWorkers=1 --testTimeout=30000`）、型検査、変更パスのBiome、pytest159件＋39 subtests、FableとCarbonの図解析（29図）、Robotics・HydrogenのPythonコード例の構文解析、Fableの費用例の実行（1.63／3.26）が成功。Markdown lintは変更前後で同一（Fable既存34件・Robotics既存8件、他0件）。CIと同じ既定設定の`bun run test:coverage`もexit 0（全行96.71%）。ビルドは今回未実行（最後の成功は2026-11-14）。
 
 ## 添字走査の所属時点・JS MIME・選択変更編集・Fable例の拒否既定等のレビュー27件（2026-11-19）
 

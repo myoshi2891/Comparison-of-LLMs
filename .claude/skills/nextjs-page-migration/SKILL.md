@@ -315,7 +315,7 @@ h2, h3 { scroll-margin-top: calc(var(--header-height, 60px) + 80px); }
 bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
   archive/html/<ベンダー>/<原本>.html \
   web-next/app/<provider>/<slug>/page.tsx
-echo "exit=$?"   # 0 でなければ移行漏れがある
+echo "exit=$?"   # 1 は移行漏れまたはレンダラー解析の未解決（source-parity-audit.md §1）
 ```
 
 漏れが出た場合の分類と対処は `references/source-parity-audit.md` §1 / §5 に従う。
