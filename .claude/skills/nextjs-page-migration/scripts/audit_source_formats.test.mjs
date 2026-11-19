@@ -1031,7 +1031,7 @@ test("checks payload textContent writes across separate module scopes", () => {
  const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
  const renderer = "const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent; mermaid.render('id', src);";
  const writer = "document.querySelector('#chart script').textContent = 'flowchart LR\\nX --> Y';";
- for (const [writerType, rendererType] of [['module', 'module'], ['module', ''], ['', 'module']]) {
+ for (const [writerType, rendererType] of [['module', 'module'], ['', 'module']]) {
   const tag = type => (type ? `<script type="${type}">` : '<script>');
   // 書き込み側にレンダラーがなくても、別スコープの読み取りに影響し得る。
   const source = `${card}${tag(writerType)}${writer}</script>${tag(rendererType)}${renderer}</script>`;
@@ -1039,6 +1039,8 @@ test("checks payload textContent writes across separate module scopes", () => {
   assert.equal(result.status, 1, source);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], source);
  }
+ // 同期実行される classic の読み取りは、解析完了後に動くモジュールの書き込みより先に終わる。
+ assert.equal(audit(`${card}<script type="module">${writer}</script><script>${renderer}</script>`, page).status, 0);
  // textContent を書き込まない別モジュールは認定を妨げない。
  assert.equal(audit(`${card}<script type="module">console.log('ready');</script><script type="module">${renderer}</script>`, page).status, 0);
 });
@@ -1576,4 +1578,119 @@ test("reports unresolved renderer analysis separately from missing content in th
  } finally {
   rmSync(dir, { recursive: true, force: true });
  }
+});
+
+test("certifies card loops only when the read and render run on every selected iteration", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('');
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)};`).join('\n') + charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join('');
+ const cards = "var ready = true; var cards = document.querySelectorAll('.diagram-card');";
+ const loop = 'for (var i = 0; i < cards.length; i++) {';
+ const pick = "var card = cards[i]; var srcEl = card.querySelector('script');";
+ const read = 'var src = srcEl.textContent;';
+ const render = "mermaid.render('x', src);";
+ for (const body of [
+  // 添字で限定した読み取り・描画は1枚目のpayloadしか処理しない。
+  `${pick} if (i === 0) { ${read} ${render} }`,
+  `${pick} ${read} if (i === 0) ${render}`,
+  `${pick} if (i === 0) ${read} ${render}`,
+  `${pick} ${read} i === 0 && ${render}`,
+  `${pick} ${read} i > 0 ? null : ${render}`,
+  `${pick} if (i > 0) continue; ${read} ${render}`,
+  `${pick} ${read} if (i > 0) { continue; } ${render}`,
+  // 反復ごとに変わる値の条件も、選択したpayloadを飛ばさないとは証明できない。
+  `${pick} var skip = i % 2; if (skip) continue; ${read} ${render}`,
+  `${pick} if (ready) { ${read} } else { ${read} } ${render}`,
+ ]) {
+  const result = audit(`${source}<script>${cards} ${loop} ${body} }</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1'], body);
+ }
+ // 全カード共通の条件と、選択済み要素・カード内に実在する要素のnullガードは読み飛ばさない（Fable原本の形）。
+ for (const body of [
+  `${pick} ${read} ${render}`,
+  `${pick} var host = card.querySelector('.diagram-wrap'); if (!host || !srcEl) continue; ${read} if (!ready) { continue; } try { ${render} } catch (e) {}`,
+  `${pick} if (ready) { ${read} ${render} }`,
+ ]) assert.equal(audit(`${source}<script>${cards} ${loop} ${body} }</script>`, page).status, 0, body);
+ // カード内に存在しない要素のガードは、そのカードを読み飛ばす。
+ const missing = audit(`${source}<script>${cards} ${loop} ${pick} var host = card.querySelector('.missing-host'); if (!host) continue; ${read} ${render} }</script>`, page);
+ assert.equal(missing.status, 1);
+});
+
+test("certifies a synchronous classic reader that runs before a deferred module writer", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const read = "const src = card.querySelector('script').textContent; mermaid.render('id', src);";
+ const writer = "<script type=\"module\">document.querySelector('#chart script').textContent = 'flowchart LR\\nX --> Y';</script>";
+ // モジュールは解析完了後に実行されるため、解析中に同期実行される classic の読み取りが先に終わる。
+ assert.equal(audit(`${card}${writer}<script>const card = document.querySelector('#chart'); ${read}</script>`, page).status, 0);
+ for (const [label, source] of [
+  ['callback', `${card}${writer}<script>const card = document.querySelector('#chart'); setTimeout(function () { ${read} });</script>`],
+  ['await', `${card}${writer}<script>const card = document.querySelector('#chart'); async function draw() { await 0; ${read} } draw();</script>`],
+  ['async module', `${card}${writer.replace('type="module"', 'type="module" async')}<script>const card = document.querySelector('#chart'); ${read}</script>`],
+ ]) {
+  const result = audit(source, page);
+  assert.equal(result.status, 1, label);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], label);
+ }
+});
+
+test("rejects unquoted or mismatched typed script selectors", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const use = selector => `${card}<script>const card = document.querySelector('#chart'); const src = card.querySelector(${selector}).textContent; mermaid.render('id', src);</script>`;
+ for (const selector of [`'script[type="text/plain"]'`, `"script[type='text/plain']"`, `'script'`]) assert.equal(audit(use(selector), page).status, 0, selector);
+ // 引用符なしの text/plain は不正なセレクターで、querySelector が例外を投げる。
+ for (const selector of [`'script[type=text/plain]'`, `"script[type='text/plain]"`]) {
+  const result = audit(use(selector), page);
+  assert.equal(result.status, 1, selector);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], selector);
+ }
+});
+
+test("requires a direct card query to run after the card is parsed", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const read = "<script>const src = card.querySelector('script').textContent; mermaid.render('id', src);</script>";
+ // カードより前の classic script での問い合わせは null を返す。
+ const early = audit(`<script>const card = document.querySelector('#chart');</script>${card}${read}`, page);
+ assert.equal(early.status, 1);
+ assert.deepEqual(early.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ assert.equal(audit(`${card}<script>const card = document.querySelector('#chart');</script>${read}`, page).status, 0);
+});
+
+test("does not treat member names such as obj.if as control heads", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef hub fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ const render = `const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);`;
+ // api.if(a) の後の / は除算。正規表現として後続の描画を隠さない。
+ assert.equal(audit(`${card}<script>const half = api.if(a) / 2; ${render} const third = 1 / 3;</script>`, page).status, 0);
+ assert.equal(audit(`${card}<script>if (ready) /x/.test(s); ${render}</script>`, page).status, 0);
+});
+
+test("treats writes that change a script type as structural edits for typed queries", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const read = `const src = card.querySelector('script[type="text/plain"]').textContent; mermaid.render('id', src);`;
+ for (const write of [
+  "card.querySelector('script').type = 'module';",
+  "card.querySelector('script').setAttribute('type', 'module');",
+  "card.querySelector('script').setAttribute(\"TYPE\", 'module');",
+  "card.querySelector('script').setAttribute(name, 'module');",
+  "card.querySelector('script').removeAttribute('type');",
+  "const first = card.querySelector('script'); first.toggleAttribute('type');",
+  "card.querySelector('script').setAttributeNS(null, 'type', 'module');",
+ ]) {
+  const result = audit(`${card}<script>const card = document.querySelector('#chart'); ${write} ${read}</script>`, page);
+  assert.equal(result.status, 1, write);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], write);
+ }
+ // 種別に関係しない属性の書き込みは選択を変えない。
+ assert.equal(audit(`${card}<script>const card = document.querySelector('#chart'); card.querySelector('script').setAttribute('data-x', '1'); ${read}</script>`, page).status, 0);
 });
