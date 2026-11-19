@@ -10,6 +10,8 @@ AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Pyt
 
 ## アーキテクチャ
 
+2026-11-19追加レビュー20件: 原本監査はカード走査で読取・描画が全反復で実行される場合だけ認定し（添字条件・反復固有のcontinueは未解決、全カード共通の条件と実在要素のnullガードは維持）、同期classicの読取は非asyncモジュールの書き込みより先と扱う。型付きセレクターの引用符一致、直接問い合わせのカード解析後、`obj.if(`の非制御頭、script種別の書き込みを追加。終了コード1の2原因を文書化。Moonshotの標準input先読みはタグ全体を読み飛ばす。共有目次はresize時に現在の目次リンクへフォーカスを移す。Fable 5.2は図2・8・9、疎通確認、drop_block、batch／fastのキャッシュ単価（Global API）、目次アイコンを修正（原本・JSX・契約を同期）。Robotics・Carbon・Hydrogenを訂正。監査150件・Fable以外の61原本の監査結果不変・全体241 files／3098 tests・pytest159件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
+
 2026-11-19レビュー27件: 原本監査はquerySelectorAllの初期化より後に解析されるカードを添字走査で認定せず、JavaScript MIME typeを全て扱い、選択scriptを変え得る編集・render引数のスプレッドを未解決とし、CLIで未解決解析を欠落と区別。Moonshotはcached探索の指数的後戻りを解消。Fable 5.2はmax_tokensで履歴へ追加せず、browser失敗を別追跡、拒否を既定、sweepはend_turnのみ合格、キャッシュnullを0（原本・JSX・契約・トークンを同期）。共有目次はデスクトップ化時にメニューのフォーカスを目次へ移す。Next.jsの差し戻しは依存変更のため確認待ち。監査144件・原本62件の監査結果不変・全体240 files／3088 tests・pytest156件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-18再追加レビュー15件: 原本監査はpayloadを読むscript自体の位置で読取時点を判定し、エスケープ識別子を未解決とし、template内の要素を文書セレクターに数えない。Moonshotはcache-hit inputを後戻りで分割しない。Fable 5.2のagent_loopは(toolset_name, name)で振り分ける（原本・JSX・契約・トークンを同期）。Carbon・Hydrogen・Decisions・Roboticsの手順とコード例を訂正。bun auditは確認待ち。監査135件・原本66件の監査結果不変・全体240 files／3082 tests・pytest152件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
@@ -683,7 +685,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3088 tests pass、2026-11-19レビュー27件修正後の実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（241 files / 3098 tests pass、2026-11-19レビュー追加20件修正後の実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
