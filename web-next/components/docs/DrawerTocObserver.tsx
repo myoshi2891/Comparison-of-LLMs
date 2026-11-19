@@ -99,11 +99,14 @@ export default function DrawerTocObserver({
       }
     };
     const resize = () => {
+      const menuHadFocus = document.activeElement === menu;
       sync(window.innerWidth <= 900 && Boolean(root?.classList.contains(styles.open)));
-      // デスクトップ幅ではメニューボタンが非表示になる。そこに残ったフォーカスを見える先頭の目次リンクへ移す
-      // （sync で目次の inert を解除した後に移す）。
-      if (window.innerWidth > 900 && document.activeElement === menu) links[0]?.focus();
       update();
+      // デスクトップ幅ではメニューボタンが非表示になる。そこに残ったフォーカスを、現在のセクションの
+      // 目次リンク（無ければ先頭）へ移す。sync で inert を解除し、update で選択を確定した後に移す。
+      // メニュー以外（目次内など）にあるフォーカスは動かさない。
+      if (window.innerWidth > 900 && menuHadFocus)
+        (links.find((a) => a.getAttribute("aria-current") === "location") ?? links[0])?.focus();
     };
     // 原本と同じUL単位で集計し、進捗DOMもそのリスト直前の表示へ限定する。
     const disposeChecklists = Array.from(
