@@ -496,10 +496,14 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
                 return f"aborted: prompt blocked ({feedback.block_reason})"
             reason = candidate.finish_reason if candidate is not None else "no candidate"
             return f"aborted: no usable candidate ({reason})"
+        # STOP 以外(MAX_TOKENS・SAFETY 等)で止まった応答は、本文が途中で切れているか呼び出しが欠けている可能性がある。
+        # 完了として本文を返さず、呼び出しも実行せず、履歴にも追加せずに中断する。STOP の応答だけを先へ進める。
+        if candidate.finish_reason != types.FinishReason.STOP:
+            return f"aborted: incomplete response ({candidate.finish_reason})"
         contents.append(candidate.content)
         calls = [p for p in candidate.content.parts if p.function_call]
         if not calls:
-            return response.text  # モデルが関数を呼ばなくなったら完了
+            return response.text  # STOP で終わり、関数を呼ばなくなったら完了
         results, observation, skip_reason, limit_reached = [], None, None, False
         estopped, moved, executed, executor_error, mapping_error = False, False, False, None, None
         for part in calls:

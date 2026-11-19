@@ -349,8 +349,15 @@ def translate(client, text):
     return client.v1.complete(prompt="Translate to Japanese: " + text).text
 '''
 
-MAX_OUTPUT_CEILING = 1_048_576  # 引き上げの上限(コンテキスト枠)。予算に合わせて小さくしてよい
-max_output_tokens = 262144
+CONTEXT_WINDOW = 1_048_576  # コンテキスト枠(入力と出力の合計)
+prompt = f"次のモジュール群をv1.complete(prompt)からv2.responses.create(input)へ移行する差分をすべて出力して\n\n{repository_code}"
+
+# 出力に使える上限は「コンテキスト枠 − 最初の入力トークン数」。枠全体を出力の上限にしない。
+input_tokens = client.models.count_tokens(model="gemini-4-hydrogen", contents=prompt).total_tokens
+MAX_OUTPUT_CEILING = CONTEXT_WINDOW - input_tokens  # 引き上げの上限。予算に合わせて小さくしてよい
+if MAX_OUTPUT_CEILING <= 0:
+    raise RuntimeError(f"Context limit exceeded: input uses {input_tokens} of {CONTEXT_WINDOW} tokens")
+max_output_tokens = min(262144, MAX_OUTPUT_CEILING)
 
 
 def model_text(interaction) -> str:
@@ -365,7 +372,7 @@ def model_text(interaction) -> str:
 
 interaction = client.interactions.create(
     model="gemini-4-hydrogen",
-    input=f"次のモジュール群をv1.complete(prompt)からv2.responses.create(input)へ移行する差分をすべて出力して\n\n{repository_code}",
+    input=prompt,
     background=True,   # サーバー側継続を選択。フォアグラウンドのクライアント側継続も可能
     store=True,
     generation_config={"max_output_tokens": max_output_tokens, "thinking_level": "high"},
@@ -412,7 +419,7 @@ text = "".join(parts)
 print(text)  # 生成された差分を表示する
 ```
 
-[公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。`incomplete`(出力上限での停止など)は失敗扱いで捨てず、途中までの出力を保持したうえで、そのinteractionのIDと `continuation_token` を使い、`max_output_tokens` を引き上げて同じジョブを継続します。継続トークンがない場合や上限まで引き上げても終わらない場合は、未完了として例外にします(継続の引数名・`max_output_tokens` が累積の上限として扱われるかは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)で確認してください)。
+[公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。`incomplete`(出力上限での停止など)は失敗扱いで捨てず、途中までの出力を保持したうえで、そのinteractionのIDと `continuation_token` を使い、`max_output_tokens` を引き上げて同じジョブを継続します。引き上げの上限は1Mのコンテキスト枠そのものではなく、枠から最初の入力トークン数を引いた残りです。残りがない場合は生成を始めずにコンテキスト上限のエラーにします。継続トークンがない場合や上限まで引き上げても終わらない場合は、未完了として例外にします(継続の引数名・`max_output_tokens` が累積の上限として扱われるかは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)で確認してください)。
 
 ポーリング中にプロセスが落ちたり `interactions.get` が失敗したりしても、`create` をやり直すと**別のジョブ**が始まり、課金も二重になります。継続するたびに、**各hopの `interaction_id` と、そのhopで受け取ったテキスト**を順序付きで永続化しておいてください。最新のinteractionが前のhopの出力を含むとは限らないため、復旧時は保存済みの前hopまでのテキストを `parts` に戻し、保存しておいた最新の `interaction_id` で `client.interactions.get(id=interaction_id)` から状態確認を再開して、そのhop以降の出力だけを追記します(継続時に前hopの出力がどう返るかは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)で確認してください)。不要になったジョブは、同じIDに対してAPIリファレンスのキャンセル操作を使って止めます(メソッド名・対応SDKバージョンは[Interactions APIリファレンス](https://ai.google.dev/api/interactions-api)で確認)。
 
