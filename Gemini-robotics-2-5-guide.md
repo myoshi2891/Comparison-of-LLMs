@@ -247,18 +247,22 @@ The points are in [y, x] format normalized to 0-1000.
 
 def ask_points(image_path: str, thinking_level: str = "medium") -> list[dict]:
     uploaded = client.files.upload(file=image_path)
-    response = client.models.generate_content(
-        model="gemini-robotics-er-2-preview",
-        contents=[
-            types.Part.from_uri(
-                file_uri=uploaded.uri, mime_type=uploaded.mime_type
+    try:
+        response = client.models.generate_content(
+            model="gemini-robotics-er-2-preview",
+            contents=[
+                types.Part.from_uri(
+                    file_uri=uploaded.uri, mime_type=uploaded.mime_type
+                ),
+                PROMPT,
+            ],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level=thinking_level)
             ),
-            PROMPT,
-        ],
-        config=types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(thinking_level=thinking_level)
-        ),
-    )
+        )
+    finally:
+        # 失敗時も含め、アップロードしたカメラ画像をFile APIに残さない
+        client.files.delete(name=uploaded.name)
     return parse_json_array(response.text)
 
 FENCE = "`" * 3  # Markdown のコードフェンス(バッククォート 3 つ)
@@ -618,10 +622,11 @@ sequenceDiagram
 
 > **生成中に新しいプロンプトを送ると「割り込み」として扱われ、推論中のツール呼び出しが取り消されます。** タイマーだけでハートビートを送り続けると、モデルが取り消しループに陥り「反応しない」ように見えます。
 
-**対策**: 前のターンが `turn_complete` になるまで次のハートビートを送らない。公式の例では `asyncio.Event` で待機します。ハートビート以外にもプロンプトを送る経路がある場合は、下の例のように**全送信者で共有するターンゲート(`asyncio.Lock`)**を通し、生成中のターンへ割り込まないようにします。映像フレームを送る経路も、ハートビートを含めて**セッション全体で 1 つの送信間隔制御(`send_frame`)**を通し、1 FPS 上限を合計で守ります。完了を確認できないままタイムアウト・キャンセルしたセッションは、ゲートを離す前に使用不可とし、再接続などで復旧するまで送信を拒否します。
+**対策**: 前のターンが `turn_complete` になるまで次のハートビートを送らない。公式の例では `asyncio.Event` で待機します。ハートビート以外にもプロンプトを送る経路がある場合は、下の例のように**全送信者で共有するターンゲート(`asyncio.Lock`)**を通し、生成中のターンへ割り込まないようにします。映像フレームを送る経路も、ハートビートを含めて**セッション全体で 1 つの送信間隔制御(`send_frame`)**を通し、1 FPS 上限を合計で守ります。フレームは送信枠と間隔待ちを済ませてから取得し、待機中に他の送信者が新しいフレームを送った後で古いフレームを送らないようにします。完了を確認できないままタイムアウト・キャンセルしたセッションは、ゲートを離す前に使用不可とし、再接続などで復旧するまで送信を拒否します。
 
 ```python
 import asyncio
+from collections.abc import Awaitable, Callable
 from google.genai import types
 
 HEARTBEAT_TEXT = (
@@ -638,6 +643,7 @@ class LiveSessionState:
       そのターンの turn_complete を受け取るまで保持する。生成中のターンへ割り込まないため。
     - send_frame: ハートビートを含むすべての映像送信者が通る唯一のフレーム送信経路。
       1 FPS 上限をセッション全体で守る(送信者ごとに間隔を数えると合計で上限を超える)。
+      フレームは送信枠と間隔待ちの後に capture() で取得し、待機中に古くなったフレームを送らない。
     - usable: 完了を確認できないターンが残ったら False にする。再接続などの復旧で新しいセッションの
       LiveSessionState を作り直すまで、すべての送信を拒否する。
     受信側は turn_complete を受け取ったときに turn_done.set() を呼ぶ。
@@ -657,7 +663,7 @@ class LiveSessionState:
         if not self.usable:
             raise RuntimeError("live session is unusable; recover or reconnect before sending")
 
-    async def send_frame(self, frame: bytes) -> None:
+    async def send_frame(self, capture: Callable[[], Awaitable[bytes]]) -> None:
         loop = asyncio.get_running_loop()
         async with self._frame_lock:  # 全映像送信者で 1 つのタイムスタンプを共有して読み書きする
             self.ensure_usable()
@@ -665,6 +671,10 @@ class LiveSessionState:
                 # 間隔は取得開始ではなく、前のフレームを実際に送った時刻から数える
                 await asyncio.sleep(max(0.0, self.min_frame_interval - (loop.time() - self._last_frame_sent)))
             self.ensure_usable()  # 待機中に使用不可になった場合は送らない
+            # 送信枠を確保してから最新フレームを取る。先に取得すると、枠を待つ間に
+            # 他の送信者が新しいフレームを送り、その後へ古いフレームを送ってしまう。
+            frame = await capture()
+            self.ensure_usable()  # 取得中に使用不可になった場合も送らない
             await self.session.send_realtime_input(
                 video=types.Blob(data=frame, mime_type="image/jpeg")
             )
@@ -681,9 +691,9 @@ async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
         # ゲートを保持している間だけ turn_done を消すので、生成中のターンの完了通知を消さない。
         async with state.turn_gate:
             state.ensure_usable()  # 使用不可のセッションには送らない
-            frame = await camera.latest_jpeg()
             state.turn_done.clear()    # 古い完了通知で次のハートビートへ進まないよう、送信前に消す
-            await state.send_frame(frame)
+            # フレームは send_frame が送信枠を確保した後に取得する(待機中に古くならない)
+            await state.send_frame(camera.latest_jpeg)
             await state.session.send_realtime_input(text=HEARTBEAT_TEXT)
             try:
                 # いま送ったターンが終わるまでゲートを離さない。受信側の終了やセッション切断で

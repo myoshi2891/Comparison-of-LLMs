@@ -318,7 +318,7 @@ flowchart TD
     MODE -- "フォアグラウンド またはステートレス" --> FG["Interactions SDKの自動継続 または continuation_token の自前ループ"]
     MODE -- "GenerateContent" --> GC["対応SDKの自動継続 またはRESTの継続ループ"]
     F --> G["ステータスをポーリング in_progress queued の間待機"]
-    G --> H["completed を確認して output_text を取得 失敗や不完全終了は例外"]
+    G --> H["completed を確認して output_text を取得<br/>incomplete は continuation_token があれば途中出力を保持し上限を上げて継続 なければ例外<br/>failed と cancelled は例外"]
     FG --> FGM{"継続方式は何か"}
     FGM -- "SDKの自動継続" --> AUTO["interactions.create が返す統合済みの出力とusageをそのまま使う 最終hopをidで再取得しない getは最後のhopの出力しか返さない"]
     AUTO --> AINT{"自動継続の途中で ContinuationInterruptedError が送出されたか"}
@@ -349,42 +349,70 @@ def translate(client, text):
     return client.v1.complete(prompt="Translate to Japanese: " + text).text
 '''
 
+MAX_OUTPUT_CEILING = 1_048_576  # 引き上げの上限(コンテキスト枠)。予算に合わせて小さくしてよい
+max_output_tokens = 262144
+
+
+def model_text(interaction) -> str:
+    return "".join(
+        content.text
+        for step in (interaction.steps or [])
+        if step.type == "model_output"
+        for content in (step.content or [])
+        if content.type == "text" and content.text is not None
+    )
+
+
 interaction = client.interactions.create(
     model="gemini-4-hydrogen",
     input=f"次のモジュール群をv1.complete(prompt)からv2.responses.create(input)へ移行する差分をすべて出力して\n\n{repository_code}",
     background=True,   # サーバー側継続を選択。フォアグラウンドのクライアント側継続も可能
     store=True,
-    generation_config={"max_output_tokens": 262144, "thinking_level": "high"},
+    generation_config={"max_output_tokens": max_output_tokens, "thinking_level": "high"},
 )
+parts: list[str] = []  # incomplete で止まった区間の出力も含め、順に保持する
 
-# ポーリング前にIDを保存する。get が失敗・中断しても、同じジョブを再開・取り消しできる。
-interaction_id = interaction.id
-print(f"interaction id: {interaction_id}")  # 実運用ではジョブ管理のDB等へ保存する
+while True:
+    # ポーリング前にIDを保存する。get が失敗・中断しても、同じジョブを再開・取り消しできる。
+    interaction_id = interaction.id
+    print(f"interaction id: {interaction_id}")  # 実運用ではジョブ管理のDB等へ保存する
 
-while interaction.status in ("in_progress", "queued"):
-    time.sleep(5)
-    interaction = client.interactions.get(id=interaction_id)
+    while interaction.status in ("in_progress", "queued"):
+        time.sleep(5)
+        interaction = client.interactions.get(id=interaction_id)
 
-if interaction.status == "failed":
-    raise RuntimeError(f"Interaction failed: {interaction.id}")
-if interaction.status == "cancelled":
-    raise RuntimeError(f"Interaction cancelled: {interaction.id}")
-if interaction.status == "incomplete":
-    raise RuntimeError(f"Interaction incomplete; review limits before retrying: {interaction.id}")
-if interaction.status != "completed":
-    raise RuntimeError(f"Unexpected interaction status: {interaction.status}")
+    if interaction.status == "failed":
+        raise RuntimeError(f"Interaction failed: {interaction.id}")
+    if interaction.status == "cancelled":
+        raise RuntimeError(f"Interaction cancelled: {interaction.id}")
+    if interaction.status == "incomplete":
+        # 出力上限で止まった場合、継続トークンがあれば最初からやり直さずに同じジョブを続ける。
+        token = getattr(interaction, "continuation_token", None)
+        if token is None or max_output_tokens >= MAX_OUTPUT_CEILING:
+            raise RuntimeError(f"Interaction incomplete and cannot be resumed: {interaction.id}")
+        # 途中までの出力は捨てずに保持する。継続したinteractionの steps に前hopの出力も
+        # 含まれるかは公式資料で確認し、含まれる場合は重複して結合しないよう調整する。
+        parts.append(model_text(interaction))
+        max_output_tokens = min(max_output_tokens * 2, MAX_OUTPUT_CEILING)  # hopをまたいだ累積の上限として引き上げる
+        interaction = client.interactions.create(
+            model="gemini-4-hydrogen",
+            previous_interaction_id=interaction_id,  # store=True のため元の入力は再送しない
+            continuation_token=token,
+            background=True,
+            store=True,
+            generation_config={"max_output_tokens": max_output_tokens, "thinking_level": "high"},
+        )
+        continue
+    if interaction.status != "completed":
+        raise RuntimeError(f"Unexpected interaction status: {interaction.status}")
+    parts.append(model_text(interaction))
+    break
 
-text = "".join(
-    content.text
-    for step in (interaction.steps or [])
-    if step.type == "model_output"
-    for content in (step.content or [])
-    if content.type == "text" and content.text is not None
-)
+text = "".join(parts)
 print(text)  # 生成された差分を表示する
 ```
 
-[公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。
+[公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。`incomplete`(出力上限での停止など)は失敗扱いで捨てず、途中までの出力を保持したうえで、そのinteractionのIDと `continuation_token` を使い、`max_output_tokens` を引き上げて同じジョブを継続します。継続トークンがない場合や上限まで引き上げても終わらない場合は、未完了として例外にします(継続の引数名・`max_output_tokens` が累積の上限として扱われるかは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)で確認してください)。
 
 ポーリング中にプロセスが落ちたり `interactions.get` が失敗したりしても、`create` をやり直すと**別のジョブ**が始まり、課金も二重になります。保存しておいた `interaction_id` で `client.interactions.get(id=interaction_id)` から状態確認を再開してください。不要になったジョブは、同じIDに対してAPIリファレンスのキャンセル操作を使って止めます(メソッド名・対応SDKバージョンは[Interactions APIリファレンス](https://ai.google.dev/api/interactions-api)で確認)。
 
