@@ -2,9 +2,20 @@
 
 > 本ファイルは Next.js 移行完了後の保守・改善フェーズにおける開発の進捗（特にテスト関連）および品質チェックのルールを記録する。
 >
-> - 最終更新日: **Updated 2026-11-18**
+> - 最終更新日: **Updated 2026-11-19**
 > - 過去の移行進捗・旧ルール: [`docs/archive/MIGRATION_PROGRESS.md`](archive/MIGRATION_PROGRESS.md)
 > - 移行計画アーカイブ: [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](archive/NEXTJS_PHASE_A_F_PLAN.md)
+
+## 添字走査の所属時点・JS MIME・選択変更編集・Fable例の拒否既定等のレビュー27件（2026-11-19）
+
+- 27件のうち26件を有効と確認して対応。監査・Moonshot・Fable・共有目次はRed／Greenで修正し、ガイドは文書修正としてコミットした。
+- 監査: `querySelectorAll`の静的リストは初期化時点の文書だけを含むため、classic scriptの初期化より後に解析されるカードは添字走査で認定しない（先行するカードは認定を継続）。classic scriptの判定をHTML標準のJavaScript MIME type（`application/x-javascript`等）へ拡張。選択中のscriptの削除・置換やカード要素の`innerHTML`・`prepend`等、選択されるscriptを変え得る編集はtextContent読取を未解決とする（描画先の差し替えと末尾追加は認定を維持）。`mermaid.render`の先頭2引数のスプレッドは未解決。CLIは未解決の解析を内容の欠落と分けて案内する。初期化順テストのアロー関数をブロック本体へ直し、対照を追加。Red 5件を追加。
+- Moonshot: cached価格探索の通常文字分岐がインラインタグの開始を読めたため、N/Aと連続タグで指数的に後戻りしていた（タグ24個で28秒）。通常文字分岐からインラインタグの開始を除外。回帰1件を追加。
+- Fable 5.2: agent_loopはmax_tokensで履歴へ追加する前に返し、checkpointを直前の完了バッチに保つ。computerとbrowserの失敗をツールセット別に追跡。handle_responseは拒否を既定とし、ハンドラー外で承認した移行先だけ再試行。sweepはend_turnかつ判定関数が受理した応答だけを合格にする。usd／estimate_usdはキャッシュ件数のnullを0とする。原本HTML／Markdown・JSX・source／structure契約・highlight.jsトークンを同期（トークンは原本のSRIと一致するhighlight.js 11.12.0で再生成し、変更前の4ブロックで往復一致を確認）。例のPythonは`-E`で実行。全ページ内フラグメントリンクの解決を検証し、確認日は形式だけを検証。
+- 共有目次（DrawerTocObserver）: メニューにフォーカスがある状態でデスクトップ幅へ広げると、非表示のメニューから先頭の目次リンクへ移す。unmount時にメニューのaria状態を閉へ戻す（強化した解除テストで検出）。
+- ガイド: Carbonは金銭操作を常に呼び出しごとの承認対象にし、64K未満のストリーミングは通常のストリーミングAPI、バックグラウンドのin_progress／queuedはポーリング、表示は思考でないtextだけ、再開時のusageは累積値として置き換え。Hydrogenはhopごとのinteraction IDとテキストを永続化して復旧。DecisionsはPython 3.11以上を両環境の前提に追加。Roboticsは動作数をタスク状態に保持、座標変換の例外をuncertainとして記録し残りをskipped、ハートビートの送信をtry内へ移動。
+- スキップ: `web-next/package.json`のNext.js 16.4.5→16.4.2の差し戻しは、ユーザーの意図的な依存更新コミット（`5bd50c0c`）を戻す依存変更のため、確認待ちとして実施しない。
+- 検証: 監査144件（形式108・照合36）、archiveのHTML原本62件で原本側監査出力が修正前と同一、FableのHTML原本監査exit 0、Fable対象89件、全体Vitest240 files／3088 tests（`--maxWorkers=1 --testTimeout=30000`）、型検査、変更パスのBiome、pytest156件＋39 subtests、RoboticsのPythonコード例の構文解析が成功。ビルドは今回未実行（最後の成功は2026-11-14）。
 
 ## 読取scriptの特定・エスケープ識別子・名前空間付き振り分け等のレビュー15件（2026-11-18 再追加）
 

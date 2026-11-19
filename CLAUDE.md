@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-18
+Updated 2026-11-19
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+2026-11-19レビュー27件: 原本監査はquerySelectorAllの初期化より後に解析されるカードを添字走査で認定せず、JavaScript MIME typeを全て扱い、選択scriptを変え得る編集・render引数のスプレッドを未解決とし、CLIで未解決解析を欠落と区別。Moonshotはcached探索の指数的後戻りを解消。Fable 5.2はmax_tokensで履歴へ追加せず、browser失敗を別追跡、拒否を既定、sweepはend_turnのみ合格、キャッシュnullを0（原本・JSX・契約・トークンを同期）。共有目次はデスクトップ化時にメニューのフォーカスを目次へ移す。Next.jsの差し戻しは依存変更のため確認待ち。監査144件・原本62件の監査結果不変・全体240 files／3088 tests・pytest156件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
 
 2026-11-18再追加レビュー15件: 原本監査はpayloadを読むscript自体の位置で読取時点を判定し、エスケープ識別子を未解決とし、template内の要素を文書セレクターに数えない。Moonshotはcache-hit inputを後戻りで分割しない。Fable 5.2のagent_loopは(toolset_name, name)で振り分ける（原本・JSX・契約・トークンを同期）。Carbon・Hydrogen・Decisions・Roboticsの手順とコード例を訂正。bun auditは確認待ち。監査135件・原本66件の監査結果不変・全体240 files／3082 tests・pytest152件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
 
@@ -681,7 +683,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（240 files / 3082 tests pass、2026-11-18再追加レビュー15件修正後の実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（240 files / 3088 tests pass、2026-11-19レビュー27件修正後の実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功
