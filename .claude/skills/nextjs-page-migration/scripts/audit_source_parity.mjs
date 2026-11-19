@@ -1334,14 +1334,17 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (!(position > open && position < close)) return false;
       // Same for every card: no index, no per-iteration binding or write, no call or assignment.
       const uniform = condition => {
-        if (/[()=]|\+\+|--/.test(condition.replace(/[!=]==?|[<>]=/g, " "))) return false;
+        // Member/index reads (state.ready, flags[0]) can change without a write to the binding.
+        if (/[()=.[\]]|\+\+|--/.test(condition.replace(/[!=]==?|[<>]=/g, " "))) return false;
         return Array.from(condition.matchAll(/(?<![\w$.])[A-Za-z_$][\w$]*/g)).every(name => {
           const id = name[0];
           if (/^(?:true|false|null|undefined|typeof|void|in|instanceof)$/.test(id)) return true;
           if (id === indexName) return false;
           if (Array.from(executable.matchAll(new RegExp(`\\b(?:var|let|const)\\s+${id.replace(/\$/g, "\\$")}(?![\\w$])`, "g")))
             .some(declaration => declaration.index > open && declaration.index < close)) return false;
-          return !Array.from(writeIndexes(id)).some(write => write > open && write < close);
+          // A write inside any function may run from the loop body through a call.
+          return !Array.from(writeIndexes(id)).some(write => (write > open && write < close) ||
+            functions.some(fn => fn.body < write && write < fn.end && !(fn.body < open && close < fn.end)));
         });
       };
       // An element binding that the selected card is proven to contain, so `!name` is false.
