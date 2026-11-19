@@ -1291,9 +1291,12 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     }
     // Only follow a selected card's text/plain script, optionally through an alias.
     const query = /^(\w+)\.querySelector\(\s*(['"])(.*?)\2\s*\)$/;
+    // Bindings whose subtree a script query searches; edits to them can change the selection.
+    const cardOwners = new Set();
     const scriptElement = (value, at = before) => {
       const selected = query.exec(value);
       if (!selected || !/^script(?:\[type=['"]?text\/plain['"]?\])?$/.test(selected[3])) return false;
+      cardOwners.add(selected[1]);
       if (!(selected[3] === "script" ? selectedScript.any : selectedScript.plain)) return false;
       // A classic script that runs before the payload is parsed reads nothing: unresolved.
       if (!selectedScript.availableAt(at)) return false;
@@ -1302,10 +1305,14 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
       if (direct) return selectedScript.unique(direct[2]);
       const indexed = owner && /^(\w+)\[(\w+)\]$/.exec(owner);
-      const collection = indexed && binding(indexed[1], ownerBinding.at);
+      const collectionBinding = indexed && bindingAt(indexed[1], ownerBinding.at);
+      const collection = collectionBinding?.value;
       const all = collection && /^document\.querySelectorAll\(\s*(['"])(.*?)\1\s*\)$/.exec(collection);
       // The supported indexed traversal visits the selected cards in order.
       if (!all || !matchesCardSelector(cardTag, all[2])) return false;
+      // querySelectorAll returns a static list of the elements parsed when its initializer ran.
+      // A card that a classic initializer may precede is not provably in the traversed list.
+      if (!selectedScript.cardAvailableAt(collectionBinding.at)) return false;
       // The card initializer and this read must both run inside the body of the same loop;
       // a matching loop elsewhere in the scope proves nothing about this payload.
       const loopHeader = new RegExp(`for\\s*\\(\\s*var\\s+${indexed[2]}\\s*=\\s*0\\s*;\\s*${indexed[2]}\\s*<\\s*${indexed[1]}\\.length\\s*;\\s*${indexed[2]}\\+\\+\\s*\\)\\s*\\{`, "g");
@@ -1402,10 +1409,25 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\.textContent|\[\s*(?:(['"])textContent\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
-    return ![...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
-      .some(write => isTextContentKey(write, rawSource) && mayBeSelectedScript(write[1], write.index))
-      ? { base: usesValidatedDedent ? dedentedPayload : payload }
-      : false;
+    if ([...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
+      .some(write => isTextContentKey(write, rawSource) && mayBeSelectedScript(write[1], write.index))) return false;
+    // Structural edits can change which script the card query returns (for example removing
+    // the first matching script), so the read no longer proves this payload. Edits elsewhere,
+    // such as replacing the diagram host's markup or appending after the script, keep it.
+    const mayBeCardOwner = (name, seen = new Set()) => {
+      if (cardOwners.has(name)) return true;
+      if (seen.has(name)) return false;
+      const next = new Set(seen).add(name);
+      return Array.from(literalSource.matchAll(new RegExp(`(?<![\\w$.])${name}\\s*=\\s*(\\w+)\\s*;`, "g")))
+        .some(copy => mayBeCardOwner(copy[1], next));
+    };
+    // The selector stays inside one quoted literal so a match cannot span two queries.
+    const receiver = String.raw`(\w+(?:\.querySelector\(\s*(['"])([^'"\n]*)\2\s*\))?)\s*\.\s*`;
+    const scriptEdits = new RegExp(`${receiver}(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text))\\s*\\(|outerHTML\\s*=(?!=))`, "g");
+    const ownerEdits = new RegExp(`(?<![\\w$.])(\\w+)\\s*\\.\\s*(?:(?:removeChild|replaceChild|insertBefore|prepend|replaceChildren|insertAdjacent(?:HTML|Element|Text))\\s*\\(|(?:innerHTML|outerHTML|textContent|innerText)\\s*=(?!=))`, "g");
+    if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index)) ||
+      Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeCardOwner(edit[1]))) return false;
+    return { base: usesValidatedDedent ? dedentedPayload : payload };
   };
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
@@ -1433,6 +1455,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       }
     }
     if (!complete || arguments_.length < 2) return null;
+    // A spread among the first two arguments can shift which value reaches the source parameter.
+    if (arguments_.slice(0, 2).some(argument => /^\s*\.\.\./.test(executable.slice(argument.start, argument.end)))) return null;
     const source = arguments_[1];
     const expression = executable.slice(source.start, source.end);
     // Template bodies are masked in both analysis views. Inspect their original,
@@ -1580,7 +1604,8 @@ function materializePlainTextCards(src) {
     // Scripts inside uninstantiated template content are not renderers for document cards.
     if (script.inTemplate) return false;
     const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
-    return !type || type === "module" || /^(?:text|application)\/(?:java|ecma)script$/.test(type);
+    // The HTML standard's JavaScript MIME type essences (text/plain payloads stay excluded).
+    return !type || type === "module" || /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(type);
   });
   // Classic scripts share the global scope; each module has its own CLASSDEFS.
   const allScopes = [
@@ -1693,6 +1718,8 @@ function materializePlainTextCards(src) {
           // order; module scripts run after parsing. Unrelated earlier queries do not matter.
           availableAt: at => !renderer.classic || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition > start + marker.index),
+          cardAvailableAt: at => !renderer.classic || renderer.segments.some(segment =>
+            segment.start <= at && at <= segment.end && segment.documentPosition > start),
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 },
         foreignWrite));
       if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
@@ -2159,8 +2186,15 @@ if (process.exitCode === undefined) {
             `\n❌ page.tsx に存在しないか改変された原本の callout/alert (${result.missingCalloutElements.length} 件)`
           );
         }
+        // 未解決は原本の描画スクリプト（mermaid.render 周辺）を静的に追えないことを表し、内容の欠落ではない。
+        const unresolvedOnly = result.unresolvedMermaidSources.length > 0 && [
+          result.missingHeadings, result.missingLinks, result.missingListItems, result.missingCodeBlocks,
+          result.missingTableRows, result.missingParagraphs, result.missingSvgElements, result.missingCalloutElements,
+        ].every(list => list.length === 0);
         if (result.unresolvedMermaidSources.length > 0) {
-          console.log(`\n❌ 実行時のCLASSDEFSを静的評価できません: ${result.unresolvedMermaidSources.join(", ")}`);
+          console.log(`\n❌ 描画スクリプトの静的解析が未解決（描画スクリプトの特定・図ソース・CLASSDEFS）: ${result.unresolvedMermaidSources.join(", ")}`);
+          console.log("  図の内容を転写するのではなく、原本の描画スクリプト（mermaid.render の呼び出しと図ソースの読み取り）を確認すること。");
+          if (!result.mermaidSourcesMatch) console.log("  下記の Mermaid 不一致は、未解決の図が実行時の補完なしで比較されたことによる可能性がある。");
         }
         if (!result.mermaidSourcesMatch) {
           console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");
@@ -2173,9 +2207,11 @@ if (process.exitCode === undefined) {
         }
 
         console.log(
-          result.blocking
-            ? "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
-            : "\n判定: ✅ 漏れなし — Green 判定に進んでよい。"
+          !result.blocking
+            ? "\n判定: ✅ 漏れなし — Green 判定に進んでよい。"
+            : unresolvedOnly
+              ? "\n判定: ❌ 描画スクリプトの静的解析が未解決 — Green コミット禁止。描画スクリプトを確認してから再実行すること。"
+              : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
         );
         process.exitCode = result.blocking ? 1 : 0;
       }
