@@ -625,6 +625,16 @@ class TestMoonshot:
             matched = re.search(gap, text, re.IGNORECASE | re.DOTALL)
             assert matched is not None and matched.group(1) == "3.25", text
 
+    def test_cached_input_gap_fails_promptly_with_repeated_inline_tags(self):
+        # cached 価格が N/A でインラインタグが連続しても、タグの読み方が分岐して指数的に後戻りしない。
+        import time
+
+        gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}\$([\d.]+)"
+        text = "<p>Kimi K3 cached input " + "<b>" * 24 + "N/A</p>"
+        started = time.perf_counter()
+        assert re.search(gap, text, re.IGNORECASE | re.DOTALL) is None
+        assert time.perf_counter() - started < 0.5
+
     def test_definition_list_extracts_sibling_definitions(self):
         html = "<dl><dt>Kimi K3</dt><dd>input $3.25</dd><dd>output $16.50</dd></dl>"
         with patch("scraper.providers.moonshot.get_page_text", return_value=html):
