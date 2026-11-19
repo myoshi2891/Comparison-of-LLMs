@@ -51,16 +51,25 @@ for name in ("usd", "estimate_usd"):
         "ephemeral_5m_input_tokens": 200000, "ephemeral_1h_input_tokens": 300000}}), 11.8)
     assert math.isclose(scope[name]({"cache_creation_input_tokens": 100000, "cache_creation": {
         "ephemeral_5m_input_tokens": 200000, "ephemeral_1h_input_tokens": 300000}}), 6.8)
-for mode, price in (("batch", 24), ("fast", 96)):
+# batch・fast も公式の倍率(5分書込 1.25x・1時間書込 2x・読取 0.025x)を各モードの入力単価へ重ねて課金する。
+for mode, price, read, w5, w1 in (("batch", 24, 0.10, 5, 8), ("fast", 96, 0.40, 20, 32)):
     assert scope["estimate_usd"]({"input_tokens": 1000000, "output_tokens": 1000000}, mode) == price
-    for cached in ({"cache_read_input_tokens": 1}, {"cache_creation_input_tokens": 1},
-        {"cache_creation": {"ephemeral_5m_input_tokens": 1}}, {"cache_creation": {"ephemeral_1h_input_tokens": 1}}):
-        try:
-            scope["estimate_usd"](cached, mode)
-        except ValueError:
-            pass
-        else:
-            raise AssertionError((mode, cached))
+    assert math.isclose(scope["estimate_usd"]({"cache_read_input_tokens": 1000000}, mode), read), mode
+    for ttl, rate in (("5m", w5), ("1h", w1)):
+        assert math.isclose(scope["estimate_usd"]({"cache_creation_input_tokens": 1000000,
+            "cache_creation": {"ephemeral_" + ttl + "_input_tokens": 1000000}}, mode), rate), (mode, ttl)
+    assert math.isclose(scope["estimate_usd"]({"cache_creation_input_tokens": 1000000}, mode), w5), mode
+# キャッシュ単価を設定していないモードは、キャッシュ使用量を推測で課金せず拒否する。
+scope["RATES"]["unconfigured"] = {"in": 1.0, "out": 2.0}
+assert scope["estimate_usd"]({"input_tokens": 1000000}, "unconfigured") == 1
+for cached in ({"cache_read_input_tokens": 1}, {"cache_creation_input_tokens": 1},
+    {"cache_creation": {"ephemeral_5m_input_tokens": 1}}, {"cache_creation": {"ephemeral_1h_input_tokens": 1}}):
+    try:
+        scope["estimate_usd"](cached, "unconfigured")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError(cached)
 for usage, price in (
     ({"cache_creation_input_tokens": 1000000}, 10),
     ({"cache_creation_input_tokens": 1000000, "cache_creation": {}}, 10),
