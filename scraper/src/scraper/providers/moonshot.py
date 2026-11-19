@@ -60,8 +60,12 @@ _OTHER_OUTPUT_LABEL = rf"\b(?:batch|cached){_INLINE_SEP}output\b"
 # batch/cached input のラベルを越えるのは、その後ろ（output より前）に標準 input
 # （"input" または "Cache Miss"）が続く場合だけ。続かなければそのレコードは batch/cached の行であり、
 # 後続の output は標準 output ではない。
+# タグは丸ごと読み飛ばし、属性値（data-field="input" 等）を標準 input のラベルとみなさない。
+# 通常文字の分岐は完結したタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
+_ANY_TAG = r"<[^<>]*>"
 _STD_INPUT_AHEAD = _RECORD_GAP.replace(
-    r"[\s\S]", rf"(?!\boutput\b)(?:{_CACHED_LABEL}|(?!{_CACHED_LABEL})[\s\S])"
+    r"[\s\S]",
+    rf"(?!\boutput\b)(?:{_ANY_TAG}|{_CACHED_LABEL}|(?!{_ANY_TAG}|{_CACHED_LABEL})[\s\S])",
 )
 _OUTPUT_LABEL_GAP = _RECORD_GAP.replace(
     r"[\s\S]",
