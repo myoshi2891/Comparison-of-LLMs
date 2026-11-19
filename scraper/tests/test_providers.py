@@ -608,6 +608,33 @@ class TestMoonshot:
         assert model.price_out != 8.25
         assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
 
+    @pytest.mark.parametrize(
+        "batch_row",
+        [
+            # batch 行の後ろのタグ属性に input があっても、標準 input のラベルとはみなさない。
+            '<p>Kimi K3 batch input $1.60 <span data-field="input">output</span> $8.25</p>',
+            '<p>Kimi K3 batch input $1.60 <div class="input-col">output $8.25</div></p>',
+        ],
+    )
+    def test_batch_row_tag_attribute_input_is_not_standard_input(self, batch_row):
+        html = batch_row + "<p>Kimi K3 input $3.25 output $16.50</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    def test_std_input_ahead_fails_promptly_with_repeated_inline_tags(self):
+        # 標準 input の先読みでインラインタグが連続しても、指数的に後戻りしない。
+        import time
+
+        pattern = (
+            rf"Kimi K3{moonshot._OUTPUT_LABEL_GAP}{moonshot._OUTPUT_LABEL}"
+            rf"{moonshot._OUTPUT_PRICE_GAP}\$([\d.]+)"
+        )
+        text = "<p>Kimi K3 batch input " + "<b>" * 24 + "N/A</p>"
+        started = time.perf_counter()
+        assert re.search(pattern, text, re.IGNORECASE | re.DOTALL) is None
+        assert time.perf_counter() - started < 0.5
+
     def test_cached_input_gap_cannot_stop_inside_a_price(self):
         text = "Kimi K3 cached input $0.25 input $3.25 output $16.50"
         gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}"
