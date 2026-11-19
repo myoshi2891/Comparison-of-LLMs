@@ -1695,3 +1695,24 @@ test("treats writes that change a script type as structural edits for typed quer
  // 種別に関係しない属性の書き込みは選択を変えない。
  assert.equal(audit(`${card}<script>const card = document.querySelector('#chart'); card.querySelector('script').setAttribute('data-x', '1'); ${read}</script>`, page).status, 0);
 });
+
+test("does not treat continue guards on members or function-written flags as uniform", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="diagram-card"><script type="text/plain">${s}</script></div>`).join('');
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)};`).join('\n') + charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join('');
+ const loop = "var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) {";
+ const render = "var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src);";
+ for (const body of [
+  // メンバーの値はループ内で書き換えられても変数への書き込みとして数えられない。
+  `var state = { ready: true }; ${loop} if (!state.ready) continue; ${render} state.ready = false; }`,
+  `var flags = [true]; ${loop} if (!flags[0]) continue; ${render} flags[0] = false; }`,
+  // ループ外で宣言した関数がフラグを書き換え、ループ内から呼ばれる。
+  `var ready = true; function off() { ready = false; } ${loop} if (!ready) continue; ${render} off(); }`,
+ ]) {
+  const result = audit(`${source}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1'], body);
+ }
+ // 最上位で一度だけ書き込まれる共有フラグ（Fable原本の mermaidReady）は認定を維持する。
+ assert.equal(audit(`${source}<script>var ready = false; try { ready = true; } catch (e) {} ${loop} if (!ready) continue; ${render} }</script>`, page).status, 0);
+});
