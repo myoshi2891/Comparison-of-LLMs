@@ -380,6 +380,12 @@ test("keeps i elements with explicit callout classes or variants as callouts",()
  assert.equal(audit(source,'<i className={styles.icon}></i><i>Mind the gap</i><i data-variant="warning">Check twice</i>').status,1);
 });
 
+test("classifies i callouts without variants taken from icon class tokens",()=>{
+ const source='<i class="callout ti ti-alert-triangle">Mind the gap</i>';
+ assert.equal(audit(source,'<i className={styles.callout}>Mind the gap</i>').status,0);
+ assert.equal(audit(source,'<i className={`${styles.callout} ${styles.warning}`}>Mind the gap</i>').status,1);
+});
+
 test("restores CLASSDEFS only from uncommented executable scripts", () => {
  const chart = 'flowchart LR\nA --> B';
  const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
@@ -980,6 +986,13 @@ test("does not certify stale script textContent after observed writes", () => {
   'card.querySelector("script").textContent = other;',
   'if (enabled) { script.textContent = other; }',
   'if (enabled) { const alias = script; alias.textContent = other; }',
+  'script["textContent"] = other;',
+  "script[ 'textContent' ] += other;",
+  'const alias = script; alias["textContent"] = other;',
+  'card.querySelector("script")["textContent"] = other;',
+  '++script["textContent"];',
+  'const alias = script; alias[`textContent`] = other;',
+  'script[ `textContent` ] ??= other;',
  ]) {
   const source = `${card}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); ${write} const src = script.textContent; mermaid.render('id', src);</script>`;
   const result = audit(source, page);
@@ -988,6 +1001,11 @@ test("does not certify stale script textContent after observed writes", () => {
  }
  const source = `${card}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); const src = script.textContent; mermaid.render('id', src);</script>`;
  assert.equal(audit(source, page).status, 0);
+ // 別の script からのテンプレートリテラル経由の書き込みも、payload を読む source を未解決にする。
+ const foreign = audit(`${source}<script type="module">document.querySelector('#chart script')[\`textContent\`] = other;</script>`, page);
+ assert.equal(foreign.status, 1);
+ // 同じ長さの空白だけのテンプレートキーは textContent ではない。
+ assert.equal(audit(`${source}<script type="module">const x = {}; x[\`           \`] = other;</script>`, page).status, 0);
 });
 
 test("keeps computed mermaid render calls unresolved instead of certifying the base payload", () => {
@@ -1434,4 +1452,34 @@ test("does not count elements inside template content as document selector match
  assert.equal(audit(`<template><div id="card-0"></div></template>${card}<script>${reader}</script>`, page).status, 0);
  // 文書内に同じ id が実在する場合は従来どおり未解決。
  assert.equal(audit(`<div id="card-0"></div>${card}<script>${reader}</script>`, page).status, 1);
+});
+
+test("does not select payload scripts inside template content of a card", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const decoy = 'flowchart LR\nX --> Y';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div class="diagram-card" id="card-0"><template><script type="text/plain">${decoy}</script></template><script type="text/plain">${chart}</script></div>`;
+ const reader = `const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#card-0'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);`;
+ const page = c => `const D = ${JSON.stringify(c + suffix)}; <MermaidDiagram chart={D} />`;
+ // template の中身は querySelector の対象外。カードの実 payload は template 外の最初の script。
+ assert.equal(audit(`${card}<script>${reader}</script>`, page(chart)).status, 0);
+ assert.equal(audit(`${card}<script>${reader}</script>`, page(decoy)).status, 1);
+});
+
+test("treats reads before a later inner let or const in the same block as shadowed", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const head = "const card = document.querySelector('#chart'); const script = card.querySelector('script');";
+ // 後続の内側 let／const は同じブロック全体で外側の束縛を隠し、宣言前の読み取りは TDZ になる。
+ for (const body of [
+  "function draw() { const src = script.textContent; mermaid.render('id', src); const script = other; } draw();",
+  "function draw() { const src = script.textContent; mermaid.render('id', src); let script; } draw();",
+ ]) {
+  const result = audit(`${card}<script>${head} ${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], body);
+ }
+ // 内側に同名の宣言がなければ、初期化済みの外側の束縛へ解決する。
+ assert.equal(audit(`${card}<script>${head} function draw() { const src = script.textContent; mermaid.render('id', src); const other = 1; } draw();</script>`, page).status, 0);
 });

@@ -216,6 +216,21 @@ const TAG_ATTRIBUTE_RE = new RegExp(
 /** good トークンを variant 指定として扱う属性名（小文字）。 */
 const VARIANT_ATTRIBUTE_NAMES = new Set(["class", "classname", "variant", "data-variant", "data-testid"]);
 
+/** A `textContent` template-literal key after blankNonCodeText (body blanked, length kept). */
+const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60 {11}\x60`;
+
+/**
+ * Confirms that a write matched in masked source names textContent in the raw source.
+ * Masking keeps offsets, so a blanked template key is checked at the same position.
+ * @param {RegExpMatchArray} write - A match against the masked source.
+ * @param {string} rawSource - The unmasked source with identical offsets.
+ * @return {boolean} False only for a blanked template key that is not `textContent`.
+ */
+function isTextContentKey(write, rawSource) {
+  if (!write[0].includes("\x60")) return true;
+  return /\[\s*\x60textContent\x60\s*\]/.test(rawSource.slice(write.index, write.index + write[0].length));
+}
+
 /**
  * Creates a markup-independent comparison key for a callout or alert element.
  * @param {string} openingTag - The element's opening tag, including its type markers.
@@ -261,14 +276,15 @@ const ICON_CLASS_TOKEN_RE = /(^|[\s"'{])(?:ti|fa[a-z]?|bi|mdi|icon)-[\w-]*/gi;
  * @returns {Array} The normalized callout and alert elements found in the source.
  */
 function collectMarkupCalloutElements(src) {
-  return extractElementContents(src, (openingTag) => {
-    // <i> はアイコン用途が多いため、ti-alert-triangle 等のアイコンクラスのトークンだけを除いて判定する。
-    // 明示的な callout／alert クラスや variant 属性を持つ <i> は棚卸し対象に残す。
-    const tag = /^<i\b/i.test(openingTag) ? openingTag.replace(ICON_CLASS_TOKEN_RE, "$1") : openingTag;
-    return /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
-      tag
-    );
-  }).map(({ openingTag, content }) => normalizeCalloutElement(openingTag, content));
+  // <i> はアイコン用途が多いため、ti-alert-triangle 等のアイコンクラスのトークンだけを除いて判定・正規化する。
+  // 明示的な callout／alert クラスや variant 属性を持つ <i> は棚卸し対象に残し、その marker は保持する。
+  const withoutIconTokens = (openingTag) =>
+    /^<i\b/i.test(openingTag) ? openingTag.replace(ICON_CLASS_TOKEN_RE, "$1") : openingTag;
+  return extractElementContents(src, (openingTag) =>
+    /<(?:Callout|Alert)\b|(?:class|className)\s*=\s*(?:["'][^"']*(?:callout|alert)|\{[^}]*styles\.(?:callout|alert))|data-(?:testid|variant)\s*=\s*["'](?:callout|alert|warn|warning|info|note|good|success|tip)/i.test(
+      withoutIconTokens(openingTag)
+    )
+  ).map(({ openingTag, content }) => normalizeCalloutElement(withoutIconTokens(openingTag), content));
 }
 
 /**
@@ -1231,11 +1247,15 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const callPath = pathAt(at);
       const hidden = new RegExp(`\\b(?:function\\b[^()]*|catch)\\s*\\([^)]*\\b${name}\\b|\\([^)]*\\b${name}\\b[^)]*\\)\\s*=>|\\b${name}\\s*=>`);
       if (hidden.test(executable) || /\bclass\b/.test(executable)) return undefined;
+      // Every declaration in an enclosing block is visible across that whole block, even one
+      // placed after `at`: a later inner let/const shadows the outer binding (TDZ before it).
       const declarations = Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}(?![\\w$])`, "g")))
-        .filter(d => d.index < at && pathAt(d.index).every((block, i) => callPath[i] === block));
+        .filter(d => pathAt(d.index).every((block, i) => callPath[i] === block));
       declarations.sort((a, b) => pathAt(b.index).length - pathAt(a.index).length);
       if (!declarations.length) return undefined;
       const d = declarations[0];
+      // The visible binding is declared after the read: uninitialized there, never the outer one.
+      if (d.index >= at) return undefined;
       if (declarations.slice(1).some(other => pathAt(other.index).length === pathAt(d.index).length)) return undefined;
       if (/^var\b/.test(d[0]) && sharedAcrossDeferredRead(d.index, at)) return undefined;
       // A redeclaration in this block, or a nested `var` (function-scoped), can
@@ -1377,11 +1397,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // Reading an element binding does not establish its current textContent.
     // Unresolved writes through the element, a DOM query or a known alias block certification.
     // A deferred read may follow a write placed later in the source, so scan the whole scope.
-    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)\.textContent`;
+    // Static computed access (script["textContent"]) writes the same property as dot access.
+    // Template keys are blanked in literalSource; match their length and confirm them in rawSource.
+    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\.textContent|\[\s*(?:(['"])textContent\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
     return ![...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
-      .some(write => mayBeSelectedScript(write[1], write.index))
+      .some(write => isTextContentKey(write, rawSource) && mayBeSelectedScript(write[1], write.index))
       ? { base: usesValidatedDedent ? dedentedPayload : payload }
       : false;
   };
@@ -1596,7 +1618,8 @@ function materializePlainTextCards(src) {
     // Writes to any element's textContent (static or computed key). Which element is written
     // cannot be resolved across scopes, so another scope's write may replace the payload.
     const writesTextContent = /\.\s*textContent\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
-      /\[\s*(['"`])textContent\1\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(literalSource);
+      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])textContent\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
+        .some(write => isTextContentKey(write, rawSource));
     return { literalSource, rawSource, selectors, computedRenderer, classic, segments, writesTextContent, hasSelection: selectionCalls.length > 0,
       hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer || computedRenderer };
   });
@@ -1619,7 +1642,8 @@ function materializePlainTextCards(src) {
     }
     const marker = Array.from(ownedContent.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g)).find(match => {
       const script = scripts[Number(match[1])];
-      return readHtmlAttribute(script.attributes, "type")?.toLowerCase() === "text/plain" && readHtmlAttribute(script.attributes, "data-for") === undefined;
+      // Template content is an inert fragment: it is neither shown nor reachable by querySelector.
+      return !script.inTemplate && readHtmlAttribute(script.attributes, "type")?.toLowerCase() === "text/plain" && readHtmlAttribute(script.attributes, "data-for") === undefined;
     });
     if (!marker) continue;
     const script = scripts[Number(marker[1])];
@@ -1655,8 +1679,11 @@ function materializePlainTextCards(src) {
       const cardId = readHtmlAttribute(card.openingTag, "id") ?? `card-${marker[1]}`;
       if (!renderer && scopes.length > 0) unresolvedMermaidSources.push(`renderer:${cardId}`);
       // querySelector searches all descendants; ownership masking is only for payload selection.
-      const firstScript = /<script data-audit-payload="(\d+)"><\/script>/.exec(card.content);
-      const firstPlain = Array.from(card.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
+      // Scripts inside <template> content are not descendants that querySelector can return.
+      const queryableScripts = Array.from(card.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
+        .filter(match => !scripts[Number(match[1])].inTemplate);
+      const firstScript = queryableScripts[0];
+      const firstPlain = queryableScripts
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
       // Cross-scope textContent writes only invalidate DOM-backed (payload-reading) sources.
       const foreignWrite = Boolean(renderer) && allScopes.some(scope => scope !== renderer && scope.writesTextContent);
