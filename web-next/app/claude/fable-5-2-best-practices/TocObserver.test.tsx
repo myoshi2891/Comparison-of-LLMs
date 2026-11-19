@@ -232,6 +232,9 @@ it("unmountで全リスナー・inert・開状態を解除", () => {
   expect(s.inert).toBe(false);
   expect(r.classList.contains(styles.open)).toBe(false);
   fireEvent.click(b);
+  // 解除後のメニュー操作では、切り離されたドロワーが開かない。
+  expect(r.classList.contains(styles.open)).toBe(false);
+  expect(b.getAttribute("aria-expanded")).toBe("false");
   // 切り離された input は click で change を発火しないため、状態を変えて明示的に送る。
   box.checked = true;
   fireEvent.change(box);
@@ -297,6 +300,14 @@ it("デスクトップ幅ではフォーカス移動も本文のinert化も行�
   fireEvent.click(menu());
   expect(document.activeElement).toBe(menu());
   expect(guideContent().inert).toBe(false);
+});
+it("メニューにフォーカスがある状態でdesktopへ広げると、非表示のメニューから先頭の目次リンクへ移す", () => {
+  render(<Harness />);
+  menu().focus();
+  Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  fireEvent.resize(window);
+  expect(document.activeElement).toBe(links()[0]);
+  expect(sidebar().inert).toBe(false);
 });
 it("開いた状態でdesktopへ広げると本文のinertを解除しフォーカスを動かさない", () => {
   render(<Harness />);

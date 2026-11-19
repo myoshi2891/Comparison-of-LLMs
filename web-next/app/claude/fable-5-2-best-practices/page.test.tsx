@@ -142,6 +142,11 @@ it("目次19リンクの文言・順序・アンカー解決・全ID一意性・
   const ids = Array.from(container.querySelectorAll("[id]")).map((e) => e.id);
   expect(ids).toEqual([...new Set(ids)]);
   expect(Array.from(container.querySelectorAll("h2,h3")).every((e) => !!e.id)).toBe(true);
+  // 目次以外の出典番号・小見出しリンクも含め、全ページ内リンクが同じIDの要素へ解決する。
+  const unresolved = Array.from(container.querySelectorAll('a[href^="#"]'))
+    .map((a) => decodeURIComponent((a.getAttribute("href") ?? "").slice(1)))
+    .filter((id) => !id || !container.querySelector(`[id="${CSS.escape(id)}"]`));
+  expect(unresolved).toEqual([]);
   expect(links.filter((e) => e.getAttribute("aria-current") === "location")).toEqual([links[0]]);
   expect(links[0].classList.contains(styles.active)).toBe(true);
 });
@@ -265,8 +270,12 @@ it("metadata・registry・ヒーローの日付を保持", () => {
     summary:
       "Claude Fable 5.2 のモデル選定、effort、API実装、履歴管理、Claude Code・マルチエージェント運用、コストと評価を学ぶ中級〜上級ガイド。",
     addedAt: "2026-11-13",
-    lastReviewed: "2026-11-13",
+    lastReviewed: entry?.lastReviewed,
   });
+  // 確認日は月次更新で変わるため特定の値に固定せず、暦日の形式と公開日以後であることだけを確かめる。
+  expect(entry?.lastReviewed).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  expect(Number.isNaN(Date.parse(entry?.lastReviewed ?? ""))).toBe(false);
+  expect((entry?.lastReviewed ?? "") >= (entry?.addedAt ?? "")).toBe(true);
   const { getByTestId } = render(<Page />);
   const dates = getByTestId("hero-dates");
   expect(dates.closest("header")?.classList.contains(styles.hero)).toBe(true);
