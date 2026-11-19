@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import pricingSnapshot from "@/data/pricing.json";
 import {
   byAddedAtDesc,
   byLastReviewedDesc,
@@ -64,8 +65,13 @@ describe("PageEntrySchema", () => {
 
 describe("pageRegistry", () => {
   it("Homeの公開日と確認日を価格データ更新日に揃える", () => {
+    // 価格スナップショットの生成日と同期していることを、固定日付ではなく実データで確かめる。
     const home = findBySlug("/");
-    expect([home?.addedAt, home?.lastReviewed]).toEqual(["2026-11-13", "2026-11-13"]);
+    expect(pricingSnapshot.generated_at).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect([home?.addedAt, home?.lastReviewed]).toEqual([
+      pricingSnapshot.generated_at,
+      pricingSnapshot.generated_at,
+    ]);
   });
 
   it("Home（/）を含む", () => {
