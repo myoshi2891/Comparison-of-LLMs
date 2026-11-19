@@ -143,9 +143,11 @@ it("目次19リンクの文言・順序・アンカー解決・全ID一意性・
   expect(ids).toEqual([...new Set(ids)]);
   expect(Array.from(container.querySelectorAll("h2,h3")).every((e) => !!e.id)).toBe(true);
   // 目次以外の出典番号・小見出しリンクも含め、全ページ内リンクが同じIDの要素へ解決する。
+  // リンクごとの属性セレクター検索はカバレッジ計測下で約1.5秒かかるため、収集済みの全IDで照合する。
+  const idSet = new Set(ids);
   const unresolved = Array.from(container.querySelectorAll('a[href^="#"]'))
     .map((a) => decodeURIComponent((a.getAttribute("href") ?? "").slice(1)))
-    .filter((id) => !id || !container.querySelector(`[id="${CSS.escape(id)}"]`));
+    .filter((id) => !id || !idSet.has(id));
   expect(unresolved).toEqual([]);
   expect(links.filter((e) => e.getAttribute("aria-current") === "location")).toEqual([links[0]]);
   expect(links[0].classList.contains(styles.active)).toBe(true);
