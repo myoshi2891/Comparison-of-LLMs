@@ -240,6 +240,8 @@ it("unmountで全リスナー・inert・開状態を解除", () => {
   fireEvent.change(box);
   fireEvent.scroll(window);
   expect(count.textContent).toBe("0");
+  // 開状態のまま解除しても、document の keydown リスナーが残らず Tab の既定動作を止めない。
+  expect(fireEvent.keyDown(document, { key: "Tab", cancelable: true })).toBe(true);
   expect(remove.mock.calls.map((c) => c[0])).toEqual(expect.arrayContaining(["scroll", "resize"]));
 });
 it("マークアップが無い場合もmount・cleanup可能", () => {
@@ -308,6 +310,25 @@ it("メニューにフォーカスがある状態でdesktopへ広げると、非
   fireEvent.resize(window);
   expect(document.activeElement).toBe(links()[0]);
   expect(sidebar().inert).toBe(false);
+});
+it("メニューにフォーカスがある状態でdesktopへ広げると、現在のセクションの目次リンクへ移す", () => {
+  render(<Harness />);
+  position = 1000;
+  fireEvent.scroll(window);
+  expect(active()).toEqual(["#s1"]);
+  menu().focus();
+  Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  fireEvent.resize(window);
+  expect(document.activeElement).toBe(links()[1]);
+});
+it("目次リンクにフォーカスがある状態でdesktopへ広げても、目次内のフォーカスを動かさない", () => {
+  render(<Harness />);
+  position = 1000;
+  fireEvent.click(menu());
+  links()[2].focus();
+  Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  fireEvent.resize(window);
+  expect(document.activeElement).toBe(links()[2]);
 });
 it("開いた状態でdesktopへ広げると本文のinertを解除しフォーカスを動かさない", () => {
   render(<Harness />);
