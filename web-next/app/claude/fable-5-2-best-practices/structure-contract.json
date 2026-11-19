@@ -1130,12 +1130,12 @@
                     [
                       [
                         "text",
-                        "ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です"
+                        "フォールバックを明示的に有効にした場合に限り、ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です"
                       ],
                       ["span", { "class": "tag official" }, [["text", "公式"]]],
                       ["text", "("],
                       ["a", { "class": "src-link", "href": "#S1" }, [["text", "S1"]]],
-                      ["text", ")。"]
+                      ["text", ")。有効にしなければ拒否のまま返ります。"]
                     ]
                   ]
                 ]
@@ -1823,7 +1823,7 @@
                   ["div", { "class": "diagram-title" }, [["text", "図2 モデル選定フロー"]]],
                   [
                     "diagram",
-                    "flowchart TD\n    START[\"新しいタスク\"] --> Q1{\"仕様は明確で　1〜数ファイルで完結する?\"}\n    Q1 -- \"はい\" --> Q2{\"大量・低遅延・低コストが最優先?\"}\n    Q2 -- \"はい\" --> HAIKU[\"Haiku 5.5・Sonnet 5.5\"]\n    Q2 -- \"いいえ\" --> OPUS[\"Opus 5.5 を medium〜high で試す\"]\n    Q1 -- \"いいえ\" --> Q3{\"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?\"}\n    Q3 -- \"はい\" --> FABLE[\"Fable 5.2 を high で試す\"]\n    Q3 -- \"いいえ\" --> OPUS\n    OPUS --> Q4{\"Opus の高 effort でも　evals が基準未達?\"}\n    Q4 -- \"はい\" --> FABLE\n    Q4 -- \"いいえ\" --> DONE[\"そのまま運用\"]\n    FABLE --> Q5{\"一部だけが難所?\"}\n    Q5 -- \"はい\" --> HYBRID[\"小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行\"]\n    Q5 -- \"いいえ\" --> DONE\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
+                    "flowchart TD\n    START[\"新しいタスク\"] --> Q1{\"仕様は明確で　1〜数ファイルで完結する?\"}\n    Q1 -- \"はい\" --> Q2{\"大量・低遅延・低コストが最優先?\"}\n    Q2 -- \"はい\" --> HAIKU[\"Haiku 5.5・Sonnet 5.5\"]\n    Q2 -- \"いいえ\" --> OPUS[\"Opus 5.5 を medium〜high で試す\"]\n    Q1 -- \"いいえ\" --> Q3{\"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?\"}\n    Q3 -- \"はい\" --> FABLE[\"Fable 5.2 を high で試す\"]\n    Q3 -- \"いいえ\" --> OPUS\n    OPUS --> Q4{\"Opus の高 effort でも　evals が基準未達?\"}\n    Q4 -- \"はい\" --> FABLE\n    Q4 -- \"いいえ\" --> DONE[\"そのまま運用\"]\n    FABLE --> Q5{\"一部だけが難所?\"}\n    Q5 -- \"はい\" --> HYBRID[\"小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行\"]\n    Q5 -- \"いいえ\" --> EVAL{\"Fable の構成で　evals が基準を満たす?\"}\n    HYBRID --> EVAL\n    EVAL -- \"はい\" --> DONE\n    EVAL -- \"いいえ\" --> RETRY[\"effort・プロンプト・分担を見直して　選定からやり直す\"]\n    RETRY --> Q5\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\n    class RETRY box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
                   ]
                 ]
               ],
@@ -2312,7 +2312,26 @@
                                   ["text", ")"]
                                 ]
                               ],
-                              ["td", {}, [["text", "最小のリクエストで 200 が返る"]]]
+                              [
+                                "td",
+                                {},
+                                [
+                                  [
+                                    "text",
+                                    "最小のリクエストで 200 が返る(認証・通信の確認)。生成の確認として、本文の"
+                                  ],
+                                  ["code", {}, [["text", "stop_reason"]]],
+                                  ["text", "が"],
+                                  ["code", {}, [["text", "refusal"]]],
+                                  ["text", "ではなく"],
+                                  ["code", {}, [["text", "end_turn"]]],
+                                  ["text", "で、"],
+                                  ["code", {}, [["text", "model"]]],
+                                  ["text", "が"],
+                                  ["code", {}, [["text", "claude-fable-5-2"]]],
+                                  ["text", "である"]
+                                ]
+                              ]
                             ]
                           ],
                           [
@@ -4395,7 +4414,11 @@
                   ["span", { "class": "tag official" }, [["text", "公式"]]],
                   ["text", "("],
                   ["a", { "class": "src-link", "href": "#S3" }, [["text", "S3"]]],
-                  ["text", ")。"]
+                  ["text", ")。既存のリクエストへは次の"],
+                  ["code", {}, [["text", "thinking"]]],
+                  ["text", "フィールドだけを統合し、"],
+                  ["code", {}, [["text", "messages"]]],
+                  ["text", "は手元の有効なメッセージの配列をそのまま送ります。"]
                 ]
               ],
               [
@@ -4409,7 +4432,7 @@
                     [
                       [
                         "code",
-                        "{\n  \"model\": \"claude-fable-5-2\",\n  \"max_tokens\": 16000,\n  \"thinking\": {\n    \"type\": \"adaptive\",\n    \"block_binding\": { \"prefix_mismatch_behavior\": \"drop_block\" }\n  },\n  \"messages\": [\"...\"]\n}"
+                        "{\n  \"thinking\": {\n    \"type\": \"adaptive\",\n    \"block_binding\": { \"prefix_mismatch_behavior\": \"drop_block\" }\n  }\n}"
                       ]
                     ]
                   ]
@@ -8178,7 +8201,7 @@
                     [
                       [
                         "code",
-                        "RATES = {  # USD / 百万トークン(公式価格表)\n    \"standard\": {\"in\": 8.0, \"out\": 40.0, \"cache_read\": 0.20, \"cache_write_5m\": 10.0, \"cache_write_1h\": 16.0},\n    \"batch\": {\"in\": 4.0, \"out\": 20.0},\n    \"fast\": {\"in\": 16.0, \"out\": 80.0},  # fast mode のキャッシュ単価は公式の価格表で確認する\n}\n\n\ndef estimate_usd(usage: dict, mode: str = \"standard\") -> float:\n    r = RATES[mode]\n    cache = usage.get(\"cache_creation\") or {}\n    # キャッシュ件数は null で返ることがあるため、0 として扱う\n    read = usage.get(\"cache_read_input_tokens\") or 0\n    write_5m = cache.get(\"ephemeral_5m_input_tokens\") or 0\n    write_1h = cache.get(\"ephemeral_1h_input_tokens\") or 0\n    write_other = max(0, (usage.get(\"cache_creation_input_tokens\") or 0) - write_5m - write_1h)\n    write_5m += write_other\n    cached = read or write_5m or write_1h or usage.get(\"cache_creation_input_tokens\") or 0\n    if cached and any(key not in r for key in (\"cache_read\", \"cache_write_5m\", \"cache_write_1h\")):\n        raise ValueError(\"このモードのキャッシュ単価を確認・設定してから見積もってください\")\n    return (\n        usage.get(\"input_tokens\", 0) * r[\"in\"]\n        + usage.get(\"output_tokens\", 0) * r[\"out\"]\n        + (read * r[\"cache_read\"] if read else 0)\n        + (write_5m * r[\"cache_write_5m\"] if write_5m else 0)\n        + (write_1h * r[\"cache_write_1h\"] if write_1h else 0)\n    ) / 1_000_000\n\n\n# 例: 未キャッシュ入力5万 + キャッシュ読み出し15万 + 出力3万(思考込み)\nexample = {\"input_tokens\": 50_000, \"cache_read_input_tokens\": 150_000, \"output_tokens\": 30_000}\nprint(round(estimate_usd(example), 2))  # 0.40 + 0.03 + 1.20 = 1.63"
+                        "RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inference_geo=\"us\" は全項目 1.1 倍)\n    \"standard\": {\"in\": 8.0, \"out\": 40.0, \"cache_read\": 0.20, \"cache_write_5m\": 10.0, \"cache_write_1h\": 16.0},\n    # batch・fast のキャッシュ単価は、公式の倍率(5分書き込み 1.25 倍・1時間書き込み 2 倍・読み出し 0.025 倍)を各モードの入力単価に掛けた値\n    \"batch\": {\"in\": 4.0, \"out\": 20.0, \"cache_read\": 0.10, \"cache_write_5m\": 5.0, \"cache_write_1h\": 8.0},\n    \"fast\": {\"in\": 16.0, \"out\": 80.0, \"cache_read\": 0.40, \"cache_write_5m\": 20.0, \"cache_write_1h\": 32.0},\n}\n\n\ndef estimate_usd(usage: dict, mode: str = \"standard\") -> float:\n    r = RATES[mode]\n    cache = usage.get(\"cache_creation\") or {}\n    # キャッシュ件数は null で返ることがあるため、0 として扱う\n    read = usage.get(\"cache_read_input_tokens\") or 0\n    write_5m = cache.get(\"ephemeral_5m_input_tokens\") or 0\n    write_1h = cache.get(\"ephemeral_1h_input_tokens\") or 0\n    write_other = max(0, (usage.get(\"cache_creation_input_tokens\") or 0) - write_5m - write_1h)\n    write_5m += write_other\n    cached = read or write_5m or write_1h or usage.get(\"cache_creation_input_tokens\") or 0\n    if cached and any(key not in r for key in (\"cache_read\", \"cache_write_5m\", \"cache_write_1h\")):\n        raise ValueError(\"このモードのキャッシュ単価を確認・設定してから見積もってください\")\n    return (\n        usage.get(\"input_tokens\", 0) * r[\"in\"]\n        + usage.get(\"output_tokens\", 0) * r[\"out\"]\n        + (read * r[\"cache_read\"] if read else 0)\n        + (write_5m * r[\"cache_write_5m\"] if write_5m else 0)\n        + (write_1h * r[\"cache_write_1h\"] if write_1h else 0)\n    ) / 1_000_000\n\n\n# 例: 未キャッシュ入力5万 + キャッシュ読み出し15万 + 出力3万(思考込み)\nexample = {\"input_tokens\": 50_000, \"cache_read_input_tokens\": 150_000, \"output_tokens\": 30_000}\nprint(round(estimate_usd(example), 2))  # 0.40 + 0.03 + 1.20 = 1.63\nprint(round(estimate_usd(example, \"fast\"), 2))  # 0.80 + 0.06 + 2.40 = 3.26"
                       ]
                     ]
                   ]
@@ -8853,7 +8876,7 @@
                   ["div", { "class": "diagram-title" }, [["text", "図8 拒否の処理フロー"]]],
                   [
                     "diagram",
-                    "flowchart TD\n    REQ[\"リクエスト送信\"] --> RESP{\"stop_reason は refusal?\"}\n    RESP -- \"いいえ\" --> OK[\"通常処理\"]\n    RESP -- \"はい\" --> CAT{\"stop_details.category\"}\n    CAT -- \"reasoning_extraction\" --> RE[\"推論を本文に書かせる指示を削除　display を summarized に変更\"]\n    CAT -- \"cyber・bio\" --> LEGIT{\"正当な業務か?\"}\n    LEGIT -- \"はい\" --> VERIFY[\"検証プログラムに申請　Mythos 5.2 の利用を検討\"]\n    LEGIT -- \"いいえ\" --> STOP[\"依頼を取り下げる\"]\n    CAT -- \"frontier_llm\" --> LIMIT[\"該当領域は能力が制限される　他の手段を検討\"]\n    CAT -- \"その他\" --> LOG[\"ログに記録して内容を確認\"]\n    VERIFY --> FB{\"当面は代替モデルで継続したい?\"}\n    FB -- \"はい\" --> FALLBACK[\"Opus 4.8・Opus 5 へフォールバック\"]\n    FB -- \"いいえ\" --> WAIT[\"承認を待つ\"]\n\n    class OK done\n    class STOP,LIMIT box\n    class FALLBACK,VERIFY,RE hub\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
+                    "flowchart TD\n    REQ[\"リクエスト送信\"] --> RESP{\"stop_reason は refusal?\"}\n    RESP -- \"いいえ\" --> OK[\"通常処理\"]\n    RESP -- \"はい\" --> CAT{\"stop_details.category\"}\n    CAT -- \"reasoning_extraction\" --> RE[\"推論を本文に書かせる指示を削除　display を summarized に変更\"]\n    CAT -- \"cyber・bio\" --> LEGIT{\"正当な業務か?\"}\n    LEGIT -- \"はい\" --> VERIFY[\"検証プログラムに申請　Mythos 5.2 の利用を検討\"]\n    LEGIT -- \"いいえ\" --> STOP[\"依頼を取り下げる\"]\n    CAT -- \"frontier_llm\" --> LIMIT[\"該当領域は能力が制限される　他の手段を検討\"]\n    CAT -- \"その他\" --> LOG[\"ログに記録して内容を確認\"]\n    VERIFY --> FB{\"フォールバックを許可する　運用方針が明示されている?\"}\n    FB -- \"はい\" --> FALLBACK[\"方針で承認した　Opus 4.8・Opus 5 へフォールバック\"]\n    FB -- \"いいえ・未決定\" --> WAIT[\"拒否のまま終了　方針の決定と承認を待つ\"]\n\n    class OK done\n    class STOP,LIMIT box\n    class FALLBACK,VERIFY,RE hub\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
                   ]
                 ]
               ],
@@ -9676,7 +9699,12 @@
                                 "td",
                                 {},
                                 [
-                                  ["text", "履歴を追記のみにする。暫定は"],
+                                  ["text", "今後の不一致は履歴を追記のみにして防ぐ。後から"],
+                                  ["code", {}, [["text", "system"]]],
+                                  [
+                                    "text",
+                                    "などを編集して既に無効になったブロックは追記では直らないため、ブロックを生成したときのプレフィックスに戻すか、編集を残すなら新しい会話を始める。暫定は"
+                                  ],
                                   ["code", {}, [["text", "drop_block"]]],
                                   ["text", "(トークン増に注意)"]
                                 ]
@@ -9989,7 +10017,7 @@
                   ["div", { "class": "diagram-title" }, [["text", "図9 問題の切り分けフロー"]]],
                   [
                     "diagram",
-                    "flowchart TD\n    S[\"問題が起きた\"] --> A{\"HTTP ステータスは?\"}\n    A -- \"400\" --> B[\"エラーメッセージを確認\"]\n    B --> B1{\"思考ブロック関連?\"}\n    B1 -- \"はい\" --> R7[\"7章　 履歴を追記のみに\"]\n    B1 -- \"いいえ\" --> R6[\"6.2　 非対応パラメータを確認\"]\n    A -- \"200\" --> C{\"stop_reason は?\"}\n    C -- \"refusal\" --> R12[\"12章　 カテゴリ別に対応\"]\n    C -- \"max_tokens\" --> R6B[\"max_tokens を引き上げ　または effort を下げる\"]\n    C -- \"end_turn\" --> D{\"品質・挙動の問題?\"}\n    D -- \"途中で止まる・承認が多い\" --> R81[\"8.1・8.2・8.6\"]\n    D -- \"無言・遅い\" --> R84[\"6.5・8.4・5章\"]\n    D -- \"費用が高い\" --> R11[\"8.5・11章\"]\n    D -- \"コードの扱いが違う\" --> R83[\"8.3・9.3\"]\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
+                    "flowchart TD\n    S[\"問題が起きた\"] --> A{\"HTTP ステータスは?\"}\n    A -- \"400\" --> B[\"エラーメッセージを確認\"]\n    B --> B1{\"思考ブロック関連?\"}\n    B1 -- \"はい\" --> R7[\"7章　 今後の不一致は追記のみで防ぐ　既に無効なブロックは　生成時のプレフィックスに戻すか　新しい会話で始める\"]\n    B1 -- \"いいえ\" --> R6[\"6.2　 非対応パラメータを確認\"]\n    A -- \"200\" --> C{\"stop_reason は?\"}\n    C -- \"refusal\" --> R12[\"12章　 カテゴリ別に対応\"]\n    C -- \"max_tokens\" --> R6B[\"max_tokens を引き上げ　または effort を下げる\"]\n    C -- \"end_turn\" --> D{\"品質・挙動の問題?\"}\n    D -- \"途中で止まる・承認が多い\" --> R81[\"8.1・8.2・8.6\"]\n    D -- \"無言・遅い\" --> R84[\"6.5・8.4・5章\"]\n    D -- \"費用が高い\" --> R11[\"8.5・11章\"]\n    D -- \"コードの扱いが違う\" --> R83[\"8.3・9.3\"]\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
                   ]
                 ]
               ]

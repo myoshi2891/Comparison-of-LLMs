@@ -1093,12 +1093,12 @@
               >)。
             </li>
             <li>
-              ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5
+              フォールバックを明示的に有効にした場合に限り、ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5
               の応答に切り替わる設計です <span class="tag official">公式</span> (<a
                 class="src-link"
                 href="#S1"
                 >S1</a
-              >)。
+              >)。有効にしなければ拒否のまま返ります。
             </li>
           </ul>
           <h3 id="s1-3">1.3 公式ベンチマークの要点(Fable 5.2 / Fable 5.1 / Opus 5.5)</h3>
@@ -1399,10 +1399,15 @@
                   Q4 -- "いいえ" --> DONE["そのまま運用"]
                   FABLE --> Q5{"一部だけが難所?"}
                   Q5 -- "はい" --> HYBRID["小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行"]
-                  Q5 -- "いいえ" --> DONE
+                  Q5 -- "いいえ" --> EVAL{"Fable の構成で　evals が基準を満たす?"}
+                  HYBRID --> EVAL
+                  EVAL -- "はい" --> DONE
+                  EVAL -- "いいえ" --> RETRY["effort・プロンプト・分担を見直して　選定からやり直す"]
+                  RETRY --> Q5
 
                   class FABLE,HYBRID hub
                   class DONE,HAIKU,OPUS done
+                  class RETRY box
             </script>
           </div>
           <h3 id="s3-3">3.3 タスク別の使い分け表</h3>
@@ -1597,7 +1602,11 @@
                     API を使うなら、モデル ID を <code>claude-fable-5-2</code> にする
                     <span class="tag official">公式</span> (<a class="src-link" href="#S3">S3</a>)
                   </td>
-                  <td>最小のリクエストで 200 が返る</td>
+                  <td>
+                    最小のリクエストで 200 が返る(認証・通信の確認)。生成の確認として、本文の
+                    <code>stop_reason</code> が <code>refusal</code> ではなく <code>end_turn</code> で、<code>model</code> が
+                    <code>claude-fable-5-2</code> である
+                  </td>
                 </tr>
                 <tr>
                   <td>5</td>
@@ -2519,20 +2528,19 @@
             <code>"drop_block"</code>
             にすると、無効な思考ブロックを破棄して続行できます。破棄したブロックは、レスポンスの
             <code>input_transformations</code> に一覧されます
-            <span class="tag official">公式</span> (<a class="src-link" href="#S3">S3</a>)。
+            <span class="tag official">公式</span> (<a class="src-link" href="#S3">S3</a>)。既存のリクエストへは次の
+            <code>thinking</code> フィールドだけを統合し、<code>messages</code>
+            は手元の有効なメッセージの配列をそのまま送ります。
           </p>
           <div class="code-block">
             <div class="cb-head">json</div>
             <pre><code class="language-json"></code></pre>
             <script type="text/plain">
               {
-                "model": "claude-fable-5-2",
-                "max_tokens": 16000,
                 "thinking": {
                   "type": "adaptive",
                   "block_binding": { "prefix_mismatch_behavior": "drop_block" }
-                },
-                "messages": ["..."]
+                }
               }
             </script>
           </div>
@@ -3973,10 +3981,11 @@
             <div class="cb-head">python</div>
             <pre><code class="language-python"></code></pre>
             <script type="text/plain">
-              RATES = {  # USD / 百万トークン(公式価格表)
+              RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inference_geo="us" は全項目 1.1 倍)
                   "standard": {"in": 8.0, "out": 40.0, "cache_read": 0.20, "cache_write_5m": 10.0, "cache_write_1h": 16.0},
-                  "batch": {"in": 4.0, "out": 20.0},
-                  "fast": {"in": 16.0, "out": 80.0},  # fast mode のキャッシュ単価は公式の価格表で確認する
+                  # batch・fast のキャッシュ単価は、公式の倍率(5分書き込み 1.25 倍・1時間書き込み 2 倍・読み出し 0.025 倍)を各モードの入力単価に掛けた値
+                  "batch": {"in": 4.0, "out": 20.0, "cache_read": 0.10, "cache_write_5m": 5.0, "cache_write_1h": 8.0},
+                  "fast": {"in": 16.0, "out": 80.0, "cache_read": 0.40, "cache_write_5m": 20.0, "cache_write_1h": 32.0},
               }
 
 
@@ -4004,6 +4013,7 @@
               # 例: 未キャッシュ入力5万 + キャッシュ読み出し15万 + 出力3万(思考込み)
               example = {"input_tokens": 50_000, "cache_read_input_tokens": 150_000, "output_tokens": 30_000}
               print(round(estimate_usd(example), 2))  # 0.40 + 0.03 + 1.20 = 1.63
+              print(round(estimate_usd(example, "fast"), 2))  # 0.80 + 0.06 + 2.40 = 3.26
             </script>
           </div>
           <h3 id="s11-2">11.2 コスト比較の注意</h3>
@@ -4238,9 +4248,9 @@
                   LEGIT -- "いいえ" --> STOP["依頼を取り下げる"]
                   CAT -- "frontier_llm" --> LIMIT["該当領域は能力が制限される　他の手段を検討"]
                   CAT -- "その他" --> LOG["ログに記録して内容を確認"]
-                  VERIFY --> FB{"当面は代替モデルで継続したい?"}
-                  FB -- "はい" --> FALLBACK["Opus 4.8・Opus 5 へフォールバック"]
-                  FB -- "いいえ" --> WAIT["承認を待つ"]
+                  VERIFY --> FB{"フォールバックを許可する　運用方針が明示されている?"}
+                  FB -- "はい" --> FALLBACK["方針で承認した　Opus 4.8・Opus 5 へフォールバック"]
+                  FB -- "いいえ・未決定" --> WAIT["拒否のまま終了　方針の決定と承認を待つ"]
 
                   class OK done
                   class STOP,LIMIT box
@@ -4547,7 +4557,11 @@
                 <tr>
                   <td>400: <code>The block is bound to a different conversation</code></td>
                   <td>履歴の編集後に、無効になった思考ブロックを送っている</td>
-                  <td>履歴を追記のみにする。暫定は <code>drop_block</code>(トークン増に注意)</td>
+                  <td>
+                    今後の不一致は履歴を追記のみにして防ぐ。後から <code>system</code>
+                    などを編集して既に無効になったブロックは追記では直らないため、ブロックを生成したときのプレフィックスに戻すか、編集を残すなら新しい会話を始める。暫定は
+                    <code>drop_block</code>(トークン増に注意)
+                  </td>
                   <td>7章</td>
                 </tr>
                 <tr>
@@ -4669,7 +4683,7 @@
                   S["問題が起きた"] --> A{"HTTP ステータスは?"}
                   A -- "400" --> B["エラーメッセージを確認"]
                   B --> B1{"思考ブロック関連?"}
-                  B1 -- "はい" --> R7["7章　 履歴を追記のみに"]
+                  B1 -- "はい" --> R7["7章　 今後の不一致は追記のみで防ぐ　既に無効なブロックは　生成時のプレフィックスに戻すか　新しい会話で始める"]
                   B1 -- "いいえ" --> R6["6.2　 非対応パラメータを確認"]
                   A -- "200" --> C{"stop_reason は?"}
                   C -- "refusal" --> R12["12章　 カテゴリ別に対応"]

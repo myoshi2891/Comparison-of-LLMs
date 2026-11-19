@@ -101,7 +101,7 @@ flowchart LR
 ```
 
 - Fable 5.2 の安全装置は 5.1 と同等の堅牢さを保ちつつ、不要なブロックが約55%減(cyber 約60%減、bio 約40%減)とされています [公式] (S1)。
-- ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です [公式] (S1)。
+- フォールバックを明示的に有効にした場合に限り、ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です [公式] (S1)。有効にしなければ拒否のまま返ります。
 
 ### 1.3 公式ベンチマークの要点(Fable 5.2 / Fable 5.1 / Opus 5.5)
 
@@ -180,7 +180,11 @@ flowchart TD
     Q4 -- "いいえ" --> DONE["そのまま運用"]
     FABLE --> Q5{"一部だけが難所?"}
     Q5 -- "はい" --> HYBRID["小型モデルが主担当 + Fable を advisor に<br/>または Fable が指揮し小型モデルが実行"]
-    Q5 -- "いいえ" --> DONE
+    Q5 -- "いいえ" --> EVAL{"Fable の構成で<br/>evals が基準を満たす?"}
+    HYBRID --> EVAL
+    EVAL -- "はい" --> DONE
+    EVAL -- "いいえ" --> RETRY["effort・プロンプト・分担を見直して<br/>選定からやり直す"]
+    RETRY --> Q5
 
     classDef main fill:#e8eefc,stroke:#3b5bdb,color:#1b1f3b
     classDef ok fill:#e6f4ea,stroke:#2b8a3e,color:#0b2e13
@@ -225,7 +229,7 @@ Claude Code の advisor 機能では、メインモデルと advisor モデル�
 | 1 | 利用プランを確認する。Fable 5.2 は Pro / Max / Ultra / Team / Enterprise で利用できる [公式] (S2) | claude.ai のモデルピッカーに Fable 5.2 が出る |
 | 2 | Claude Code を **v2.1.321 以降** に更新する [公式] (S7, S8) | `claude --version` |
 | 3 | モデルを選択する | Claude Code 内で `/model fable` |
-| 4 | API を使うなら、モデル ID を `claude-fable-5-2` にする [公式] (S3) | 最小のリクエストで 200 が返る |
+| 4 | API を使うなら、モデル ID を `claude-fable-5-2` にする [公式] (S3) | 最小のリクエストで 200 が返る(認証・通信の確認)。生成の確認として、本文の `stop_reason` が `refusal` ではなく `end_turn` で、`model` が `claude-fable-5-2` である |
 | 5 | **データ保持の要件**を法務・セキュリティと合意する。30日保持が前提で、ZDR は原則使えない。Enterprise には Enterprise Frontier Safeguards(顧客インフラ上で保存し ZDR と両立する監視、非公開ベータ)がある [公式] (S1, S3) | 契約・社内規程との突き合わせ |
 | 6 | 利用枠の仕様を把握する(4.2 参照) | プラン画面の使用量表示 |
 
@@ -635,17 +639,14 @@ flowchart TD
 
 ### 7.4 暫定回避: `drop_block`(あくまで応急処置)
 
-編集を直す時間がないときは、ベータのヘッダ `thinking-binding-controls-2026-08-01` を付け、`thinking.block_binding.prefix_mismatch_behavior` を `"drop_block"` にすると、無効な思考ブロックを破棄して続行できます。破棄したブロックは、レスポンスの `input_transformations` に一覧されます [公式] (S3)。
+編集を直す時間がないときは、ベータのヘッダ `thinking-binding-controls-2026-08-01` を付け、`thinking.block_binding.prefix_mismatch_behavior` を `"drop_block"` にすると、無効な思考ブロックを破棄して続行できます。破棄したブロックは、レスポンスの `input_transformations` に一覧されます [公式] (S3)。既存のリクエストへは次の `thinking` フィールドだけを統合し、`messages` は手元の有効なメッセージの配列をそのまま送ります。
 
 ```json
 {
-  "model": "claude-fable-5-2",
-  "max_tokens": 16000,
   "thinking": {
     "type": "adaptive",
     "block_binding": { "prefix_mismatch_behavior": "drop_block" }
-  },
-  "messages": ["..."]
+  }
 }
 ```
 
@@ -1141,10 +1142,11 @@ Claude Managed Agents で advisor を設定している場合、advisor のモ�
 | 再試行・フォールバック | 上記を再実行した分 | 切替でキャッシュが失われる場合がある |
 
 ```python
-RATES = {  # USD / 百万トークン(公式価格表)
+RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inference_geo="us" は全項目 1.1 倍)
     "standard": {"in": 8.0, "out": 40.0, "cache_read": 0.20, "cache_write_5m": 10.0, "cache_write_1h": 16.0},
-    "batch": {"in": 4.0, "out": 20.0},
-    "fast": {"in": 16.0, "out": 80.0},  # fast mode のキャッシュ単価は公式の価格表で確認する
+    # batch・fast のキャッシュ単価は、公式の倍率(5分書き込み 1.25 倍・1時間書き込み 2 倍・読み出し 0.025 倍)を各モードの入力単価に掛けた値
+    "batch": {"in": 4.0, "out": 20.0, "cache_read": 0.10, "cache_write_5m": 5.0, "cache_write_1h": 8.0},
+    "fast": {"in": 16.0, "out": 80.0, "cache_read": 0.40, "cache_write_5m": 20.0, "cache_write_1h": 32.0},
 }
 
 
@@ -1172,6 +1174,7 @@ def estimate_usd(usage: dict, mode: str = "standard") -> float:
 # 例: 未キャッシュ入力5万 + キャッシュ読み出し15万 + 出力3万(思考込み)
 example = {"input_tokens": 50_000, "cache_read_input_tokens": 150_000, "output_tokens": 30_000}
 print(round(estimate_usd(example), 2))  # 0.40 + 0.03 + 1.20 = 1.63
+print(round(estimate_usd(example, "fast"), 2))  # 0.80 + 0.06 + 2.40 = 3.26
 ```
 
 ### 11.2 コスト比較の注意
@@ -1239,9 +1242,9 @@ flowchart TD
     LEGIT -- "いいえ" --> STOP["依頼を取り下げる"]
     CAT -- "frontier_llm" --> LIMIT["該当領域は能力が制限される<br/>他の手段を検討"]
     CAT -- "その他" --> LOG["ログに記録して内容を確認"]
-    VERIFY --> FB{"当面は代替モデルで継続したい?"}
-    FB -- "はい" --> FALLBACK["Opus 4.8 / Opus 5 へフォールバック"]
-    FB -- "いいえ" --> WAIT["承認を待つ"]
+    VERIFY --> FB{"フォールバックを許可する<br/>運用方針が明示されている?"}
+    FB -- "はい" --> FALLBACK["方針で承認した<br/>Opus 4.8 / Opus 5 へフォールバック"]
+    FB -- "いいえ・未決定" --> WAIT["拒否のまま終了<br/>方針の決定と承認を待つ"]
 
     classDef ok fill:#e6f4ea,stroke:#2b8a3e,color:#0b2e13
     classDef ng fill:#fdecea,stroke:#c92a2a,color:#3b0b0b
@@ -1359,7 +1362,7 @@ Elvis Saravia(DAIR.AI)は、本番でのモデル選定は公開ベンチマー�
 
 | 症状 | 原因 | 対処 | 参照 |
 | --- | --- | --- | --- |
-| 400: `The block is bound to a different conversation` | 履歴の編集後に、無効になった思考ブロックを送っている | 履歴を追記のみにする。暫定は `drop_block`(トークン増に注意) | 7章 |
+| 400: `The block is bound to a different conversation` | 履歴の編集後に、無効になった思考ブロックを送っている | 今後の不一致は履歴を追記のみにして防ぐ。後から `system` などを編集して既に無効になったブロックは追記では直らないため、ブロックを生成したときのプレフィックスに戻すか、編集を残すなら新しい会話を始める。暫定は `drop_block`(トークン増に注意) | 7章 |
 | 400: `thinking` 指定が不正 | `enabled` / `disabled` / `budget_tokens` を使っている | 省略するか `adaptive`。深さは effort | 6.2 |
 | 400: `tool_choice` が不正 | `any` / 特定ツールの強制 | `auto` + `strict: true` | 6.3 |
 | 400: コンピュータ操作ツールのエラー | `computer_20251124` を使っている(Bedrock以外) | `computer_toolset_20260801` | 6.2 |
@@ -1385,7 +1388,7 @@ flowchart TD
     S["問題が起きた"] --> A{"HTTP ステータスは?"}
     A -- "400" --> B["エラーメッセージを確認"]
     B --> B1{"思考ブロック関連?"}
-    B1 -- "はい" --> R7["7章: 履歴を追記のみに"]
+    B1 -- "はい" --> R7["7章: 今後の不一致は追記のみで防ぐ<br/>既に無効なブロックは<br/>生成時のプレフィックスに戻すか<br/>新しい会話で始める"]
     B1 -- "いいえ" --> R6["6.2: 非対応パラメータを確認"]
     A -- "200" --> C{"stop_reason は?"}
     C -- "refusal" --> R12["12章: カテゴリ別に対応"]

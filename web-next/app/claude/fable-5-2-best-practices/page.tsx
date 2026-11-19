@@ -23,7 +23,7 @@ const LIGHT_THEME = {
 const DIAGRAM_0 =
   'flowchart LR\n    BASE["同一の基盤モデル"]\n    FABLE["Claude Fable 5.2　全ユーザーが利用可能　cyber・bio の安全装置あり"]\n    MYTHOS["Claude Mythos 5.2　認証済み組織のみ　cyber・bio の制限を緩和"]\n    CVP["Cyber Verification Program"]\n    LSVP["Life Sciences Verification Program"]\n    SEC["Claude Security　Enterprise プラン"]\n\n    BASE --> FABLE\n    BASE --> MYTHOS\n    CVP --> MYTHOS\n    LSVP --> MYTHOS\n    MYTHOS --> SEC\n\n    class BASE,FABLE hub\n    class MYTHOS box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_1 =
-  'flowchart TD\n    START["新しいタスク"] --> Q1{"仕様は明確で　1〜数ファイルで完結する?"}\n    Q1 -- "はい" --> Q2{"大量・低遅延・低コストが最優先?"}\n    Q2 -- "はい" --> HAIKU["Haiku 5.5・Sonnet 5.5"]\n    Q2 -- "いいえ" --> OPUS["Opus 5.5 を medium〜high で試す"]\n    Q1 -- "いいえ" --> Q3{"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?"}\n    Q3 -- "はい" --> FABLE["Fable 5.2 を high で試す"]\n    Q3 -- "いいえ" --> OPUS\n    OPUS --> Q4{"Opus の高 effort でも　evals が基準未達?"}\n    Q4 -- "はい" --> FABLE\n    Q4 -- "いいえ" --> DONE["そのまま運用"]\n    FABLE --> Q5{"一部だけが難所?"}\n    Q5 -- "はい" --> HYBRID["小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行"]\n    Q5 -- "いいえ" --> DONE\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
+  'flowchart TD\n    START["新しいタスク"] --> Q1{"仕様は明確で　1〜数ファイルで完結する?"}\n    Q1 -- "はい" --> Q2{"大量・低遅延・低コストが最優先?"}\n    Q2 -- "はい" --> HAIKU["Haiku 5.5・Sonnet 5.5"]\n    Q2 -- "いいえ" --> OPUS["Opus 5.5 を medium〜high で試す"]\n    Q1 -- "いいえ" --> Q3{"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?"}\n    Q3 -- "はい" --> FABLE["Fable 5.2 を high で試す"]\n    Q3 -- "いいえ" --> OPUS\n    OPUS --> Q4{"Opus の高 effort でも　evals が基準未達?"}\n    Q4 -- "はい" --> FABLE\n    Q4 -- "いいえ" --> DONE["そのまま運用"]\n    FABLE --> Q5{"一部だけが難所?"}\n    Q5 -- "はい" --> HYBRID["小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行"]\n    Q5 -- "いいえ" --> EVAL{"Fable の構成で　evals が基準を満たす?"}\n    HYBRID --> EVAL\n    EVAL -- "はい" --> DONE\n    EVAL -- "いいえ" --> RETRY["effort・プロンプト・分担を見直して　選定からやり直す"]\n    RETRY --> Q5\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\n    class RETRY box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_2 =
   'flowchart TD\n    A["タスクを分類する"] --> B{"仕様が明確で　短時間で終わる?"}\n    B -- "はい" --> LOW["low から試す"]\n    B -- "いいえ" --> C{"対話的に人が待っている?"}\n    C -- "はい" --> MED["medium から試す"]\n    C -- "いいえ" --> D{"長時間・無人・　難度が高い?"}\n    D -- "はい" --> HIGH["high を起点にする"]\n    D -- "いいえ" --> MED\n    LOW --> E["自社 evals で評価する"]\n    MED --> E\n    HIGH --> E\n    E --> F{"品質は基準を満たすか?"}\n    F -- "満たす" --> G{"1段下げても満たすか?"}\n    G -- "はい" --> DOWN["1段下げて再評価"]\n    DOWN --> E\n    G -- "いいえ" --> FIX["その effort で確定"]\n    F -- "満たさない" --> H{"high 未満?"}\n    H -- "はい" --> UP["1段上げて再評価"]\n    UP --> E\n    H -- "いいえ" --> I{"プロンプトや　ハーネスに原因がない?"}\n    I -- "原因あり" --> PROMPT["8章の9パターンを確認"]\n    I -- "原因なし" --> XH["xhigh を試し　効果とコストを測定"]\n\n    class LOW,MED,HIGH,XH hub\n    class FIX done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_3 =
@@ -35,9 +35,9 @@ const DIAGRAM_5 =
 const DIAGRAM_6 =
   'flowchart LR\n    HUMAN["人　 目標と完了条件を定義　承認ゲートを管理"]\n    ORCH["指揮役 Fable 5.2　計画・分担・統合"]\n    W1["作業者 A　Sonnet 5.5・low"]\n    W2["作業者 B　Haiku 5.5・low"]\n    W3["作業者 C　Opus 5.5・medium"]\n    VER["検証役　テスト・型検査・形式検証"]\n    REV["レビューチーム　独立した別モデル"]\n    STATE["共有状態　タスク台帳・チェックポイント"]\n\n    HUMAN --> ORCH\n    ORCH --> W1\n    ORCH --> W2\n    ORCH --> W3\n    W1 --> VER\n    W2 --> VER\n    W3 --> VER\n    VER --> ORCH\n    ORCH <--> STATE\n    ORCH --> REV\n    REV --> HUMAN\n\n    class ORCH hub\n    class HUMAN,REV box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_7 =
-  'flowchart TD\n    REQ["リクエスト送信"] --> RESP{"stop_reason は refusal?"}\n    RESP -- "いいえ" --> OK["通常処理"]\n    RESP -- "はい" --> CAT{"stop_details.category"}\n    CAT -- "reasoning_extraction" --> RE["推論を本文に書かせる指示を削除　display を summarized に変更"]\n    CAT -- "cyber・bio" --> LEGIT{"正当な業務か?"}\n    LEGIT -- "はい" --> VERIFY["検証プログラムに申請　Mythos 5.2 の利用を検討"]\n    LEGIT -- "いいえ" --> STOP["依頼を取り下げる"]\n    CAT -- "frontier_llm" --> LIMIT["該当領域は能力が制限される　他の手段を検討"]\n    CAT -- "その他" --> LOG["ログに記録して内容を確認"]\n    VERIFY --> FB{"当面は代替モデルで継続したい?"}\n    FB -- "はい" --> FALLBACK["Opus 4.8・Opus 5 へフォールバック"]\n    FB -- "いいえ" --> WAIT["承認を待つ"]\n\n    class OK done\n    class STOP,LIMIT box\n    class FALLBACK,VERIFY,RE hub\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
+  'flowchart TD\n    REQ["リクエスト送信"] --> RESP{"stop_reason は refusal?"}\n    RESP -- "いいえ" --> OK["通常処理"]\n    RESP -- "はい" --> CAT{"stop_details.category"}\n    CAT -- "reasoning_extraction" --> RE["推論を本文に書かせる指示を削除　display を summarized に変更"]\n    CAT -- "cyber・bio" --> LEGIT{"正当な業務か?"}\n    LEGIT -- "はい" --> VERIFY["検証プログラムに申請　Mythos 5.2 の利用を検討"]\n    LEGIT -- "いいえ" --> STOP["依頼を取り下げる"]\n    CAT -- "frontier_llm" --> LIMIT["該当領域は能力が制限される　他の手段を検討"]\n    CAT -- "その他" --> LOG["ログに記録して内容を確認"]\n    VERIFY --> FB{"フォールバックを許可する　運用方針が明示されている?"}\n    FB -- "はい" --> FALLBACK["方針で承認した　Opus 4.8・Opus 5 へフォールバック"]\n    FB -- "いいえ・未決定" --> WAIT["拒否のまま終了　方針の決定と承認を待つ"]\n\n    class OK done\n    class STOP,LIMIT box\n    class FALLBACK,VERIFY,RE hub\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_8 =
-  'flowchart TD\n    S["問題が起きた"] --> A{"HTTP ステータスは?"}\n    A -- "400" --> B["エラーメッセージを確認"]\n    B --> B1{"思考ブロック関連?"}\n    B1 -- "はい" --> R7["7章　 履歴を追記のみに"]\n    B1 -- "いいえ" --> R6["6.2　 非対応パラメータを確認"]\n    A -- "200" --> C{"stop_reason は?"}\n    C -- "refusal" --> R12["12章　 カテゴリ別に対応"]\n    C -- "max_tokens" --> R6B["max_tokens を引き上げ　または effort を下げる"]\n    C -- "end_turn" --> D{"品質・挙動の問題?"}\n    D -- "途中で止まる・承認が多い" --> R81["8.1・8.2・8.6"]\n    D -- "無言・遅い" --> R84["6.5・8.4・5章"]\n    D -- "費用が高い" --> R11["8.5・11章"]\n    D -- "コードの扱いが違う" --> R83["8.3・9.3"]\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
+  'flowchart TD\n    S["問題が起きた"] --> A{"HTTP ステータスは?"}\n    A -- "400" --> B["エラーメッセージを確認"]\n    B --> B1{"思考ブロック関連?"}\n    B1 -- "はい" --> R7["7章　 今後の不一致は追記のみで防ぐ　既に無効なブロックは　生成時のプレフィックスに戻すか　新しい会話で始める"]\n    B1 -- "いいえ" --> R6["6.2　 非対応パラメータを確認"]\n    A -- "200" --> C{"stop_reason は?"}\n    C -- "refusal" --> R12["12章　 カテゴリ別に対応"]\n    C -- "max_tokens" --> R6B["max_tokens を引き上げ　または effort を下げる"]\n    C -- "end_turn" --> D{"品質・挙動の問題?"}\n    D -- "途中で止まる・承認が多い" --> R81["8.1・8.2・8.6"]\n    D -- "無言・遅い" --> R84["6.5・8.4・5章"]\n    D -- "費用が高い" --> R11["8.5・11章"]\n    D -- "コードの扱いが違う" --> R83["8.3・9.3"]\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_9 =
   'flowchart TD\n    W1["1週目　環境と評価セット"] --> W2["2週目　effort と棚卸し"]\n    W2 --> W3["3週目　症状別の対処と安全処理"]\n    W3 --> W4["4週目　マルチエージェントと予算ガード"]\n    W4 --> OPS["運用ルール化　週次レビュー"]\n\n    class W1 hub\n    class OPS done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 /** 指定HTMLを全文・要素構造ごと保持する静的ガイド。 */
@@ -746,14 +746,14 @@ export default function Page() {
               </li>{" "}
               <li>
                 {
-                  " ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です "
+                  " フォールバックを明示的に有効にした場合に限り、ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です "
                 }
                 <span className={[styles.tag, styles.official].join(" ")}>{"公式"}</span>
                 {" ("}
                 <a className={styles["src-link"]} href="#S1">
                   {"S1"}
                 </a>
-                {")。 "}
+                {")。有効にしなければ拒否のまま返ります。 "}
               </li>{" "}
             </ul>{" "}
             <h3 id="s1-3">{"1.3 公式ベンチマークの要点(Fable 5.2 / Fable 5.1 / Opus 5.5)"}</h3>{" "}
@@ -1493,7 +1493,21 @@ export default function Page() {
                       </a>
                       {") "}
                     </td>
-                    <td>{"最小のリクエストで 200 が返る"}</td>
+                    <td>
+                      {
+                        " 最小のリクエストで 200 が返る(認証・通信の確認)。生成の確認として、本文の "
+                      }
+                      <code>{"stop_reason"}</code>
+                      {" が "}
+                      <code>{"refusal"}</code>
+                      {" ではなく "}
+                      <code>{"end_turn"}</code>
+                      {" で、"}
+                      <code>{"model"}</code>
+                      {" が "}
+                      <code>{"claude-fable-5-2"}</code>
+                      {" である "}
+                    </td>
                   </tr>
                   <tr>
                     <td>{"5"}</td>
@@ -4167,7 +4181,11 @@ export default function Page() {
               <a className={styles["src-link"]} href="#S3">
                 {"S3"}
               </a>
-              {")。 "}
+              {")。既存のリクエストへは次の "}
+              <code>{"thinking"}</code>
+              {" フィールドだけを統合し、"}
+              <code>{"messages"}</code>
+              {" は手元の有効なメッセージの配列をそのまま送ります。 "}
             </p>{" "}
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
@@ -4176,22 +4194,6 @@ export default function Page() {
                 <code className="language-json">
                   <span className={styles.codeLine}>
                     <span className="hljs-punctuation">{"{"}</span>
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"  "}
-                    <span className="hljs-attr">{'"model"'}</span>
-                    <span className="hljs-punctuation">{":"}</span>{" "}
-                    <span className="hljs-string">{'"claude-fable-5-2"'}</span>
-                    <span className="hljs-punctuation">{","}</span>
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"  "}
-                    <span className="hljs-attr">{'"max_tokens"'}</span>
-                    <span className="hljs-punctuation">{":"}</span>{" "}
-                    <span className="hljs-number">{"16000"}</span>
-                    <span className="hljs-punctuation">{","}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -4223,16 +4225,6 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"  "}
                     <span className="hljs-punctuation">{"}"}</span>
-                    <span className="hljs-punctuation">{","}</span>
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"  "}
-                    <span className="hljs-attr">{'"messages"'}</span>
-                    <span className="hljs-punctuation">{":"}</span>{" "}
-                    <span className="hljs-punctuation">{"["}</span>
-                    <span className="hljs-string">{'"..."'}</span>
-                    <span className="hljs-punctuation">{"]"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -6868,7 +6860,11 @@ export default function Page() {
                 <code className="language-python">
                   <span className={styles.codeLine}>
                     {"RATES = {  "}
-                    <span className="hljs-comment">{"# USD / 百万トークン(公式価格表)"}</span>
+                    <span className="hljs-comment">
+                      {
+                        '# USD / 百万トークン(公式価格表の Global API 価格。inference_geo="us" は全項目 1.1 倍)'
+                      }
+                    </span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -6899,6 +6895,15 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"    "}
+                    <span className="hljs-comment">
+                      {
+                        "# batch・fast のキャッシュ単価は、公式の倍率(5分書き込み 1.25 倍・1時間書き込み 2 倍・読み出し 0.025 倍)を各モードの入力単価に掛けた値"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
                     <span className="hljs-string">{'"batch"'}</span>
                     {": {"}
                     <span className="hljs-string">{'"in"'}</span>
@@ -6908,6 +6913,18 @@ export default function Page() {
                     <span className="hljs-string">{'"out"'}</span>
                     {": "}
                     <span className="hljs-number">{"20.0"}</span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_read"'}</span>
+                    {": "}
+                    <span className="hljs-number">{"0.10"}</span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_write_5m"'}</span>
+                    {": "}
+                    <span className="hljs-number">{"5.0"}</span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_write_1h"'}</span>
+                    {": "}
+                    <span className="hljs-number">{"8.0"}</span>
                     {"},"}
                   </span>
                   {"\n"}
@@ -6922,10 +6939,19 @@ export default function Page() {
                     <span className="hljs-string">{'"out"'}</span>
                     {": "}
                     <span className="hljs-number">{"80.0"}</span>
-                    {"},  "}
-                    <span className="hljs-comment">
-                      {"# fast mode のキャッシュ単価は公式の価格表で確認する"}
-                    </span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_read"'}</span>
+                    {": "}
+                    <span className="hljs-number">{"0.40"}</span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_write_5m"'}</span>
+                    {": "}
+                    <span className="hljs-number">{"20.0"}</span>
+                    {", "}
+                    <span className="hljs-string">{'"cache_write_1h"'}</span>
+                    {": "}
+                    <span className="hljs-number">{"32.0"}</span>
+                    {"},"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>{"}"}</span>
@@ -7151,6 +7177,18 @@ export default function Page() {
                     <span className="hljs-number">{"2"}</span>
                     {"))  "}
                     <span className="hljs-comment">{"# 0.40 + 0.03 + 1.20 = 1.63"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    <span className="hljs-built_in">{"print"}</span>
+                    {"("}
+                    <span className="hljs-built_in">{"round"}</span>
+                    {"(estimate_usd(example, "}
+                    <span className="hljs-string">{'"fast"'}</span>
+                    {"), "}
+                    <span className="hljs-number">{"2"}</span>
+                    {"))  "}
+                    <span className="hljs-comment">{"# 0.80 + 0.06 + 2.40 = 3.26"}</span>
                   </span>
                 </code>
               </pre>{" "}
@@ -8150,9 +8188,13 @@ export default function Page() {
                     </td>
                     <td>{"履歴の編集後に、無効になった思考ブロックを送っている"}</td>
                     <td>
-                      {"履歴を追記のみにする。暫定は "}
+                      {" 今後の不一致は履歴を追記のみにして防ぐ。後から "}
+                      <code>{"system"}</code>
+                      {
+                        " などを編集して既に無効になったブロックは追記では直らないため、ブロックを生成したときのプレフィックスに戻すか、編集を残すなら新しい会話を始める。暫定は "
+                      }
                       <code>{"drop_block"}</code>
-                      {"(トークン増に注意)"}
+                      {"(トークン増に注意) "}
                     </td>
                     <td>{"7章"}</td>
                   </tr>

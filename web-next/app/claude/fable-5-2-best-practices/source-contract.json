@@ -13,14 +13,14 @@
   },
   "diagrams": [
     "flowchart LR\n    BASE[\"同一の基盤モデル\"]\n    FABLE[\"Claude Fable 5.2　全ユーザーが利用可能　cyber・bio の安全装置あり\"]\n    MYTHOS[\"Claude Mythos 5.2　認証済み組織のみ　cyber・bio の制限を緩和\"]\n    CVP[\"Cyber Verification Program\"]\n    LSVP[\"Life Sciences Verification Program\"]\n    SEC[\"Claude Security　Enterprise プラン\"]\n\n    BASE --> FABLE\n    BASE --> MYTHOS\n    CVP --> MYTHOS\n    LSVP --> MYTHOS\n    MYTHOS --> SEC\n\n    class BASE,FABLE hub\n    class MYTHOS box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
-    "flowchart TD\n    START[\"新しいタスク\"] --> Q1{\"仕様は明確で　1〜数ファイルで完結する?\"}\n    Q1 -- \"はい\" --> Q2{\"大量・低遅延・低コストが最優先?\"}\n    Q2 -- \"はい\" --> HAIKU[\"Haiku 5.5・Sonnet 5.5\"]\n    Q2 -- \"いいえ\" --> OPUS[\"Opus 5.5 を medium〜high で試す\"]\n    Q1 -- \"いいえ\" --> Q3{\"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?\"}\n    Q3 -- \"はい\" --> FABLE[\"Fable 5.2 を high で試す\"]\n    Q3 -- \"いいえ\" --> OPUS\n    OPUS --> Q4{\"Opus の高 effort でも　evals が基準未達?\"}\n    Q4 -- \"はい\" --> FABLE\n    Q4 -- \"いいえ\" --> DONE[\"そのまま運用\"]\n    FABLE --> Q5{\"一部だけが難所?\"}\n    Q5 -- \"はい\" --> HYBRID[\"小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行\"]\n    Q5 -- \"いいえ\" --> DONE\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
+    "flowchart TD\n    START[\"新しいタスク\"] --> Q1{\"仕様は明確で　1〜数ファイルで完結する?\"}\n    Q1 -- \"はい\" --> Q2{\"大量・低遅延・低コストが最優先?\"}\n    Q2 -- \"はい\" --> HAIKU[\"Haiku 5.5・Sonnet 5.5\"]\n    Q2 -- \"いいえ\" --> OPUS[\"Opus 5.5 を medium〜high で試す\"]\n    Q1 -- \"いいえ\" --> Q3{\"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?\"}\n    Q3 -- \"はい\" --> FABLE[\"Fable 5.2 を high で試す\"]\n    Q3 -- \"いいえ\" --> OPUS\n    OPUS --> Q4{\"Opus の高 effort でも　evals が基準未達?\"}\n    Q4 -- \"はい\" --> FABLE\n    Q4 -- \"いいえ\" --> DONE[\"そのまま運用\"]\n    FABLE --> Q5{\"一部だけが難所?\"}\n    Q5 -- \"はい\" --> HYBRID[\"小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行\"]\n    Q5 -- \"いいえ\" --> EVAL{\"Fable の構成で　evals が基準を満たす?\"}\n    HYBRID --> EVAL\n    EVAL -- \"はい\" --> DONE\n    EVAL -- \"いいえ\" --> RETRY[\"effort・プロンプト・分担を見直して　選定からやり直す\"]\n    RETRY --> Q5\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\n    class RETRY box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
     "flowchart TD\n    A[\"タスクを分類する\"] --> B{\"仕様が明確で　短時間で終わる?\"}\n    B -- \"はい\" --> LOW[\"low から試す\"]\n    B -- \"いいえ\" --> C{\"対話的に人が待っている?\"}\n    C -- \"はい\" --> MED[\"medium から試す\"]\n    C -- \"いいえ\" --> D{\"長時間・無人・　難度が高い?\"}\n    D -- \"はい\" --> HIGH[\"high を起点にする\"]\n    D -- \"いいえ\" --> MED\n    LOW --> E[\"自社 evals で評価する\"]\n    MED --> E\n    HIGH --> E\n    E --> F{\"品質は基準を満たすか?\"}\n    F -- \"満たす\" --> G{\"1段下げても満たすか?\"}\n    G -- \"はい\" --> DOWN[\"1段下げて再評価\"]\n    DOWN --> E\n    G -- \"いいえ\" --> FIX[\"その effort で確定\"]\n    F -- \"満たさない\" --> H{\"high 未満?\"}\n    H -- \"はい\" --> UP[\"1段上げて再評価\"]\n    UP --> E\n    H -- \"いいえ\" --> I{\"プロンプトや　ハーネスに原因がない?\"}\n    I -- \"原因あり\" --> PROMPT[\"8章の9パターンを確認\"]\n    I -- \"原因なし\" --> XH[\"xhigh を試し　効果とコストを測定\"]\n\n    class LOW,MED,HIGH,XH hub\n    class FIX done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
     "flowchart TD\n    A[\"リクエストを組み立てる\"] --> B{\"system・tools・過去メッセージを　前回から変更した?\"}\n    B -- \"いいえ　追記のみ\" --> OK[\"検査に合格　思考が再利用され　キャッシュも効く\"]\n    B -- \"はい\" --> C{\"思考ブロックを　含めて送った?\"}\n    C -- \"いいえ\" --> WEAK[\"ブロックを除いて送信　モデルが考え直し出力トークン増　類推\"]\n    C -- \"はい\" --> D{\"prefix_mismatch_behavior　の設定\"}\n    D -- \"未設定\" --> ERR[\"400 エラー\"]\n    D -- \"drop_block\" --> DROP[\"ブロックを破棄して継続　再思考でトークン増の恐れ\"]\n\n    class OK done\n    class ERR,DROP,WEAK box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
     "flowchart TD\n    A[\"1　アプリが1回目のリクエストを送る　system　tools　user\"] --> B[\"2　APIが thinking ブロックと tool_use を返す\"]\n    B --> C[\"3　アプリは返された content をそのまま履歴に追記する\"]\n    C --> D[\"4　アプリがツールを実行して結果を得る\"]\n    D --> E[\"5　アプリが履歴と tool_result で2回目のリクエストを送る\"]\n    E --> F[\"6　APIが prefix を検査して思考を再利用しキャッシュも効かせる\"]\n    F --> G[\"7　APIが text ブロックと end_turn を返す\"]\n    class A hub\n    class G done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
     "flowchart TD\n    A[\"タスクを受け取る\"] --> B[\"plan mode で計画　effort は medium\"]\n    B --> C[\"別のセッションが　計画を厳しくレビュー\"]\n    C --> D{\"計画は十分?\"}\n    D -- \"いいえ\" --> B\n    D -- \"はい\" --> E{\"作業は長時間・難度が高い?\"}\n    E -- \"はい\" --> F[\"effort を high に上げ　最後まで走らせる\"]\n    E -- \"いいえ\" --> G[\"medium のまま実装\"]\n    F --> H[\"自動検証　テスト・型・リンタ\"]\n    G --> H\n    H --> I{\"検証は合格?\"}\n    I -- \"いいえ\" --> J[\"失敗ログを渡して修正\"]\n    J --> H\n    I -- \"はい\" --> K[\"git diff --stat と　差分を人が読む\"]\n    K --> L{\"頼んでいない変更が　混ざっていない?\"}\n    L -- \"混ざっている\" --> M[\"差し戻し　または範囲を指定して再依頼\"]\n    M --> H\n    L -- \"問題なし\" --> N[\"PR を作成\"]\n\n    class B,F,G,H hub\n    class N done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
     "flowchart LR\n    HUMAN[\"人　 目標と完了条件を定義　承認ゲートを管理\"]\n    ORCH[\"指揮役 Fable 5.2　計画・分担・統合\"]\n    W1[\"作業者 A　Sonnet 5.5・low\"]\n    W2[\"作業者 B　Haiku 5.5・low\"]\n    W3[\"作業者 C　Opus 5.5・medium\"]\n    VER[\"検証役　テスト・型検査・形式検証\"]\n    REV[\"レビューチーム　独立した別モデル\"]\n    STATE[\"共有状態　タスク台帳・チェックポイント\"]\n\n    HUMAN --> ORCH\n    ORCH --> W1\n    ORCH --> W2\n    ORCH --> W3\n    W1 --> VER\n    W2 --> VER\n    W3 --> VER\n    VER --> ORCH\n    ORCH <--> STATE\n    ORCH --> REV\n    REV --> HUMAN\n\n    class ORCH hub\n    class HUMAN,REV box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
-    "flowchart TD\n    REQ[\"リクエスト送信\"] --> RESP{\"stop_reason は refusal?\"}\n    RESP -- \"いいえ\" --> OK[\"通常処理\"]\n    RESP -- \"はい\" --> CAT{\"stop_details.category\"}\n    CAT -- \"reasoning_extraction\" --> RE[\"推論を本文に書かせる指示を削除　display を summarized に変更\"]\n    CAT -- \"cyber・bio\" --> LEGIT{\"正当な業務か?\"}\n    LEGIT -- \"はい\" --> VERIFY[\"検証プログラムに申請　Mythos 5.2 の利用を検討\"]\n    LEGIT -- \"いいえ\" --> STOP[\"依頼を取り下げる\"]\n    CAT -- \"frontier_llm\" --> LIMIT[\"該当領域は能力が制限される　他の手段を検討\"]\n    CAT -- \"その他\" --> LOG[\"ログに記録して内容を確認\"]\n    VERIFY --> FB{\"当面は代替モデルで継続したい?\"}\n    FB -- \"はい\" --> FALLBACK[\"Opus 4.8・Opus 5 へフォールバック\"]\n    FB -- \"いいえ\" --> WAIT[\"承認を待つ\"]\n\n    class OK done\n    class STOP,LIMIT box\n    class FALLBACK,VERIFY,RE hub\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
-    "flowchart TD\n    S[\"問題が起きた\"] --> A{\"HTTP ステータスは?\"}\n    A -- \"400\" --> B[\"エラーメッセージを確認\"]\n    B --> B1{\"思考ブロック関連?\"}\n    B1 -- \"はい\" --> R7[\"7章　 履歴を追記のみに\"]\n    B1 -- \"いいえ\" --> R6[\"6.2　 非対応パラメータを確認\"]\n    A -- \"200\" --> C{\"stop_reason は?\"}\n    C -- \"refusal\" --> R12[\"12章　 カテゴリ別に対応\"]\n    C -- \"max_tokens\" --> R6B[\"max_tokens を引き上げ　または effort を下げる\"]\n    C -- \"end_turn\" --> D{\"品質・挙動の問題?\"}\n    D -- \"途中で止まる・承認が多い\" --> R81[\"8.1・8.2・8.6\"]\n    D -- \"無言・遅い\" --> R84[\"6.5・8.4・5章\"]\n    D -- \"費用が高い\" --> R11[\"8.5・11章\"]\n    D -- \"コードの扱いが違う\" --> R83[\"8.3・9.3\"]\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
+    "flowchart TD\n    REQ[\"リクエスト送信\"] --> RESP{\"stop_reason は refusal?\"}\n    RESP -- \"いいえ\" --> OK[\"通常処理\"]\n    RESP -- \"はい\" --> CAT{\"stop_details.category\"}\n    CAT -- \"reasoning_extraction\" --> RE[\"推論を本文に書かせる指示を削除　display を summarized に変更\"]\n    CAT -- \"cyber・bio\" --> LEGIT{\"正当な業務か?\"}\n    LEGIT -- \"はい\" --> VERIFY[\"検証プログラムに申請　Mythos 5.2 の利用を検討\"]\n    LEGIT -- \"いいえ\" --> STOP[\"依頼を取り下げる\"]\n    CAT -- \"frontier_llm\" --> LIMIT[\"該当領域は能力が制限される　他の手段を検討\"]\n    CAT -- \"その他\" --> LOG[\"ログに記録して内容を確認\"]\n    VERIFY --> FB{\"フォールバックを許可する　運用方針が明示されている?\"}\n    FB -- \"はい\" --> FALLBACK[\"方針で承認した　Opus 4.8・Opus 5 へフォールバック\"]\n    FB -- \"いいえ・未決定\" --> WAIT[\"拒否のまま終了　方針の決定と承認を待つ\"]\n\n    class OK done\n    class STOP,LIMIT box\n    class FALLBACK,VERIFY,RE hub\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
+    "flowchart TD\n    S[\"問題が起きた\"] --> A{\"HTTP ステータスは?\"}\n    A -- \"400\" --> B[\"エラーメッセージを確認\"]\n    B --> B1{\"思考ブロック関連?\"}\n    B1 -- \"はい\" --> R7[\"7章　 今後の不一致は追記のみで防ぐ　既に無効なブロックは　生成時のプレフィックスに戻すか　新しい会話で始める\"]\n    B1 -- \"いいえ\" --> R6[\"6.2　 非対応パラメータを確認\"]\n    A -- \"200\" --> C{\"stop_reason は?\"}\n    C -- \"refusal\" --> R12[\"12章　 カテゴリ別に対応\"]\n    C -- \"max_tokens\" --> R6B[\"max_tokens を引き上げ　または effort を下げる\"]\n    C -- \"end_turn\" --> D{\"品質・挙動の問題?\"}\n    D -- \"途中で止まる・承認が多い\" --> R81[\"8.1・8.2・8.6\"]\n    D -- \"無言・遅い\" --> R84[\"6.5・8.4・5章\"]\n    D -- \"費用が高い\" --> R11[\"8.5・11章\"]\n    D -- \"コードの扱いが違う\" --> R83[\"8.3・9.3\"]\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;",
     "flowchart TD\n    W1[\"1週目　環境と評価セット\"] --> W2[\"2週目　effort と棚卸し\"]\n    W2 --> W3[\"3週目　症状別の対処と安全処理\"]\n    W3 --> W4[\"4週目　マルチエージェントと予算ガード\"]\n    W4 --> OPS[\"運用ルール化　週次レビュー\"]\n\n    class W1 hub\n    class OPS done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
   ],
   "tokens": [
@@ -499,14 +499,6 @@
     ],
     [
       ["hljs-punctuation", "{"],
-      ["hljs-attr", "\"model\""],
-      ["hljs-punctuation", ":"],
-      ["hljs-string", "\"claude-fable-5-2\""],
-      ["hljs-punctuation", ","],
-      ["hljs-attr", "\"max_tokens\""],
-      ["hljs-punctuation", ":"],
-      ["hljs-number", "16000"],
-      ["hljs-punctuation", ","],
       ["hljs-attr", "\"thinking\""],
       ["hljs-punctuation", ":"],
       ["hljs-punctuation", "{"],
@@ -522,12 +514,6 @@
       ["hljs-string", "\"drop_block\""],
       ["hljs-punctuation", "}"],
       ["hljs-punctuation", "}"],
-      ["hljs-punctuation", ","],
-      ["hljs-attr", "\"messages\""],
-      ["hljs-punctuation", ":"],
-      ["hljs-punctuation", "["],
-      ["hljs-string", "\"...\""],
-      ["hljs-punctuation", "]"],
       ["hljs-punctuation", "}"]
     ],
     [
@@ -617,7 +603,10 @@
       ["hljs-punctuation", "}"]
     ],
     [
-      ["hljs-comment", "# USD / 百万トークン(公式価格表)"],
+      [
+        "hljs-comment",
+        "# USD / 百万トークン(公式価格表の Global API 価格。inference_geo=\"us\" は全項目 1.1 倍)"
+      ],
       ["hljs-string", "\"standard\""],
       ["hljs-string", "\"in\""],
       ["hljs-number", "8.0"],
@@ -629,17 +618,32 @@
       ["hljs-number", "10.0"],
       ["hljs-string", "\"cache_write_1h\""],
       ["hljs-number", "16.0"],
+      [
+        "hljs-comment",
+        "# batch・fast のキャッシュ単価は、公式の倍率(5分書き込み 1.25 倍・1時間書き込み 2 倍・読み出し 0.025 倍)を各モードの入力単価に掛けた値"
+      ],
       ["hljs-string", "\"batch\""],
       ["hljs-string", "\"in\""],
       ["hljs-number", "4.0"],
       ["hljs-string", "\"out\""],
       ["hljs-number", "20.0"],
+      ["hljs-string", "\"cache_read\""],
+      ["hljs-number", "0.10"],
+      ["hljs-string", "\"cache_write_5m\""],
+      ["hljs-number", "5.0"],
+      ["hljs-string", "\"cache_write_1h\""],
+      ["hljs-number", "8.0"],
       ["hljs-string", "\"fast\""],
       ["hljs-string", "\"in\""],
       ["hljs-number", "16.0"],
       ["hljs-string", "\"out\""],
       ["hljs-number", "80.0"],
-      ["hljs-comment", "# fast mode のキャッシュ単価は公式の価格表で確認する"],
+      ["hljs-string", "\"cache_read\""],
+      ["hljs-number", "0.40"],
+      ["hljs-string", "\"cache_write_5m\""],
+      ["hljs-number", "20.0"],
+      ["hljs-string", "\"cache_write_1h\""],
+      ["hljs-number", "32.0"],
       ["hljs-keyword", "def"],
       ["hljs-title function_", "estimate_usd"],
       ["hljs-params", "usage: dict, mode: str = \"standard\""],
@@ -712,7 +716,12 @@
       ["hljs-built_in", "print"],
       ["hljs-built_in", "round"],
       ["hljs-number", "2"],
-      ["hljs-comment", "# 0.40 + 0.03 + 1.20 = 1.63"]
+      ["hljs-comment", "# 0.40 + 0.03 + 1.20 = 1.63"],
+      ["hljs-built_in", "print"],
+      ["hljs-built_in", "round"],
+      ["hljs-string", "\"fast\""],
+      ["hljs-number", "2"],
+      ["hljs-comment", "# 0.80 + 0.06 + 2.40 = 3.26"]
     ],
     [
       ["hljs-keyword", "def"],
@@ -762,7 +771,7 @@
     "{\n  \"model\": \"claude-fable-5-2\",\n  \"max_tokens\": 4000,\n  \"output_config\": { \"effort\": \"low\" },\n  \"tools\": [\n    {\n      \"name\": \"record_review\",\n      \"description\": \"コードレビューの結果を記録する\",\n      \"strict\": true,\n      \"input_schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"severity\": { \"type\": \"string\", \"enum\": [\"low\", \"medium\", \"high\"] },\n          \"summary\": { \"type\": \"string\" }\n        },\n        \"required\": [\"severity\", \"summary\"],\n        \"additionalProperties\": false\n      }\n    }\n  ],\n  \"tool_choice\": { \"type\": \"auto\" },\n  \"messages\": [{ \"role\": \"user\", \"content\": \"次の差分をレビューして、結果を記録して: ...\" }]\n}",
     "def call(body: dict, betas: list[str] | None = None) -> dict:\n    headers = dict(HEADERS)\n    if betas:\n        headers[\"anthropic-beta\"] = \",\".join(betas)\n    r = httpx.post(API, headers=headers, json=body, timeout=900)\n    r.raise_for_status()\n    return r.json()\n\n\ndef agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = \"high\", max_turns: int = 60, checkpoint: dict | None = None) -> dict:\n    # system と tools は会話の途中で変更しない(prefix チェックの対象)\n    system = \"あなたはこのリポジトリの保守担当エージェントです。...\"\n    # checkpoint={} を渡すと、上限到達後は同じ辞書で再呼び出しして続行できる\n    messages = [{\"role\": \"user\", \"content\": user_prompt}]\n    if checkpoint is not None and \"messages\" in checkpoint:\n        messages = checkpoint[\"messages\"]\n\n    for _ in range(max_turns):\n        data = call({\n            \"model\": \"claude-fable-5-2\",\n            \"max_tokens\": 32_000,\n            \"output_config\": {\"effort\": effort},\n            \"system\": system,\n            \"cache_control\": {\"type\": \"ephemeral\"},  # 自動キャッシュを明示的に有効化\n            \"tools\": tools,\n            \"messages\": messages,\n        })\n\n        if data[\"stop_reason\"] == \"max_tokens\":\n            # 途中で切れた応答(未完成の tool_use を含み得る)は履歴へ追加しない。\n            # checkpoint は直前に完了したツール結果バッチのまま残る\n            return data\n\n        # 返ってきた content をそのまま追記する。ブロックの削除・並べ替え・書き換えは禁止\n        messages.append({\"role\": \"assistant\", \"content\": data[\"content\"]})\n\n        if data[\"stop_reason\"] == \"refusal\":\n            return data  # 12章の方針で処理する\n        if data[\"stop_reason\"] == \"pause_turn\":\n            if checkpoint is not None:\n                checkpoint[\"messages\"] = messages\n            continue\n        if data[\"stop_reason\"] != \"tool_use\":\n            return data\n\n        results = []\n        failed_toolsets = set()  # このターンで操作が失敗したツールセット(computer と browser を別々に追跡)\n        for block in data[\"content\"]:\n            if block[\"type\"] == \"tool_use\":\n                result = {\"type\": \"tool_result\", \"tool_use_id\": block[\"id\"]}\n                # ツールセットのメンバーへの結果には同じ toolset_name を返す(欠落・不一致は拒否される)\n                if \"toolset_name\" in block:\n                    result[\"toolset_name\"] = block[\"toolset_name\"]\n                toolset = block.get(\"toolset_name\")\n                if toolset in failed_toolsets:\n                    # 同じツールセットの後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す\n                    result[\"content\"] = f\"Not executed: an earlier {toolset} action in this turn failed\"\n                    result[\"is_error\"] = True\n                    results.append(result)\n                    continue\n                # ツールセットのメンバーは別のツールセットに同名のツールがあり得るため、\n                # (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。\n                tool_key = (block[\"toolset_name\"], block[\"name\"]) if \"toolset_name\" in block else block[\"name\"]\n                # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。\n                try:\n                    result[\"content\"] = copy.deepcopy(run_tool(tool_key, copy.deepcopy(block[\"input\"])))\n                except Exception as error:\n                    result[\"content\"] = f\"{type(error).__name__}: {error}\"\n                    result[\"is_error\"] = True\n                    if toolset in (\"computer\", \"browser\"):\n                        failed_toolsets.add(toolset)\n                results.append(result)\n        messages.append({\"role\": \"user\", \"content\": results})\n        if checkpoint is not None:\n            checkpoint[\"messages\"] = messages  # 次のAPI呼び出し前に保存する\n\n    if checkpoint is not None:\n        checkpoint[\"messages\"] = messages  # 最後のtool_resultも保存する\n    raise RuntimeError(\"max_turns に到達しました\")",
     "data = call(\n    {\n        \"model\": \"claude-fable-5-2\",\n        \"max_tokens\": 32_000,\n        \"output_config\": {\"effort\": \"high\"},\n        \"thinking\": {\"type\": \"adaptive\", \"display\": \"updates\"},\n        \"messages\": [{\"role\": \"user\", \"content\": \"...\"}],\n    },\n    betas=[\"thinking-display-updates-2026-08-18\"],\n)\n\n# call() 完了後にテキストと thinking の進捗を表示する（待機中の逐次更新ではない）\nfor block in data[\"content\"]:\n    if block[\"type\"] == \"text\":\n        print(block[\"text\"])\n    elif block[\"type\"] == \"thinking\" and block.get(\"thinking\"):\n        print(\"[進捗]\", block[\"thinking\"])",
-    "{\n  \"model\": \"claude-fable-5-2\",\n  \"max_tokens\": 16000,\n  \"thinking\": {\n    \"type\": \"adaptive\",\n    \"block_binding\": { \"prefix_mismatch_behavior\": \"drop_block\" }\n  },\n  \"messages\": [\"...\"]\n}",
+    "{\n  \"thinking\": {\n    \"type\": \"adaptive\",\n    \"block_binding\": { \"prefix_mismatch_behavior\": \"drop_block\" }\n  }\n}",
     "# 作業の完遂\n- ユーザーが依頼した作業が残っている間は、ターンを終えない。残作業を並べて止まる、続行の提案をして待つ、という終わり方をしない。\n- 状況メモの共有や、ユーザーの回答次第で変わる論点の確認は歓迎する。ただし、回答に依存しない作業は止まらずに進める。\n- エラー、タイムアウト、ロックされたファイル、空の結果、失敗するツールに出会ったら、まず原因を調べる。本当の阻害要因でなければ、待って再試行する、要求を直す、別のツールや情報源を使う、といった方法で乗り越える。\n- 誰かが「動かせない」と明確に決めたもの(触るなと指定されたファイル、意図的に与えられていない権限、安全上のガードレール)は迂回しない。見つけた事実をそのまま報告し、安全な別の方法で完了を目指す。\n- 破壊的・不可逆な操作の確認は、これまでどおり省略しない。",
     "あなたはこのコードベースのオーナーであり、長期的なメンテナーです。設計の判断はあなたに任されています。今後もこのコードの上に作り続ける前提で、重複や構造の問題は見つけた時点で整理してください。",
     "しばらくユーザーに報告していません。今何をしているかを一言で伝えてから、作業を続けてください。",
@@ -773,7 +782,7 @@
     "# プロジェクト概要\n(何のためのシステムか、主要ディレクトリ、ビルドとテストのコマンドを3〜10行で書く)\n\n# 作業ルール\n- 変更前後で同じテストを実行し、結果を報告する。\n- ファイル削除、本番へのデプロイ、スキーマ変更、force push は事前に確認する。それ以外の定型作業は確認なしで進めてよい。\n- 失敗したら原因を読んで直してから再実行する。冪等でない処理(./deploy.sh など)は、失敗後に再実行しない。\n\n# コードの所有\nあなたはこのリポジトリのオーナー兼メンテナーです。設計の判断は任せます。重複や構造の問題は見つけた時点で整理してください。\n\n# 報告の書き方\n読み手は作業の途中経過を見ていません。報告は単独で理解できるように書き、重要な点を最初の数文に置いてください。",
     "# 作業ツリーを分けて、並行して別のブランチで作業する\ngit worktree add ../myrepo-feature-a -b feature-a\ngit worktree add ../myrepo-feature-b -b feature-b\n\n# それぞれのディレクトリで Claude Code を起動する\ncd ../myrepo-feature-a && claude --model claude-fable-5-2",
     "{\n  \"hooks\": {\n    \"PostToolUse\": [\n      {\n        \"matcher\": \"Write|Edit\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"jq -j '.tool_input.file_path, \\\"\\\\u0000\\\"' | xargs -0 sh -c 'for file do case \\\"$file\\\" in *.ts|*.tsx|*.js) npx prettier --write -- \\\"$file\\\";; esac; done' sh\"\n          }\n        ]\n      }\n    ]\n  }\n}",
-    "RATES = {  # USD / 百万トークン(公式価格表)\n    \"standard\": {\"in\": 8.0, \"out\": 40.0, \"cache_read\": 0.20, \"cache_write_5m\": 10.0, \"cache_write_1h\": 16.0},\n    \"batch\": {\"in\": 4.0, \"out\": 20.0},\n    \"fast\": {\"in\": 16.0, \"out\": 80.0},  # fast mode のキャッシュ単価は公式の価格表で確認する\n}\n\n\ndef estimate_usd(usage: dict, mode: str = \"standard\") -> float:\n    r = RATES[mode]\n    cache = usage.get(\"cache_creation\") or {}\n    # キャッシュ件数は null で返ることがあるため、0 として扱う\n    read = usage.get(\"cache_read_input_tokens\") or 0\n    write_5m = cache.get(\"ephemeral_5m_input_tokens\") or 0\n    write_1h = cache.get(\"ephemeral_1h_input_tokens\") or 0\n    write_other = max(0, (usage.get(\"cache_creation_input_tokens\") or 0) - write_5m - write_1h)\n    write_5m += write_other\n    cached = read or write_5m or write_1h or usage.get(\"cache_creation_input_tokens\") or 0\n    if cached and any(key not in r for key in (\"cache_read\", \"cache_write_5m\", \"cache_write_1h\")):\n        raise ValueError(\"このモードのキャッシュ単価を確認・設定してから見積もってください\")\n    return (\n        usage.get(\"input_tokens\", 0) * r[\"in\"]\n        + usage.get(\"output_tokens\", 0) * r[\"out\"]\n        + (read * r[\"cache_read\"] if read else 0)\n        + (write_5m * r[\"cache_write_5m\"] if write_5m else 0)\n        + (write_1h * r[\"cache_write_1h\"] if write_1h else 0)\n    ) / 1_000_000\n\n\n# 例: 未キャッシュ入力5万 + キャッシュ読み出し15万 + 出力3万(思考込み)\nexample = {\"input_tokens\": 50_000, \"cache_read_input_tokens\": 150_000, \"output_tokens\": 30_000}\nprint(round(estimate_usd(example), 2))  # 0.40 + 0.03 + 1.20 = 1.63",
+    "RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inference_geo=\"us\" は全項目 1.1 倍)\n    \"standard\": {\"in\": 8.0, \"out\": 40.0, \"cache_read\": 0.20, \"cache_write_5m\": 10.0, \"cache_write_1h\": 16.0},\n    # batch・fast のキャッシュ単価は、公式の倍率(5分書き込み 1.25 倍・1時間書き込み 2 倍・読み出し 0.025 倍)を各モードの入力単価に掛けた値\n    \"batch\": {\"in\": 4.0, \"out\": 20.0, \"cache_read\": 0.10, \"cache_write_5m\": 5.0, \"cache_write_1h\": 8.0},\n    \"fast\": {\"in\": 16.0, \"out\": 80.0, \"cache_read\": 0.40, \"cache_write_5m\": 20.0, \"cache_write_1h\": 32.0},\n}\n\n\ndef estimate_usd(usage: dict, mode: str = \"standard\") -> float:\n    r = RATES[mode]\n    cache = usage.get(\"cache_creation\") or {}\n    # キャッシュ件数は null で返ることがあるため、0 として扱う\n    read = usage.get(\"cache_read_input_tokens\") or 0\n    write_5m = cache.get(\"ephemeral_5m_input_tokens\") or 0\n    write_1h = cache.get(\"ephemeral_1h_input_tokens\") or 0\n    write_other = max(0, (usage.get(\"cache_creation_input_tokens\") or 0) - write_5m - write_1h)\n    write_5m += write_other\n    cached = read or write_5m or write_1h or usage.get(\"cache_creation_input_tokens\") or 0\n    if cached and any(key not in r for key in (\"cache_read\", \"cache_write_5m\", \"cache_write_1h\")):\n        raise ValueError(\"このモードのキャッシュ単価を確認・設定してから見積もってください\")\n    return (\n        usage.get(\"input_tokens\", 0) * r[\"in\"]\n        + usage.get(\"output_tokens\", 0) * r[\"out\"]\n        + (read * r[\"cache_read\"] if read else 0)\n        + (write_5m * r[\"cache_write_5m\"] if write_5m else 0)\n        + (write_1h * r[\"cache_write_1h\"] if write_1h else 0)\n    ) / 1_000_000\n\n\n# 例: 未キャッシュ入力5万 + キャッシュ読み出し15万 + 出力3万(思考込み)\nexample = {\"input_tokens\": 50_000, \"cache_read_input_tokens\": 150_000, \"output_tokens\": 30_000}\nprint(round(estimate_usd(example), 2))  # 0.40 + 0.03 + 1.20 = 1.63\nprint(round(estimate_usd(example, \"fast\"), 2))  # 0.80 + 0.06 + 2.40 = 3.26",
     "def handle_response(data: dict, retry_on_other_model, approved_fallback: str | None = None):\n    if data.get(\"stop_reason\") != \"refusal\":\n        return data\n\n    category = (data.get(\"stop_details\") or {}).get(\"category\")\n\n    if category == \"reasoning_extraction\":\n        # 推奨フォールバックなし。プロンプトから推論の再現を求める指示を削除する\n        raise ValueError(\"推論の再現を本文に求めている指示を削除してください\")\n\n    # 既定は拒否のまま扱い、category だけでは別モデルへ再試行しない。\n    # フォールバックの適格性はハンドラーの外で明示的に判断し、承認した移行先を渡す\n    # (許可された移行先: cyber は Opus 4.8、bio は Opus 5)\n    allowed = {\"cyber\": \"claude-opus-4-8\", \"bio\": \"claude-opus-5\"}\n    if approved_fallback is not None and approved_fallback == allowed.get(category):\n        return retry_on_other_model(approved_fallback)\n\n    raise RuntimeError(f\"拒否されました: category={category}\")"
   ],
   "h1": ["Claude Fable 5.2 ベストプラクティス完全ガイド"],
@@ -909,7 +918,7 @@
     "Fable 5.2 は、過去ターンの思考ブロックを保持して使う preserved thinking を前提に動きます。このため、履歴の扱い方がそのまま信頼性とコストを左右します。",
     "思考ブロックより前にある内容(system、tools、過去のメッセージ)が、モデルがそのブロックを出した時点から変わっていないかを API が検査します。変わっていると、既定では 400 エラーです。Fable 5.2 では全アカウントで強制されます 公式 (S3)。",
     "Claude Code、claude.ai、Claude Managed Agents、Claude Agent SDK が履歴を組み立てる場合は、利用者側で対応する作業は発生しません 公式 (S3)。自前でメッセージ配列を組み立てているコードだけが点検対象です。",
-    "編集を直す時間がないときは、ベータのヘッダ thinking-binding-controls-2026-08-01 を付け、thinking.block_binding.prefix_mismatch_behavior を \"drop_block\" にすると、無効な思考ブロックを破棄して続行できます。破棄したブロックは、レスポンスの input_transformations に一覧されます 公式 (S3)。",
+    "編集を直す時間がないときは、ベータのヘッダ thinking-binding-controls-2026-08-01 を付け、thinking.block_binding.prefix_mismatch_behavior を \"drop_block\" にすると、無効な思考ブロックを破棄して続行できます。破棄したブロックは、レスポンスの input_transformations に一覧されます 公式 (S3)。既存のリクエストへは次の thinking フィールドだけを統合し、messages は手元の有効なメッセージの配列をそのまま送ります。",
     "コストに注意: 毎ターン破棄すると、モデルが毎回考え直すため出力トークンが増えます。公式の検証では、これが最悪のケースとして挙げられています 公式 (S5)。まず自分のタスクで出力トークンを測り、恒久策は履歴を追記のみにすることです。",
     "私見: モデルを頻繁に切り替えるルーターは、切替のたびに推論が失われます。会話ごとにモデルを固定し、切り替えるなら新しい会話か、サブエージェントとして分離するのが安全です。",
     "履歴を追記のみにしてプレフィックスが一致すると、キャッシュ再利用の条件を満たしやすくなります。一致だけではキャッシュは有効になりません。agent_loop() のようにリクエストのトップレベルで cache_control を指定するか、明示的なキャッシュブレークポイントを設定することが前提です。通常のツール定義だけでは自動的にキャッシュされません。キャッシュ読み出しは入力単価の0.025倍($0.20/MTok)で、5分書き込みが $10、1時間書き込みが $16(いずれも百万トークンあたり)です。キャッシュ対象の最小サイズは512トークンです 公式 (S3, S4)。",
@@ -1007,7 +1016,7 @@
     "対象 中級〜上級者",
     "範囲 API・Claude Code・マルチエージェント・コスト",
     "Fable 5.2 の安全装置は 5.1 と同等の堅牢さを保ちつつ、不要なブロックが約55%減(cyber 約60%減、bio 約40%減)とされています 公式 (S1)。",
-    "ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です 公式 (S1)。",
+    "フォールバックを明示的に有効にした場合に限り、ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です 公式 (S1)。有効にしなければ拒否のまま返ります。",
     "まず Opus 5.5 から始める。必要に応じて、上は Fable / Mythos、下は Sonnet 5.5 / Haiku 5.5 に切り替える 公式 (S1)。",
     "Platform Docs の表現: Opus で高い effort に上げても評価基準を満たせないときに Fable へ移る 公式 (S3)。",
     "Fable 5.2 は Advisor(小型モデルが難所で相談する先)や Orchestrator(単純作業を小型モデルへ委譲する指揮役)としても使える 公式 (S1)。",
@@ -1098,7 +1107,7 @@
   "ul": [
     "資料の概要 0読む前に: この資料の確度ラベル 1概要: Fable 5.2 を30秒で把握する 25.1 から 5.2 で何が変わったか 3Step 1: モデル選定 4Step 2: アクセスと環境の準備 5Step 3: effort 設計 6Step 4: API 実装の基本 7Step 5: Preserved thinking と履歴管理 8Step 6: プロンプト設計の9パターン 9Step 7: Claude Code 運用 10Step 8: マルチエージェントと長時間実行 11Step 9: コスト設計 12Step 10: 安全装置・拒否・フォールバック 13Step 11: 評価と品質保証 14トラブルシューティング 15導入チェックリストと30日ロードマップ 16補足: 追加ベストプラクティスと根拠ソース 17未確認事項と留意点",
     "モデルID claude-fable-5-2 調査時点 2026-11-12 対象 中級〜上級者 範囲 API・Claude Code・マルチエージェント・コスト",
-    "Fable 5.2 の安全装置は 5.1 と同等の堅牢さを保ちつつ、不要なブロックが約55%減(cyber 約60%減、bio 約40%減)とされています 公式 (S1)。 ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です 公式 (S1)。",
+    "Fable 5.2 の安全装置は 5.1 と同等の堅牢さを保ちつつ、不要なブロックが約55%減(cyber 約60%減、bio 約40%減)とされています 公式 (S1)。 フォールバックを明示的に有効にした場合に限り、ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です 公式 (S1)。有効にしなければ拒否のまま返ります。",
     "まず Opus 5.5 から始める。必要に応じて、上は Fable / Mythos、下は Sonnet 5.5 / Haiku 5.5 に切り替える 公式 (S1)。 Platform Docs の表現: Opus で高い effort に上げても評価基準を満たせないときに Fable へ移る 公式 (S3)。 Fable 5.2 は Advisor(小型モデルが難所で相談する先)や Orchestrator(単純作業を小型モデルへ委譲する指揮役)としても使える 公式 (S1)。",
     "Claude Code が v2.1.321 以上である モデル選択(/model)と effort(/effort)の操作を一度試した 組織のデータ保持ポリシーが「30日保持」と矛盾しない 既存のプロンプト・CLAUDE.md・エージェント設定を変更前にバックアップした(8章・9章で棚卸しする) 評価用タスクセット(10〜30件)を用意した(13章で使う)",
     "system と tools が、会話の全期間で同一である messages に追記するだけで、既存要素の変更・並べ替え・削除をしていない アシスタントの各ターンを、全ブロックを同じ順序のまま送り返している 履歴の圧縮は compaction / context editing で行い、手作業の要約挿入をしていない 会話の途中でツールのバージョンやアドバイザーのモデルを変えていない(変えるなら新しい会話で)",
@@ -1856,7 +1865,12 @@
       [
         ["td", null, null, "4"],
         ["td", null, null, "API を使うなら、モデル ID を claude-fable-5-2 にする 公式 (S3)"],
-        ["td", null, null, "最小のリクエストで 200 が返る"]
+        [
+          "td",
+          null,
+          null,
+          "最小のリクエストで 200 が返る(認証・通信の確認)。生成の確認として、本文の stop_reason が refusal ではなく end_turn で、model が claude-fable-5-2 である"
+        ]
       ],
       [
         ["td", null, null, "5"],
@@ -3052,7 +3066,12 @@
       [
         ["td", null, null, "400: The block is bound to a different conversation"],
         ["td", null, null, "履歴の編集後に、無効になった思考ブロックを送っている"],
-        ["td", null, null, "履歴を追記のみにする。暫定は drop_block(トークン増に注意)"],
+        [
+          "td",
+          null,
+          null,
+          "今後の不一致は履歴を追記のみにして防ぐ。後から system などを編集して既に無効になったブロックは追記では直らないため、ブロックを生成したときのプレフィックスに戻すか、編集を残すなら新しい会話を始める。暫定は drop_block(トークン増に注意)"
+        ],
         ["td", null, null, "7章"]
       ],
       [
@@ -3964,7 +3983,7 @@
         ],
         [
           "li",
-          "ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です 公式 (S1)。"
+          "フォールバックを明示的に有効にした場合に限り、ブロックされたリクエストは、cyber は Opus 4.8、bio は Opus 5 の応答に切り替わる設計です 公式 (S1)。有効にしなければ拒否のまま返ります。"
         ]
       ],
       []

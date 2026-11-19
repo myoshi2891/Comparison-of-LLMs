@@ -269,5 +269,10 @@
     "selector": ".root .checklist .done :global(span)",
     "media": null,
     "declarations": [["text-decoration", "line-through", false]]
+  },
+  {
+    "selector": ".root .mobile-bar :global(button) :global(i.ti-menu-2)::before",
+    "media": null,
+    "declarations": [["content", "\"\\2630\"", false]]
   }
 ]

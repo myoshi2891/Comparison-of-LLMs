@@ -826,3 +826,7 @@ body:has(.root) :global(nav[aria-label="関連ページ"]) {
 .root .checklist .done :global(span) {
   text-decoration: line-through;
 }
+/* Tabler のスタイルシートを読めない場合も、目次ボタンを見分けられるようページ内でアイコンを描く。 */
+.root .mobile-bar :global(button) :global(i.ti-menu-2)::before {
+  content: "\2630";
+}
