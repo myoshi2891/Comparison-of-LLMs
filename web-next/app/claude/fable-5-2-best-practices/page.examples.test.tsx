@@ -13,7 +13,8 @@ function examples() {
   return Array.from(container.querySelectorAll("pre code"), (e) => e.textContent ?? "");
 }
 function python(program: string, input: unknown) {
-  const result = spawnSync("python3", ["-c", program], {
+  // -E: PYTHON* 環境変数（PYTHONOPTIMIZE 等）を無視し、assert を常に有効にする。
+  const result = spawnSync("python3", ["-E", "-c", program], {
     input: JSON.stringify(input),
     encoding: "utf8",
   });
@@ -453,5 +454,149 @@ with tempfile.TemporaryDirectory() as directory:
     assert not (root / "PWNED").exists()
 `,
     code
+  );
+});
+
+it("表示した費用関数はキャッシュ件数の明示的なnullを0として扱う", () => {
+  python(
+    `
+import ast, json, math, sys
+scope = {}
+for code in json.load(sys.stdin):
+    if "def usd(" not in code and "def estimate_usd(" not in code:
+        continue
+    nodes = [n for n in ast.parse(code).body if
+        isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id in ("PRICE", "RATES") for t in n.targets)
+        or isinstance(n, ast.FunctionDef) and n.name in ("usd", "estimate_usd")]
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), "example", "exec"), scope)
+usage = {"input_tokens": 1000000, "output_tokens": 0, "cache_read_input_tokens": None,
+    "cache_creation_input_tokens": None,
+    "cache_creation": {"ephemeral_5m_input_tokens": None, "ephemeral_1h_input_tokens": None}}
+for name in ("usd", "estimate_usd"):
+    assert scope[name](usage) == 8, name
+    assert math.isclose(scope[name]({"cache_creation_input_tokens": 1000000,
+        "cache_creation": {"ephemeral_5m_input_tokens": None, "ephemeral_1h_input_tokens": 1000000}}), 16), name
+for mode in ("batch", "fast"):
+    assert scope["estimate_usd"](usage, mode) > 0
+`,
+    examples()
+  );
+});
+
+it("sweepは正常終了し判定関数が受理した応答だけを合格にする", () => {
+  python(
+    `
+import ast, json, sys
+code = next(c for c in json.load(sys.stdin) if "def sweep(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "sweep")
+results = {"low": "max_tokens", "high": "end_turn"}
+def run_once(prompt, effort):
+    return {"effort": effort, "sec": 1.5, "usd": 0.25, "out_tokens": 9, "stop_reason": results[effort], "text": "ok"}
+scope = {"run_once": run_once}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+rows = scope["sweep"]([{"id": "t", "prompt": "p", "check": lambda text: text == "ok"}], levels=("low", "high"))
+assert [(r["effort"], r["passed"]) for r in rows] == [("low", False), ("high", True)]
+assert all((r["sec"], r["usd"]) == (1.5, 0.25) for r in rows)
+`,
+    examples()
+  );
+});
+
+it("agent_loopはmax_tokensで切れた応答を履歴へ追加せず、完了済みバッチのcheckpointを保つ", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+tool = {"type": "tool_use", "id": "t1", "name": "read", "input": {}}
+partial = {"type": "tool_use", "id": "t2", "name": "read", "input": {}}
+replies = [{"stop_reason": "tool_use", "content": [tool]}, {"stop_reason": "max_tokens", "content": [partial]}]
+requests = []
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return replies[len(requests) - 1]
+scope = {"call": call, "copy": __import__("copy")}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+assert scope["agent_loop"]("task", [], lambda name, args: "ok", max_turns=3, checkpoint=checkpoint) is replies[1]
+assert checkpoint["messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": [tool]},
+    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "ok"}]}]
+`,
+    examples()
+  );
+});
+
+it("agent_loopはブラウザ操作の失敗をコンピュータ操作と別に追跡し、後続のブラウザ操作だけを止める", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+def use(toolset, n):
+    block = {"type": "tool_use", "id": toolset[0] + str(n), "name": "act", "input": {"n": n}}
+    if toolset != "custom":
+        block["toolset_name"] = toolset
+    return block
+blocks = [use("browser", 1), use("browser", 2), use("computer", 3), use("custom", 4), use("browser", 5)]
+replies = [{"stop_reason": "tool_use", "content": blocks}, {"stop_reason": "end_turn", "content": []}]
+executed = []
+def call(body):
+    executed.append("call")
+    return replies[executed.count("call") - 1]
+def run_tool(name, args):
+    executed.append(args["n"])
+    if args["n"] == 1:
+        raise RuntimeError("navigation failed")
+    return "ok"
+scope = {"call": call, "copy": __import__("copy")}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint)
+assert [e for e in executed if e != "call"] == [1, 3, 4]
+results = checkpoint["messages"][2]["content"]
+assert [r.get("is_error") for r in results] == [True, True, None, None, True]
+assert results[1]["content"] == "Not executed: an earlier browser action in this turn failed"
+assert results[4]["content"] == "Not executed: an earlier browser action in this turn failed"
+assert all(r["toolset_name"] == "browser" for r in (results[0], results[1], results[4]))
+`,
+    examples()
+  );
+});
+
+it("handle_responseは拒否を既定とし、カテゴリだけでは別モデルへ再試行しない", () => {
+  python(
+    `
+import ast, json, sys
+code = next(c for c in json.load(sys.stdin) if "def handle_response(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "handle_response")
+scope = {}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+handle = scope["handle_response"]
+calls = []
+def retry(target):
+    calls.append(target)
+    return {"retried": target}
+for category in ("cyber", "bio", "other", None):
+    data = {"stop_reason": "refusal", "stop_details": {"category": category}}
+    try:
+        handle(data, retry)
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError(category)
+assert calls == []
+ok = {"stop_reason": "end_turn"}
+assert handle(ok, retry) is ok
+# ハンドラーの外で適格性を判断し、承認済みの移行先を明示した場合だけ再試行する
+assert handle({"stop_reason": "refusal", "stop_details": {"category": "cyber"}}, retry, approved_fallback="claude-opus-4-8") == {"retried": "claude-opus-4-8"}
+try:
+    handle({"stop_reason": "refusal", "stop_details": {"category": "cyber"}}, retry, approved_fallback="claude-opus-5")
+except RuntimeError:
+    pass
+else:
+    raise AssertionError("mismatched approval must stay refused")
+assert calls == ["claude-opus-4-8"]
+`,
+    examples()
   );
 });
