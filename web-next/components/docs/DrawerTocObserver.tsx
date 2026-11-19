@@ -100,6 +100,9 @@ export default function DrawerTocObserver({
     };
     const resize = () => {
       sync(window.innerWidth <= 900 && Boolean(root?.classList.contains(styles.open)));
+      // デスクトップ幅ではメニューボタンが非表示になる。そこに残ったフォーカスを見える先頭の目次リンクへ移す
+      // （sync で目次の inert を解除した後に移す）。
+      if (window.innerWidth > 900 && document.activeElement === menu) links[0]?.focus();
       update();
     };
     // 原本と同じUL単位で集計し、進捗DOMもそのリスト直前の表示へ限定する。
@@ -153,6 +156,9 @@ export default function DrawerTocObserver({
         dispose();
       });
       root?.classList.remove(styles.open);
+      // 開状態のまま解除されても、メニューの aria 状態を閉に戻す。
+      menu?.setAttribute("aria-expanded", "false");
+      menu?.setAttribute("aria-label", "目次を開く");
       if (sidebar) sidebar.inert = false;
       if (guideContent) guideContent.inert = false;
     };
