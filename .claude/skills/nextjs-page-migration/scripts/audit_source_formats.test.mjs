@@ -733,11 +733,16 @@ test("does not certify CLASSDEFS before an invocation initializes it", () => {
  const declaration = `var CLASSDEFS = ${JSON.stringify(suffix)};`;
  const render = `const src = ${JSON.stringify(chart)}; mermaid.render('id', src + CLASSDEFS);`;
  const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ // 対照: start() より前に CLASSDEFS を初期化すれば、同じアロー関数の描画を認定する。
+ const control = audit(`${card}<script>${declaration} start(); function start() { const draw = () => { ${render} }; draw(); }</script>`, page);
+ assert.equal(control.status, 0);
+ assert.deepEqual(control.data.unresolvedMermaidSources, []);
  for (const body of [
   `draw(); ${declaration} function draw() { ${render} }`,
   `const early = draw; early(); ${declaration} function draw() { ${render} }`,
   `start(); ${declaration} function draw() { ${render} } function start() { draw(); }`,
-  `start(); ${declaration} function start() { const draw = () => ${render} draw(); }`,
+  // ブロック本体のアロー関数にして、構文ではなく初期化順の判定まで到達させる。
+  `start(); ${declaration} function start() { const draw = () => { ${render} }; draw(); }`,
   `if (enabled) ${declaration} ${render}`,
   `function draw() { ${declaration} ${render} } draw();`,
  ]) {
@@ -1482,4 +1487,93 @@ test("treats reads before a later inner let or const in the same block as shadow
  }
  // 内側に同名の宣言がなければ、初期化済みの外側の束縛へ解決する。
  assert.equal(audit(`${card}<script>${head} function draw() { const src = script.textContent; mermaid.render('id', src); const other = 1; } draw();</script>`, page).status, 0);
+});
+
+test("certifies indexed cards only when they precede the querySelectorAll initializer", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const card = (id, chart) => `<div id="${id}" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)};`).join('\n') + charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join('');
+ const query = "var cards = document.querySelectorAll('.diagram-card');";
+ const loop = "for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }";
+ // 静的な NodeList は初期化時点の文書だけを含む。後から解析された b は走査対象にならない。
+ const late = audit(`${card('a', charts[0])}<script>${query}</script>${card('b', charts[1])}<script>${loop}</script>`, page);
+ assert.equal(late.status, 1);
+ assert.deepEqual(late.data.unresolvedMermaidSources, ['CLASSDEFS:b']);
+ // 両カードが初期化より前なら、どちらも認定する。
+ const early = audit(`${card('a', charts[0])}${card('b', charts[1])}<script>${query}</script><script>${loop}</script>`, page);
+ assert.equal(early.status, 0);
+ assert.deepEqual(early.data.unresolvedMermaidSources, []);
+});
+
+test("treats every HTML JavaScript MIME type as a classic script renderer", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ const body = `var CLASSDEFS = ${JSON.stringify(suffix)}; var card = document.querySelector('#chart'); var src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);`;
+ for (const type of ['application/x-javascript', 'text/jscript', 'text/javascript1.5', 'text/livescript', 'application/x-ecmascript', 'TEXT/JAVASCRIPT']) {
+  const result = audit(`${card}<script type="${type}">${body}</script>`, page);
+  assert.equal(result.status, 0, type);
+ }
+});
+
+test("keeps DOM-backed reads unresolved after edits that change the selected card script", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const select = "const card = document.querySelector('#chart');";
+ const read = "const src = card.querySelector('script').textContent; mermaid.render('id', src);";
+ for (const edit of [
+  "card.querySelector('script').remove();",
+  "const first = card.querySelector('script'); first.remove();",
+  "card.querySelector('script').replaceWith(document.createElement('script'));",
+  "card.innerHTML = '';",
+  "card.prepend(document.createElement('script'));",
+  "card.insertBefore(document.createElement('script'), card.firstChild);",
+  "const alias = card; alias.replaceChildren();",
+ ]) {
+  const result = audit(`${card}<script>${select} ${edit} ${read}</script>`, page);
+  assert.equal(result.status, 1, edit);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], edit);
+ }
+ // 選択される script を変えない編集（描画先の差し替え・末尾への追加）は認定を保つ。
+ for (const edit of [
+  "card.querySelector('.diagram-wrap').innerHTML = '<svg></svg>';",
+  "card.append(document.createElement('p'));",
+ ]) {
+  const result = audit(`${card}<script>${select} ${edit} ${read}</script>`, page);
+  assert.equal(result.status, 0, edit);
+ }
+});
+
+test("does not validate a source argument shifted by a spread in mermaid.render", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const head = `const src = ${JSON.stringify(chart)}; const args = ['id', 'flowchart LR\\nX --> Y'];`;
+ for (const call of ["mermaid.render(...args, src);", "mermaid.render('id', ...args, src);", "mermaid.render(...['id'], src);"]) {
+  const result = audit(`${card}<script>${head} ${call}</script>`, page);
+  assert.equal(result.status, 1, call);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], call);
+ }
+ assert.equal(audit(`${card}<script>${head} mermaid.render('id', src);</script>`, page).status, 0);
+});
+
+test("reports unresolved renderer analysis separately from missing content in the CLI", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const dir = mkdtempSync(join(tmpdir(), "source-formats-"));
+ try {
+  writeFileSync(join(dir, "source.html"), `${card}<script>const src = ${JSON.stringify(chart)}; mermaid.render(...['id'], src);</script>`);
+  writeFileSync(join(dir, "page.tsx"), page);
+  const result = spawnSync(process.execPath, [script, join(dir, "source.html"), join(dir, "page.tsx")], { encoding: "utf8" });
+  assert.ifError(result.error);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /描画スクリプトの静的解析が未解決/);
+  assert.match(result.stdout, /図の内容を転写するのではなく/);
+  assert.doesNotMatch(result.stdout, /漏れを転写してから再実行/);
+ } finally {
+  rmSync(dir, { recursive: true, force: true });
+ }
 });
