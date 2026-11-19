@@ -27,7 +27,8 @@ _RECORD_GAP = (
 )
 _PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
 # cached と input の間には空白か、レコード境界ではないインラインタグ（span・br 等）を許す。
-_INLINE_SEP = r"(?:\s|<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)[^<>]*>)+"
+_INLINE_TAG = r"<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)[^<>]*>"
+_INLINE_SEP = rf"(?:\s|{_INLINE_TAG})+"
 # batch input と cache-hit の入力（"input (cache hit)" / "cache hit input"）も標準入力
 # ではないため、cached input と同様に価格ごと読み飛ばす。標準入力は cache-miss 側を選ぶ。
 # "cache-hit input" のように後ろへ続く input もラベルの一部として読む（価格探索の禁止語に当たらないように）。
@@ -38,7 +39,10 @@ _CACHED_LABEL = (
 )
 # cached input の価格を探す間も output・標準 input のラベルは越えない
 # （output 価格や、cached が N/A のときの標準 input 価格を cached 扱いにしない）。
-_CACHED_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"(?!\b(?:output|input)\b)[^$]")
+# インラインタグは丸ごと読み飛ばし、属性値（class="input-price" 等）をラベルとみなさない。
+_CACHED_PRICE_GAP = _RECORD_GAP.replace(
+    r"[\s\S]", rf"(?:{_INLINE_TAG}|(?!\b(?:output|input)\b)[^$])"
+)
 # cached inputの価格はひとまとまりで読み飛ばし、output以降へは進まない。
 # 価格のない cached（N/A 等）はラベルだけを読み飛ばす。価格が続く場合はこの分岐を使えず、
 # cached 価格を標準入力として拾わない。

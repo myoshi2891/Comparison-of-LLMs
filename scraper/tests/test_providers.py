@@ -559,6 +559,8 @@ class TestMoonshot:
             '<p>Kimi K3 <span>cache</span> <span>hit</span> input $0.25 input $3.25 output $16.50</p>',
             # cache-hit・cached・batch が同じレコードに並んでも標準入力だけを選ぶ。
             '<p>Kimi K3 cache hit $0.25 cached input $0.2 batch input $1.6 input $3.25 output $16.50</p>',
+            # cached 価格を囲むタグの属性値（input-price 等）で cached の価格探索を打ち切らない。
+            '<p>Kimi K3 cached input <span class="input-price">$0.25</span> input $3.25 output $16.50</p>',
         ):
             with patch("scraper.providers.moonshot.get_page_text", return_value=html):
                 model = _find(moonshot.scrape(), "Kimi K3")
@@ -613,6 +615,15 @@ class TestMoonshot:
         matched = re.match(gap + r"(?= input)", text)
         assert matched is not None
         assert matched.group() == "Kimi K3 cached input $0.25"
+
+    def test_cached_input_gap_skips_label_words_in_inline_tag_attributes(self):
+        gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}\$([\d.]+)"
+        for text in (
+            '<p>Kimi K3 cached input <span data-field="output">$0.25</span> input $3.25</p>',
+            '<p>Kimi K3 cached input <span class="input-price">$0.25</span> input $3.25</p>',
+        ):
+            matched = re.search(gap, text, re.IGNORECASE | re.DOTALL)
+            assert matched is not None and matched.group(1) == "3.25", text
 
     def test_definition_list_extracts_sibling_definitions(self):
         html = "<dl><dt>Kimi K3</dt><dd>input $3.25</dd><dd>output $16.50</dd></dl>"
