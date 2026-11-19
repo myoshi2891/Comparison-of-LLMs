@@ -2116,19 +2116,26 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-comment">
+                      {"# キャッシュ件数は null で返ることがあるため、0 として扱う"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"    write_5m = cache.get("}
                     <span className="hljs-string">{'"ephemeral_5m_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
-                    {")"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"    write_1h = cache.get("}
                     <span className="hljs-string">{'"ephemeral_1h_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
-                    {")"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -2143,9 +2150,10 @@ export default function Page() {
                     <span className="hljs-built_in">{"max"}</span>
                     {"("}
                     <span className="hljs-number">{"0"}</span>
-                    {", usage.get("}
+                    {", (usage.get("}
                     <span className="hljs-string">{'"cache_creation_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
                     {") - write_5m - write_1h)"}
                   </span>
@@ -2177,9 +2185,10 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        + usage.get("}
+                    {"        + (usage.get("}
                     <span className="hljs-string">{'"cache_read_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
                     {") * PRICE["}
                     <span className="hljs-string">{'"cache_read"'}</span>
@@ -2424,14 +2433,25 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-comment">
+                      {"# 正常終了(end_turn)し、自社の合否判定関数が受理した応答だけを合格にする"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"            res["}
                     <span className="hljs-string">{'"passed"'}</span>
-                    {"] = task["}
+                    {"] = res["}
+                    <span className="hljs-string">{'"stop_reason"'}</span>
+                    {"] == "}
+                    <span className="hljs-string">{'"end_turn"'}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" task["}
                     <span className="hljs-string">{'"check"'}</span>
                     {"](res["}
                     <span className="hljs-string">{'"text"'}</span>
-                    {"])  "}
-                    <span className="hljs-comment">{"# 自社の合否判定関数"}</span>
+                    {"])"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>{"            rows.append(res)"}</span>
@@ -3259,6 +3279,38 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" data["}
+                    <span className="hljs-string">{'"stop_reason"'}</span>
+                    {"] == "}
+                    <span className="hljs-string">{'"max_tokens"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-comment">
+                      {"# 途中で切れた応答(未完成の tool_use を含み得る)は履歴へ追加しない。"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-comment">
+                      {"# checkpoint は直前に完了したツール結果バッチのまま残る"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"return"}</span>
+                    {" data"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}></span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
                     <span className="hljs-comment">
                       {
                         "# 返ってきた content をそのまま追記する。ブロックの削除・並べ替え・書き換えは禁止"
@@ -3349,11 +3401,11 @@ export default function Page() {
                   <span className={styles.codeLine}>{"        results = []"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        computer_failed = "}
-                    <span className="hljs-literal">{"False"}</span>
-                    {"  "}
+                    {"        failed_toolsets = "}
+                    <span className="hljs-built_in">{"set"}</span>
+                    {"()  "}
                     <span className="hljs-comment">
-                      {"# このターンで先行するコンピュータ操作が失敗したか"}
+                      {"# このターンで操作が失敗したツールセット(computer と browser を別々に追跡)"}
                     </span>
                   </span>
                   {"\n"}
@@ -3415,20 +3467,25 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"                toolset = block.get("}
+                    <span className="hljs-string">{'"toolset_name"'}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"                "}
                     <span className="hljs-keyword">{"if"}</span>
-                    {" block.get("}
-                    <span className="hljs-string">{'"toolset_name"'}</span>
-                    {") == "}
-                    <span className="hljs-string">{'"computer"'}</span>{" "}
-                    <span className="hljs-keyword">{"and"}</span>
-                    {" computer_failed:"}
+                    {" toolset "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" failed_toolsets:"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"                    "}
                     <span className="hljs-comment">
-                      {"# 後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す"}
+                      {
+                        "# 同じツールセットの後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す"
+                      }
                     </span>
                   </span>
                   {"\n"}
@@ -3437,7 +3494,9 @@ export default function Page() {
                     <span className="hljs-string">{'"content"'}</span>
                     {"] = "}
                     <span className="hljs-string">
-                      {'"Not executed: an earlier computer action in this turn failed"'}
+                      {'f"Not executed: an earlier '}
+                      <span className="hljs-subst">{"{toolset}"}</span>
+                      {' action in this turn failed"'}
                     </span>
                   </span>
                   {"\n"}
@@ -3543,12 +3602,19 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"                    computer_failed = computer_failed "}
-                    <span className="hljs-keyword">{"or"}</span>
-                    {" block.get("}
-                    <span className="hljs-string">{'"toolset_name"'}</span>
-                    {") == "}
+                    {"                    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" toolset "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" ("}
                     <span className="hljs-string">{'"computer"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"browser"'}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        failed_toolsets.add(toolset)"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -6896,27 +6962,34 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-comment">
+                      {"# キャッシュ件数は null で返ることがあるため、0 として扱う"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"    read = usage.get("}
                     <span className="hljs-string">{'"cache_read_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
-                    {")"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"    write_5m = cache.get("}
                     <span className="hljs-string">{'"ephemeral_5m_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
-                    {")"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"    write_1h = cache.get("}
                     <span className="hljs-string">{'"ephemeral_1h_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
-                    {")"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -6924,9 +6997,10 @@ export default function Page() {
                     <span className="hljs-built_in">{"max"}</span>
                     {"("}
                     <span className="hljs-number">{"0"}</span>
-                    {", usage.get("}
+                    {", (usage.get("}
                     <span className="hljs-string">{'"cache_creation_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
                     {") - write_5m - write_1h)"}
                   </span>
@@ -6942,9 +7016,9 @@ export default function Page() {
                     <span className="hljs-keyword">{"or"}</span>
                     {" usage.get("}
                     <span className="hljs-string">{'"cache_creation_input_tokens"'}</span>
-                    {", "}
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
                     <span className="hljs-number">{"0"}</span>
-                    {")"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -7547,7 +7621,12 @@ export default function Page() {
                     <span className="hljs-params">
                       {"data: "}
                       <span className="hljs-built_in">{"dict"}</span>
-                      {", retry_on_other_model"}
+                      {", retry_on_other_model, approved_fallback: "}
+                      <span className="hljs-built_in">{"str"}</span>
+                      {" | "}
+                      <span className="hljs-literal">{"None"}</span>
+                      {" = "}
+                      <span className="hljs-literal">{"None"}</span>
                     </span>
                     {"):"}
                   </span>
@@ -7611,37 +7690,54 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"    "}
-                    <span className="hljs-keyword">{"if"}</span>
-                    {" category "}
-                    <span className="hljs-keyword">{"in"}</span>
-                    {" ("}
-                    <span className="hljs-string">{'"cyber"'}</span>
-                    {", "}
-                    <span className="hljs-string">{'"bio"'}</span>
-                    {"):"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"        "}
                     <span className="hljs-comment">
-                      {"# 許可されたフォールバック先: cyber は Opus 4.8、bio は Opus 5"}
+                      {"# 既定は拒否のまま扱い、category だけでは別モデルへ再試行しない。"}
                     </span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        target = "}
-                    <span className="hljs-string">{'"claude-opus-4-8"'}</span>{" "}
-                    <span className="hljs-keyword">{"if"}</span>
-                    {" category == "}
-                    <span className="hljs-string">{'"cyber"'}</span>{" "}
-                    <span className="hljs-keyword">{"else"}</span>{" "}
+                    {"    "}
+                    <span className="hljs-comment">
+                      {
+                        "# フォールバックの適格性はハンドラーの外で明示的に判断し、承認した移行先を渡す"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-comment">
+                      {"# (許可された移行先: cyber は Opus 4.8、bio は Opus 5)"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    allowed = {"}
+                    <span className="hljs-string">{'"cyber"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"claude-opus-4-8"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"bio"'}</span>
+                    {": "}
                     <span className="hljs-string">{'"claude-opus-5"'}</span>
+                    {"}"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" approved_fallback "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" approved_fallback == allowed.get(category):"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"        "}
                     <span className="hljs-keyword">{"return"}</span>
-                    {" retry_on_other_model(target)"}
+                    {" retry_on_other_model(approved_fallback)"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}></span>

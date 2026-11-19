@@ -1933,14 +1933,15 @@
               def usd(usage: dict) -> float:
                   """usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。"""
                   cache = usage.get("cache_creation") or {}
-                  write_5m = cache.get("ephemeral_5m_input_tokens", 0)
-                  write_1h = cache.get("ephemeral_1h_input_tokens", 0)
+                  # キャッシュ件数は null で返ることがあるため、0 として扱う
+                  write_5m = cache.get("ephemeral_5m_input_tokens") or 0
+                  write_1h = cache.get("ephemeral_1h_input_tokens") or 0
                   # TTL 内訳に含まれない集計分は、既定の5分書き込み単価で課金する
-                  write_5m += max(0, usage.get("cache_creation_input_tokens", 0) - write_5m - write_1h)
+                  write_5m += max(0, (usage.get("cache_creation_input_tokens") or 0) - write_5m - write_1h)
                   return (
                       usage.get("input_tokens", 0) * PRICE["in"]
                       + usage.get("output_tokens", 0) * PRICE["out"]
-                      + usage.get("cache_read_input_tokens", 0) * PRICE["cache_read"]
+                      + (usage.get("cache_read_input_tokens") or 0) * PRICE["cache_read"]
                       + write_5m * PRICE["cache_write_5m"]
                       + write_1h * PRICE["cache_write_1h"]
                   ) / 1_000_000
@@ -1974,7 +1975,8 @@
                       for level in levels:
                           res = run_once(task["prompt"], level)
                           res["task"] = task["id"]
-                          res["passed"] = task["check"](res["text"])  # 自社の合否判定関数
+                          # 正常終了(end_turn)し、自社の合否判定関数が受理した応答だけを合格にする
+                          res["passed"] = res["stop_reason"] == "end_turn" and task["check"](res["text"])
                           rows.append(res)
                   return rows
             </script>
@@ -2227,6 +2229,11 @@
                           "messages": messages,
                       })
 
+                      if data["stop_reason"] == "max_tokens":
+                          # 途中で切れた応答(未完成の tool_use を含み得る)は履歴へ追加しない。
+                          # checkpoint は直前に完了したツール結果バッチのまま残る
+                          return data
+
                       # 返ってきた content をそのまま追記する。ブロックの削除・並べ替え・書き換えは禁止
                       messages.append({"role": "assistant", "content": data["content"]})
 
@@ -2240,16 +2247,17 @@
                           return data
 
                       results = []
-                      computer_failed = False  # このターンで先行するコンピュータ操作が失敗したか
+                      failed_toolsets = set()  # このターンで操作が失敗したツールセット(computer と browser を別々に追跡)
                       for block in data["content"]:
                           if block["type"] == "tool_use":
                               result = {"type": "tool_result", "tool_use_id": block["id"]}
                               # ツールセットのメンバーへの結果には同じ toolset_name を返す(欠落・不一致は拒否される)
                               if "toolset_name" in block:
                                   result["toolset_name"] = block["toolset_name"]
-                              if block.get("toolset_name") == "computer" and computer_failed:
-                                  # 後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す
-                                  result["content"] = "Not executed: an earlier computer action in this turn failed"
+                              toolset = block.get("toolset_name")
+                              if toolset in failed_toolsets:
+                                  # 同じツールセットの後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す
+                                  result["content"] = f"Not executed: an earlier {toolset} action in this turn failed"
                                   result["is_error"] = True
                                   results.append(result)
                                   continue
@@ -2262,7 +2270,8 @@
                               except Exception as error:
                                   result["content"] = f"{type(error).__name__}: {error}"
                                   result["is_error"] = True
-                                  computer_failed = computer_failed or block.get("toolset_name") == "computer"
+                                  if toolset in ("computer", "browser"):
+                                      failed_toolsets.add(toolset)
                               results.append(result)
                       messages.append({"role": "user", "content": results})
                       if checkpoint is not None:
@@ -3974,12 +3983,13 @@
               def estimate_usd(usage: dict, mode: str = "standard") -> float:
                   r = RATES[mode]
                   cache = usage.get("cache_creation") or {}
-                  read = usage.get("cache_read_input_tokens", 0)
-                  write_5m = cache.get("ephemeral_5m_input_tokens", 0)
-                  write_1h = cache.get("ephemeral_1h_input_tokens", 0)
-                  write_other = max(0, usage.get("cache_creation_input_tokens", 0) - write_5m - write_1h)
+                  # キャッシュ件数は null で返ることがあるため、0 として扱う
+                  read = usage.get("cache_read_input_tokens") or 0
+                  write_5m = cache.get("ephemeral_5m_input_tokens") or 0
+                  write_1h = cache.get("ephemeral_1h_input_tokens") or 0
+                  write_other = max(0, (usage.get("cache_creation_input_tokens") or 0) - write_5m - write_1h)
                   write_5m += write_other
-                  cached = read or write_5m or write_1h or usage.get("cache_creation_input_tokens", 0)
+                  cached = read or write_5m or write_1h or usage.get("cache_creation_input_tokens") or 0
                   if cached and any(key not in r for key in ("cache_read", "cache_write_5m", "cache_write_1h")):
                       raise ValueError("このモードのキャッシュ単価を確認・設定してから見積もってください")
                   return (
@@ -4274,7 +4284,7 @@
             <div class="cb-head">python</div>
             <pre><code class="language-python"></code></pre>
             <script type="text/plain">
-              def handle_response(data: dict, retry_on_other_model):
+              def handle_response(data: dict, retry_on_other_model, approved_fallback: str | None = None):
                   if data.get("stop_reason") != "refusal":
                       return data
 
@@ -4284,10 +4294,12 @@
                       # 推奨フォールバックなし。プロンプトから推論の再現を求める指示を削除する
                       raise ValueError("推論の再現を本文に求めている指示を削除してください")
 
-                  if category in ("cyber", "bio"):
-                      # 許可されたフォールバック先: cyber は Opus 4.8、bio は Opus 5
-                      target = "claude-opus-4-8" if category == "cyber" else "claude-opus-5"
-                      return retry_on_other_model(target)
+                  # 既定は拒否のまま扱い、category だけでは別モデルへ再試行しない。
+                  # フォールバックの適格性はハンドラーの外で明示的に判断し、承認した移行先を渡す
+                  # (許可された移行先: cyber は Opus 4.8、bio は Opus 5)
+                  allowed = {"cyber": "claude-opus-4-8", "bio": "claude-opus-5"}
+                  if approved_fallback is not None and approved_fallback == allowed.get(category):
+                      return retry_on_other_model(approved_fallback)
 
                   raise RuntimeError(f"拒否されました: category={category}")
             </script>
