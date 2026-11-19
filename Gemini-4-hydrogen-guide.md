@@ -414,7 +414,7 @@ print(text)  # 生成された差分を表示する
 
 [公式のバックグラウンド実行例](https://ai.google.dev/gemini-api/docs/background-execution)と[Interactions APIの状態定義](https://ai.google.dev/api/interactions-api)に従い、成功した完了状態でのみテキストを採用します。`incomplete`(出力上限での停止など)は失敗扱いで捨てず、途中までの出力を保持したうえで、そのinteractionのIDと `continuation_token` を使い、`max_output_tokens` を引き上げて同じジョブを継続します。継続トークンがない場合や上限まで引き上げても終わらない場合は、未完了として例外にします(継続の引数名・`max_output_tokens` が累積の上限として扱われるかは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)で確認してください)。
 
-ポーリング中にプロセスが落ちたり `interactions.get` が失敗したりしても、`create` をやり直すと**別のジョブ**が始まり、課金も二重になります。保存しておいた `interaction_id` で `client.interactions.get(id=interaction_id)` から状態確認を再開してください。不要になったジョブは、同じIDに対してAPIリファレンスのキャンセル操作を使って止めます(メソッド名・対応SDKバージョンは[Interactions APIリファレンス](https://ai.google.dev/api/interactions-api)で確認)。
+ポーリング中にプロセスが落ちたり `interactions.get` が失敗したりしても、`create` をやり直すと**別のジョブ**が始まり、課金も二重になります。継続するたびに、**各hopの `interaction_id` と、そのhopで受け取ったテキスト**を順序付きで永続化しておいてください。最新のinteractionが前のhopの出力を含むとは限らないため、復旧時は保存済みの前hopまでのテキストを `parts` に戻し、保存しておいた最新の `interaction_id` で `client.interactions.get(id=interaction_id)` から状態確認を再開して、そのhop以降の出力だけを追記します(継続時に前hopの出力がどう返るかは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)で確認してください)。不要になったジョブは、同じIDに対してAPIリファレンスのキャンセル操作を使って止めます(メソッド名・対応SDKバージョンは[Interactions APIリファレンス](https://ai.google.dev/api/interactions-api)で確認)。
 
 **Long Decode の運用ルール**
 

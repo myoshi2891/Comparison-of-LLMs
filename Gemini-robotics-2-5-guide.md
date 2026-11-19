@@ -471,10 +471,12 @@ def function_response_part(fc, payload: dict) -> types.Part:
     return types.Part(function_response=types.FunctionResponse(id=fc.id, name=fc.name, response=payload))
 
 
-def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> str:
+def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, image_to_base) -> str:
     # 上限はモデル応答の数ではなく、関数呼び出し(動作)の数で数える。
     # 1 応答に複数の呼び出しが並んでも、合計 MAX_STEPS 回を超えて実行しない。
-    actions = 0
+    # 動作数はタスク状態に保存し、新しい観測を追加して再開するときも同じ task_state を渡す。
+    # 呼び出しごとに 0 へ戻すと、復旧を繰り返すたびに上限が外れる。
+    task_state.setdefault("actions", 0)
     while True:
         if estop_active():  # 非常停止が入っていればモデルに問い合わせずに終了
             return "aborted: emergency stop"
@@ -499,10 +501,10 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
         if not calls:
             return response.text  # モデルが関数を呼ばなくなったら完了
         results, observation, skip_reason, limit_reached = [], None, None, False
-        estopped, moved, executed, executor_error = False, False, False, None
+        estopped, moved, executed, executor_error, mapping_error = False, False, False, None, None
         for part in calls:
             fc = part.function_call
-            if skip_reason is None and actions >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
+            if skip_reason is None and task_state["actions"] >= MAX_STEPS:  # 各呼び出しの実行前に上限を確認する
                 # 上限に達しても即座に戻らず、残りの呼び出しを skipped として記録して履歴を揃える。
                 skip_reason, limit_reached = "step limit reached; this action was not executed", True
             if skip_reason is None and fc.name == "move" and moved:
@@ -514,14 +516,21 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
                 # 並列呼び出しの各 function_call には、順序どおり必ず 1 つずつ結果を返す。
                 results.append(function_response_part(fc, {"status": "skipped", "reason": skip_reason}))
                 continue
-            actions += 1
+            task_state["actions"] += 1
             # fc.args は省略され得るため、dict へ変換する前に検証する(変換は検証成功後のみ)。
             reason = validate(fc.name, fc.args)
             robot_args = None
             if not reason:
                 # 画像由来の目標は、校正済みの変換で基座標へ写して境界を検査してからだけ実行器へ渡す
-                robot_args, reason = to_robot_args(fc.name, dict(fc.args), image_to_base)
-            if reason:
+                try:
+                    robot_args, reason = to_robot_args(fc.name, dict(fc.args), image_to_base)
+                except Exception as err:
+                    # 変換の例外では校正状態を確認できない。先行する完了済みの結果は捨てず、
+                    # この呼び出しを uncertain として記録し、残りは skipped にして呼び出し元へ戻す。
+                    mapping_error = f"{type(err).__name__}: {err}"
+            if mapping_error is not None:
+                payload = {"status": "uncertain", "reason": f"coordinate mapping error ({mapping_error}); calibration state is unknown and this action was not executed"}
+            elif reason:
                 payload = {"status": "rejected", "reason": reason}
             else:
                 # 生成待ちの間に停止された場合に備え、実行直前にも再確認する。
@@ -556,6 +565,9 @@ def run_task(contents: list, execute_on_robot, estop_active, image_to_base) -> s
         if estopped:
             # 完了した動作の結果・skipped の記録・最新観測を contents に残し、呼び出し元が復旧に使えるようにする。
             return "aborted: emergency stop"
+        if mapping_error is not None:
+            # 完了済みの結果・uncertain・skipped の記録を contents に残し、呼び出し元が校正を確認して復旧する。
+            return f"aborted: coordinate mapping error ({mapping_error})"
         if executor_error is not None:
             # 完了済みの結果・uncertain・skipped の記録を contents に残し、呼び出し元が状態を確認して復旧する。
             return f"aborted: executor error ({executor_error})"
@@ -694,8 +706,10 @@ async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
             state.turn_done.clear()    # 古い完了通知で次のハートビートへ進まないよう、送信前に消す
             # フレームは send_frame が送信枠を確保した後に取得する(待機中に古くならない)
             await state.send_frame(camera.latest_jpeg)
-            await state.session.send_realtime_input(text=HEARTBEAT_TEXT)
             try:
+                # 送信が取り消し・失敗しても、プロンプトは受理された可能性があり完了を確認できない。
+                # そのため送信も try の中で行い、下の例外処理でセッションを使用不可にする。
+                await state.session.send_realtime_input(text=HEARTBEAT_TEXT)
                 # いま送ったターンが終わるまでゲートを離さない。受信側の終了やセッション切断で
                 # turn_complete が届かない場合に無期限に止まらないよう、待機に上限を設ける。
                 await asyncio.wait_for(state.turn_done.wait(), timeout=turn_timeout)
@@ -706,6 +720,10 @@ async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
                 if isinstance(exc, asyncio.CancelledError):
                     raise
                 raise RuntimeError("turn_complete not received; stop heartbeat and recover the session") from None
+            except Exception:
+                # 送信の失敗でも未完了のターンが残り得るため、ゲートを離す前に使用不可にする。
+                state.usable = False
+                raise
 ```
 
 ### 9.4 ストリーミングのベストプラクティス

@@ -344,12 +344,12 @@ flowchart TD
     A["1回の応答で必要な出力量"] --> M{"呼び出し方式"}
     M -- "ストリーミング" --> B{"64K トークンを超えるか<br/>または思考で上限に達しがちか"}
     M -- "非ストリーミング SDK<br/>5章の generate_content" --> SB{"64K トークンを超えるか<br/>または思考で上限に達しがちか"}
-    SB -- "いいえ" --> C
+    SB -- "いいえ" --> C["通常の generate_content"]
     SB -- "はい" --> D
     M -- "非ストリーミング REST" --> NB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
     NB -- "いいえ" --> C
     NB -- "はい" --> D
-    B -- "いいえ" --> C["通常の generate_content"]
+    B -- "いいえ" --> CS["通常のストリーミング<br/>generate_content_stream で逐次出力"]
     B -- "はい" --> D{"遅延に敏感か"}
     D -- "はい" --> E["タスクを分割して対応"]
     D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
@@ -358,7 +358,7 @@ flowchart TD
     GACC --> CONT{"finishReason は何か"}
     CONT -- "CONTINUATION" --> NEXT["元の contents systemInstruction tools<br/>maxOutputTokens をそのまま再送し<br/>continuation_token を付ける"]
     NEXT --> GACC
-    CONT -- "STOP" --> GJOIN["蓄積した全セグメントのpartsを結合して採用"]
+    CONT -- "STOP" --> GJOIN["蓄積した全セグメントのpartsを会話履歴に保持<br/>表示する回答は思考サマリーでないtextパートだけを結合"]
     GJOIN --> G["累積トークンと課金を監視"]
     CONT -- "MAX_TOKENS" --> MTOK{"continuation_token が返されたか"}
     MTOK -- "はい" --> RAISE["蓄積したpartsを保持し<br/>max_output_tokens を累積の上限として引き上げ<br/>同じ continuation_token で再開<br/>STOP までは部分出力を採用しない"]
@@ -367,6 +367,8 @@ flowchart TD
     CONT -- "SAFETY など" --> GERR
     API -- "Interactions 非ストリーミング" --> ACC["各hopの出力テキストとusageを順に蓄積"]
     ACC --> IST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
+    IST -- "in_progress queued<br/>バックグラウンド実行" --> IPOLL["interactions.get で<br/>終端状態になるまでポーリング"]
+    IPOLL --> IST
     IST -- "requires_action" --> IACT["ツール呼び出しを承認ゲートに通す 12.2節"]
     IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>store=True はこのinteractionのidで結果を送る<br/>store=False は元の入力 返されたmodelのsteps<br/>function_resultを次のリクエストに含める"]
     IACT -- "拒否" --> IREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくstoreで分ける"]
@@ -385,7 +387,7 @@ flowchart TD
     IST -- "failed cancelled" --> ERR
     API -- "Interactions ストリーミング" --> SACC["受信イベントのテキストを順に蓄積<br/>usageはhop内で累積値なので最新値だけ保持<br/>最後に受信したevent_idを受信位置のカーソルとして保存<br/>continuation_tokenを受け取ったらチェックポイントとして別に保存"]
     SACC --> SDROP{"ストリームが終了イベントの前に切断されたか"}
-    SDROP -- "はい" --> SUSE["中断したhopで最後に受け取ったusageを<br/>そのhopの値として保持し 合算に含める<br/>受け取っていなければ usage 不明と記録"]
+    SDROP -- "はい" --> SUSE["中断したhopで最後に受け取ったusageは暫定値として保持<br/>同じバックグラウンドinteractionを再開して最終usageを受け取ったら置き換え<br/>usageは累積値なので両方を合算しない<br/>後続のusageが届かなければ最後に受け取った値をそのinteractionの値とし<br/>受け取っていなければ usage 不明と記録"]
     SUSE --> SCP{"continuation_tokenを保存済みか"}
     SCP -- "はい store=True" --> SRES["同じinteraction idに保存済みcontinuation_tokenを付けて再開<br/>event_idは重複除去のカーソルとしてだけ使い<br/>カーソル以前のイベントは追記しない"]
     SCP -- "はい store=False" --> SSL["元の入力 モデル ツール 生成設定に<br/>保存済みのcontinuation_tokenを付けて再送<br/>チェックポイント以降に受信した出力は破棄して再生成分で置き換える"]
@@ -649,7 +651,7 @@ flowchart TD
     RISK -- "はい" --> HU["タスク開始前に人間の承認を必須にする"]
     RISK -- "いいえ" --> RUN["Carbon がタスクを進め<br/>ツール呼び出しを要求"]
     HU -- "承認済み" --> RUN
-    RUN --> GATE{"呼び出しごとの承認ゲート<br/>本番デプロイか 不可逆か 範囲外か<br/>または外部コンテンツ読み込み済みフラグが true か"}
+    RUN --> GATE{"呼び出しごとの承認ゲート<br/>金銭操作か 本番デプロイか 不可逆か 範囲外か<br/>または外部コンテンツ読み込み済みフラグが true か<br/>金銭操作は他の条件によらず常に承認対象"}
     GATE -- "はい" --> HU2["この呼び出しを人間が承認"]
     GATE -- "いいえ" --> EXEC["最小権限の範囲で実行"]
     HU2 -- "承認済み" --> EXEC

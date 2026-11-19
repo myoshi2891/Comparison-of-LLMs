@@ -55,11 +55,14 @@ flowchart TD
 ### 2-1. 必要なもの
 
 1. Google AI Studio で発行した Gemini API キー
-2. Python SDK を使う場合は `google-genai` **3.2 以降**(`client.decisions.create(...)`)
-3. SDK を使わない場合は REST(`x-goog-api-key` ヘッダ)
-4. Step 6 の REST クライアントで使う `httpx` と、Step 13 の契約テストを実行する `pytest`(どちらもこの環境に入れる)
+2. Python 3.11 以降(Step 2 の SDK 環境と Step 9 の ADK 環境の両方。コード例の `str | None` 型注釈も 3.10 以降が必要)
+3. Python SDK を使う場合は `google-genai` **3.2 以降**(`client.decisions.create(...)`)
+4. SDK を使わない場合は REST(`x-goog-api-key` ヘッダ)
+5. Step 6 の REST クライアントで使う `httpx` と、Step 13 の契約テストを実行する `pytest`(どちらもこの環境に入れる)
 
 ```bash
+python3.11 -m venv .venv  # 3.11 以降のインタープリタで作る
+source .venv/bin/activate
 pip install -U "google-genai>=3.2" httpx pytest
 export GEMINI_API_KEY="あなたのAPIキー"
 ```
@@ -406,7 +409,7 @@ sequenceDiagram
 
 ```bash
 # Step 2 とは別の環境を作る(Step 2 の環境には google-adk を入れない)
-python -m venv .venv-adk
+python3.11 -m venv .venv-adk  # Step 2 と同じく 3.11 以降で作る
 source .venv-adk/bin/activate
 pip install -U google-adk httpx
 ```
