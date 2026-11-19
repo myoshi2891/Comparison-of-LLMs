@@ -40,8 +40,9 @@ _CACHED_LABEL = (
 # cached input の価格を探す間も output・標準 input のラベルは越えない
 # （output 価格や、cached が N/A のときの標準 input 価格を cached 扱いにしない）。
 # インラインタグは丸ごと読み飛ばし、属性値（class="input-price" 等）をラベルとみなさない。
+# 通常文字の分岐はインラインタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
 _CACHED_PRICE_GAP = _RECORD_GAP.replace(
-    r"[\s\S]", rf"(?:{_INLINE_TAG}|(?!\b(?:output|input)\b)[^$])"
+    r"[\s\S]", rf"(?:{_INLINE_TAG}|(?!{_INLINE_TAG})(?!\b(?:output|input)\b)[^$])"
 )
 # cached inputの価格はひとまとまりで読み飛ばし、output以降へは進まない。
 # 価格のない cached（N/A 等）はラベルだけを読み飛ばす。価格が続く場合はこの分岐を使えず、
