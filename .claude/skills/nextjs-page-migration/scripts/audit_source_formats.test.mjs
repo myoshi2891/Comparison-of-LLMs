@@ -1007,10 +1007,11 @@ test("does not certify stale script textContent after observed writes", () => {
  const source = `${card}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); const src = script.textContent; mermaid.render('id', src);</script>`;
  assert.equal(audit(source, page).status, 0);
  // 別の script からのテンプレートリテラル経由の書き込みも、payload を読む source を未解決にする。
- const foreign = audit(`${source}<script type="module">document.querySelector('#chart script')[\`textContent\`] = other;</script>`, page);
+ // async の module は解析中にも実行され得るため、classic の読み取りより先に書き込める。
+ const foreign = audit(`${source}<script type="module" async>document.querySelector('#chart script')[\`textContent\`] = other;</script>`, page);
  assert.equal(foreign.status, 1);
  // 同じ長さの空白だけのテンプレートキーは textContent ではない。
- assert.equal(audit(`${source}<script type="module">const x = {}; x[\`           \`] = other;</script>`, page).status, 0);
+ assert.equal(audit(`${source}<script type="module" async>const x = {}; x[\`           \`] = other;</script>`, page).status, 0);
 });
 
 test("keeps computed mermaid render calls unresolved instead of certifying the base payload", () => {

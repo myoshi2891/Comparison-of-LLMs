@@ -724,7 +724,8 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
       canStartRegex = lastToken === "." ? false : /^(?:return|throw|case|delete|void|typeof|instanceof|in|yield|await|else|do)$/.test(word)
         // `of` is an ordinary identifier outside a for head; leave its slash unresolved.
         || (word === "of" ? null : false);
-      lastToken = word;
+      // A member name (obj.if) is a property, never a control keyword or statement head.
+      lastToken = lastToken === "." ? "member" : word;
       continue;
     }
     if ((char === "+" || char === "-") && next === char) {
@@ -1291,11 +1292,136 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     }
     // Only follow a selected card's text/plain script, optionally through an alias.
     const query = /^(\w+)\.querySelector\(\s*(['"])(.*?)\2\s*\)$/;
+    /** The index of the bracket that opens the group closed at `closeIndex` (or -1). */
+    const openerOf = closeIndex => {
+      const pairs = { ")": "(", "]": "[", "}": "{" };
+      let depth = 0;
+      for (let k = closeIndex; k >= 0; k--) {
+        if (pairs[executable[k]]) depth++;
+        else if ("([{".includes(executable[k]) && --depth === 0) return k;
+      }
+      return -1;
+    };
+    /** Statement text from its start up to `position` (blocks, `;` and loop body bound it). */
+    const statementBefore = (position, floor) => {
+      let k = position - 1;
+      for (; k > floor; k--) {
+        const char = executable[k];
+        if (char === ";" || char === "{" || char === "}") break;
+        if (char === ")" || char === "]") { k = openerOf(k); if (k <= floor) return null; }
+      }
+      return executable.slice(k + 1, position);
+    };
+    /** Split a condition at top-level occurrences of `operator` (&& or ||). */
+    const splitTop = (condition, operator) => {
+      const parts = [];
+      let depth = 0, from = 0;
+      for (let k = 0; k < condition.length; k++) {
+        if ("([{".includes(condition[k])) depth++;
+        else if (")]}".includes(condition[k])) depth--;
+        else if (depth === 0 && condition.startsWith(operator, k)) { parts.push(condition.slice(from, k)); from = k + 2; k++; }
+      }
+      parts.push(condition.slice(from));
+      return parts.map(part => part.trim());
+    };
+    /**
+     * Whether `position` executes on every iteration of the card loop body (open..close).
+     * Enclosing try/finally and bare blocks, timer callbacks, and `if` blocks whose condition
+     * holds for every selected card are transparent. `continue` guards before the position
+     * may only test values shared by all iterations or elements proven present in the card.
+     */
+    const runsEveryIteration = (position, open, close, indexName, selected) => {
+      if (!(position > open && position < close)) return false;
+      // Same for every card: no index, no per-iteration binding or write, no call or assignment.
+      const uniform = condition => {
+        if (/[()=]|\+\+|--/.test(condition.replace(/[!=]==?|[<>]=/g, " "))) return false;
+        return Array.from(condition.matchAll(/(?<![\w$.])[A-Za-z_$][\w$]*/g)).every(name => {
+          const id = name[0];
+          if (/^(?:true|false|null|undefined|typeof|void|in|instanceof)$/.test(id)) return true;
+          if (id === indexName) return false;
+          if (Array.from(executable.matchAll(new RegExp(`\\b(?:var|let|const)\\s+${id.replace(/\$/g, "\\$")}(?![\\w$])`, "g")))
+            .some(declaration => declaration.index > open && declaration.index < close)) return false;
+          return !Array.from(writeIndexes(id)).some(write => write > open && write < close);
+        });
+      };
+      // An element binding that the selected card is proven to contain, so `!name` is false.
+      const present = (name, at) => {
+        if (!/^[A-Za-z_$][\w$]*$/.test(name)) return false;
+        const value = bindingAt(name, at)?.value;
+        const element = value && query.exec(value);
+        if (!element || element[1] !== selected[1]) return false;
+        if (element[3] === selected[3]) return true;
+        return selectedScript.cardHas?.(element[3]) === true;
+      };
+      const neverTrue = (condition, at) => uniform(condition) ||
+        splitTop(condition, "||").every(part => uniform(part) || (/^!\s*[A-Za-z_$][\w$]*$/.test(part) && present(part.replace(/^!\s*/, ""), at)));
+      const alwaysTrue = (condition, at) => uniform(condition) ||
+        splitTop(condition, "&&").every(part => uniform(part) || present(part, at));
+      /** Condition text of a `(...)` group closed at `closeParen` when it follows `if` (not `else if`). */
+      const ifCondition = closeParen => {
+        const opener = openerOf(closeParen);
+        const head = executable.slice(0, opener);
+        if (opener < 0 || !/(?<![\w$.])if\s*$/.test(head) || /(?<![\w$.])else\s+if\s*$/.test(head)) return undefined;
+        return executable.slice(opener + 1, closeParen);
+      };
+      /** Blocks between the loop body and `index`, innermost last. */
+      const blocksAround = index => {
+        const stack = [];
+        for (let k = open + 1; k < index; k++) {
+          if (executable[k] === "{") stack.push(k);
+          else if (executable[k] === "}") stack.pop();
+        }
+        return stack;
+      };
+      for (const block of blocksAround(position)) {
+        const head = executable.slice(open + 1, block).replace(/\s+$/, "");
+        if (/(?<![\w$.])(?:try|finally)$/.test(head) || /[;{}]$/.test(head) || head === "") continue;
+        const callable = /(?:function\s*\([^()]*\)|(?:\([^()]*\)|[A-Za-z_$][\w$]*)\s*=>)$/.exec(head);
+        // A timer callback runs once for this iteration; other callbacks may never run.
+        if (callable && /(?<![\w$.])(?:setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.test(head.slice(0, callable.index))) continue;
+        if (head.endsWith(")")) {
+          const condition = ifCondition(open + 1 + head.length - 1);
+          if (condition !== undefined && alwaysTrue(condition, block)) continue;
+        }
+        return false;
+      }
+      // An unbraced `if`/loop statement or a short-circuit/ternary before the position is conditional.
+      const statement = statementBefore(position, open);
+      if (statement === null || /^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(statement) || /&&|\|\||\?/.test(statement)) return false;
+      // `continue` before the position skips the rest of this iteration.
+      const nested = functions.filter(fn => fn.body > open && fn.end <= close + 1);
+      const innerLoops = loops.filter(loop => loop.start > open && loop.end <= close + 1);
+      for (const exit of executable.slice(open, position).matchAll(/(?<![\w$.])continue(?![\w$])/g)) {
+        const index = open + exit.index;
+        if (nested.some(fn => fn.body < index && index < fn.end)) continue;
+        // A labeled continue may target an outer loop; an inner loop's own continue does not skip this one.
+        if (/^[ \t]*[A-Za-z_$]/.test(executable.slice(index + 8))) return false;
+        if (innerLoops.some(loop => loop.start < index && index < loop.end)) continue;
+        const guard = statementBefore(index, open);
+        if (guard === null) return false;
+        const braceless = /^\s*if\s*\(/.exec(guard);
+        let condition;
+        if (braceless) {
+          // The `if (...)` group must end right before this `continue`.
+          const closeParen = executable.slice(0, index).trimEnd().length - 1;
+          if (executable[closeParen] !== ")" || openerOf(closeParen) !== index - guard.length + braceless[0].length - 1) return false;
+          condition = executable.slice(openerOf(closeParen) + 1, closeParen);
+        } else {
+          if (guard.trim() !== "") return false;
+          const block = blocksAround(index).at(-1);
+          const head = block === undefined ? "" : executable.slice(open + 1, block).replace(/\s+$/, "");
+          condition = head.endsWith(")") ? ifCondition(open + head.length) : undefined;
+        }
+        if (condition === undefined || !neverTrue(condition, index)) return false;
+      }
+      return true;
+    };
     // Bindings whose subtree a script query searches; edits to them can change the selection.
     const cardOwners = new Set();
     const scriptElement = (value, at = before) => {
       const selected = query.exec(value);
-      if (!selected || !/^script(?:\[type=['"]?text\/plain['"]?\])?$/.test(selected[3])) return false;
+      // An unquoted text/plain is an invalid selector (querySelector throws); quotes must match.
+      if (!selected || !/^script(?:\[type=(['"])text\/plain\1\])?$/.test(selected[3])) return false;
       cardOwners.add(selected[1]);
       if (!(selected[3] === "script" ? selectedScript.any : selectedScript.plain)) return false;
       // A classic script that runs before the payload is parsed reads nothing: unresolved.
@@ -1303,7 +1429,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const ownerBinding = bindingAt(selected[1], at);
       const owner = ownerBinding?.value;
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
-      if (direct) return selectedScript.unique(direct[2]);
+      // The query runs where its initializer runs; before the card is parsed it returns null.
+      if (direct) return selectedScript.cardAvailableAt(ownerBinding.at) && selectedScript.unique(direct[2]);
       const indexed = owner && /^(\w+)\[(\w+)\]$/.exec(owner);
       const collectionBinding = indexed && bindingAt(indexed[1], ownerBinding.at);
       const collection = collectionBinding?.value;
@@ -1333,7 +1460,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           .some(exit => !nested.some(fn => fn.body < open + exit.index && open + exit.index < fn.end))) return false;
         // Any other write to the index inside the body skips or repeats cards, so the
         // in-order card-to-payload mapping is no longer proven.
-        return !Array.from(writeIndexes(indexed[2])).some(write => write > open && write < close);
+        if (Array.from(writeIndexes(indexed[2])).some(write => write > open && write < close)) return false;
+        // The card binding, the payload read and mermaid.render must run on every selected
+        // iteration. A condition such as `i === 0` would certify cards it never renders.
+        return [ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected));
       });
     };
     let value = initial;
@@ -1380,7 +1510,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     if (!value.endsWith(".textContent")) return false;
     // A textContent write in another scope (even one without a renderer) may replace this
     // DOM-backed payload before the read. Literal sources above are unaffected.
-    if (foreignDomWrite) return false;
+    // A deferred module writer runs after parsing, so only a classic read that completes
+    // synchronously while parsing (not in a callback or after an await) precedes it.
+    if (foreignDomWrite === true ||
+      (foreignDomWrite === "deferred" && functions.some(fn => fn.body < initialBinding.at && initialBinding.at < fn.end))) return false;
     const element = value.slice(0, -12).trim();
     const isSelectedScript = (reference, at = before, seen = new Set()) => {
       if (scriptElement(reference, at)) return true;
@@ -1425,7 +1558,11 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const receiver = String.raw`(\w+(?:\.querySelector\(\s*(['"])([^'"\n]*)\2\s*\))?)\s*\.\s*`;
     const scriptEdits = new RegExp(`${receiver}(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text))\\s*\\(|outerHTML\\s*=(?!=))`, "g");
     const ownerEdits = new RegExp(`(?<![\\w$.])(\\w+)\\s*\\.\\s*(?:(?:removeChild|replaceChild|insertBefore|prepend|replaceChildren|insertAdjacent(?:HTML|Element|Text))\\s*\\(|(?:innerHTML|outerHTML|textContent|innerText)\\s*=(?!=))`, "g");
+    // Changing a script's type can move a typed query (script[type="text/plain"]) to another script.
+    // Attribute writes with a literal non-type name keep the selection; computed names stay unresolved.
+    const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute)\\s*\\(\\s*(?!(['"])(?!type\\4)[^'"\\n]*\\4)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
     if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index)) ||
+      Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index)) ||
       Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeCardOwner(edit[1]))) return false;
     return { base: usesValidatedDedent ? dedentedPayload : payload };
   };
@@ -1645,7 +1782,9 @@ function materializePlainTextCards(src) {
     const writesTextContent = /\.\s*textContent\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
       Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])textContent\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
         .some(write => isTextContentKey(write, rawSource));
-    return { literalSource, rawSource, selectors, computedRenderer, classic, segments, writesTextContent, hasSelection: selectionCalls.length > 0,
+    // Inline module scripts without async run after the document is parsed.
+    const deferredModule = !classic && group.every(script => readHtmlAttribute(script.attributes, "async") === undefined);
+    return { literalSource, rawSource, selectors, computedRenderer, classic, deferredModule, segments, writesTextContent, hasSelection: selectionCalls.length > 0,
       hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer || computedRenderer };
   });
   const scopes = allScopes.filter(scope => scope.hasRenderer);
@@ -1711,7 +1850,10 @@ function materializePlainTextCards(src) {
       const firstPlain = queryableScripts
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
       // Cross-scope textContent writes only invalidate DOM-backed (payload-reading) sources.
-      const foreignWrite = Boolean(renderer) && allScopes.some(scope => scope !== renderer && scope.writesTextContent);
+      const foreignWriters = renderer ? allScopes.filter(scope => scope !== renderer && scope.writesTextContent) : [];
+      // Deferred module writers cannot run before a classic renderer's synchronous read.
+      const foreignWrite = foreignWriters.length === 0 ? false
+        : renderer.classic && foreignWriters.every(scope => scope.deferredModule) ? "deferred" : true;
       const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
           // The classic script that performs the read must come after this payload in document
@@ -1720,7 +1862,14 @@ function materializePlainTextCards(src) {
             segment.start <= at && at <= segment.end && segment.documentPosition > start + marker.index),
           cardAvailableAt: at => !renderer.classic || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition > start),
-          unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1 },
+          unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1,
+          // Whether the card contains an element for a single-class selector, so a per-card
+          // query for it is never null (a `!host` guard cannot skip this card).
+          cardHas: selector => {
+            const wanted = /^\.([A-Za-z_-][\w-]*)$/.exec(selector);
+            return Boolean(wanted) && Array.from(card.content.matchAll(new RegExp(`<[A-Za-z][\\w:-]*${htmlAttributesPattern}>`, "g")))
+              .some(tag => (readHtmlAttribute(tag[1], "class") ?? "").split(/\s+/).includes(wanted[1]));
+          } },
         foreignWrite));
       if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
       // Serialize the entity-decoded chart: inventory decodes the HTML escape layer once, so the
