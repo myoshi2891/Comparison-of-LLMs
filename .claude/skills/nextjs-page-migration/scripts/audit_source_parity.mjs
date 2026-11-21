@@ -217,7 +217,7 @@ const TAG_ATTRIBUTE_RE = new RegExp(
 const VARIANT_ATTRIBUTE_NAMES = new Set(["class", "classname", "variant", "data-variant", "data-testid"]);
 
 /** A `textContent` or `text` template-literal key after blankNonCodeText (body blanked, length kept). */
-const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60(?: {11}| {4})\x60`;
+const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60 *\x60`;
 
 /**
  * Confirms that a write matched in masked source names textContent or text in the raw source.
@@ -228,7 +228,14 @@ const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60(?: {11}| {4})\x60`;
  */
 function isTextContentKey(write, rawSource) {
   if (!write[0].includes("\x60")) return true;
-  return /\[\s*\x60(?:textContent|text)\x60\s*\]/.test(rawSource.slice(write.index, write.index + write[0].length));
+  const key = /\[\s*\x60((?:[^\x60\\$]|\\[\s\S]|\$(?!\{))*)\x60\s*\]/.exec(rawSource.slice(write.index, write.index + write[0].length));
+  if (!key) return false;
+  const decoded = key[1].replace(/\\(?:u\{([0-9a-fA-F]+)\}|u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2})|([\s\S]))/g, (_all, braced, unicode, hex, simple) => {
+    if (simple !== undefined) return ({ n: "\n", r: "\r", t: "\t", b: "\b", f: "\f", v: "\v", 0: "\0" })[simple] ?? simple;
+    const code = Number.parseInt(braced ?? unicode ?? hex, 16);
+    return code <= 0x10ffff ? String.fromCodePoint(code) : "";
+  });
+  return decoded === "textContent" || decoded === "text";
 }
 
 /**
@@ -1379,7 +1386,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         const element = value && query.exec(value);
         if (!element || element[1] !== selected[1]) return false;
         if (element[3] === selected[3]) return true;
-        if (selectedScript.cardHas?.(element[3]) !== true) return false;
+        if (selectedScript.cardHas?.(element[3], at) !== true) return false;
         return !hostMayBeRemoved(name, element[3], selected[1], at);
       };
       const loopPath = pathAt(open);
@@ -1494,6 +1501,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       };
       for (const block of blocksAround(position)) {
         const head = executable.slice(open + 1, block).replace(/\s+$/, "");
+        // A statement before the render inside `try` may throw into `catch` first.
+        if (/(?<![\w$.])try$/.test(head) && executable.slice(block + 1, position).trim() !== "") return false;
         if (/(?<![\w$.])(?:try|finally)$/.test(head) || /[;{}]$/.test(head) || head === "") continue;
         const callable = /(?:function\s*\([^()]*\)|(?:\([^()]*\)|[A-Za-z_$][\w$]*)\s*=>)$/.exec(head);
         // A timer callback runs once for this iteration; other callbacks may never run.
@@ -1871,7 +1880,7 @@ function classTokens(value) {
 
 /** Match static card selectors; complex/dynamic selectors are not guessed. */
 function matchesCardSelector(tag, selector) {
-  if (!/^(?:[A-Za-z][\w-]*)?(?:[.#][\w-]+)*$/.test(selector) || !selector) return false;
+  if (!/^(?:[A-Za-z][\w-]*)?(?:[.#]-?[A-Za-z_][\w-]*)*$/.test(selector) || !selector) return false;
   const element = /^([A-Za-z][\w-]*)/.exec(selector)?.[1];
   if (element && /^<([\w-]+)/.exec(tag)?.[1].toLowerCase() !== element.toLowerCase()) return false;
   const classes = classTokens(readHtmlAttribute(tag, "class"));
@@ -1918,8 +1927,9 @@ function materializePlainTextCards(src) {
     // Scripts inside uninstantiated template content are not renderers for document cards.
     if (script.inTemplate) return false;
     // nomodule scripts are skipped by module-capable browsers; they stay in the DOM inventory.
-    if (readHtmlAttribute(script.attributes, "nomodule") !== undefined) return false;
     const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
+    // nomodule only suppresses classic scripts; module scripts run regardless.
+    if (readHtmlAttribute(script.attributes, "nomodule") !== undefined && type !== "module") return false;
     // The HTML standard's JavaScript MIME type essences (text/plain payloads stay excluded).
     return !type || type === "module" || /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(type);
   });
@@ -2071,13 +2081,13 @@ function materializePlainTextCards(src) {
           // Whether an element matched by `selector` inside the card can contain the selected
           // script (or any script, for complex selectors that cannot be statically matched).
           mayContainScript: selector => {
-            if (!/^(?:[A-Za-z][\w-]*)?(?:[.#][\w-]+)*$/.test(selector) || !selector) return true;
+            if (!/^(?:[A-Za-z][\w-]*)?(?:[.#]-?[A-Za-z_][\w-]*)*$/.test(selector) || !selector) return true;
             const matches = extractElementContents(card.content, tag => matchesCardSelector(tag, selector), true);
             return matches.some(el => /<script data-audit-payload="\d+"><\/script>/.test(el.content));
           },
           // Whether the card contains an element for a single-class selector outside inert
           // <template> contents, so a per-card query for it is never null (`!host` cannot skip).
-          cardHas: selector => {
+          cardHas: (selector, at) => {
             const wanted = /^\.([A-Za-z_-][\w-]*)$/.exec(selector);
             if (!wanted) return false;
             let depth = 0;
@@ -2087,7 +2097,11 @@ function materializePlainTextCards(src) {
                 if (isTemplate) depth = Math.max(0, depth - 1);
                 continue;
               }
-              if (depth === 0 && classTokens(readHtmlAttribute(tag[3], "class")).includes(wanted[1])) return true;
+              if (depth === 0 && classTokens(readHtmlAttribute(tag[3], "class")).includes(wanted[1])) {
+                // A classic script only sees hosts parsed before it; a later host leaves `!host` reachable.
+                if (at === undefined || renderer.deferredModule || renderer.segments.some(segment =>
+                  segment.start <= at && at <= segment.end && segment.documentPosition > start + tag.index)) return true;
+              }
               if (isTemplate) depth += 1;
             }
             return false;

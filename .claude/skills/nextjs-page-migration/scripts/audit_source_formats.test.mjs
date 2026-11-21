@@ -2049,8 +2049,10 @@ test("normalizes CRLF script payloads and ignores template text/plain payloads",
 	const card = payload => `<div class="diagram-card"><script type="text/plain">${payload}</script></div>`;
 	assert.equal(audit(card(chart), page).status, 0);
 	assert.equal(audit(card(chart.replace(/\n/g, "\r\n")), page).status, 0);
-	const detached = `<template><script type="text/plain" data-for="c">WRONG</script></template><div class="code-block"><code id="c"></code></div>`;
-	assert.equal(audit(detached, "<pre>{\"\"}</pre>").data.matched === true, false);
+	const detached = `<template><script type="text/plain" data-for="c">WRONG</script></template><pre><code id="c"></code></pre>`;
+	assert.equal(audit(detached, "<pre>{\"\"}</pre>").status, 0);
+	// Control: the same text inside the visible block must fail the audit.
+	assert.notEqual(audit(`<pre><code id="c">WRONG</code></pre>`, "<pre>{\"\"}</pre>").status, 0);
 });
 
 test("keeps escaped mermaid render spellings unresolved", () => {
