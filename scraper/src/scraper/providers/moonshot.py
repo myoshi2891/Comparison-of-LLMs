@@ -87,7 +87,10 @@ _OUTPUT_LABEL_GAP = _RECORD_GAP.replace(
     rf"(?={_STD_INPUT_AHEAD}{_STD_INPUT_LABEL})"
     rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
 )
-_OUTPUT_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"(?!\b(?:batch|cached|cache|input)\b)[^$]")
+_OUTPUT_PRICE_GAP = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?:{_ANY_TAG}|(?!{_ANY_TAG})(?!\b(?:batch|cached|cache|input)\b)[^$])",
+)
 
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
 _FALLBACKS: dict[str, tuple[float, float]] = {
