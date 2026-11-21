@@ -2022,7 +2022,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"python"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="python のコード例 1">
                 <code className="language-python">
                   <span className={styles.codeLine}>
                     <span className="hljs-keyword">{"import"}</span>
@@ -3088,7 +3090,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"json"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="json のコード例 2">
                 <code className="language-json">
                   <span className={styles.codeLine}>
                     <span className="hljs-punctuation">{"{"}</span>
@@ -3314,7 +3318,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"python"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="python のコード例 3">
                 <code className="language-python">
                   <span className={styles.codeLine}>
                     <span className="hljs-keyword">{"def"}</span>{" "}
@@ -4248,7 +4254,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"python"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="python のコード例 4">
                 <code className="language-python">
                   <span className={styles.codeLine}>{"tools = ["}</span>
                   {"\n"}
@@ -4753,7 +4761,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"json"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="json のコード例 5">
                 <code className="language-json">
                   <span className={styles.codeLine}>
                     <span className="hljs-punctuation">{"{"}</span>
@@ -5086,7 +5096,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"markdown"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="markdown のコード例 6">
                 <code className="language-markdown">
                   <span className={styles.codeLine}>
                     <span className="hljs-section">{"# 作業の完遂"}</span>
@@ -5287,7 +5299,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"markdown"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="markdown のコード例 7">
                 <code className="language-markdown">
                   <span className={styles.codeLine}>
                     {
@@ -5557,7 +5571,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"markdown"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="markdown のコード例 8">
                 <code className="language-markdown">
                   <span className={styles.codeLine}>
                     {
@@ -5571,7 +5587,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"markdown"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="markdown のコード例 9">
                 <code className="language-markdown">
                   <span className={styles.codeLine}>
                     <span className="hljs-section">{"# 状況の伝え方"}</span>
@@ -5715,7 +5733,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"markdown"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="markdown のコード例 10">
                 <code className="language-markdown">
                   <span className={styles.codeLine}>
                     <span className="hljs-section">{"# サブエージェントの使い方"}</span>
@@ -5840,7 +5860,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"diff"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="diff のコード例 11">
                 <code className="language-diff">
                   <span className={styles.codeLine}>
                     <span className="hljs-deletion">
@@ -6025,7 +6047,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"markdown"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="markdown のコード例 12">
                 <code className="language-markdown">
                   <span className={styles.codeLine}>
                     <span className="hljs-section">{"# 読み手に伝わる書き方"}</span>
@@ -6449,7 +6473,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"markdown"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="markdown のコード例 13">
                 <code className="language-markdown">
                   <span className={styles.codeLine}>
                     <span className="hljs-section">{"# プロジェクト概要"}</span>
@@ -6790,7 +6816,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"json"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="json のコード例 14">
                 <code className="language-json">
                   <span className={styles.codeLine}>
                     <span className="hljs-punctuation">{"{"}</span>
@@ -8258,7 +8286,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"python"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="python のコード例 15">
                 <code className="language-python">
                   <span className={styles.codeLine}>
                     <span className="hljs-keyword">{"def"}</span>{" "}
