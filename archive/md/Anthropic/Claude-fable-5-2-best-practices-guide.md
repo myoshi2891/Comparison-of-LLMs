@@ -301,10 +301,12 @@ flowchart TD
     MED --> E
     HIGH --> E
     E --> F{"品質は基準を満たすか?"}
-    F -- "満たす" --> G{"1段下げても満たすか?"}
+    F -- "満たす" --> G0{"すでに low か?"}
+    G0 -- "はい" --> FIX["その effort で確定"]
+    G0 -- "いいえ" --> G{"1段下げても満たすか?"}
     G -- "はい" --> DOWN["1段下げて再評価"]
     DOWN --> E
-    G -- "いいえ" --> FIX["その effort で確定"]
+    G -- "いいえ" --> FIX
     F -- "満たさない" --> H{"high 未満?"}
     H -- "はい" --> UP["1段上げて再評価"]
     UP --> E
@@ -342,8 +344,15 @@ HEADERS = {
 PRICE = {"in": 8.0, "out": 40.0, "cache_read": 0.20, "cache_write_5m": 10.0, "cache_write_1h": 16.0}
 
 
-def usd(usage: dict) -> float:
+def usd(usage: dict, response: dict | None = None) -> float:
     """usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。"""
+    # refusal 単体では非課金と断定しない。stop_details.billed is False で非課金が確認できた場合のみ 0 とする
+    if (
+        response is not None
+        and response.get("stop_reason") == "refusal"
+        and (response.get("stop_details") or {}).get("billed") is False
+    ):
+        return 0.0
     cache = usage.get("cache_creation") or {}
     # キャッシュ件数は null で返ることがあるため、0 として扱う
     write_5m = cache.get("ephemeral_5m_input_tokens") or 0
@@ -372,9 +381,10 @@ def run_once(prompt: str, effort: str, max_tokens: int = 32_000) -> dict:
     data = r.json()
     text = "".join(b.get("text", "") for b in data["content"] if b["type"] == "text")
     return {
+        "status": "ok",
         "effort": effort,
         "sec": round(time.time() - t0, 1),
-        "usd": round(usd(data["usage"]), 4),
+        "usd": round(usd(data["usage"], data), 4),
         "out_tokens": data["usage"]["output_tokens"],
         "stop_reason": data["stop_reason"],
         "text": text,
@@ -385,7 +395,18 @@ def sweep(tasks: list[dict], levels=("low", "medium", "high", "xhigh")) -> list[
     rows = []
     for task in tasks:
         for level in levels:
-            res = run_once(task["prompt"], level)
+            try:
+                res = run_once(task["prompt"], level)
+            except Exception as error:
+                # 後続リクエストが失敗しても完了済みの計測結果を保持し、品質不合格とは別行で記録する
+                rows.append({
+                    "task": task["id"],
+                    "effort": level,
+                    "status": "request_error",
+                    "error": f"{type(error).__name__}: {error}",
+                    "passed": None,
+                })
+                continue
             res["task"] = task["id"]
             # 正常終了(end_turn)し、自社の合否判定関数が受理した応答だけを合格にする
             res["passed"] = res["stop_reason"] == "end_turn" and task["check"](res["text"])
@@ -486,38 +507,52 @@ def call(body: dict, betas: list[str] | None = None) -> dict:
     return r.json()
 
 
-def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "high", max_turns: int = 60, checkpoint: dict | None = None) -> dict:
+def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "high", max_turns: int = 60, checkpoint: dict | None = None, max_tokens: int = 32_000) -> dict:
     # system と tools は会話の途中で変更しない(prefix チェックの対象)
     system = "あなたはこのリポジトリの保守担当エージェントです。..."
     # checkpoint={} を渡すと、上限到達後は同じ辞書で再呼び出しして続行できる
     messages = [{"role": "user", "content": user_prompt}]
-    if checkpoint is not None and "messages" in checkpoint:
-        messages = checkpoint["messages"]
+    container_id = None
+    if checkpoint is not None:
+        if "messages" in checkpoint:
+            messages = checkpoint["messages"]
+        container_id = checkpoint.get("container_id")
 
     for _ in range(max_turns):
-        data = call({
+        body = {
             "model": "claude-fable-5-2",
-            "max_tokens": 32_000,
+            "max_tokens": max_tokens,
             "output_config": {"effort": effort},
             "system": system,
             "cache_control": {"type": "ephemeral"},  # 自動キャッシュを明示的に有効化
             "tools": tools,
             "messages": messages,
-        })
+        }
+        if container_id is not None:
+            body["container"] = container_id
+        data = call(body)
 
-        if data["stop_reason"] == "max_tokens":
+        if data["stop_reason"] in ("max_tokens", "model_context_window_exceeded"):
             # 途中で切れた応答(未完成の tool_use を含み得る)は履歴へ追加しない。
             # checkpoint は直前に完了したツール結果バッチのまま残る
             return data
+        if data["stop_reason"] == "refusal":
+            # 拒否応答は共有 checkpoint の履歴へ追記しない(12章の方針で処理する)
+            return data
+
+        container = data.get("container")
+        returned_id = container.get("id") if isinstance(container, dict) else container
+        if returned_id:
+            container_id = returned_id
 
         # 返ってきた content をそのまま追記する。ブロックの削除・並べ替え・書き換えは禁止
         messages.append({"role": "assistant", "content": data["content"]})
 
-        if data["stop_reason"] == "refusal":
-            return data  # 12章の方針で処理する
         if data["stop_reason"] == "pause_turn":
             if checkpoint is not None:
                 checkpoint["messages"] = messages
+                if container_id is not None:
+                    checkpoint["container_id"] = container_id
             continue
         if data["stop_reason"] != "tool_use":
             return data
@@ -552,9 +587,13 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
         messages.append({"role": "user", "content": results})
         if checkpoint is not None:
             checkpoint["messages"] = messages  # 次のAPI呼び出し前に保存する
+            if container_id is not None:
+                checkpoint["container_id"] = container_id
 
     if checkpoint is not None:
         checkpoint["messages"] = messages  # 最後のtool_resultも保存する
+        if container_id is not None:
+            checkpoint["container_id"] = container_id
     raise RuntimeError("max_turns に到達しました")
 ```
 
@@ -564,7 +603,7 @@ Fable 5.2 は、ツール呼び出しの合間に書く経過報告を**思考�
 
 | `thinking.display` | 返ってくるもの | 用途 |
 | --- | --- | --- |
-| `"omitted"`(既定) | 思考ブロックの本文は空 | 画面に出さない。最安・最速 |
+| `"omitted"`(既定) | 思考ブロックの本文は空 | 画面に出さない。本文送信の遅延を抑えやすい(思考トークン自体は同額課金で、非表示にしても安くならない) |
 | `"updates"` | 各経過報告の短い要約(ベータ。ヘッダ `thinking-display-updates-2026-08-18`) | **ユーザーに進捗を見せたい**とき |
 | `"summarized"` | 経過報告 + 要約された推論 | 推論の様子も見たいとき。推論過程の再現を本文に書かせる代わりに使う |
 
@@ -580,7 +619,7 @@ data = call(
     betas=["thinking-display-updates-2026-08-18"],
 )
 
-# call() 完了後にテキストと thinking の進捗を表示する（待機中の逐次更新ではない）
+# 応答完了後の確認例(post-response inspection)。待機中にリアルタイム表示するには stream: true で進捗イベントを受信し、到着順に描画する
 for block in data["content"]:
     if block["type"] == "text":
         print(block["text"])
@@ -588,7 +627,7 @@ for block in data["content"]:
         print("[進捗]", block["thinking"])
 ```
 
-> ベータ機能のヘッダ名と挙動は更新されうるため、導入時に公式ドキュメント(S5)の該当箇所を確認してください。
+> 待機中の無言を防ぐには、ストリーミングで進捗イベントを受信し、到着順に画面へ描画します(上の `call()` は応答完了後の確認例です)。ベータ機能のヘッダ名と挙動は更新されうるため、導入時に公式ドキュメント(S5)の該当箇所を確認してください。
 
 ---
 
@@ -1008,7 +1047,7 @@ Claude Code の hooks で、編集後の自動整形や禁止操作のブロッ�
         "hooks": [
           {
             "type": "command",
-            "command": "jq -j '.tool_input.file_path, \"\\u0000\"' | xargs -0 sh -c 'for file do case \"$file\" in *.ts|*.tsx|*.js) npx prettier --write -- \"$file\";; esac; done' sh"
+            "command": "jq -j '.tool_input.file_path, \"\\u0000\"' | xargs -0 sh -c 'for file do case \"$file\" in *.ts|*.tsx|*.js) if [ -x ./node_modules/.bin/prettier ]; then ./node_modules/.bin/prettier --write -- \"$file\"; else echo \"prettier not installed locally; skipping $file\" >&2; fi;; esac; done' sh"
           }
         ]
       }

@@ -25,7 +25,7 @@ const DIAGRAM_0 =
 const DIAGRAM_1 =
   'flowchart TD\n    START["新しいタスク"] --> Q1{"仕様は明確で　1〜数ファイルで完結する?"}\n    Q1 -- "はい" --> Q2{"大量・低遅延・低コストが最優先?"}\n    Q2 -- "はい" --> HAIKU["Haiku 5.5・Sonnet 5.5"]\n    Q2 -- "いいえ" --> OPUS["Opus 5.5 を medium〜high で試す"]\n    Q1 -- "いいえ" --> Q3{"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?"}\n    Q3 -- "はい" --> FABLE["Fable 5.2 を high で試す"]\n    Q3 -- "いいえ" --> OPUS\n    OPUS --> Q4{"Opus の高 effort でも　evals が基準未達?"}\n    Q4 -- "はい" --> FABLE\n    Q4 -- "いいえ" --> DONE["そのまま運用"]\n    FABLE --> Q5{"一部だけが難所?"}\n    Q5 -- "はい" --> HYBRID["小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行"]\n    Q5 -- "いいえ" --> EVAL{"Fable の構成で　evals が基準を満たす?"}\n    HYBRID --> EVAL\n    EVAL -- "はい" --> DONE\n    EVAL -- "いいえ" --> RETRY["effort・プロンプト・分担を見直して　選定からやり直す"]\n    RETRY --> Q5\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\n    class RETRY box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_2 =
-  'flowchart TD\n    A["タスクを分類する"] --> B{"仕様が明確で　短時間で終わる?"}\n    B -- "はい" --> LOW["low から試す"]\n    B -- "いいえ" --> C{"対話的に人が待っている?"}\n    C -- "はい" --> MED["medium から試す"]\n    C -- "いいえ" --> D{"長時間・無人・　難度が高い?"}\n    D -- "はい" --> HIGH["high を起点にする"]\n    D -- "いいえ" --> MED\n    LOW --> E["自社 evals で評価する"]\n    MED --> E\n    HIGH --> E\n    E --> F{"品質は基準を満たすか?"}\n    F -- "満たす" --> G{"1段下げても満たすか?"}\n    G -- "はい" --> DOWN["1段下げて再評価"]\n    DOWN --> E\n    G -- "いいえ" --> FIX["その effort で確定"]\n    F -- "満たさない" --> H{"high 未満?"}\n    H -- "はい" --> UP["1段上げて再評価"]\n    UP --> E\n    H -- "いいえ" --> I{"プロンプトや　ハーネスに原因がない?"}\n    I -- "原因あり" --> PROMPT["8章の9パターンを確認"]\n    I -- "原因なし" --> XH["xhigh を試し　効果とコストを測定"]\n\n    class LOW,MED,HIGH,XH hub\n    class FIX done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
+  'flowchart TD\n    A["タスクを分類する"] --> B{"仕様が明確で　短時間で終わる?"}\n    B -- "はい" --> LOW["low から試す"]\n    B -- "いいえ" --> C{"対話的に人が待っている?"}\n    C -- "はい" --> MED["medium から試す"]\n    C -- "いいえ" --> D{"長時間・無人・　難度が高い?"}\n    D -- "はい" --> HIGH["high を起点にする"]\n    D -- "いいえ" --> MED\n    LOW --> E["自社 evals で評価する"]\n    MED --> E\n    HIGH --> E\n    E --> F{"品質は基準を満たすか?"}\n    F -- "満たす" --> G0{"すでに low か?"}\n    G0 -- "はい" --> FIX["その effort で確定"]\n    G0 -- "いいえ" --> G{"1段下げても満たすか?"}\n    G -- "はい" --> DOWN["1段下げて再評価"]\n    DOWN --> E\n    G -- "いいえ" --> FIX\n    F -- "満たさない" --> H{"high 未満?"}\n    H -- "はい" --> UP["1段上げて再評価"]\n    UP --> E\n    H -- "いいえ" --> I{"プロンプトや　ハーネスに原因がない?"}\n    I -- "原因あり" --> PROMPT["8章の9パターンを確認"]\n    I -- "原因なし" --> XH["xhigh を試し　効果とコストを測定"]\n\n    class LOW,MED,HIGH,XH hub\n    class FIX done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_3 =
   'flowchart TD\n    A["リクエストを組み立てる"] --> B{"system・tools・過去メッセージを　前回から変更した?"}\n    B -- "いいえ　追記のみ" --> OK["検査に合格　思考が再利用され　キャッシュも効く"]\n    B -- "はい" --> C{"思考ブロックを　含めて送った?"}\n    C -- "いいえ" --> WEAK["ブロックを除いて送信　モデルが考え直し出力トークン増　類推"]\n    C -- "はい" --> D{"prefix_mismatch_behavior　の設定"}\n    D -- "未設定" --> ERR["400 エラー"]\n    D -- "drop_block" --> DROP["ブロックを破棄して継続　再思考でトークン増の恐れ"]\n\n    class OK done\n    class ERR,DROP,WEAK box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_4 =
@@ -392,7 +392,14 @@ export default function Page() {
                 " リリース直後は一次情報と推測が混在します。本書では、すべての主張に次のラベルを付けています。 "
               }
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="この資料の確度ラベル一覧"
+            >
               {" "}
               <table>
                 <thead>
@@ -1541,7 +1548,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"bash"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="Claude Code の確認と起動コマンド">
                 <code className="language-bash">
                   <span className={styles.codeLine}>
                     <span className="hljs-comment">
@@ -2106,6 +2115,12 @@ export default function Page() {
                     <span className="hljs-params">
                       {"usage: "}
                       <span className="hljs-built_in">{"dict"}</span>
+                      {", response: "}
+                      <span className="hljs-built_in">{"dict"}</span>
+                      {" | "}
+                      <span className="hljs-literal">{"None"}</span>
+                      {" = "}
+                      <span className="hljs-literal">{"None"}</span>
                     </span>
                     {") -> "}
                     <span className="hljs-built_in">{"float"}</span>
@@ -2119,6 +2134,59 @@ export default function Page() {
                         '"""usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。"""'
                       }
                     </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-comment">
+                      {
+                        "# refusal 単体では非課金と断定しない。stop_details.billed is False で非課金が確認できた場合のみ 0 とする"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        response "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" response.get("}
+                    <span className="hljs-string">{'"stop_reason"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"refusal"'}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" (response.get("}
+                    <span className="hljs-string">{'"stop_details"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" {}).get("}
+                    <span className="hljs-string">{'"billed"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-literal">{"False"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"    ):"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"return"}</span>{" "}
+                    <span className="hljs-number">{"0.0"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -2330,6 +2398,14 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"        "}
+                    <span className="hljs-string">{'"status"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"ok"'}</span>
+                    {","}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
                     <span className="hljs-string">{'"effort"'}</span>
                     {": effort,"}
                   </span>
@@ -2351,7 +2427,7 @@ export default function Page() {
                     <span className="hljs-built_in">{"round"}</span>
                     {"(usd(data["}
                     <span className="hljs-string">{'"usage"'}</span>
-                    {"]), "}
+                    {"], data), "}
                     <span className="hljs-number">{"4"}</span>
                     {"),"}
                   </span>
@@ -2433,9 +2509,89 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"            res = run_once(task["}
+                    {"            "}
+                    <span className="hljs-keyword">{"try"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                res = run_once(task["}
                     <span className="hljs-string">{'"prompt"'}</span>
                     {"], level)"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"except"}</span>
+                    {" Exception "}
+                    <span className="hljs-keyword">{"as"}</span>
+                    {" error:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-comment">
+                      {
+                        "# 後続リクエストが失敗しても完了済みの計測結果を保持し、品質不合格とは別行で記録する"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                rows.append({"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-string">{'"task"'}</span>
+                    {": task["}
+                    <span className="hljs-string">{'"id"'}</span>
+                    {"],"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-string">{'"effort"'}</span>
+                    {": level,"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-string">{'"status"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"request_error"'}</span>
+                    {","}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-string">{'"error"'}</span>
+                    {": "}
+                    <span className="hljs-string">
+                      {'f"'}
+                      <span className="hljs-subst">
+                        {"{"}
+                        <span className="hljs-built_in">{"type"}</span>
+                        {"(error).__name__}"}
+                      </span>
+                      {": "}
+                      <span className="hljs-subst">{"{error}"}</span>
+                      {'"'}
+                    </span>
+                    {","}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-string">{'"passed"'}</span>
+                    {": "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {","}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                })"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"continue"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -2596,7 +2752,13 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"bash"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+                tabIndex={0}
+                role="region"
+                aria-label="Messages API 最小リクエストの curl コマンド"
+              >
                 <code className="language-bash">
                   <span className={styles.codeLine}>
                     {"curl https://api.anthropic.com/v1/messages \\"}
@@ -3165,6 +3327,10 @@ export default function Page() {
                       <span className="hljs-literal">{"None"}</span>
                       {" = "}
                       <span className="hljs-literal">{"None"}</span>
+                      {", max_tokens: "}
+                      <span className="hljs-built_in">{"int"}</span>
+                      {" = "}
+                      <span className="hljs-number">{"32_000"}</span>
                     </span>
                     {") -> "}
                     <span className="hljs-built_in">{"dict"}</span>
@@ -3203,22 +3369,38 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"    container_id = "}
+                    <span className="hljs-literal">{"None"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"    "}
                     <span className="hljs-keyword">{"if"}</span>
                     {" checkpoint "}
                     <span className="hljs-keyword">{"is"}</span>{" "}
                     <span className="hljs-keyword">{"not"}</span>{" "}
-                    <span className="hljs-literal">{"None"}</span>{" "}
-                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
                     <span className="hljs-string">{'"messages"'}</span>{" "}
                     <span className="hljs-keyword">{"in"}</span>
                     {" checkpoint:"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        messages = checkpoint["}
+                    {"            messages = checkpoint["}
                     <span className="hljs-string">{'"messages"'}</span>
                     {"]"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        container_id = checkpoint.get("}
+                    <span className="hljs-string">{'"container_id"'}</span>
+                    {")"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}></span>
@@ -3232,7 +3414,7 @@ export default function Page() {
                     {"(max_turns):"}
                   </span>
                   {"\n"}
-                  <span className={styles.codeLine}>{"        data = call({"}</span>
+                  <span className={styles.codeLine}>{"        body = {"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"            "}
@@ -3245,9 +3427,7 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"            "}
                     <span className="hljs-string">{'"max_tokens"'}</span>
-                    {": "}
-                    <span className="hljs-number">{"32_000"}</span>
-                    {","}
+                    {": max_tokens,"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3287,7 +3467,25 @@ export default function Page() {
                     {": messages,"}
                   </span>
                   {"\n"}
-                  <span className={styles.codeLine}>{"        })"}</span>
+                  <span className={styles.codeLine}>{"        }"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" container_id "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            body["}
+                    <span className="hljs-string">{'"container"'}</span>
+                    {"] = container_id"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"        data = call(body)"}</span>
                   {"\n"}
                   <span className={styles.codeLine}></span>
                   {"\n"}
@@ -3296,9 +3494,13 @@ export default function Page() {
                     <span className="hljs-keyword">{"if"}</span>
                     {" data["}
                     <span className="hljs-string">{'"stop_reason"'}</span>
-                    {"] == "}
+                    {"] "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" ("}
                     <span className="hljs-string">{'"max_tokens"'}</span>
-                    {":"}
+                    {", "}
+                    <span className="hljs-string">{'"model_context_window_exceeded"'}</span>
+                    {"):"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3319,6 +3521,60 @@ export default function Page() {
                     {"            "}
                     <span className="hljs-keyword">{"return"}</span>
                     {" data"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" data["}
+                    <span className="hljs-string">{'"stop_reason"'}</span>
+                    {"] == "}
+                    <span className="hljs-string">{'"refusal"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-comment">
+                      {"# 拒否応答は共有 checkpoint の履歴へ追記しない(12章の方針で処理する)"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"return"}</span>
+                    {" data"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}></span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        container = data.get("}
+                    <span className="hljs-string">{'"container"'}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        returned_id = container.get("}
+                    <span className="hljs-string">{'"id"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(container, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"else"}</span>
+                    {" container"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" returned_id:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            container_id = returned_id"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}></span>
@@ -3352,23 +3608,6 @@ export default function Page() {
                     {" data["}
                     <span className="hljs-string">{'"stop_reason"'}</span>
                     {"] == "}
-                    <span className="hljs-string">{'"refusal"'}</span>
-                    {":"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"            "}
-                    <span className="hljs-keyword">{"return"}</span>
-                    {" data  "}
-                    <span className="hljs-comment">{"# 12章の方針で処理する"}</span>
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"        "}
-                    <span className="hljs-keyword">{"if"}</span>
-                    {" data["}
-                    <span className="hljs-string">{'"stop_reason"'}</span>
-                    {"] == "}
                     <span className="hljs-string">{'"pause_turn"'}</span>
                     {":"}
                   </span>
@@ -3387,6 +3626,22 @@ export default function Page() {
                     {"                checkpoint["}
                     <span className="hljs-string">{'"messages"'}</span>
                     {"] = messages"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" container_id "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    checkpoint["}
+                    <span className="hljs-string">{'"container_id"'}</span>
+                    {"] = container_id"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3662,6 +3917,22 @@ export default function Page() {
                     <span className="hljs-comment">{"# 次のAPI呼び出し前に保存する"}</span>
                   </span>
                   {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" container_id "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                checkpoint["}
+                    <span className="hljs-string">{'"container_id"'}</span>
+                    {"] = container_id"}
+                  </span>
+                  {"\n"}
                   <span className={styles.codeLine}></span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3679,6 +3950,22 @@ export default function Page() {
                     <span className="hljs-string">{'"messages"'}</span>
                     {"] = messages  "}
                     <span className="hljs-comment">{"# 最後のtool_resultも保存する"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" container_id "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            checkpoint["}
+                    <span className="hljs-string">{'"container_id"'}</span>
+                    {"] = container_id"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3728,7 +4015,11 @@ export default function Page() {
                       {"(既定)"}
                     </td>
                     <td>{"思考ブロックの本文は空"}</td>
-                    <td>{"画面に出さない。最安・最速"}</td>
+                    <td>
+                      {
+                        "画面に出さない。本文送信の遅延を抑えやすい(思考トークン自体は同額課金で、非表示にしても安くならない)"
+                      }
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -3832,7 +4123,7 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     <span className="hljs-comment">
                       {
-                        "# call() 完了後にテキストと thinking の進捗を表示する（待機中の逐次更新ではない）"
+                        "# 応答完了後の確認例(post-response inspection)。待機中にリアルタイム表示するには stream: true で進捗イベントを受信し、到着順に描画する"
                       }
                     </span>
                   </span>
@@ -3892,7 +4183,13 @@ export default function Page() {
             <div className={styles.callout} data-variant="info">
               {" "}
               <p>
-                {" ベータ機能のヘッダ名と挙動は更新されうるため、導入時に公式ドキュメント("}
+                {
+                  " 待機中の無言を防ぐには、ストリーミングで進捗イベントを受信し、到着順に画面へ描画します(上の "
+                }
+                <code>{"call()"}</code>
+                {
+                  " は応答完了後の確認例です)。ベータ機能のヘッダ名と挙動は更新されうるため、導入時に公式ドキュメント("
+                }
                 <a className={styles["src-link"]} href="#S5">
                   {"S5"}
                 </a>
@@ -6074,7 +6371,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"bash"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="git worktree を使った並列作業コマンド">
                 <code className="language-bash">
                   <span className={styles.codeLine}>
                     <span className="hljs-comment">
@@ -6268,7 +6567,7 @@ export default function Page() {
                     <span className="hljs-punctuation">{":"}</span>{" "}
                     <span className="hljs-string">
                       {
-                        '"jq -j \'.tool_input.file_path, \\"\\\\u0000\\"\' | xargs -0 sh -c \'for file do case \\"$file\\" in *.ts|*.tsx|*.js) npx prettier --write -- \\"$file\\";; esac; done\' sh"'
+                        '"jq -j \'.tool_input.file_path, \\"\\\\u0000\\"\' | xargs -0 sh -c \'for file do case \\"$file\\" in *.ts|*.tsx|*.js) if [ -x ./node_modules/.bin/prettier ]; then ./node_modules/.bin/prettier --write -- \\"$file\\"; else echo \\"prettier not installed locally; skipping $file\\" >&2; fi;; esac; done\' sh"'
                       }
                     </span>
                   </span>
