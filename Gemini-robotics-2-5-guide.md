@@ -539,9 +539,17 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
             else:
                 # 生成待ちの間に停止された場合に備え、実行直前にも再確認する。
                 # ソフトウェアの確認であり、独立した物理インターロックの代わりではない。
-                if estop_active():
+                try:
+                    estop_triggered = estop_active()
+                except Exception as err:
+                    # 非常停止状態の確認に失敗した場合は安全側(停止要求)として扱い、
+                    # 完了済みの結果を contents へ残したままこの呼び出し以降を中断する。
+                    estop_triggered = True
+                    skip_reason = f"emergency stop check failed ({type(err).__name__}: {err}); this action was not executed"
+                if estop_triggered:
                     # 実行済みの結果を捨てずに、この呼び出しと残りを skipped として記録してから中断する。
-                    skip_reason, estopped = "emergency stop; this action was not executed", True
+                    skip_reason = skip_reason or "emergency stop; this action was not executed"
+                    estopped = True
                     results.append(function_response_part(fc, {"status": "skipped", "reason": skip_reason}))
                     continue
                 # 実行器は (構造化結果, 実行後の最新観測 JPEG のバイト列または None) を返す契約とする。
