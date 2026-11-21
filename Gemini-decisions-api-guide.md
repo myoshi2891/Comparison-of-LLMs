@@ -504,9 +504,14 @@ async def handle_user_message(runner, user_id: str, session_id: str, message: ty
     拒否したメッセージでは run_async を呼ばないため、セッション履歴にも
     後続ターンの LLM リクエストにも含まれない。
 
-    前提: 同じ session_id に対しては 1 ターンずつ呼ぶ。前のターンのイベントを最後まで
-    読み終えてから次のメッセージで呼び出す。このラッパーは直列化しないため、同じ
-    セッションで並行して呼ぶと、判定の完了順に Runner へ渡り、送信順と履歴の順序が入れ替わり得る。
+    前提:
+    - 同じ session_id に対しては 1 ターンずつ呼ぶ。前のターンのイベントを最後まで
+      読み終えてから次のメッセージで呼び出す。このラッパーは直列化しないため、同じ
+      セッションで並行して呼ぶと、判定の完了順に Runner へ渡り、送信順と履歴の順序が入れ替わり得る。
+    - `runner` にはユーザーメッセージを書き換える `on_user_message_callback` プラグインを
+      登録しないこと。テンプレート展開や参照解決などで入力を変換する場合は、Runner へ渡す前に
+      最終的な展開済み入力を作成して `screen_input` で審査し、未審査のテキストがエージェントへ
+      到達しない保証を維持する。
     """
     # 最初の await より前に独立したスナップショットを作り、判定と実行の両方に同じものを渡す。
     # 呼び出し元が判定中に message を書き換えても、未判定の内容が Runner へ届かない。
@@ -517,6 +522,7 @@ async def handle_user_message(runner, user_id: str, session_id: str, message: ty
         # append_event を呼ばないため、定型応答はセッションへ保存されない。
         yield rejection_event(rejection)
         return
+    # 前提: runner にメッセージ改変を行う on_user_message_callback プラグインがないこと
     async for event in runner.run_async(user_id=user_id, session_id=session_id, new_message=snapshot):
         yield event
 ```
