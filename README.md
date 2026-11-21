@@ -155,6 +155,10 @@ make build
 
 # 全テストの実行（Vitest + Pytest）
 make test
+
+# web-next/package.json（Next.js 等）の依存更新後に既存 web-node-modules ボリュームを更新する場合
+make refresh-web-deps
+# （ボリューム自体を作り直す場合は make clean && make build-web）
 ```
 
 ### 2. ネイティブ環境でセットアップする場合
