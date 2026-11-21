@@ -383,7 +383,12 @@ it("原本110 CSS規則の全宣言・順序・media条件を一致（図寸法�
   });
   expect(actual).toEqual(
     expected.css
-      .filter((r) => !["html", ".diagram-wrap svg", ".mermaidTooltip"].includes(r.selector))
+      .filter(
+        (r) =>
+          !["html", ".diagram-wrap svg", ".diagram-wrap > *", ".mermaidTooltip"].includes(
+            r.selector
+          )
+      )
       .map((r) => ({
         selector: normalize(scoped(r.selector)),
         media: r.media,

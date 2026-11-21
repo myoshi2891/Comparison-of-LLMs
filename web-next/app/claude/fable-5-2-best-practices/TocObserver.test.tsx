@@ -220,8 +220,15 @@ it("チェック全件・解除でカウンターと幅を更新", () => {
   expect(document.getElementById("chkCount")?.textContent).toBe("1");
 });
 it("unmountで全リスナー・inert・開状態を解除", () => {
+  const captureFlag = (opt: unknown) =>
+    typeof opt === "boolean" ? opt : Boolean((opt as AddEventListenerOptions | undefined)?.capture);
+  const add = vi.spyOn(window, "addEventListener");
   const remove = vi.spyOn(window, "removeEventListener");
   const { unmount } = render(<Harness />);
+  const registered = add.mock.calls
+    .filter(([event]) => event === "scroll" || event === "resize")
+    .map(([event, listener, options]) => [event, listener, captureFlag(options)]);
+  expect(registered.map(([event]) => event)).toEqual(expect.arrayContaining(["scroll", "resize"]));
   const r = root(),
     s = sidebar(),
     b = menu(),
@@ -242,7 +249,10 @@ it("unmountで全リスナー・inert・開状態を解除", () => {
   expect(count.textContent).toBe("0");
   // 開状態のまま解除しても、document の keydown リスナーが残らず Tab の既定動作を止めない。
   expect(fireEvent.keyDown(document, { key: "Tab", cancelable: true })).toBe(true);
-  expect(remove.mock.calls.map((c) => c[0])).toEqual(expect.arrayContaining(["scroll", "resize"]));
+  const removed = remove.mock.calls
+    .filter(([event]) => event === "scroll" || event === "resize")
+    .map(([event, listener, options]) => [event, listener, captureFlag(options)]);
+  for (const reg of registered) expect(removed).toContainEqual(reg);
 });
 it("マークアップが無い場合もmount・cleanup可能", () => {
   const { unmount } = render(<TocObserver />);

@@ -710,8 +710,14 @@ scope = {"HEADERS": {}, "time": __import__("time"), "httpx": types.SimpleNamespa
 exec(compile(ast.Module(body=nodes, type_ignores=[]), "example", "exec"), scope)
 
 usage = {"input_tokens": 100000, "output_tokens": 10000}
+pre_output_usage = {"input_tokens": 100000, "output_tokens": 0}
 assert scope["usd"](usage, {"stop_reason": "refusal", "stop_details": {"billed": False}}) == 0.0
-assert scope["usd"](usage, {"stop_reason": "refusal"}) > 0
+# stop_details.billed が無い公式レスポンス形式では、出力トークン 0 の事前拒否(pre-output refusal)を非課金(0.0)とする
+assert scope["usd"](pre_output_usage, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": "cyber"}}) == 0.0
+assert scope["usd"](pre_output_usage, {"stop_reason": "refusal"}) == 0.0
+# 出力トークンが発生した拒否や billed=True の拒否、通常応答は従来どおり課金する
+assert scope["usd"](usage, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": "cyber"}}) > 0
+assert scope["usd"](pre_output_usage, {"stop_reason": "refusal", "stop_details": {"billed": True}}) > 0
 assert scope["usd"](usage, {"stop_reason": "end_turn", "stop_details": {"billed": False}}) > 0
 
 rows = scope["sweep"]([{"id": "t1", "prompt": "p", "check": lambda t: t == "ok"}], levels=("low", "medium", "high", "xhigh"))
@@ -734,6 +740,44 @@ assert check_rows[0]["passed"] is None
 assert check_rows[0]["usd"] > 0 and check_rows[0]["sec"] >= 0
 assert "ValueError: grader crashed" in check_rows[0]["error"]
 assert check_rows[1]["status"] == "request_error"
+`,
+    examples()
+  );
+});
+
+it("agent_loopはcheckpointと作業用messagesを分離し、完了済み再開を拒否しつつpause_turn経由のテキストを順序どおり通知する", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+paused_1 = {"stop_reason": "pause_turn", "content": [{"type": "text", "text": "step 1. "}, {"type": "thinking", "signature": "s1"}]}
+paused_2 = {"stop_reason": "pause_turn", "content": [{"type": "text", "text": "step 2. "}]}
+done = {"stop_reason": "end_turn", "content": [{"type": "text", "text": "final."}]}
+replies = [paused_1, paused_2, done]
+requests = []
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return replies[len(requests) - 1]
+scope = {"call": call, "copy": copy}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+visible = []
+result = scope["agent_loop"]("task", [], None, max_turns=5, checkpoint=checkpoint, on_text=visible.append)
+# 生のAPI応答は変更せず、pause_turnから最終応答までの可視テキストを順序どおり取得できる
+assert result is done
+assert visible == ["step 1. ", "step 2. ", "final."]
+# 完了ターンのassistant応答はcheckpoint["messages"]を汚染せず、checkpointは完了済みとしてマークされる
+assert checkpoint["completed"] is True
+assert len(checkpoint["messages"]) == 3
+assert checkpoint["messages"][-1]["content"] == paused_2["content"]
+# 完了済みcheckpointを再開しようとするとエラーになる
+try:
+    scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=checkpoint)
+except ValueError:
+    pass
+else:
+    raise AssertionError("completed checkpoint must not be resumed")
 `,
     examples()
   );

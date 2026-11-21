@@ -348,13 +348,11 @@ PRICE = {"in": 8.0, "out": 40.0, "cache_read": 0.20, "cache_write_5m": 10.0, "ca
 
 def usd(usage: dict, response: dict | None = None) -> float:
     """usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。"""
-    # refusal 単体では非課金と断定しない。stop_details.billed is False で非課金が確認できた場合のみ 0 とする
-    if (
-        response is not None
-        and response.get("stop_reason") == "refusal"
-        and (response.get("stop_details") or {}).get("billed") is False
-    ):
-        return 0.0
+    # 出力トークン 0 の事前拒否(pre-output refusal)は入力トークンも非課金(billed 明示時はそれに従う)
+    if response is not None and response.get("stop_reason") == "refusal":
+        billed = (response.get("stop_details") or {}).get("billed")
+        if billed is False or (billed is None and (usage.get("output_tokens") or 0) == 0):
+            return 0.0
     cache = usage.get("cache_creation") or {}
     # キャッシュ件数は null で返ることがあるため、0 として扱う
     write_5m = cache.get("ephemeral_5m_input_tokens") or 0
@@ -467,7 +465,7 @@ curl https://api.anthropic.com/v1/messages \
 | `computer_20251124` ツール | 400(Bedrock を除く) | `computer_toolset_20260801` ツールセット | 公式 (S3) |
 | advisor に Fable 5.1 などを指定(executor が Fable 5.2) | 400 | advisor を `claude-fable-5-2` または `claude-mythos-5-2` に | 公式 (S3) |
 | 履歴の編集後に古い思考ブロックを送る | 400(`The block is bound to a different conversation`) | 7章を参照 | 公式 (S3) |
-| 顧客管理の暗号鍵(CMEK)を使う組織で structured outputs を利用 | 利用不可 | `strict` を外し、ツール入力を自前で検証する | 公式 (S3) |
+| 顧客管理の暗号鍵(CMEK)を使う組織で structured outputs を利用 | 利用不可 | JSON 出力は `output_config.format` を外して応答 JSON を自前で検証し、strict ツール利用は `strict: true` を外してツール入力を自前で検証する | 公式 (S3) |
 
 > プリフィル(assistant の先頭を埋める指定)とサンプリングパラメータには制限があり、Opus 5 から引き継がれています [公式] (S4)。移行ガイドで該当部分を確認してください。
 
@@ -515,15 +513,17 @@ def call(body: dict, betas: list[str] | None = None) -> dict:
     return r.json()
 
 
-def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "high", max_turns: int = 60, checkpoint: dict | None = None, max_tokens: int = 32_000) -> dict:
+def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "high", max_turns: int = 60, checkpoint: dict | None = None, max_tokens: int = 32_000, on_text=None) -> dict:
     # system と tools は会話の途中で変更しない(prefix チェックの対象)
     system = "あなたはこのリポジトリの保守担当エージェントです。..."
     # checkpoint={} を渡すと、上限到達後は同じ辞書で再呼び出しして続行できる
     messages = [{"role": "user", "content": user_prompt}]
     container_id = None
     if checkpoint is not None:
+        if checkpoint.get("completed"):
+            raise ValueError("完了済みの checkpoint は再開できません")
         if "messages" in checkpoint:
-            messages = checkpoint["messages"]
+            messages = list(checkpoint["messages"])
         container_id = checkpoint.get("container_id")
 
     for _ in range(max_turns):
@@ -557,12 +557,22 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
         messages.append({"role": "assistant", "content": data["content"]})
 
         if data["stop_reason"] == "pause_turn":
+            if on_text is not None:
+                for block in data["content"]:
+                    if block.get("type") == "text" and block.get("text"):
+                        on_text(block["text"])
             if checkpoint is not None:
-                checkpoint["messages"] = messages
+                checkpoint["messages"] = list(messages)
                 if container_id is not None:
                     checkpoint["container_id"] = container_id
             continue
         if data["stop_reason"] != "tool_use":
+            if on_text is not None:
+                for block in data["content"]:
+                    if block.get("type") == "text" and block.get("text"):
+                        on_text(block["text"])
+            if checkpoint is not None:
+                checkpoint["completed"] = True
             return data
 
         results = []
@@ -594,12 +604,12 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                 results.append(result)
         messages.append({"role": "user", "content": results})
         if checkpoint is not None:
-            checkpoint["messages"] = messages  # 次のAPI呼び出し前に保存する
+            checkpoint["messages"] = list(messages)  # 次のAPI呼び出し前にスナップショットを保存する
             if container_id is not None:
                 checkpoint["container_id"] = container_id
 
     if checkpoint is not None:
-        checkpoint["messages"] = messages  # 最後のtool_resultも保存する
+        checkpoint["messages"] = list(messages)  # 最後のtool_resultもスナップショットで保存する
         if container_id is not None:
             checkpoint["container_id"] = container_id
     raise RuntimeError("max_turns に到達しました")
@@ -616,18 +626,28 @@ Fable 5.2 は、ツール呼び出しの合間に書く経過報告を**思考�
 | `"summarized"` | 経過報告 + 要約された推論 | 推論の様子も見たいとき。推論過程の再現を本文に書かせる代わりに使う |
 
 ```python
+tools = [
+    {
+        "name": "run_tests",
+        "description": "テストスイートを実行して失敗ログを返す",
+        "input_schema": {"type": "object", "properties": {"target": {"type": "string"}}},
+    }
+]
 data = call(
     {
         "model": "claude-fable-5-2",
         "max_tokens": 32_000,
         "output_config": {"effort": "high"},
         "thinking": {"type": "adaptive", "display": "updates"},
-        "messages": [{"role": "user", "content": "..."}],
+        "tools": tools,
+        "messages": [{"role": "user", "content": "テストを実行して失敗箇所を特定してください"}],
     },
     betas=["thinking-display-updates-2026-08-18"],
 )
 
-# 応答完了後の確認例(post-response inspection)。待機中にリアルタイム表示するには stream: true で進捗イベントを受信し、到着順に描画する
+# 応答完了後の確認例(post-response inspection)。
+# 例: data["content"] = [{"type": "thinking", "thinking": "単体テストを実行して原因を確認します。"}, {"type": "tool_use", "id": "t1", "name": "run_tests", "input": {"target": "tests/"}}]
+# 待機中にリアルタイム表示するには stream: true で進捗イベントを受信し、到着順に描画する
 for block in data["content"]:
     if block["type"] == "text":
         print(block["text"])
@@ -930,7 +950,7 @@ Simon Willison は、この発想を「This codebase is yours」と一言で言�
 | advisor の設定 | `/advisor`、または `--advisor` フラグ | 組み合わせの制約は3.4 (S7) |
 | 指示ファイルの監査 | `/doctor prompt-audit` | v2.1.283 以降。何も書き換えず差分案を提示する (S16) |
 | 非対話での実行 | `claude -p "..." --model claude-fable-5-2 --effort medium` | `--effort` は検証記事での使用例 (S16) |
-| 非対話 + fast mode | `claude -p "..." --model claude-fable-5-2 --settings '{"fastMode": true}'` | 公式ドキュメントの記載 (S8) |
+| 非対話 + fast mode | `claude -p "..." --model claude-fable-5-2 --settings '{"fastMode": true}'` | 公式ドキュメントの記載 (S8)。Google Cloud Agent Platform で非対話 fast mode を使うには Claude Code v2.1.322 以上と Fable リージョン `global` / `us` / `eu` が必要(その他のリージョンではコマンドが成功しても標準速度で動作する場合がある) |
 
 ### 9.2 Step A: Claude Code が自動で送っている指示を知る
 
@@ -1253,7 +1273,7 @@ print(round(estimate_usd(example, "fast"), 2))  # 0.80 + 0.06 + 2.40 = 3.26
 ### 11.4 予算ガードの考え方 [私見]
 
 1. **1タスクあたりの上限金額**と**最大ターン数**を決め、ハーネスで強制する。
-2. 実行ごとに「入力・出力・キャッシュ・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(トークン費用の見積もり関数 `estimate_usd` とは別にツール費も上限へ合算する)。
+2. 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は `estimate_usd` の値をそのまま使い、リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。
 3. 週次で**タスク種別ごとの平均コスト**を見て、effort と構成を見直す。
 4. 上限に達したら、**途中経過を保存して人に引き継ぐ**(破棄しない)。
 
@@ -1441,7 +1461,8 @@ flowchart TD
     B1 -- "いいえ" --> R6["6.2: 非対応パラメータを確認"]
     A -- "200" --> C{"stop_reason は?"}
     C -- "refusal" --> R12["12章: カテゴリ別に対応"]
-    C -- "max_tokens" --> R6B["max_tokens を引き上げ<br/>または effort を下げる"]
+    C -- "max_tokens" --> R6B["コンテキストに余裕がある場合は<br/>max_tokens を引き上げ<br/>または effort を下げる"]
+    C -- "model_context_window_exceeded" --> R6C["対応する compaction を使うか<br/>完了済み作業の要約で新しい会話を開始"]
     C -- "end_turn" --> D{"品質・挙動の問題?"}
     D -- "途中で止まる・承認が多い" --> R81["8.1 / 8.2 / 8.6"]
     D -- "無言・遅い" --> R84["6.5 / 8.4 / 5章"]
@@ -1449,7 +1470,7 @@ flowchart TD
     D -- "コードの扱いが違う" --> R83["8.3 / 9.3"]
 
     classDef main fill:#e8eefc,stroke:#3b5bdb,color:#1b1f3b
-    class R7,R6,R12,R6B,R81,R84,R11,R83 main
+    class R7,R6,R12,R6B,R6C,R81,R84,R11,R83 main
 ```
 
 ---

@@ -439,9 +439,6 @@
   overflow-x: auto;
   min-width: 0;
 }
-.root .diagram-wrap > :global(*) {
-  min-width: 0;
-}
 .root .diagram-fallback {
   white-space: pre-wrap;
   font-family: var(--font-mono);

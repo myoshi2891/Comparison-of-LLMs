@@ -37,7 +37,7 @@ const DIAGRAM_6 =
 const DIAGRAM_7 =
   'flowchart TD\n    REQ["リクエスト送信"] --> RESP{"stop_reason は refusal?"}\n    RESP -- "いいえ" --> OK["通常処理"]\n    RESP -- "はい" --> CAT{"stop_details.category"}\n    CAT -- "reasoning_extraction" --> RE["推論を本文に書かせる指示を削除　display を summarized に変更"]\n    CAT -- "cyber・bio" --> LEGIT{"正当な業務か?"}\n    LEGIT -- "はい" --> VERIFY["検証プログラムに申請　Mythos 5.2 の利用を検討"]\n    LEGIT -- "いいえ" --> STOP["依頼を取り下げる"]\n    CAT -- "frontier_llm" --> LIMIT["該当領域は能力が制限される　他の手段を検討"]\n    CAT -- "その他" --> LOG["ログに記録して内容を確認"]\n    VERIFY --> FB{"フォールバックを許可する　運用方針が明示されている?"}\n    FB -- "はい" --> FALLBACK["方針で承認した　Opus 4.8・Opus 5 へフォールバック"]\n    FB -- "いいえ・未決定" --> WAIT["拒否のまま終了　方針の決定と承認を待つ"]\n\n    class OK done\n    class STOP,LIMIT box\n    class FALLBACK,VERIFY,RE hub\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_8 =
-  'flowchart TD\n    S["問題が起きた"] --> A{"HTTP ステータスは?"}\n    A -- "400" --> B["エラーメッセージを確認"]\n    B --> B1{"思考ブロック関連?"}\n    B1 -- "はい" --> R7["7章　 今後の不一致は追記のみで防ぐ　既に無効なブロックは　生成時のプレフィックスに戻すか　新しい会話で始める"]\n    B1 -- "いいえ" --> R6["6.2　 非対応パラメータを確認"]\n    A -- "200" --> C{"stop_reason は?"}\n    C -- "refusal" --> R12["12章　 カテゴリ別に対応"]\n    C -- "max_tokens" --> R6B["max_tokens を引き上げ　または effort を下げる"]\n    C -- "end_turn" --> D{"品質・挙動の問題?"}\n    D -- "途中で止まる・承認が多い" --> R81["8.1・8.2・8.6"]\n    D -- "無言・遅い" --> R84["6.5・8.4・5章"]\n    D -- "費用が高い" --> R11["8.5・11章"]\n    D -- "コードの扱いが違う" --> R83["8.3・9.3"]\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
+  'flowchart TD\n    S["問題が起きた"] --> A{"HTTP ステータスは?"}\n    A -- "400" --> B["エラーメッセージを確認"]\n    B --> B1{"思考ブロック関連?"}\n    B1 -- "はい" --> R7["7章　 今後の不一致は追記のみで防ぐ　既に無効なブロックは　生成時のプレフィックスに戻すか　新しい会話で始める"]\n    B1 -- "いいえ" --> R6["6.2　 非対応パラメータを確認"]\n    A -- "200" --> C{"stop_reason は?"}\n    C -- "refusal" --> R12["12章　 カテゴリ別に対応"]\n    C -- "max_tokens" --> R6B["コンテキストに余裕がある場合は　max_tokens を引き上げ　または effort を下げる"]\n    C -- "model_context_window_exceeded" --> R6C["対応する compaction を使うか　完了済み作業の要約で新しい会話を開始"]\n    C -- "end_turn" --> D{"品質・挙動の問題?"}\n    D -- "途中で止まる・承認が多い" --> R81["8.1・8.2・8.6"]\n    D -- "無言・遅い" --> R84["6.5・8.4・5章"]\n    D -- "費用が高い" --> R11["8.5・11章"]\n    D -- "コードの扱いが違う" --> R83["8.3・9.3"]\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_9 =
   'flowchart TD\n    W1["1週目　環境と評価セット"] --> W2["2週目　effort と棚卸し"]\n    W2 --> W3["3週目　症状別の対処と安全処理"]\n    W3 --> W4["4週目　マルチエージェントと予算ガード"]\n    W4 --> OPS["運用ルール化　週次レビュー"]\n\n    class W1 hub\n    class OPS done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 /** 指定HTMLを全文・要素構造ごと保持する静的ガイド。 */
@@ -773,7 +773,14 @@ export default function Page() {
               </a>
               {")。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="公式ベンチマークの要点(Fable 5.2 / Fable 5.1 / Opus 5.5)"
+            >
               {" "}
               <table>
                 <thead>
@@ -2140,7 +2147,7 @@ export default function Page() {
                     {"    "}
                     <span className="hljs-comment">
                       {
-                        "# refusal 単体では非課金と断定しない。stop_details.billed is False で非課金が確認できた場合のみ 0 とする"
+                        "# 出力トークン 0 の事前拒否(pre-output refusal)は入力トークンも非課金(billed 明示時はそれに従う)"
                       }
                     </span>
                   </span>
@@ -2148,43 +2155,51 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"    "}
                     <span className="hljs-keyword">{"if"}</span>
-                    {" ("}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"        response "}
+                    {" response "}
                     <span className="hljs-keyword">{"is"}</span>{" "}
                     <span className="hljs-keyword">{"not"}</span>{" "}
-                    <span className="hljs-literal">{"None"}</span>
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"        "}
+                    <span className="hljs-literal">{"None"}</span>{" "}
                     <span className="hljs-keyword">{"and"}</span>
                     {" response.get("}
                     <span className="hljs-string">{'"stop_reason"'}</span>
                     {") == "}
                     <span className="hljs-string">{'"refusal"'}</span>
+                    {":"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        "}
-                    <span className="hljs-keyword">{"and"}</span>
-                    {" (response.get("}
+                    {"        billed = (response.get("}
                     <span className="hljs-string">{'"stop_details"'}</span>
                     {") "}
                     <span className="hljs-keyword">{"or"}</span>
                     {" {}).get("}
                     <span className="hljs-string">{'"billed"'}</span>
-                    {") "}
-                    <span className="hljs-keyword">{"is"}</span>{" "}
-                    <span className="hljs-literal">{"False"}</span>
+                    {")"}
                   </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>{"    ):"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" billed "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-literal">{"False"}</span>{" "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" (billed "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" (usage.get("}
+                    <span className="hljs-string">{'"output_tokens"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
+                    <span className="hljs-number">{"0"}</span>
+                    {") == "}
+                    <span className="hljs-number">{"0"}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
                     <span className="hljs-keyword">{"return"}</span>{" "}
                     <span className="hljs-number">{"0.0"}</span>
                   </span>
@@ -3014,8 +3029,11 @@ export default function Page() {
                     <td>{"顧客管理の暗号鍵(CMEK)を使う組織で structured outputs を利用"}</td>
                     <td>{"利用不可"}</td>
                     <td>
-                      <code>{"strict"}</code>
-                      {" を外し、ツール入力を自前で検証する"}
+                      {"JSON 出力は "}
+                      <code>{"output_config.format"}</code>
+                      {" を外して応答 JSON を自前で検証し、strict ツール利用は "}
+                      <code>{"strict: true"}</code>
+                      {" を外してツール入力を自前で検証する"}
                     </td>
                     <td>
                       {"公式 ("}
@@ -3386,6 +3404,8 @@ export default function Page() {
                       <span className="hljs-built_in">{"int"}</span>
                       {" = "}
                       <span className="hljs-number">{"32_000"}</span>
+                      {", on_text="}
+                      <span className="hljs-literal">{"None"}</span>
                     </span>
                     {") -> "}
                     <span className="hljs-built_in">{"dict"}</span>
@@ -3440,6 +3460,24 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint.get("}
+                    <span className="hljs-string">{'"completed"'}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"raise"}</span>
+                    {" ValueError("}
+                    <span className="hljs-string">
+                      {'"完了済みの checkpoint は再開できません"'}
+                    </span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
                     <span className="hljs-keyword">{"if"}</span>{" "}
                     <span className="hljs-string">{'"messages"'}</span>{" "}
                     <span className="hljs-keyword">{"in"}</span>
@@ -3447,9 +3485,11 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"            messages = checkpoint["}
+                    {"            messages = "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {"(checkpoint["}
                     <span className="hljs-string">{'"messages"'}</span>
-                    {"]"}
+                    {"])"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3670,6 +3710,45 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"            "}
                     <span className="hljs-keyword">{"if"}</span>
+                    {" on_text "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" block "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" data["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"]:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" block.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"text"'}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" block.get("}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        on_text(block["}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {"])"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"if"}</span>
                     {" checkpoint "}
                     <span className="hljs-keyword">{"is"}</span>{" "}
                     <span className="hljs-keyword">{"not"}</span>{" "}
@@ -3680,7 +3759,9 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                checkpoint["}
                     <span className="hljs-string">{'"messages"'}</span>
-                    {"] = messages"}
+                    {"] = "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {"(messages)"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3712,6 +3793,62 @@ export default function Page() {
                     {"] != "}
                     <span className="hljs-string">{'"tool_use"'}</span>
                     {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" on_text "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" block "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" data["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"]:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" block.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"text"'}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" block.get("}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        on_text(block["}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {"])"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                checkpoint["}
+                    <span className="hljs-string">{'"completed"'}</span>
+                    {"] = "}
+                    <span className="hljs-literal">{"True"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3968,8 +4105,12 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"            checkpoint["}
                     <span className="hljs-string">{'"messages"'}</span>
-                    {"] = messages  "}
-                    <span className="hljs-comment">{"# 次のAPI呼び出し前に保存する"}</span>
+                    {"] = "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {"(messages)  "}
+                    <span className="hljs-comment">
+                      {"# 次のAPI呼び出し前にスナップショットを保存する"}
+                    </span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -4003,8 +4144,12 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"        checkpoint["}
                     <span className="hljs-string">{'"messages"'}</span>
-                    {"] = messages  "}
-                    <span className="hljs-comment">{"# 最後のtool_resultも保存する"}</span>
+                    {"] = "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {"(messages)  "}
+                    <span className="hljs-comment">
+                      {"# 最後のtool_resultもスナップショットで保存する"}
+                    </span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -4105,6 +4250,50 @@ export default function Page() {
               <div className={styles["cb-head"]}>{"python"}</div>{" "}
               <pre>
                 <code className="language-python">
+                  <span className={styles.codeLine}>{"tools = ["}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"    {"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-string">{'"name"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"run_tests"'}</span>
+                    {","}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-string">{'"description"'}</span>
+                    {": "}
+                    <span className="hljs-string">
+                      {'"テストスイートを実行して失敗ログを返す"'}
+                    </span>
+                    {","}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-string">{'"input_schema"'}</span>
+                    {": {"}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"object"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"properties"'}</span>
+                    {": {"}
+                    <span className="hljs-string">{'"target"'}</span>
+                    {": {"}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"string"'}</span>
+                    {"}}},"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"    }"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"]"}</span>
+                  {"\n"}
                   <span className={styles.codeLine}>{"data = call("}</span>
                   {"\n"}
                   <span className={styles.codeLine}>{"    {"}</span>
@@ -4151,6 +4340,12 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"        "}
+                    <span className="hljs-string">{'"tools"'}</span>
+                    {": tools,"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
                     <span className="hljs-string">{'"messages"'}</span>
                     {": [{"}
                     <span className="hljs-string">{'"role"'}</span>
@@ -4159,7 +4354,9 @@ export default function Page() {
                     {", "}
                     <span className="hljs-string">{'"content"'}</span>
                     {": "}
-                    <span className="hljs-string">{'"..."'}</span>
+                    <span className="hljs-string">
+                      {'"テストを実行して失敗箇所を特定してください"'}
+                    </span>
                     {"}],"}
                   </span>
                   {"\n"}
@@ -4177,8 +4374,22 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     <span className="hljs-comment">
+                      {"# 応答完了後の確認例(post-response inspection)。"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    <span className="hljs-comment">
                       {
-                        "# 応答完了後の確認例(post-response inspection)。待機中にリアルタイム表示するには stream: true で進捗イベントを受信し、到着順に描画する"
+                        '# 例: data["content"] = [{"type": "thinking", "thinking": "単体テストを実行して原因を確認します。"}, {"type": "tool_use", "id": "t1", "name": "run_tests", "input": {"target": "tests/"}}]'
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    <span className="hljs-comment">
+                      {
+                        "# 待機中にリアルタイム表示するには stream: true で進捗イベントを受信し、到着順に描画する"
                       }
                     </span>
                   </span>
@@ -6033,7 +6244,17 @@ export default function Page() {
                       <a className={styles["src-link"]} href="#S8">
                         {"S8"}
                       </a>
-                      {")"}
+                      {
+                        ")。Google Cloud Agent Platform で非対話 fast mode を使うには Claude Code v2.1.322 以上と Fable リージョン "
+                      }
+                      <code>{"global"}</code>
+                      {" / "}
+                      <code>{"us"}</code>
+                      {" / "}
+                      <code>{"eu"}</code>
+                      {
+                        " が必要(その他のリージョンではコマンドが成功しても標準速度で動作する場合がある)"
+                      }
                     </td>
                   </tr>
                 </tbody>
@@ -7165,7 +7386,14 @@ export default function Page() {
               <h2 id="s11-heading">{"Step 9: コスト設計"}</h2>{" "}
             </div>{" "}
             <h3 id="s11-1">{"11.1 費用の式"}</h3> <p>{"1タスクの総額は、次の合計で考えます。"}</p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="1タスクの費用計算式一覧"
+            >
               {" "}
               <table>
                 <thead>
@@ -7221,7 +7449,9 @@ export default function Page() {
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
               <div className={styles["cb-head"]}>{"python"}</div>{" "}
-              <pre>
+              {/* biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable */}
+              {/* biome-ignore lint/a11y/useSemanticElements: preserve original pre element while exposing scrollable region */}
+              <pre tabIndex={0} role="region" aria-label="トークン費用見積もり関数(Python)">
                 <code className="language-python">
                   <span className={styles.codeLine}>
                     {"RATES = {  "}
@@ -7792,10 +8022,12 @@ export default function Page() {
               </li>{" "}
               <li>
                 {
-                  " 実行ごとに「入力・出力・キャッシュ・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(トークン費用の見積もり関数 "
+                  " 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は "
                 }
                 <code>{"estimate_usd"}</code>
-                {" とは別にツール費も上限へ合算する)。 "}
+                {
+                  " の値をそのまま使い、リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。 "
+                }
               </li>{" "}
               <li>
                 {" 週次で"}

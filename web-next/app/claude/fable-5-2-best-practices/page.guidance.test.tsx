@@ -175,15 +175,62 @@ it("6.5節: omitted を最安と主張せず、ストリーミング表示と応
   expect(text(s65Callout)).toMatch(/応答完了後の確認例/);
 });
 
-it("確度ラベル表とセットアップコマンド pre がキーボードフォーカス可能でアクセシブル名を持つ", () => {
+it("確度ラベル表・ベンチマーク表・費用式表とセットアップ/費用見積もり pre がキーボードフォーカス可能でアクセシブル名を持つ", () => {
   const { container } = render(<Page />);
   const confidenceWrap = container.querySelector("#s0 [role='region']");
   expect(confidenceWrap?.getAttribute("tabindex")).toBe("0");
   expect(confidenceWrap?.getAttribute("aria-label")).toBeTruthy();
+  const benchmarkWrap = container.querySelector("#s1-3")?.nextElementSibling?.nextElementSibling;
+  expect(benchmarkWrap?.getAttribute("tabindex")).toBe("0");
+  expect(benchmarkWrap?.getAttribute("role")).toBe("region");
+  expect(benchmarkWrap?.getAttribute("aria-label")).toBeTruthy();
+  const costWrap = container.querySelector("#s11-1")?.nextElementSibling?.nextElementSibling;
+  expect(costWrap?.getAttribute("tabindex")).toBe("0");
+  expect(costWrap?.getAttribute("role")).toBe("region");
+  expect(costWrap?.getAttribute("aria-label")).toBeTruthy();
   const setupPre = Array.from(container.querySelectorAll("pre")).find((p) =>
     text(p).includes("claude --model claude-fable-5-2")
   );
   expect(setupPre?.getAttribute("tabindex")).toBe("0");
   expect(setupPre?.getAttribute("role")).toBe("region");
   expect(setupPre?.getAttribute("aria-label")).toBeTruthy();
+  const estimatorPre = Array.from(container.querySelectorAll("pre")).find((p) =>
+    text(p).includes("def estimate_usd(")
+  );
+  expect(estimatorPre?.getAttribute("tabindex")).toBe("0");
+  expect(estimatorPre?.getAttribute("role")).toBe("region");
+  expect(estimatorPre?.getAttribute("aria-label")).toBeTruthy();
+});
+
+it("6.3 CMEK・6.5 進捗例・9.1 fast mode・11.4 予算倍率・図9 コンテキスト超過分岐が最新仕様を反映する", () => {
+  const { container } = render(<Page />);
+  const cmekRow = Array.from(container.querySelectorAll("tr")).find((r) =>
+    text(r).includes("CMEK")
+  );
+  expect(text(cmekRow)).toMatch(/output_config\.format/);
+  expect(text(cmekRow)).toMatch(/strict: true/);
+  const progressCode = Array.from(
+    container.querySelectorAll("pre code"),
+    (e) => e.textContent ?? ""
+  ).find((c) => c.includes("thinking-display-updates-2026-08-18"));
+  expect(progressCode).toMatch(/"tools": tools/);
+  expect(progressCode).toMatch(/stream: true/);
+  const fastRow = Array.from(container.querySelectorAll("tr")).find((r) =>
+    text(r).includes("非対話 + fast mode")
+  );
+  expect(text(fastRow)).toMatch(/Google Cloud Agent Platform/);
+  expect(text(fastRow)).toMatch(/v2\.1\.322/);
+  expect(text(fastRow)).toMatch(/global.*us.*eu/);
+  const budgetItem = Array.from(container.querySelectorAll("#s11 li")).find((li) =>
+    text(li).includes("estimate_usd")
+  );
+  expect(text(budgetItem)).toMatch(/推論リージョン倍率/);
+  const { labels, edges } = diagram("図9");
+  expect(
+    edges.some(
+      (e) => e.from === "C" && e.label === "model_context_window_exceeded" && e.to === "R6C"
+    )
+  ).toBe(true);
+  expect(labels.get("R6C")).toMatch(/compaction/);
+  expect(labels.get("R6B")).toMatch(/コンテキストに余裕がある場合/);
 });
