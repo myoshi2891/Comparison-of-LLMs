@@ -1182,9 +1182,8 @@ function initializerRunsBefore(executable, declarationIndex, initializedAt, decl
 /** Resolve the runtime Mermaid source in this scope: undefined = unused, null = unresolved, string = evaluated. */
 function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, cardTag, selectedScript, foreignDomWrite = false) {
   const resolution = {};
-  blankNonCodeText(rawSource, false, resolution);
+  const executable = blankNonCodeText(rawSource, false, resolution);
   if (resolution.uncertain || resolution.interpolation) return null;
-  const executable = blankNonCodeText(literalSource, false);
   /**
    * Collect every write to a binding anywhere in the scope: assignments, updates,
    * for-of/in heads and destructuring targets. Callbacks may run after later
@@ -1356,10 +1355,79 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if (element[3] === selected[3]) return true;
         return selectedScript.cardHas?.(element[3]) === true;
       };
-      const neverTrue = (condition, at) => uniform(condition) ||
-        splitTop(condition, "||").every(part => uniform(part) || (/^!\s*[A-Za-z_$][\w$]*$/.test(part) && present(part.replace(/^!\s*/, ""), at)));
-      const alwaysTrue = (condition, at) => uniform(condition) ||
-        splitTop(condition, "&&").every(part => uniform(part) || present(part, at));
+      const loopPath = pathAt(open);
+      const unwrapParens = expr => {
+        let s = expr.trim();
+        while (s.startsWith("(") && s.endsWith(")")) {
+          let depth = 0, wrapsAll = true;
+          for (let k = 0; k < s.length - 1; k++) {
+            if (s[k] === "(") depth++;
+            else if (s[k] === ")" && --depth === 0) { wrapsAll = false; break; }
+          }
+          if (!wrapsAll) break;
+          s = s.slice(1, -1).trim();
+        }
+        return s;
+      };
+      const provenUniformBool = id => {
+        if (!uniform(id)) return null;
+        const escaped = id.replace(/\$/g, "\\$");
+        const writes = Array.from(writeIndexes(id)).sort((a, b) => a - b);
+        const assignRe = new RegExp(`(?:\\b(?:var|let|const)\\s+|(?<![\\w$.]))${escaped}\\s*=\\s*(true|false)(?![\\w$])`, "g");
+        let lastProven = null;
+        for (const match of executable.matchAll(assignRe)) {
+          const namePos = match.index + match[0].indexOf(id);
+          if (namePos >= open) continue;
+          // Must not be overwritten after this assignment before or outside the loop.
+          if (writes.some(w => w > namePos)) continue;
+          const assignPath = pathAt(namePos);
+          // Every block enclosing the assignment that does not also enclose the loop must be
+          // a plain block or a `try` block (so the assignment runs on the normal execution path).
+          const extraBlocks = assignPath.filter(b => !loopPath.includes(b));
+          const inNormalPath = extraBlocks.every(b => {
+            const head = executable.slice(0, b).replace(/\s+$/, "");
+            return head === "" || /[;{}]$/.test(head) || /(?<![\w$.])try$/.test(head);
+          });
+          if (!inNormalPath) continue;
+          const enclosingStart = assignPath.at(-1) ?? -1;
+          const stmt = statementBefore(match.index, enclosingStart);
+          if (stmt === null || /^\s*(?:if|else|while|for|do|switch|with|catch)(?![\w$])/.test(stmt) || /&&|\|\||\?/.test(stmt)) continue;
+          lastProven = match[1] === "true";
+        }
+        return lastProven;
+      };
+      const provenBool = (condition, at) => {
+        const s = unwrapParens(condition);
+        if (s === "true") return true;
+        if (/^(?:false|null|undefined|0)$/.test(s)) return false;
+        if (s.startsWith("!")) {
+          const inner = provenBool(s.slice(1), at);
+          return inner === null ? null : !inner;
+        }
+        if (/^[A-Za-z_$][\w$]*$/.test(s)) {
+          if (present(s, at)) return true;
+          return provenUniformBool(s);
+        }
+        return null;
+      };
+      const neverTrue = (condition, at) => {
+        const s = unwrapParens(condition);
+        if (provenBool(s, at) === false) return true;
+        const orParts = splitTop(s, "||");
+        if (orParts.length > 1) return orParts.every(part => neverTrue(part, at));
+        const andParts = splitTop(s, "&&");
+        if (andParts.length > 1) return andParts.some(part => neverTrue(part, at));
+        return false;
+      };
+      const alwaysTrue = (condition, at) => {
+        const s = unwrapParens(condition);
+        if (provenBool(s, at) === true) return true;
+        const andParts = splitTop(s, "&&");
+        if (andParts.length > 1) return andParts.every(part => alwaysTrue(part, at));
+        const orParts = splitTop(s, "||");
+        if (orParts.length > 1) return orParts.some(part => alwaysTrue(part, at));
+        return false;
+      };
       /** Condition text of a `(...)` group closed at `closeParen` when it follows `if` (not `else if`). */
       const ifCondition = closeParen => {
         const opener = openerOf(closeParen);
@@ -1557,6 +1625,18 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       return Array.from(literalSource.matchAll(new RegExp(`(?<![\\w$.])${name}\\s*=\\s*(\\w+)\\s*;`, "g")))
         .some(copy => mayBeCardOwner(copy[1], next));
     };
+    const mayBeCardScript = (reference, at, seen = new Set()) => {
+      if (mayBeSelectedScript(reference, at)) return true;
+      const q = query.exec(reference);
+      if (q && /^script(?![\w-])/i.test(q[3]) && mayBeCardOwner(q[1])) return true;
+      if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
+      const next = new Set(seen).add(reference);
+      const bound = bindingAt(reference, at);
+      if (bound && mayBeCardScript(bound.value, bound.at, next)) return true;
+      const copies = new RegExp(`\\b${reference}\\s*=\\s*([^;]+);`, "g");
+      return Array.from(literalSource.matchAll(copies))
+        .some(copy => mayBeCardScript(copy[1].trim(), copy.index, next));
+    };
     // The selector stays inside one quoted literal so a match cannot span two queries.
     const receiver = String.raw`(\w+(?:\.querySelector\(\s*(['"])([^'"\n]*)\2\s*\))?)\s*\.\s*`;
     const scriptEdits = new RegExp(`${receiver}(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text))\\s*\\(|outerHTML\\s*=(?!=))`, "g");
@@ -1565,7 +1645,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // Attribute writes with a literal non-type name keep the selection; computed names stay unresolved.
     const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute)\\s*\\(\\s*(?!(['"])(?!type\\4)[^'"\\n]*\\4)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
     if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index)) ||
-      Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index)) ||
+      Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeCardScript(edit[1], edit.index)) ||
       Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeCardOwner(edit[1]))) return false;
     return { base: usesValidatedDedent ? dedentedPayload : payload };
   };
@@ -1573,7 +1653,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   // statements cannot supply a suffix that this render call never receives.
   const renderUses = [];
   let suffixFree = false;
-  for (const call of executable.matchAll(/\bmermaid\.render\s*\(/g)) {
+  for (const call of executable.matchAll(/\bmermaid\s*\.\s*render\s*\(/g)) {
     const start = call.index + call[0].length;
     const arguments_ = [];
     const stack = ["("];
@@ -1765,9 +1845,8 @@ function materializePlainTextCards(src) {
       return segment;
     });
     const resolution = {};
-    blankNonCodeText(rawSource, false, resolution);
+    const executable = blankNonCodeText(rawSource, false, resolution);
     const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n;\n");
-    const executable = blankNonCodeText(literalSource, false);
     const selectors = [];
     const selectionCalls = Array.from(executable.matchAll(/\bdocument\.querySelector(?:All)?\s*\(/g));
     for (const call of selectionCalls) {
@@ -1776,7 +1855,7 @@ function materializePlainTextCards(src) {
     }
     // An uncertain slash may have masked a renderer as a string/regex. Keep the
     // scope so rendererSuffix reports it unresolved instead of dropping it.
-    const maskedRenderer = resolution.uncertain && /\bmermaid\.render\b/.test(rawSource);
+    const maskedRenderer = resolution.uncertain && /\bmermaid(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\n\r\u2028\u2029]*)*\.(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\n\r\u2028\u2029]*)*render\b/.test(rawSource);
     // Computed member calls (mermaid['render'](…), mermaid[name](…), mermaid?.render) are not
     // traced by rendererSuffix; keep them as an unresolved renderer instead of certifying the base.
     const computedRenderer = /\bmermaid\s*(?:\?\.\s*)?\[|\bmermaid\s*\?\.\s*render\b/.test(executable);
@@ -1788,7 +1867,7 @@ function materializePlainTextCards(src) {
     // Inline module scripts without async run after the document is parsed.
     const deferredModule = !classic && group.every(script => readHtmlAttribute(script.attributes, "async") === undefined);
     return { literalSource, rawSource, selectors, computedRenderer, classic, deferredModule, segments, writesTextContent, hasSelection: selectionCalls.length > 0,
-      hasRenderer: /\bmermaid\.render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer || computedRenderer };
+      hasRenderer: /\bmermaid\s*\.\s*render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer || computedRenderer };
   });
   const scopes = allScopes.filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -1866,12 +1945,22 @@ function materializePlainTextCards(src) {
           cardAvailableAt: at => !renderer.classic || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition > start),
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1,
-          // Whether the card contains an element for a single-class selector, so a per-card
-          // query for it is never null (a `!host` guard cannot skip this card).
+          // Whether the card contains an element for a single-class selector outside inert
+          // <template> contents, so a per-card query for it is never null (`!host` cannot skip).
           cardHas: selector => {
             const wanted = /^\.([A-Za-z_-][\w-]*)$/.exec(selector);
-            return Boolean(wanted) && Array.from(card.content.matchAll(new RegExp(`<[A-Za-z][\\w:-]*${htmlAttributesPattern}>`, "g")))
-              .some(tag => (readHtmlAttribute(tag[1], "class") ?? "").split(/\s+/).includes(wanted[1]));
+            if (!wanted) return false;
+            let depth = 0;
+            for (const tag of card.content.matchAll(new RegExp(`<(\\/?)([A-Za-z][\\w:-]*)${htmlAttributesPattern}>`, "g"))) {
+              const isTemplate = tag[2].toLowerCase() === "template";
+              if (tag[1]) {
+                if (isTemplate) depth = Math.max(0, depth - 1);
+                continue;
+              }
+              if (depth === 0 && (readHtmlAttribute(tag[3], "class") ?? "").split(/\s+/).includes(wanted[1])) return true;
+              if (isTemplate) depth += 1;
+            }
+            return false;
           } },
         foreignWrite));
       if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
@@ -2339,10 +2428,14 @@ if (process.exitCode === undefined) {
           );
         }
         // 未解決は原本の描画スクリプト（mermaid.render 周辺）を静的に追えないことを表し、内容の欠落ではない。
-        const unresolvedOnly = result.unresolvedMermaidSources.length > 0 && [
+        // ただし図の件数自体が不一致であれば、未解決の解析と併せて件数不一致も報告する。
+        const otherMissing = [
           result.missingHeadings, result.missingLinks, result.missingListItems, result.missingCodeBlocks,
           result.missingTableRows, result.missingParagraphs, result.missingSvgElements, result.missingCalloutElements,
-        ].every(list => list.length === 0);
+        ].some(list => list.length > 0);
+        const mermaidCountMismatch = result.counts.mermaidSources.source !== result.counts.mermaidSources.page;
+        const unresolvedOnly = result.unresolvedMermaidSources.length > 0 && !otherMissing && !mermaidCountMismatch;
+        const unresolvedWithCountMismatch = result.unresolvedMermaidSources.length > 0 && !otherMissing && mermaidCountMismatch;
         if (result.unresolvedMermaidSources.length > 0) {
           console.log(`\n❌ 描画スクリプトの静的解析が未解決（描画スクリプトの特定・図ソース・CLASSDEFS）: ${result.unresolvedMermaidSources.join(", ")}`);
           console.log("  図の内容を転写するのではなく、原本の描画スクリプト（mermaid.render の呼び出しと図ソースの読み取り）を確認すること。");
@@ -2363,7 +2456,9 @@ if (process.exitCode === undefined) {
             ? "\n判定: ✅ 漏れなし — Green 判定に進んでよい。"
             : unresolvedOnly
               ? "\n判定: ❌ 描画スクリプトの静的解析が未解決 — Green コミット禁止。描画スクリプトを確認してから再実行すること。"
-              : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
+              : unresolvedWithCountMismatch
+                ? "\n判定: ❌ 描画スクリプトの静的解析が未解決かつ Mermaid 図の件数が不一致 — Green コミット禁止。描画スクリプトと図の過不足を確認してから再実行すること。"
+                : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
         );
         process.exitCode = result.blocking ? 1 : 0;
       }

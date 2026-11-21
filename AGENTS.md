@@ -27,10 +27,10 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
   ```bash
   bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
     archive/{html|md}/<ベンダー>/<原本>.{html|md|markdown} web-next/app/<provider>/<slug>/page.tsx
-  echo "exit=$?"   # 0 以外は移行漏れ → コミット禁止
+  echo "exit=$?"   # 1 は比較不一致（欠落・Mermaid ソース不一致）またはレンダラー解析の未解決、2 は引数・ファイル読み込みエラー → 0 以外はコミット禁止
   ```
 
-  運用手順と偽陽性の分類は `.claude/skills/nextjs-page-migration/references/source-parity-audit.md` を参照。
+  終了コード別の解釈・対処と偽陽性の分類は `.claude/skills/nextjs-page-migration/references/source-parity-audit.md` を参照。
 - **R5（テスト強度の下限）**: 契約テストは件数のみ・存在のみ・部分一致のみの検証を禁止し、
   見出しは `toEqual([...EXPECTED_H2])` の順序込み完全一致で検証する（詳細は `.claude/rules/tdd-mandatory-cycle.md`）
 - **legacy/ 配下の編集禁止**（Phase A–F 中は凍結）

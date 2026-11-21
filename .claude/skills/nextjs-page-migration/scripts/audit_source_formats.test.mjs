@@ -1402,9 +1402,9 @@ test("treats a classic renderer that reads its card payload before the payload i
  const reader = `const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#card-0'); const src = card.querySelector('script').textContent; mermaid.render('id', src + CLASSDEFS);`;
  const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
  // classic script はパース中に実行されるため、後ろにある payload をまだ読めない。
- const early = audit(`<script>${reader}</script>${card}`, page);
+ const early = audit(`<script>${reader}</script>${card}`, `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`);
  assert.equal(early.status, 1);
- assert.ok(JSON.stringify(early.data).includes("CLASSDEFS:card-0"));
+ assert.deepEqual(early.data.unresolvedMermaidSources, ["CLASSDEFS:card-0"]);
  // payload の後に置いた同等の renderer は有効なまま。
  assert.equal(audit(`${card}<script>${reader}</script>`, page).status, 0);
  // module script は文書のパース後に実行されるため、前に置いても payload を読める。
@@ -1434,7 +1434,9 @@ test("keeps a classic renderer valid when an unrelated earlier script runs a que
  const unrelated = `<script>var nav = document.querySelector('#nav');</script>`;
  assert.equal(audit(`${unrelated}${card}<script>${reader}</script>`, page).status, 0);
  // payload を読む script 自体が前にある場合は従来どおり未解決。
- assert.equal(audit(`<script>${reader}</script>${card}`, page).status, 1);
+ const early = audit(`<script>${reader}</script>${card}`, page);
+ assert.equal(early.status, 1);
+ assert.deepEqual(early.data.unresolvedMermaidSources, ["CLASSDEFS:card-0"]);
 });
 
 test("treats escaped identifier spellings in renderer code as unresolved", () => {
@@ -1715,4 +1717,111 @@ test("does not treat continue guards on members or function-written flags as uni
  }
  // 最上位で一度だけ書き込まれる共有フラグ（Fable原本の mermaidReady）は認定を維持する。
  assert.equal(audit(`${source}<script>var ready = false; try { ready = true; } catch (e) {} ${loop} if (!ready) continue; ${render} }</script>`, page).status, 0);
+});
+
+test("builds executable view from raw source so regex masking does not hide later assignments", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ // literalSource では /x/ が空白化されるため、2重マスクすると直後の / 2 が正規表現と誤認され
+ // 同じ行の src = 'other' 代入を飲み込んでしまう。rawSource から直接 executable を作れば検知できる。
+ const source = `${card}<script>const card = document.querySelector('#chart'); let src = card.querySelector('script').textContent; const r = /x/ / 2; src = 'flowchart LR\\nX --> Y'; const z = 1 / 2; mermaid.render('id', src);</script>`;
+ const result = audit(source, page);
+ assert.equal(result.status, 1);
+ assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+});
+
+test("recognizes whitespace and comments around the member-access dot in mermaid.render", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const suffix = '\nclassDef box fill:#fff;';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+ for (const call of [
+  "mermaid . render('id', src + CLASSDEFS);",
+  "mermaid/* note */./* note */render('id', src + CLASSDEFS);",
+  "mermaid\n  .\n  render('id', src + CLASSDEFS);",
+ ]) {
+  const source = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent; ${call}</script>`;
+  assert.equal(audit(source, page).status, 0, call);
+  assert.equal(audit(source, `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`).status, 1, call);
+ }
+});
+
+test("requires truth-value proof for loop guards instead of treating uniform conditions as always or never true", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('');
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)};`).join('\n') + charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join('');
+ const loop = "var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) {";
+ const pick = "var card = cards[i]; var src = card.querySelector('script').textContent;";
+ const render = "mermaid.render('x', src);";
+ for (const body of [
+  `${loop} if (true) continue; ${pick} ${render} }`,
+  `var skip = true; ${loop} if (skip) continue; ${pick} ${render} }`,
+  `var ready = false; ${loop} if (!ready) continue; ${pick} ${render} }`,
+  `${loop} if (false) { ${pick} ${render} } }`,
+  `var ready = false; ${loop} if (ready) { ${pick} ${render} } }`,
+  `${loop} if (unknownFlag) { ${pick} ${render} } }`,
+  `${loop} if (!unknownFlag) continue; ${pick} ${render} }`,
+ ]) {
+  const result = audit(`${source}<script>${body}</script>`, page);
+  assert.equal(result.status, 1, body);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1'], body);
+ }
+ // 真と証明できるガードと実在要素の null チェックは引き続き認定する。
+ assert.equal(audit(`${source}<script>var ready = true; ${loop} var card = cards[i]; var host = card.querySelector('.diagram-wrap'); if (!host || !ready) continue; if (ready) { var src = card.querySelector('script').textContent; ${render} } }</script>`, page).status, 0);
+});
+
+test("excludes uninstantiated template elements from cardHas checks", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)};`).join('\n') + charts.map((_, i) => `<MermaidDiagram chart={D${i}} />`).join('');
+ const script = "<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var host = card.querySelector('.diagram-wrap'); if (!host) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>";
+ // .diagram-wrap が <template> 内だけにある場合、card.querySelector('.diagram-wrap') は null になる。
+ const inTemplate = charts.map(s => `<div class="diagram-card"><template><div class="diagram-wrap"></div></template><script type="text/plain">${s}</script></div>`).join('');
+ const blocked = audit(`${inTemplate}${script}`, page);
+ assert.equal(blocked.status, 1);
+ assert.deepEqual(blocked.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1']);
+ // template 外に実在する .diagram-wrap は引き続き認定する。
+ const visible = charts.map(s => `<div class="diagram-card"><template><div class="other"></div></template><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('');
+ assert.equal(audit(`${visible}${script}`, page).status, 0);
+});
+
+test("marks type edits on an earlier non-plain script unresolved for typed queries", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="application/json">{"x":1}</script><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const read = `const src = card.querySelector('script[type="text/plain"]').textContent; mermaid.render('id', src);`;
+ for (const write of [
+  "card.querySelector('script').type = 'text/plain';",
+  "card.querySelector('script').setAttribute('type', 'text/plain');",
+  "const earlier = card.querySelector('script[type=\"application/json\"]'); earlier.type = 'text/plain';",
+ ]) {
+  const result = audit(`${card}<script>const card = document.querySelector('#chart'); ${write} ${read}</script>`, page);
+  assert.equal(result.status, 1, write);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], write);
+ }
+ // 無関係な属性の変更は引き続き認定する。
+ assert.equal(audit(`${card}<script>const card = document.querySelector('#chart'); card.querySelector('script').setAttribute('data-note', 'ok'); ${read}</script>`, page).status, 0);
+});
+
+test("reports diagram count mismatch alongside unresolved Mermaid analysis in CLI verdict", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map((s, i) => `<div id="c-${i}" class="diagram-card"><script type="text/plain">${s}</script></div>`).join('')
+  + "<script>const CLASSDEFS = getSuffix(); const cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var src = cards[i].querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); }</script>";
+ const dir = mkdtempSync(join(tmpdir(), "audit-verdict-"));
+ try {
+  const htmlPath = join(dir, "source.html");
+  const oneDiagramPage = join(dir, "one.tsx");
+  const twoDiagramPage = join(dir, "two.tsx");
+  writeFileSync(htmlPath, source);
+  writeFileSync(oneDiagramPage, `const D0 = ${JSON.stringify(charts[0])}; <MermaidDiagram chart={D0} />`);
+  writeFileSync(twoDiagramPage, `const D0 = ${JSON.stringify(charts[0])}; const D1 = ${JSON.stringify(charts[1])}; <MermaidDiagram chart={D0} /><MermaidDiagram chart={D1} />`);
+  const withCountMismatch = spawnSync(process.execPath, [script, htmlPath, oneDiagramPage], { encoding: "utf8" });
+  assert.equal(withCountMismatch.status, 1);
+  assert.match(withCountMismatch.stdout, /静的解析が未解決かつ Mermaid 図の件数が不一致/);
+  const sameCount = spawnSync(process.execPath, [script, htmlPath, twoDiagramPage], { encoding: "utf8" });
+  assert.equal(sameCount.status, 1);
+  assert.match(sameCount.stdout, /判定: ❌ 描画スクリプトの静的解析が未解決 —/);
+ } finally {
+  rmSync(dir, { recursive: true, force: true });
+ }
 });
