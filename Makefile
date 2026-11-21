@@ -36,6 +36,8 @@ build-web: ## web イメージのみビルド
 refresh-web-deps: ## web イメージを再ビルドし、既存 web-node-modules ボリュームの依存関係を更新
 	$(COMPOSE) build web
 	$(COMPOSE) run --rm --no-deps web bun install --frozen-lockfile
+	@# 稼働中の web は旧 node_modules を保持するため、起動中なら再作成して反映する
+	@if [ -n "$$($(COMPOSE) ps -q web)" ]; then $(COMPOSE) up -d --no-deps --force-recreate web; fi
 
 # ── 開発サーバー ───────────────────────────────────────────────────────────────
 dev: ## Next.js 開発サーバー起動 (http://localhost:3000)
