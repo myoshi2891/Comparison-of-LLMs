@@ -64,13 +64,15 @@ describe("PageEntrySchema", () => {
 });
 
 describe("pageRegistry", () => {
-  it("Homeの公開日と確認日を価格データ更新日に揃える", () => {
-    // 価格スナップショットの生成日と同期していることを、固定日付ではなく実データで確かめる。
-    const home = findBySlug("/");
+  it("Homeの公開日と確認日を価格データの公開日に揃える", () => {
+    // 為替のみの更新などで generated_at が動いても落ちないよう、価格公開日は明示的に固定する。
+    // 価格を再公開するときは、この定数と page-registry.ts のHome日付を同時に更新する。
+    const PRICING_PUBLICATION_DATE = "2026-11-13";
     expect(pricingSnapshot.generated_at).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    const home = findBySlug("/");
     expect([home?.addedAt, home?.lastReviewed]).toEqual([
-      pricingSnapshot.generated_at,
-      pricingSnapshot.generated_at,
+      PRICING_PUBLICATION_DATE,
+      PRICING_PUBLICATION_DATE,
     ]);
   });
 

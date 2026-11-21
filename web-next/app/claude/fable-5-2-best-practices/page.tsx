@@ -8777,7 +8777,14 @@ export default function Page() {
               <h2 id="s14-heading">{"トラブルシューティング"}</h2>{" "}
             </div>{" "}
             <h3 id="s14-1">{"14.1 症状別の一覧"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="症状別トラブルシューティング一覧"
+            >
               {" "}
               <table>
                 <thead>
@@ -9309,7 +9316,14 @@ export default function Page() {
               </li>{" "}
             </ul>{" "}
             <h3 id="s15-2">{"15.2 30日ロードマップ"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="30日ロードマップの一覧"
+            >
               {" "}
               <table>
                 <thead>
