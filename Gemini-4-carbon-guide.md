@@ -354,9 +354,14 @@ flowchart TD
     D -- "はい" --> E["タスクを分割して対応"]
     D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
     F --> API{"どのAPIで呼び出すか"}
-    API -- "GenerateContent" --> GACC["各セグメントの出力partsを順に蓄積<br/>SDKの自動継続のusageは累積値なので合算せず最後の値を使う<br/>自前RESTループではセグメントごとのusageを合算する"]
-    GACC --> CONT{"finishReason は何か"}
-    CONT -- "CONTINUATION" --> NEXT["元の contents systemInstruction tools<br/>maxOutputTokens をそのまま再送し<br/>continuation_token を付ける"]
+    API -- "GenerateContent" --> GACC["各セグメントの出力partsを順に蓄積<br/>自前ストリームは最新continuation_tokenをチェックポイント保存し<br/>チェックポイント後のpartsは未確定バッファへ分けて保持<br/>SDKの自動継続のusageは累積値なので合算せず最後の値を使う<br/>自前RESTループではセグメントごとのusageを合算する"]
+    GACC --> GDROP{"自前ストリームが<br/>finishReason 前に切断されたか"}
+    GDROP -- "はい チェックポイントあり" --> GRES["未確定バッファのpartsを破棄し<br/>最新チェックポイントまでの蓄積は保持<br/>保存済みcontinuation_tokenで元のリクエストを再送して再開"]
+    GDROP -- "はい チェックポイントなし" --> GRST["未確定バッファを破棄し<br/>continuation_tokenなしで最初から再送"]
+    GRES --> GACC
+    GRST --> GACC
+    GDROP -- "いいえ" --> CONT{"finishReason は何か"}
+    CONT -- "CONTINUATION" --> NEXT["未確定バッファを確定し最新continuation_tokenを更新<br/>元の contents systemInstruction tools<br/>maxOutputTokens をそのまま再送し<br/>continuation_token を付ける"]
     NEXT --> GACC
     CONT -- "STOP" --> GJOIN["蓄積した全セグメントのpartsを会話履歴に保持<br/>表示する回答は思考サマリーでないtextパートだけを結合"]
     GJOIN --> G["累積トークンと課金を監視"]
@@ -365,13 +370,14 @@ flowchart TD
     RAISE --> GACC
     MTOK -- "いいえ" --> GERR["未完了として扱い 部分出力を採用しない"]
     CONT -- "SAFETY など" --> GERR
-    API -- "Interactions 非ストリーミング" --> ACC["各hopの出力テキストとusageを順に蓄積"]
+    API -- "Interactions 非ストリーミング" --> ACC["終端状態のhop出力テキストとusageを蓄積<br/>(in_progress / queued の中間状態は蓄積しない)"]
     ACC --> IINT{"後続hopで応答前に<br/>ContinuationInterruptedErrorが送出されたか"}
     IINT -- "はい" --> IREC["例外のpartial_interaction(受信済み出力とusage)を保持<br/>例外のinteraction IDとcontinuation_tokenで再開<br/>store=Falseは元の入力 モデル ツール 生成設定も再送<br/>再開手順・属性名は公式SDKで確認"]
     IREC --> ACC
     IINT -- "いいえ" --> IST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
-    IST -- "in_progress queued<br/>バックグラウンド実行" --> IPOLL["interactions.get で<br/>終端状態になるまでポーリング"]
-    IPOLL --> IST
+    IST -- "in_progress queued<br/>バックグラウンド実行" --> IPOLL["interactions.get で<br/>終端状態になるまでポーリング<br/>(途中のスナップショットは蓄積しない)"]
+    IPOLL --> ICOLL["終端状態になった interaction の<br/>結合済み出力と usage を1回だけ蓄積"]
+    ICOLL --> IST
     IST -- "requires_action" --> IACT["ツール呼び出しを承認ゲートに通す 12.2節"]
     IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>store=True はこのinteractionのidで結果を送る<br/>store=False は元の入力 返されたmodelのsteps<br/>function_resultを次のリクエストに含める"]
     IACT -- "拒否" --> IREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくstoreで分ける"]

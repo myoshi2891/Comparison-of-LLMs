@@ -236,7 +236,7 @@ import re
 from google import genai
 from google.genai import types
 
-client = genai.Client()  # GEMINI_API_KEY は環境変数から読み込まれる
+client = genai.Client(http_options=types.HttpOptions(api_version="v1beta"))  # GEMINI_API_KEY は環境変数から読み込まれる
 
 PROMPT = """
 Point to no more than 10 items in the image. The label returned
@@ -372,7 +372,7 @@ import math
 from google import genai
 from google.genai import types
 
-client = genai.Client()
+client = genai.Client(http_options=types.HttpOptions(api_version="v1beta"))
 
 # 例: 安全な作業領域。座標系はロボット基座標(単位 mm、原点はテーブル面上のロボット基部中心、
 # +x はロボットから見て右、+y はロボット基部からテーブル奥へ向かう方向)。execute_on_robot もこの座標系で解釈する。
@@ -691,10 +691,13 @@ class LiveSessionState:
             # 他の送信者が新しいフレームを送り、その後へ古いフレームを送ってしまう。
             frame = await capture()
             self.ensure_usable()  # 取得中に使用不可になった場合も送らない
-            await self.session.send_realtime_input(
-                video=types.Blob(data=frame, mime_type="image/jpeg")
-            )
-            self._last_frame_sent = loop.time()
+            try:
+                await self.session.send_realtime_input(
+                    video=types.Blob(data=frame, mime_type="image/jpeg")
+                )
+            finally:
+                # キャンセル・失敗時も送信が発生した可能性があるため、送信時刻を記録して 1 FPS 上限を守る
+                self._last_frame_sent = loop.time()
 
 
 async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
