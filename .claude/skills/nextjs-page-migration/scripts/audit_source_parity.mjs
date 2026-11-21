@@ -1399,8 +1399,12 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const provenUniformBool = id => {
         if (!uniform(id)) return null;
         const escaped = id.replace(/\$/g, "\\$");
+        const hidden = new RegExp(`\\b(?:function\\b[^()]*|catch)\\s*\\([^)]*\\b${escaped}\\b|\\([^)]*\\b${escaped}\\b[^)]*\\)\\s*=>|\\b${escaped}\\s*=>|\\b(?:const|let|var)\\s*[{[][^;]*\\b${escaped}\\b`);
+        if (hidden.test(executable)) return null;
+        const lexicalDecls = Array.from(executable.matchAll(new RegExp(`\\b(?:let|const)\\s+${escaped}(?![\\w$])`, "g")))
+          .map(d => ({ index: d.index, path: pathAt(d.index) }));
         const writes = Array.from(writeIndexes(id)).sort((a, b) => a - b);
-        const assignRe = new RegExp(`(?:\\b(?:var|let|const)\\s+|(?<![\\w$.]))${escaped}\\s*=\\s*(true|false)(?![\\w$])`, "g");
+        const assignRe = new RegExp(`(?:\\b(var|let|const)\\s+|(?<![\\w$.]))${escaped}\\s*=\\s*(true|false)(?![\\w$])`, "g");
         let lastProven = null;
         for (const match of executable.matchAll(assignRe)) {
           const afterAssign = executable.slice(match.index + match[0].length);
@@ -1414,6 +1418,20 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           // Every block enclosing the assignment that does not also enclose the loop must be
           // a plain block or a `try` block (so the assignment runs on the normal execution path).
           const extraBlocks = assignPath.filter(b => !loopPath.includes(b));
+          // A block-scoped `let`/`const` declaration in a nested block is not visible at the guard.
+          if ((match[1] === "let" || match[1] === "const") && extraBlocks.length > 0) continue;
+          // Reject writes to a binding shadowed by a nested `let`/`const` in `extraBlocks`,
+          // or writes to an outer binding that is shadowed by a closer `let`/`const` at the guard.
+          const shadowedInExtra = extraBlocks.length > 0 && lexicalDecls.some(d =>
+            d.path.length > 0 && extraBlocks.includes(d.path.at(-1)) && d.path.every((b, idx) => assignPath[idx] === b)
+          );
+          if (shadowedInExtra) continue;
+          const shadowedAtGuard = lexicalDecls.some(d =>
+            d.path.every((b, idx) => loopPath[idx] === b) &&
+            d.path.length > assignPath.length &&
+            d.index !== match.index
+          );
+          if (shadowedAtGuard) continue;
           const inNormalPath = extraBlocks.every(b => {
             const head = executable.slice(0, b).replace(/\s+$/, "");
             return head === "" || /[;{}]$/.test(head) || /(?<![\w$.])try$/.test(head);
@@ -1422,7 +1440,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           const enclosingStart = assignPath.at(-1) ?? -1;
           const stmt = statementBefore(match.index, enclosingStart);
           if (stmt === null || /^\s*(?:if|else|while|for|do|switch|with|catch)(?![\w$])/.test(stmt) || /&&|\|\||\?/.test(stmt)) continue;
-          lastProven = match[1] === "true";
+          lastProven = match[2] === "true";
         }
         return lastProven;
       };
@@ -1559,9 +1577,21 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         const nested = functions.filter(fn => fn.body > open && fn.end <= close + 1);
         if (Array.from(executable.slice(open, close).matchAll(/(?<![\w$.])(?:break|return|throw)(?![\w$])/g))
           .some(exit => !nested.some(fn => fn.body < open + exit.index && open + exit.index < fn.end))) return false;
-        // Any other write to the index inside the body skips or repeats cards, so the
-        // in-order card-to-payload mapping is no longer proven.
-        if (Array.from(writeIndexes(indexed[2])).some(write => write > open && write < close)) return false;
+        // Any other write to the index inside the body, or inside a function in the same
+        // lexical scope that may be called during traversal (even if defined outside the loop),
+        // skips or repeats cards, so the in-order card-to-payload mapping is no longer proven.
+        const headerStart = loop.index;
+        const enclosingFn = functions.filter(fn => fn.body < open && close < fn.end).at(-1);
+        const indexScopeStart = enclosingFn ? enclosingFn.body : 0;
+        const indexScopeEnd = enclosingFn ? enclosingFn.end : executable.length;
+        if (Array.from(writeIndexes(indexed[2])).some(write =>
+          (write > open && write < close) ||
+          (!(write >= headerStart && write < open) &&
+            write > indexScopeStart && write < indexScopeEnd &&
+            functions.some(fn => fn.body < write && write < fn.end &&
+              fn.body > indexScopeStart && fn.end <= indexScopeEnd &&
+              !(fn.body < open && close < fn.end)))
+        )) return false;
         // The card binding, the payload read and mermaid.render must run on every selected
         // iteration. A condition such as `i === 0` would certify cards it never renders.
         return [ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected));
@@ -1636,24 +1666,44 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         .some(copy => mayBeSelectedScript(copy[1].trim(), copy.index, next));
     };
     // Reading an element binding does not establish its current textContent.
-    // Unresolved writes through the element, a DOM query or a known alias block certification.
-    // A deferred read may follow a write placed later in the source, so scan the whole scope.
+    // Unresolved writes through the element, a DOM query or a known alias block certification
+    // whenever the write can precede the read that captures `src` (writes provably after a
+    // top-level synchronous capture do not alter the already-captured string).
     // Static computed access (script["textContent"]) writes the same property as dot access.
     // Template keys are blanked in literalSource; match their length and confirm them in rawSource.
+    const writeCanPrecedeRead = writeIndex => {
+      if (writeIndex <= initialBinding.at) return true;
+      if (functions.some(fn => fn.body < initialBinding.at && initialBinding.at < fn.end)) return true;
+      if (functions.some(fn => fn.body < writeIndex && writeIndex < fn.end)) return true;
+      if (loops.some(loop => loop.start < initialBinding.at && initialBinding.at < loop.end)) return true;
+      return false;
+    };
     const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\.(?:textContent|text)\b|\[\s*(?:(['"])(?:textContent|text)\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
     if ([...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
-      .some(write => isTextContentKey(write, rawSource) && mayBeSelectedScript(write[1], write.index))) return false;
+      .some(write => writeCanPrecedeRead(write.index) && isTextContentKey(write, rawSource) && mayBeSelectedScript(write[1], write.index))) return false;
     // Structural edits can change which script the card query returns (for example removing
     // the first matching script), so the read no longer proves this payload. Edits elsewhere,
-    // such as replacing the diagram host's markup or appending after the script, keep it.
+    // such as replacing a separate diagram host's markup or appending after the script, keep it.
     const mayBeCardOwner = (name, seen = new Set()) => {
       if (cardOwners.has(name)) return true;
       if (seen.has(name)) return false;
       const next = new Set(seen).add(name);
       return Array.from(literalSource.matchAll(new RegExp(`(?<![\\w$.])${name}\\s*=\\s*(\\w+)\\s*;`, "g")))
         .some(copy => mayBeCardOwner(copy[1], next));
+    };
+    const mayBeScriptContainer = (reference, at, seen = new Set()) => {
+      if (mayBeCardOwner(reference)) return true;
+      const q = query.exec(reference);
+      if (q && mayBeCardOwner(q[1])) return selectedScript.mayContainScript?.(q[3]) ?? true;
+      if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
+      const next = new Set(seen).add(reference);
+      const bound = bindingAt(reference, at);
+      if (bound && mayBeScriptContainer(bound.value, bound.at, next)) return true;
+      const copies = new RegExp(`\\b${reference}\\s*=\\s*([^;]+);`, "g");
+      return Array.from(literalSource.matchAll(copies))
+        .some(copy => mayBeScriptContainer(copy[1].trim(), copy.index, next));
     };
     const mayBeCardScript = (reference, at, seen = new Set()) => {
       if (mayBeSelectedScript(reference, at)) return true;
@@ -1670,13 +1720,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // The selector stays inside one quoted literal so a match cannot span two queries.
     const receiver = String.raw`(\w+(?:\.querySelector\(\s*(['"])([^'"\n]*)\2\s*\))?)\s*\.\s*`;
     const scriptEdits = new RegExp(`${receiver}(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text))\\s*\\(|outerHTML\\s*=(?!=))`, "g");
-    const ownerEdits = new RegExp(`(?<![\\w$.])(\\w+)\\s*\\.\\s*(?:(?:removeChild|replaceChild|insertBefore|prepend|replaceChildren|insertAdjacent(?:HTML|Element|Text))\\s*\\(|(?:innerHTML|outerHTML|textContent|innerText)\\s*=(?!=))`, "g");
+    const ownerEdits = new RegExp(`${receiver}(?:(?:removeChild|replaceChild|insertBefore|prepend|replaceChildren|insertAdjacent(?:HTML|Element|Text))\\s*\\(|(?:innerHTML|outerHTML|textContent|innerText)\\s*=(?!=))`, "g");
     // Changing a script's type can move a typed query (script[type="text/plain"]) to another script.
     // Attribute writes with a literal non-type name keep the selection; computed names stay unresolved.
     const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute)\\s*\\(\\s*(?!(['"])(?!type\\4)[^'"\\n]*\\4)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
-    if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index)) ||
+    if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index) || mayBeScriptContainer(edit[1], edit.index)) ||
       Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeCardScript(edit[1], edit.index)) ||
-      Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeCardOwner(edit[1]))) return false;
+      Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeScriptContainer(edit[1], edit.index))) return false;
     return { base: usesValidatedDedent ? dedentedPayload : payload };
   };
   // Strings/comments are already masked. Balance parentheses so later ASI
@@ -1725,7 +1775,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (base !== "src" && !/^(?:"[^"\r\n]*"|'[^'\r\n]*'|`[^`]*`)$/.test(base)) return null;
       if (base === "src" && !srcIsPayload(call.index)) return null;
       if (base !== "src") {
-        const literal = rawSource.slice(source.start, source.end).trim();
+        const leading = expression.indexOf(base);
+        const literalStart = source.start + leading;
+        const literal = rawSource.slice(literalStart, literalStart + base.length);
         const value = decodeQuotedEntryEscapes(literal.slice(1, -1), true);
         if (value === undefined || normalizeMermaidSource(value) !== normalizeMermaidSource(payload)) return null;
       }
@@ -1886,9 +1938,12 @@ function materializePlainTextCards(src) {
     // An uncertain slash may have masked a renderer as a string/regex. Keep the
     // scope so rendererSuffix reports it unresolved instead of dropping it.
     const maskedRenderer = resolution.uncertain && /\bmermaid(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\n\r\u2028\u2029]*)*\.(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\n\r\u2028\u2029]*)*render\b/.test(rawSource);
-    // Computed member calls (mermaid['render'](…), mermaid[name](…), mermaid?.render) are not
-    // traced by rendererSuffix; keep them as an unresolved renderer instead of certifying the base.
-    const computedRenderer = /\bmermaid\s*(?:\?\.\s*)?\[|\bmermaid\s*\?\.\s*render\b/.test(executable);
+    // Computed member calls (mermaid['render'](…), mermaid[name](…), mermaid?.render) and
+    // aliased/bound references (const r = mermaid.render; mermaid.render.bind(mermaid);
+    // const { render } = mermaid; const m = mermaid) are not traced by rendererSuffix;
+    // keep them as an unresolved renderer instead of certifying the base.
+    const aliasedRenderer = /\bmermaid\s*\.\s*render\b(?!\s*\()|\{\s*[^}]*\brender\b[^}]*\}\s*=\s*mermaid\b|(?<![!=])=\s*(?:window\s*\.\s*)?mermaid\s*(?:[;,)\r\n]|$)/.test(executable);
+    const computedRenderer = /\bmermaid\s*(?:\?\.\s*)?\[|\bmermaid\s*\?\.\s*render\b/.test(executable) || aliasedRenderer;
     // Writes to any element's textContent/text (static or computed key) or structural/attribute
     // edits that can alter script selection or remove a queried host across scopes.
     const writesTextContent = /\.\s*(?:textContent|text)\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
@@ -1992,6 +2047,13 @@ function materializePlainTextCards(src) {
           cardAvailableAt: at => renderer.deferredModule || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition > start),
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1,
+          // Whether an element matched by `selector` inside the card can contain the selected
+          // script (or any script, for complex selectors that cannot be statically matched).
+          mayContainScript: selector => {
+            if (!/^(?:[A-Za-z][\w-]*)?(?:[.#][\w-]+)*$/.test(selector) || !selector) return true;
+            const matches = extractElementContents(card.content, tag => matchesCardSelector(tag, selector), true);
+            return matches.some(el => /<script data-audit-payload="\d+"><\/script>/.test(el.content));
+          },
           // Whether the card contains an element for a single-class selector outside inert
           // <template> contents, so a per-card query for it is never null (`!host` cannot skip).
           cardHas: selector => {
@@ -2483,6 +2545,7 @@ if (process.exitCode === undefined) {
         const mermaidCountMismatch = result.counts.mermaidSources.source !== result.counts.mermaidSources.page;
         const unresolvedOnly = result.unresolvedMermaidSources.length > 0 && !otherMissing && !mermaidCountMismatch;
         const unresolvedWithCountMismatch = result.unresolvedMermaidSources.length > 0 && !otherMissing && mermaidCountMismatch;
+        const mermaidCountMismatchOnly = !otherMissing && result.unresolvedMermaidSources.length === 0 && mermaidCountMismatch && !result.mermaidSourcesMatch;
         const mermaidMismatchOnly = !otherMissing && result.unresolvedMermaidSources.length === 0 && !mermaidCountMismatch && !result.mermaidSourcesMatch;
         if (result.unresolvedMermaidSources.length > 0) {
           console.log(`\n❌ 描画スクリプトの静的解析が未解決（描画スクリプトの特定・図ソース・CLASSDEFS）: ${result.unresolvedMermaidSources.join(", ")}`);
@@ -2506,9 +2569,11 @@ if (process.exitCode === undefined) {
               ? "\n判定: ❌ 描画スクリプトの静的解析が未解決 — Green コミット禁止。描画スクリプトを確認してから再実行すること。"
               : unresolvedWithCountMismatch
                 ? "\n判定: ❌ 描画スクリプトの静的解析が未解決かつ Mermaid 図の件数が不一致 — Green コミット禁止。描画スクリプトと図の過不足を確認してから再実行すること。"
-                : mermaidMismatchOnly
-                  ? "\n判定: ❌ Mermaid ソース不一致 — Green コミット禁止。Mermaid 図の順序・内容を確認してから再実行すること。"
-                  : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
+                : mermaidCountMismatchOnly
+                  ? "\n判定: ❌ Mermaid 図の件数不一致 — Green コミット禁止。Mermaid 図の過不足・内容を確認してから再実行すること。"
+                  : mermaidMismatchOnly
+                    ? "\n判定: ❌ Mermaid ソース不一致 — Green コミット禁止。Mermaid 図の順序・内容を確認してから再実行すること。"
+                    : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
         );
         process.exitCode = result.blocking ? 1 : 0;
       }
