@@ -1905,6 +1905,8 @@ function materializePlainTextCards(src) {
   const executableScripts = scripts.filter(script => {
     // Scripts inside uninstantiated template content are not renderers for document cards.
     if (script.inTemplate) return false;
+    // nomodule scripts are skipped by module-capable browsers; they stay in the DOM inventory.
+    if (readHtmlAttribute(script.attributes, "nomodule") !== undefined) return false;
     const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
     // The HTML standard's JavaScript MIME type essences (text/plain payloads stay excluded).
     return !type || type === "module" || /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(type);
