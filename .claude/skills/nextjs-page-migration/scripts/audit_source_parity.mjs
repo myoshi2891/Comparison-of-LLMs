@@ -1497,7 +1497,14 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if (/(?<![\w$.])(?:try|finally)$/.test(head) || /[;{}]$/.test(head) || head === "") continue;
         const callable = /(?:function\s*\([^()]*\)|(?:\([^()]*\)|[A-Za-z_$][\w$]*)\s*=>)$/.exec(head);
         // A timer callback runs once for this iteration; other callbacks may never run.
-        if (callable && /(?<![\w$.])(?:setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.test(head.slice(0, callable.index))) continue;
+        const timerCall = callable && /(?<![\w$.])(?:setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.exec(head.slice(0, callable.index));
+        if (timerCall) {
+          // A timer whose handle is cancelled in the scope may never run for this iteration.
+          const handle = /([A-Za-z_$][\w$]*)\s*=\s*(?:window\s*\.\s*)?$/.exec(head.slice(0, timerCall.index))?.[1];
+          const cancelled = handle !== undefined &&
+            new RegExp(String.raw`(?<![\w$])(?:clearTimeout|cancelAnimationFrame)\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
+          if (!cancelled) continue;
+        }
         if (head.endsWith(")")) {
           const condition = ifCondition(open + 1 + head.length - 1);
           if (condition !== undefined && alwaysTrue(condition, block)) continue;
@@ -1857,12 +1864,17 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   return parts.some(part => part === undefined) ? null : renderUses[0].base + parts.join("");
 }
 
+/** HTML class tokens are separated by ASCII whitespace only (not NBSP or other Unicode spaces). */
+function classTokens(value) {
+  return (value ?? "").split(/[ \t\n\r\f]+/).filter(Boolean);
+}
+
 /** Match static card selectors; complex/dynamic selectors are not guessed. */
 function matchesCardSelector(tag, selector) {
   if (!/^(?:[A-Za-z][\w-]*)?(?:[.#][\w-]+)*$/.test(selector) || !selector) return false;
   const element = /^([A-Za-z][\w-]*)/.exec(selector)?.[1];
   if (element && /^<([\w-]+)/.exec(tag)?.[1].toLowerCase() !== element.toLowerCase()) return false;
-  const classes = (readHtmlAttribute(tag, "class") ?? "").split(/\s+/);
+  const classes = classTokens(readHtmlAttribute(tag, "class"));
   return Array.from(selector.matchAll(/([.#])([\w-]+)/g)).every(([, kind, value]) =>
     kind === "#" ? readHtmlAttribute(tag, "id") === value : classes.includes(value));
 }
@@ -1899,7 +1911,7 @@ function materializePlainTextCards(src) {
         return full.startsWith("<!--") ? "" : full;
       }
       if (templateDepth === 0) documentElements.push(`<script${attributes}>`);
-      scripts.push({ full, attributes, payload, index: scripts.length, inTemplate: templateDepth > 0 });
+      scripts.push({ full, attributes, payload: payload.replace(/\r\n?/g, "\n"), index: scripts.length, inTemplate: templateDepth > 0 });
       return `<script data-audit-payload="${scripts.length - 1}"></script>`;
     });
   const executableScripts = scripts.filter(script => {
@@ -1945,7 +1957,15 @@ function materializePlainTextCards(src) {
     // const { render } = mermaid; const m = mermaid) are not traced by rendererSuffix;
     // keep them as an unresolved renderer instead of certifying the base.
     const aliasedRenderer = /\bmermaid\s*\.\s*render\b(?!\s*\()|\{\s*[^}]*\brender\b[^}]*\}\s*=\s*mermaid\b|(?<![!=])=\s*(?:window\s*\.\s*)?mermaid\s*(?:[;,)\r\n]|$)/.test(executable);
-    const computedRenderer = /\bmermaid\s*(?:\?\.\s*)?\[|\bmermaid\s*\?\.\s*render\b/.test(executable) || aliasedRenderer;
+    // Identifier names may use unicode escapes (mermaid.\u0072ender(...)); string contents are already
+    // blanked, so any escape left in `executable` belongs to an identifier. The resolver only reads
+    // plain spellings, so an extra decoded call is kept as an unresolved renderer.
+    const decodedExecutable = executable.replace(/\\u(?:\{([0-9a-fA-F]{1,6})\}|([0-9a-fA-F]{4}))/g,
+      (whole, long, short) => { try { return String.fromCodePoint(parseInt(long ?? short, 16)); } catch { return whole; } });
+    const renderCall = /\bmermaid\s*\.\s*render\s*\(/g;
+    const escapedRenderer = decodedExecutable !== executable &&
+      (decodedExecutable.match(renderCall) ?? []).length > (executable.match(renderCall) ?? []).length;
+    const computedRenderer = /\bmermaid\s*(?:\?\.\s*)?\[|\bmermaid\s*\?\.\s*render\b/.test(executable) || aliasedRenderer || escapedRenderer;
     // Writes to any element's textContent/text (static or computed key) or structural/attribute
     // edits that can alter script selection or remove a queried host across scopes.
     const writesTextContent = /\.\s*(?:textContent|text)\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
@@ -1966,8 +1986,7 @@ function materializePlainTextCards(src) {
   const scopes = allScopes.filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const cards = extractElementContents(stashed, tag => {
-    const cls = readHtmlAttribute(tag, "class") ?? "";
-    return cls.split(/\s+/).some(c => c === "code-block" || c === "diagram-card");
+    return classTokens(readHtmlAttribute(tag, "class")).some(c => c === "code-block" || c === "diagram-card");
   }, true);
   const edits = [];
   for (const card of cards.reverse()) {
@@ -1990,7 +2009,7 @@ function materializePlainTextCards(src) {
     const rawLines = script.payload.replace(/^\n+/, "").replace(/\s+$/, "").split("\n");
     const indent = Math.min(...rawLines.filter(l => l.trim()).map(l => l.match(/^[ \t]*/)[0].length));
     const payload = rawLines.map(l => l.slice(Number.isFinite(indent) ? indent : 0)).join("\n");
-    if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
+    if (classTokens(readHtmlAttribute(card.openingTag, "class")).includes("code-block")) {
       // Consume every opening tag as a unit before looking for empty code,
       // so a span's quoted title cannot supply a fake <code></code> target,
       // and skip inert <template> contents just like script selection.
@@ -2068,7 +2087,7 @@ function materializePlainTextCards(src) {
                 if (isTemplate) depth = Math.max(0, depth - 1);
                 continue;
               }
-              if (depth === 0 && (readHtmlAttribute(tag[3], "class") ?? "").split(/\s+/).includes(wanted[1])) return true;
+              if (depth === 0 && classTokens(readHtmlAttribute(tag[3], "class")).includes(wanted[1])) return true;
               if (isTemplate) depth += 1;
             }
             return false;
@@ -2108,7 +2127,15 @@ function inventoryHtml(src) {
     "gi"
   );
   const detachedCode = new Map();
-  for (const [, scriptAttrs, payload] of src.matchAll(scriptOrCodeRe)) {
+  let detachedTemplateDepth = 0;
+  for (const [whole, scriptAttrs, payload] of src.matchAll(scriptOrCodeRe)) {
+    if (scriptAttrs === undefined) {
+      // Template content is inert: its text/plain scripts never supply a card payload.
+      const template = /^<(\/?)template(?![\w:-])/i.exec(whole);
+      if (template) detachedTemplateDepth = template[1] ? Math.max(0, detachedTemplateDepth - 1) : detachedTemplateDepth + 1;
+      continue;
+    }
+    if (detachedTemplateDepth > 0) continue;
     if (readHtmlAttribute(scriptAttrs ?? "", "type")?.toLowerCase() !== "text/plain") continue;
     const target = readHtmlAttribute(scriptAttrs, "data-for");
     if (target) detachedCode.set(target, payload);

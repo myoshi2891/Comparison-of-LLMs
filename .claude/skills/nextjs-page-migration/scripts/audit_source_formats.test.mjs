@@ -1207,6 +1207,8 @@ test("rejects deferred reads of shared var card bindings inside the card loop", 
   // 共有の var はコールバック実行時に最後のカードを指し、両図を最後のpayloadとして認定しかねない。
   `${cards} ${loop} var card = cards[i]; setTimeout(function () { var src = ${read}; mermaid.render('x', src); }); }`,
   `${cards} ${loop} var card = cards[i]; var src = ${read}; setTimeout(function () { mermaid.render('x', src); }); }`,
+  // ハンドルが同じ反復で取り消されるコールバックは実行されない可能性がある。
+  `${cards} ${loop} let card = cards[i]; const t = setTimeout(function () { var src = ${read}; mermaid.render('x', src); }); clearTimeout(t); }`,
   // コールバック内でインデックス（var）を読む場合も反復固有ではない。
   `${cards} ${loop} setTimeout(function () { let card = cards[i]; let src = ${read}; mermaid.render('x', src); }); }`,
  ]) {
@@ -2029,4 +2031,33 @@ test("extracts literal mermaid.render source argument even when preceded or foll
  const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
  assert.equal(audit(`${card}<script>mermaid.render('id', /* note */ ${JSON.stringify(chart)} /* tail */);</script>`, page).status, 0);
  assert.equal(audit(`${card}<script>mermaid.render('id', ${JSON.stringify(chart)});</script>`, page).status, 0);
+});
+
+test("splits class tokens on ASCII whitespace only", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const script = "<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>";
+	const card = cls => `<div class="${cls}"><script type="text/plain">${chart}</script></div>`;
+	// 通常の空白はトークンを区切る（対照）。NBSP はトークンの一部になりカードではない。
+	assert.equal(audit(`${card("diagram-card x")}${script}`, page).status, 0);
+	assert.notEqual(audit(`${card("diagram-card\u00a0x")}${script}`, page).status, 0);
+});
+
+test("normalizes CRLF script payloads and ignores template text/plain payloads", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = payload => `<div class="diagram-card"><script type="text/plain">${payload}</script></div>`;
+	assert.equal(audit(card(chart), page).status, 0);
+	assert.equal(audit(card(chart.replace(/\n/g, "\r\n")), page).status, 0);
+	const detached = `<template><script type="text/plain" data-for="c">WRONG</script></template><div class="code-block"><code id="c"></code></div>`;
+	assert.equal(audit(detached, "<pre>{\"\"}</pre>").data.matched === true, false);
+});
+
+test("keeps escaped mermaid render spellings unresolved", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const source = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const run = call => audit(`${source}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; ${call} }</script>`, page).status;
+	assert.equal(run("mermaid.render('x', src);"), 0);
+	assert.equal(run("mermaid.\\u0072ender('x', src);"), 1);
 });
