@@ -615,6 +615,14 @@ class TestMoonshot:
         assert model.price_out != 8.25
         assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
 
+    def test_batch_input_after_standard_input_does_not_leak_output(self):
+        # 標準 input の後に batch input が来る単一レコードでは、後続 output は batch 単価。
+        html = "<p>Kimi K3 input $3.25 batch input $1.60 output $8.25</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert model.price_out != 8.25
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+
     @pytest.mark.parametrize(
         "batch_row",
         [

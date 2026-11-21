@@ -79,9 +79,14 @@ _PRE_STD_INPUT_GAP = _RECORD_GAP.replace(
     rf"(?!\boutput\b)(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}"
     rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
 )
+# 標準 input の後でも batch input のラベルは、さらに後ろに標準 input が続く場合だけ越える。
+# 続かなければ batch の行であり、後続の output は標準 output ではない。
+_BATCH_INPUT_LABEL = rf"\bbatch{_INLINE_SEP}input\b"
 _POST_STD_INPUT_OUTPUT_GAP = _RECORD_GAP.replace(
     r"[\s\S]",
-    rf"(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL}"
+    rf"(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}"
+    rf"|(?!{_BATCH_INPUT_LABEL}){_CACHED_LABEL}"
+    rf"|{_BATCH_INPUT_LABEL}(?={_STD_INPUT_AHEAD}{_STD_INPUT_LABEL})"
     rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
 )
 _OUTPUT_LABEL_GAP = _RECORD_GAP.replace(
