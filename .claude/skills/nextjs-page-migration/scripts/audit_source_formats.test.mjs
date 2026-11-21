@@ -685,7 +685,11 @@ test("does not certify an outer CLASSDEFS when a render binding is shadowed or o
   assert.equal(result.status, 1, body);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
- assert.equal(audit(`${card}<script>${declaration} function draw() { ${render} }</script>`, page).status, 0);
+ assert.equal(audit(`${card}<script>${declaration} function draw() { ${render} } draw();</script>`, page).status, 0);
+ // 呼ばれない名前付き関数は初期化後の実行が証明できないため未解決のままにする。
+ const uncalled = audit(`${card}<script>${declaration} function draw() { ${render} }</script>`, page);
+ assert.equal(uncalled.status, 1);
+ assert.deepEqual(uncalled.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
 });
 
 test("keeps separately parsed scripts apart before a following IIFE", () => {
@@ -1821,6 +1825,119 @@ test("reports diagram count mismatch alongside unresolved Mermaid analysis in CL
   const sameCount = spawnSync(process.execPath, [script, htmlPath, twoDiagramPage], { encoding: "utf8" });
   assert.equal(sameCount.status, 1);
   assert.match(sameCount.stdout, /判定: ❌ 描画スクリプトの静的解析が未解決 —/);
+ } finally {
+  rmSync(dir, { recursive: true, force: true });
+ }
+});
+
+test("rejects compound boolean initializers for loop guards while accepting complete literals", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('');
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)}; <MermaidDiagram chart={D${i}} />`).join('');
+ const loop = "var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (!ready) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }";
+ for (const init of [
+  "var ready = true && check();",
+  "var ready = true ? flag : false;",
+  "var ready = true == flag;",
+ ]) {
+  const result = audit(`${source}<script>${init} ${loop}</script>`, page);
+  assert.equal(result.status, 1, init);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1'], init);
+ }
+ assert.equal(audit(`${source}<script>var ready = true; ${loop}</script>`, page).status, 0);
+});
+
+test("allows inert template interpolations in non-renderer scripts while keeping calls unresolved", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ assert.equal(audit(`${card}<script>const label = \`v\${1 + 2}\`;</script>`, page).status, 0);
+ const withCall = audit(`${card}<script>const label = \`v\${renderChart()}\`;</script>`, page);
+ assert.equal(withCall.status, 1);
+ assert.deepEqual(withCall.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+});
+
+test("invalidates cardHas when an earlier edit removes or replaces the queried host", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="diagram-card"><div class="diagram-wrap"></div><script type="text/plain">${s}</script></div>`).join('');
+ const page = charts.map((s, i) => `const D${i} = ${JSON.stringify(s)}; <MermaidDiagram chart={D${i}} />`).join('');
+ const loop = "var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var host = card.querySelector('.diagram-wrap'); if (!host) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }";
+ for (const edit of [
+  "document.querySelectorAll('.diagram-wrap').forEach(function (el) { el.remove(); });",
+  "document.querySelector('.diagram-wrap').replaceWith(document.createElement('div'));",
+  "document.querySelector('.diagram-wrap').classList.remove('diagram-wrap');",
+ ]) {
+  const result = audit(`${source}<script>${edit} ${loop}</script>`, page);
+  assert.equal(result.status, 1, edit);
+  assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1'], edit);
+ }
+ assert.equal(audit(`${source}<script>${loop}</script>`, page).status, 0);
+});
+
+test("requires document-order availability for async module readers while keeping non-async modules eligible", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const reader = "const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent; mermaid.render('id', src);";
+ const asyncBefore = audit(`<script type="module" async>${reader}</script>${card}`, page);
+ assert.equal(asyncBefore.status, 1);
+ assert.deepEqual(asyncBefore.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ assert.equal(audit(`<script type="module">${reader}</script>${card}`, page).status, 0);
+ assert.equal(audit(`${card}<script type="module" async>${reader}</script>`, page).status, 0);
+});
+
+test("marks DOM-backed source unresolved when another scope edits script selection", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const domReader = "const card = document.querySelector('#chart'); const src = card.querySelector('script').textContent; mermaid.render('id', src);";
+ const litReader = `const src = ${JSON.stringify(chart)}; mermaid.render('id', src);`;
+ const foreignEdit = `<script type="module">document.querySelector('#chart script').remove();</script>`;
+ const domResult = audit(`${card}${foreignEdit}<script type="module">${domReader}</script>`, page);
+ assert.equal(domResult.status, 1);
+ assert.deepEqual(domResult.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ assert.equal(audit(`${card}${foreignEdit}<script type="module">${litReader}</script>`, page).status, 0);
+});
+
+test("excludes empty code elements inside template content when materializing code-block payloads", () => {
+ const payload = 'print("visible")';
+ const source = `<div class="code-block"><template><code></code></template><pre><code></code></pre><script type="text/plain">${payload}</script></div>`;
+ assert.equal(audit(source, `<pre><code>{${JSON.stringify(payload)}}</code></pre>`).status, 0);
+ const missing = audit(source, `<pre><code>{"other"}</code></pre>`);
+ assert.equal(missing.status, 1);
+ assert.deepEqual(missing.data.missingCodeBlocks, [payload]);
+});
+
+test("invalidates selected script payload on .text writes while ignoring unrelated elements", () => {
+ const chart = 'flowchart LR\nA --> B';
+ const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+ const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+ const select = "const card = document.querySelector('#chart'); const script = card.querySelector('script');";
+ const mutated = audit(`${card}<script>${select} script.text = 'other'; const src = script.textContent; mermaid.render('id', src);</script>`, page);
+ assert.equal(mutated.status, 1);
+ assert.deepEqual(mutated.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+ const unrelated = audit(`${card}<script>${select} const option = {}; option.text = 'ok'; const src = script.textContent; mermaid.render('id', src);</script>`, page);
+ assert.equal(unrelated.status, 0);
+});
+
+test("reports Mermaid-mismatch verdict without transcription instruction for ordering mismatch", () => {
+ const charts = ['flowchart LR\nA --> B', 'flowchart TD\nC --> D'];
+ const source = charts.map(s => `<div class="mermaid">${s}</div>`).join('');
+ const dir = mkdtempSync(join(tmpdir(), "audit-order-verdict-"));
+ try {
+  const htmlPath = join(dir, "source.html");
+  const reorderedPage = join(dir, "reordered.tsx");
+  const missingPage = join(dir, "missing.tsx");
+  writeFileSync(htmlPath, source);
+  writeFileSync(reorderedPage, `const D1 = ${JSON.stringify(charts[1])}; const D0 = ${JSON.stringify(charts[0])}; <MermaidDiagram chart={D1} /><MermaidDiagram chart={D0} />`);
+  writeFileSync(missingPage, `const D0 = ${JSON.stringify(charts[0])}; <MermaidDiagram chart={D0} />`);
+  const reordered = spawnSync(process.execPath, [script, htmlPath, reorderedPage], { encoding: "utf8" });
+  assert.equal(reordered.status, 1);
+  assert.match(reordered.stdout, /判定: ❌ Mermaid ソース不一致/);
+  assert.doesNotMatch(reordered.stdout, /漏れを転写してから/);
+  const omitted = spawnSync(process.execPath, [script, htmlPath, missingPage], { encoding: "utf8" });
+  assert.equal(omitted.status, 1);
+  assert.match(omitted.stdout, /判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。/);
  } finally {
   rmSync(dir, { recursive: true, force: true });
  }

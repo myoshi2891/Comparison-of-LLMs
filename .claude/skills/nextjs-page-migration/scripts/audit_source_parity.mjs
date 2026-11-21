@@ -216,19 +216,19 @@ const TAG_ATTRIBUTE_RE = new RegExp(
 /** good トークンを variant 指定として扱う属性名（小文字）。 */
 const VARIANT_ATTRIBUTE_NAMES = new Set(["class", "classname", "variant", "data-variant", "data-testid"]);
 
-/** A `textContent` template-literal key after blankNonCodeText (body blanked, length kept). */
-const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60 {11}\x60`;
+/** A `textContent` or `text` template-literal key after blankNonCodeText (body blanked, length kept). */
+const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60(?: {11}| {4})\x60`;
 
 /**
- * Confirms that a write matched in masked source names textContent in the raw source.
+ * Confirms that a write matched in masked source names textContent or text in the raw source.
  * Masking keeps offsets, so a blanked template key is checked at the same position.
  * @param {RegExpMatchArray} write - A match against the masked source.
  * @param {string} rawSource - The unmasked source with identical offsets.
- * @return {boolean} False only for a blanked template key that is not `textContent`.
+ * @return {boolean} False only for a blanked template key that is not `textContent` or `text`.
  */
 function isTextContentKey(write, rawSource) {
   if (!write[0].includes("\x60")) return true;
-  return /\[\s*\x60textContent\x60\s*\]/.test(rawSource.slice(write.index, write.index + write[0].length));
+  return /\[\s*\x60(?:textContent|text)\x60\s*\]/.test(rawSource.slice(write.index, write.index + write[0].length));
 }
 
 /**
@@ -697,6 +697,7 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
           // including nested templates, while declining to evaluate its effects.
           resolution.interpolation = true;
           const expression = blankNonCodeText(src.slice(cursor + 2), preserveQuotedStrings, resolution, true);
+          (resolution.interpolations ??= []).push(expression);
           maskedBody += "${" + expression;
           cursor += 2 + expression.length;
           if (src[cursor] === "}") { maskedBody += "}"; cursor++; }
@@ -1167,9 +1168,13 @@ function initializerRunsBefore(executable, declarationIndex, initializedAt, decl
       active.add(fn);
       if (fn.name) {
         const references = executable.matchAll(new RegExp(`(?<![\\w$])${fn.name.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
+        let hasReference = false;
         for (const reference of references) {
-          if (reference.index !== fn.nameIndex && !followsInitialization(reference.index)) return false;
+          if (reference.index === fn.nameIndex) continue;
+          hasReference = true;
+          if (!followsInitialization(reference.index)) return false;
         }
+        if (!hasReference) return false;
       }
       active.delete(fn);
       checked.add(fn);
@@ -1347,13 +1352,35 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         });
       };
       // An element binding that the selected card is proven to contain, so `!name` is false.
+      const hostMayBeRemoved = (hostName, hostSelector, cardName, at) => {
+        if (foreignDomWrite === true ||
+          (foreignDomWrite === "deferred" && functions.some(fn => fn.body < at && at < fn.end))) return true;
+        if (/(?<!\bclassList)\.\s*(?:remove\s*\(\s*\)|(?:replaceWith|removeChild|replaceChild|replaceChildren)\s*\(|outerHTML\s*=(?!=))/.test(executable)) return true;
+        const cardEsc = cardName.replace(/\$/g, "\\$");
+        if (new RegExp(`(?<![\\w$.])(?:${cardEsc}|document\\s*\\.\\s*(?:body|documentElement))\\s*\\.\\s*(?:innerHTML|textContent|innerText)\\s*=(?!=)`).test(executable)) return true;
+        const wantedClass = hostSelector.startsWith(".") ? hostSelector.slice(1) : "";
+        if (wantedClass) {
+          for (const m of literalSource.matchAll(/\.\s*classList\s*\.\s*(?:remove|replace|toggle)\s*\(\s*(?:(['"])([^'"\n]*)\1)?/g)) {
+            if (!m[2] || m[2] === wantedClass) return true;
+          }
+          const hostEsc = hostName.replace(/\$/g, "\\$");
+          const selEsc = hostSelector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const hostAttrRe = new RegExp(
+            `(?<![\\w$.])(?:${hostEsc}|${cardEsc}|\\w+\\s*\\.\\s*querySelector\\s*\\(\\s*(['"])${selEsc}\\1\\s*\\))\\s*\\.\\s*(?:className\\s*=(?!=)|(?:setAttribute|removeAttribute)\\s*\\(\\s*(?!(['"])(?!class\\2)[^'"\\n]*\\2))`,
+            "i"
+          );
+          if (hostAttrRe.test(literalSource)) return true;
+        }
+        return false;
+      };
       const present = (name, at) => {
         if (!/^[A-Za-z_$][\w$]*$/.test(name)) return false;
         const value = bindingAt(name, at)?.value;
         const element = value && query.exec(value);
         if (!element || element[1] !== selected[1]) return false;
         if (element[3] === selected[3]) return true;
-        return selectedScript.cardHas?.(element[3]) === true;
+        if (selectedScript.cardHas?.(element[3]) !== true) return false;
+        return !hostMayBeRemoved(name, element[3], selected[1], at);
       };
       const loopPath = pathAt(open);
       const unwrapParens = expr => {
@@ -1376,6 +1403,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         const assignRe = new RegExp(`(?:\\b(?:var|let|const)\\s+|(?<![\\w$.]))${escaped}\\s*=\\s*(true|false)(?![\\w$])`, "g");
         let lastProven = null;
         for (const match of executable.matchAll(assignRe)) {
+          const afterAssign = executable.slice(match.index + match[0].length);
+          // Require a complete boolean literal initializer; reject compound expressions like `true && flag`.
+          if (!/^[ \t]*(?:;|,|\}|$|[\r\n](?!\s*(?:[([`.+\-*/%<>=!&|^?:,\\]|\b(?:in|instanceof)\b)))/.test(afterAssign)) continue;
           const namePos = match.index + match[0].indexOf(id);
           if (namePos >= open) continue;
           // Must not be overwritten after this assignment before or outside the loop.
@@ -1610,7 +1640,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // A deferred read may follow a write placed later in the source, so scan the whole scope.
     // Static computed access (script["textContent"]) writes the same property as dot access.
     // Template keys are blanked in literalSource; match their length and confirm them in rawSource.
-    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\.textContent|\[\s*(?:(['"])textContent\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
+    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\.(?:textContent|text)\b|\[\s*(?:(['"])(?:textContent|text)\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
     if ([...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
@@ -1859,15 +1889,22 @@ function materializePlainTextCards(src) {
     // Computed member calls (mermaid['render'](…), mermaid[name](…), mermaid?.render) are not
     // traced by rendererSuffix; keep them as an unresolved renderer instead of certifying the base.
     const computedRenderer = /\bmermaid\s*(?:\?\.\s*)?\[|\bmermaid\s*\?\.\s*render\b/.test(executable);
-    // Writes to any element's textContent (static or computed key). Which element is written
-    // cannot be resolved across scopes, so another scope's write may replace the payload.
-    const writesTextContent = /\.\s*textContent\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
-      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])textContent\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
+    // Writes to any element's textContent/text (static or computed key) or structural/attribute
+    // edits that can alter script selection or remove a queried host across scopes.
+    const writesTextContent = /\.\s*(?:textContent|text)\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
+      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])(?:textContent|text)\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
         .some(write => isTextContentKey(write, rawSource));
+    const editsDomStructure = /\.\s*(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text)|removeChild|replaceChild|insertBefore|prepend|append|appendChild|replaceChildren|setAttribute(?:NS|Node|NodeNS)?|removeAttribute(?:NS|Node)?|toggleAttribute)\s*\(|(?:outerHTML|innerHTML|innerText|type|className)\s*=(?!=)|classList\s*\.\s*(?:remove|replace|toggle)\s*\()/.test(executable);
+    const writesDom = writesTextContent || editsDomStructure;
     // Inline module scripts without async run after the document is parsed.
     const deferredModule = !classic && group.every(script => readHtmlAttribute(script.attributes, "async") === undefined);
-    return { literalSource, rawSource, selectors, computedRenderer, classic, deferredModule, segments, writesTextContent, hasSelection: selectionCalls.length > 0,
-      hasRenderer: /\bmermaid\s*\.\s*render\s*\(/.test(executable) || resolution.interpolation || maskedRenderer || computedRenderer };
+    // Inspect interpolation content so inert expressions (e.g. constant-only templates) do not
+    // classify unrelated scripts as renderers, while calls/mermaid references remain unresolved.
+    const executableInterpolation = (resolution.interpolations ?? []).some(expr =>
+      /\bmermaid\b|(?:[\w$)\]]|\?\.)\s*\(|[\w$)\]]\s*`|\bnew\b/.test(expr)
+    );
+    return { literalSource, rawSource, selectors, computedRenderer, classic, deferredModule, segments, writesDom, hasSelection: selectionCalls.length > 0,
+      hasRenderer: /\bmermaid\s*\.\s*render\s*\(/.test(executable) || executableInterpolation || maskedRenderer || computedRenderer };
   });
   const scopes = allScopes.filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -1898,9 +1935,19 @@ function materializePlainTextCards(src) {
     const payload = rawLines.map(l => l.slice(Number.isFinite(indent) ? indent : 0)).join("\n");
     if ((readHtmlAttribute(card.openingTag, "class") ?? "").split(/\s+/).includes("code-block")) {
       // Consume every opening tag as a unit before looking for empty code,
-      // so a span's quoted title cannot supply a fake <code></code> target.
+      // so a span's quoted title cannot supply a fake <code></code> target,
+      // and skip inert <template> contents just like script selection.
       const emptyCodeOrTag = new RegExp(String.raw`<code\b${htmlAttributesPattern}>\s*<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`, "gi");
-      const code = Array.from(ownedContent.matchAll(emptyCodeOrTag)).find(match => match[1] !== undefined);
+      let codeTemplateDepth = 0;
+      let code;
+      for (const match of ownedContent.matchAll(emptyCodeOrTag)) {
+        if (match[1] !== undefined) {
+          if (codeTemplateDepth === 0) { code = match; break; }
+          continue;
+        }
+        const template = /^<(\/?)template(?![\w:-])/i.exec(match[0]);
+        if (template) codeTemplateDepth = template[1] ? Math.max(0, codeTemplateDepth - 1) : codeTemplateDepth + 1;
+      }
       if (code) {
         // Code blocks are inventoried by <pre>. A card that shows its code without a
         // <pre> still displays a block, so wrap it once; cards already using <pre> are not wrapped.
@@ -1931,18 +1978,18 @@ function materializePlainTextCards(src) {
       const firstScript = queryableScripts[0];
       const firstPlain = queryableScripts
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
-      // Cross-scope textContent writes only invalidate DOM-backed (payload-reading) sources.
-      const foreignWriters = renderer ? allScopes.filter(scope => scope !== renderer && scope.writesTextContent) : [];
+      // Cross-scope DOM/text writes only invalidate DOM-backed (payload-reading) sources.
+      const foreignWriters = renderer ? allScopes.filter(scope => scope !== renderer && scope.writesDom) : [];
       // Deferred module writers cannot run before a classic renderer's synchronous read.
       const foreignWrite = foreignWriters.length === 0 ? false
         : renderer.classic && foreignWriters.every(scope => scope.deferredModule) ? "deferred" : true;
       const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
-          // The classic script that performs the read must come after this payload in document
-          // order; module scripts run after parsing. Unrelated earlier queries do not matter.
-          availableAt: at => !renderer.classic || renderer.segments.some(segment =>
+          // Non-async module scripts run after the document is parsed; classic scripts and
+          // async modules must follow this payload in document order to prove availability.
+          availableAt: at => renderer.deferredModule || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition > start + marker.index),
-          cardAvailableAt: at => !renderer.classic || renderer.segments.some(segment =>
+          cardAvailableAt: at => renderer.deferredModule || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition > start),
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1,
           // Whether the card contains an element for a single-class selector outside inert
@@ -2436,6 +2483,7 @@ if (process.exitCode === undefined) {
         const mermaidCountMismatch = result.counts.mermaidSources.source !== result.counts.mermaidSources.page;
         const unresolvedOnly = result.unresolvedMermaidSources.length > 0 && !otherMissing && !mermaidCountMismatch;
         const unresolvedWithCountMismatch = result.unresolvedMermaidSources.length > 0 && !otherMissing && mermaidCountMismatch;
+        const mermaidMismatchOnly = !otherMissing && result.unresolvedMermaidSources.length === 0 && !mermaidCountMismatch && !result.mermaidSourcesMatch;
         if (result.unresolvedMermaidSources.length > 0) {
           console.log(`\n❌ 描画スクリプトの静的解析が未解決（描画スクリプトの特定・図ソース・CLASSDEFS）: ${result.unresolvedMermaidSources.join(", ")}`);
           console.log("  図の内容を転写するのではなく、原本の描画スクリプト（mermaid.render の呼び出しと図ソースの読み取り）を確認すること。");
@@ -2458,7 +2506,9 @@ if (process.exitCode === undefined) {
               ? "\n判定: ❌ 描画スクリプトの静的解析が未解決 — Green コミット禁止。描画スクリプトを確認してから再実行すること。"
               : unresolvedWithCountMismatch
                 ? "\n判定: ❌ 描画スクリプトの静的解析が未解決かつ Mermaid 図の件数が不一致 — Green コミット禁止。描画スクリプトと図の過不足を確認してから再実行すること。"
-                : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
+                : mermaidMismatchOnly
+                  ? "\n判定: ❌ Mermaid ソース不一致 — Green コミット禁止。Mermaid 図の順序・内容を確認してから再実行すること。"
+                  : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
         );
         process.exitCode = result.blocking ? 1 : 0;
       }
