@@ -719,9 +719,11 @@ async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
         async with state.turn_gate:
             state.ensure_usable()  # 使用不可のセッションには送らない
             state.turn_done.clear()    # 古い完了通知で次のハートビートへ進まないよう、送信前に消す
-            # フレームは send_frame が送信枠を確保した後に取得する(待機中に古くならない)
-            await state.send_frame(camera.latest_jpeg)
             try:
+                # フレームは send_frame が送信枠を確保した後に取得する(待機中に古くならない)。
+                # 取得・送信が止まってもゲートを握り続けないよう上限を設ける。タイムアウト時は
+                # 送信済みか不明なため、下の例外処理でセッションを使用不可にする。
+                await asyncio.wait_for(state.send_frame(camera.latest_jpeg), timeout=turn_timeout)
                 # 送信が取り消し・失敗しても、プロンプトは受理された可能性があり完了を確認できない。
                 # そのため送信も try の中で行い、下の例外処理でセッションを使用不可にする。
                 await state.session.send_realtime_input(text=HEARTBEAT_TEXT)
@@ -734,7 +736,7 @@ async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
                 state.usable = False
                 if isinstance(exc, asyncio.CancelledError):
                     raise
-                raise RuntimeError("turn_complete not received; stop heartbeat and recover the session") from None
+                raise RuntimeError("frame send or turn_complete timed out; stop heartbeat and recover the session") from None
             except Exception:
                 # 送信の失敗でも未完了のターンが残り得るため、ゲートを離す前に使用不可にする。
                 state.usable = False

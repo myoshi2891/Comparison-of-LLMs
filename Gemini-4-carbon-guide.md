@@ -361,7 +361,7 @@ flowchart TD
     GRES --> GACC
     GRST --> GACC
     GDROP -- "いいえ" --> CONT{"finishReason は何か"}
-    CONT -- "CONTINUATION" --> NEXT["未確定バッファを確定し最新continuation_tokenを更新<br/>元の contents systemInstruction tools<br/>maxOutputTokens をそのまま再送し<br/>continuation_token を付ける"]
+    CONT -- "CONTINUATION" --> NEXT["未確定バッファを確定し最新continuation_tokenを更新<br/>元の contents systemInstruction tools<br/>generationConfig(maxOutputTokens と設定時の thinkingConfig を含む)を<br/>毎hopそのまま再送し 最新の continuation_token を付ける"]
     NEXT --> GACC
     CONT -- "STOP" --> GJOIN["蓄積した全セグメントのpartsを会話履歴に保持<br/>表示する回答は思考サマリーでないtextパートだけを結合"]
     GJOIN --> G["累積トークンと課金を監視"]
@@ -383,7 +383,7 @@ flowchart TD
     IACT -- "拒否" --> IREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくstoreで分ける"]
     IRUN --> ACC
     IREJ --> ACC
-    IST -- "requires_continuation store=True<br/>automatic_continuation=False の自前ループ" --> ISS["previous_interaction_id と<br/>continuation_token で継続を送る"]
+    IST -- "requires_continuation store=True<br/>automatic_continuation=False の自前ループ" --> ISS["previous_interaction_id と continuation_token に加え<br/>元のモデルと max_output_tokens を含む生成設定を<br/>毎hop再送して継続を送る"]
     IST -- "requires_continuation store=False<br/>automatic_continuation=False の自前ループ" --> ISL["元の入力と同じモデル ツール system instruction(設定時) 生成設定に<br/>continuation_token を付けて再送する"]
     ISS --> ACC
     ISL --> ACC
