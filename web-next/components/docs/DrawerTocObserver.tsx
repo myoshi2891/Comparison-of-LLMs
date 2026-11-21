@@ -32,7 +32,8 @@ export default function DrawerTocObserver({
     const links = Array.from(sidebar?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
     const guideContent = root?.querySelector<HTMLElement>(`.${styles.main}`) ?? null;
     let wasOpen = false;
-    const sync = (open: boolean) => {
+    const siteHamburger = document.querySelector<HTMLElement>("#common-header .ch-hamburger");
+    const sync = (open: boolean, restoreFocus = true) => {
       root?.classList.toggle(styles.open, open);
       menu?.setAttribute("aria-expanded", String(open));
       menu?.setAttribute("aria-label", open ? "目次を閉じる" : "目次を開く");
@@ -40,7 +41,8 @@ export default function DrawerTocObserver({
       if (sidebar) {
         const hidden = mobile && !open;
         // 背景クリック等でフォーカスが目次外へ移っていても、閉じたら開いた要素へ戻す。
-        if (hidden && (wasOpen || sidebar.contains(document.activeElement))) menu?.focus();
+        if (restoreFocus && hidden && (wasOpen || sidebar.contains(document.activeElement)))
+          menu?.focus();
         sidebar.inert = hidden;
       }
       // モバイルのドロワー表示中は、チェックリストを含む本文をキーボード操作の対象から外す。
@@ -50,6 +52,10 @@ export default function DrawerTocObserver({
       wasOpen = open;
     };
     const close = () => sync(false);
+    // サイトメニューを開くときはドロワーを閉じる。フォーカスはサイトのハンバーガーに残す。
+    const closeForSiteMenu = () => {
+      if (wasOpen) sync(false, false);
+    };
     const toggle = () => sync(!root?.classList.contains(styles.open));
     /** 開いたモバイルドロワーでは、Tab 移動をメニューと目次リンクの間で DOM 順に循環させる。 */
     const containFocus = (event: KeyboardEvent) => {
@@ -137,6 +143,7 @@ export default function DrawerTocObserver({
       };
     });
     menu?.addEventListener("click", toggle);
+    siteHamburger?.addEventListener("click", closeForSiteMenu);
     backdrop?.addEventListener("click", close);
     document.addEventListener("keydown", key);
     window.addEventListener("scroll", update, { passive: true });
@@ -148,6 +155,7 @@ export default function DrawerTocObserver({
     update();
     return () => {
       menu?.removeEventListener("click", toggle);
+      siteHamburger?.removeEventListener("click", closeForSiteMenu);
       backdrop?.removeEventListener("click", close);
       document.removeEventListener("keydown", key);
       window.removeEventListener("scroll", update);

@@ -304,6 +304,23 @@ it("背景クリックでフォーカスが背景へ移っていても開いた�
   expect(guideContent().inert).toBe(false);
   expect(document.activeElement).toBe(menu());
 });
+it("サイトメニューを開くとドロワーを閉じ、フォーカスはサイトのハンバーガーに残す", () => {
+  const header = document.createElement("div");
+  header.id = "common-header";
+  const hamburger = document.createElement("button");
+  hamburger.className = "ch-hamburger";
+  header.appendChild(hamburger);
+  document.body.appendChild(header);
+  render(<Harness />);
+  fireEvent.click(menu());
+  expect(guideContent().inert).toBe(true);
+  hamburger.focus();
+  fireEvent.click(hamburger);
+  expect(menu().getAttribute("aria-expanded")).toBe("false");
+  expect(guideContent().inert).toBe(false);
+  expect(document.activeElement).toBe(hamburger);
+  header.remove();
+});
 it("閉じた状態のEscapeでは本文のフォーカスを奪わない", () => {
   render(<Harness />);
   const box = document.querySelector("input[data-guide-check]") as HTMLInputElement;
@@ -323,7 +340,12 @@ it("メニューにフォーカスがある状態でdesktopへ広げると、非
   render(<Harness />);
   menu().focus();
   Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
+  let inertWhenFocused: boolean | undefined;
+  links()[0].addEventListener("focus", () => {
+    inertWhenFocused = sidebar().inert;
+  });
   fireEvent.resize(window);
+  expect(inertWhenFocused).toBe(false);
   expect(document.activeElement).toBe(links()[0]);
   expect(sidebar().inert).toBe(false);
 });
