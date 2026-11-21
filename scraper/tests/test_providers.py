@@ -690,6 +690,15 @@ class TestMoonshot:
             model = _find(moonshot.scrape(), "Kimi K3")
         assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
 
+    def test_quoted_attribute_with_greater_than_is_not_price_text(self):
+        html = (
+            '<dl><dt>Kimi K3</dt><dd data-note="a > $9.99">input $3.25</dd>'
+            '<dd title="x > $8.88">output $16.50</dd></dl>'
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
     def test_definition_list_cannot_pair_prices_from_different_records(self):
         html = "<dl><dt>Kimi K3</dt><dd>input $3.25</dd><dt>Other</dt><dd>output $16.50</dd></dl>"
         with patch("scraper.providers.moonshot.get_page_text", return_value=html):
