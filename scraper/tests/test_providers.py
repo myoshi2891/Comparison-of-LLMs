@@ -629,6 +629,21 @@ class TestMoonshot:
             model = _find(moonshot.scrape(), "Kimi K3")
         assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
 
+    @pytest.mark.parametrize(
+        "cache_hit_row",
+        [
+            # cache-hit 注記にインライン HTML が含まれる行は標準 input として扱わない。
+            "<p>Kimi K3 batch input $1.60 input <span>(cache hit)</span> $0.25 output $8.25</p>",
+            "<p>Kimi K3 batch input $1.60 input (<span>cache hit</span>) $0.25 output $8.25</p>",
+            "<p>Kimi K3 batch input $1.60 input (<span>cache</span>-<span>hit</span>) $0.25 output $8.25</p>",
+        ],
+    )
+    def test_cache_hit_row_with_inline_html_is_not_standard_input(self, cache_hit_row):
+        html = cache_hit_row + "<p>Kimi K3 input $3.25 output $16.50</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
     def test_std_input_ahead_fails_promptly_with_repeated_inline_tags(self):
         # 標準 input の先読みでインラインタグが連続しても、指数的に後戻りしない。
         import time
