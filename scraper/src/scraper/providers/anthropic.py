@@ -17,6 +17,8 @@ _CLAUDE_SONNET_5_5 = "Claude Sonnet 5.5"
 _CLAUDE_SONNET_5 = "Claude Sonnet 5"
 _CLAUDE_FABLE_5 = "Claude Fable 5"
 _CLAUDE_FABLE_51 = "Claude Fable 5.1"
+_CLAUDE_FABLE_52 = "Claude Fable 5.2"
+_CLAUDE_MYTHOS_52 = "Claude Mythos 5.2"
 _CLAUDE_OPUS_5_5 = "Claude Opus 5.5"
 _CLAUDE_OPUS_5 = "Claude Opus 5"
 _CLAUDE_OPUS_4_5 = "Claude Opus 4.5"
@@ -25,6 +27,9 @@ _CLAUDE_HAIKU_5_5 = "Claude Haiku 5.5"
 
 # フォールバック価格(ハードコード最終手段)
 _FALLBACKS: dict[str, tuple[float, float]] = {
+    # https://platform.claude.com/docs/en/about-claude/pricing (2026-11-13, Standard)
+    _CLAUDE_FABLE_52:           (8.00, 40.00),
+    _CLAUDE_MYTHOS_52:          (8.00, 40.00),
     _CLAUDE_FABLE_51:           (10.00, 50.00),
     _CLAUDE_FABLE_5:            (10.00, 50.00),
     _CLAUDE_OPUS_5_5:           (4.00,  20.00),
@@ -184,7 +189,9 @@ def _build_models_from_results(
 
 
 _TAG = {
-    _CLAUDE_FABLE_51:           "最上位 Flagship",
+    _CLAUDE_FABLE_52:           "最上位 Flagship",
+    _CLAUDE_MYTHOS_52:          "Restricted",
+    _CLAUDE_FABLE_51:           "最上位 前世代",
     _CLAUDE_FABLE_5:            "最上位 前世代",
     _CLAUDE_OPUS_5_5:           "最新 Opus",
     _CLAUDE_OPUS_5:             "Stable",
@@ -202,6 +209,8 @@ _TAG = {
     "Claude Opus 4.1 (Legacy)": "Retired",
 }
 _CLS = {
+    _CLAUDE_FABLE_52:           "tag-flag",
+    _CLAUDE_MYTHOS_52:          "tag-flag",
     _CLAUDE_FABLE_51:           "tag-flag",
     _CLAUDE_FABLE_5:            "tag-flag",
     _CLAUDE_OPUS_5_5:           "tag-flag",
@@ -220,6 +229,8 @@ _CLS = {
     "Claude Opus 4.1 (Legacy)": "tag-leg",
 }
 _SUB_JA = {
+    _CLAUDE_FABLE_52:           "最新最上位 / キャッシュ読取 $0.20 / Fast mode $16/$80",
+    _CLAUDE_MYTHOS_52:          "検証プログラム認証組織限定 / キャッシュ読取 $0.20 / Fast mode $16/$80",
     _CLAUDE_FABLE_51:           "最上位モデル / 1M ctx / キャッシュ読取0.025x / 新トークナイザ",
     _CLAUDE_FABLE_5:            "最上位 前世代 / 1M ctx / 長期エージェント / 新トークナイザ",
     _CLAUDE_OPUS_5_5:           "現行フラッグシップ / 1M ctx / キャッシュ読取0.05x / Fast mode対応",
@@ -238,6 +249,8 @@ _SUB_JA = {
     "Claude Opus 4.1 (Legacy)": "提供終了 (Bedrock/Google Cloud のみ継続)",
 }
 _SUB_EN = {
+    _CLAUDE_FABLE_52:           "Latest top-tier / cache reads $0.20 / Fast mode $16/$80",
+    _CLAUDE_MYTHOS_52:          "Verified organizations only / cache reads $0.20 / Fast mode $16/$80",
     _CLAUDE_FABLE_51:           "Most capable / 1M ctx / 0.025x cache reads / new tokenizer",
     _CLAUDE_FABLE_5:            "Prev top-tier / 1M ctx / long-horizon agent / new tokenizer",
     _CLAUDE_OPUS_5_5:           "Current flagship / 1M ctx / 0.05x cache reads / Fast mode",

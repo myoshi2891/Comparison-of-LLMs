@@ -1,5 +1,5 @@
 .PHONY: help \
-        build-images build-scraper build-web \
+        build-images build-scraper build-web refresh-web-deps \
         dev dev-detach \
         scrape scrape-no-scrape \
         build \
@@ -32,6 +32,12 @@ build-scraper: ## scraper イメージのみビルド
 
 build-web: ## web イメージのみビルド
 	$(COMPOSE) build web
+
+refresh-web-deps: ## web イメージを再ビルドし、既存 web-node-modules ボリュームの依存関係を更新
+	$(COMPOSE) build web
+	$(COMPOSE) run --rm --no-deps web bun install --frozen-lockfile
+	@# 稼働中の web は旧 node_modules を保持するため、起動中なら再作成して反映する
+	@if [ -n "$$($(COMPOSE) ps -q web)" ]; then $(COMPOSE) up -d --no-deps --force-recreate web; fi
 
 # ── 開発サーバー ───────────────────────────────────────────────────────────────
 dev: ## Next.js 開発サーバー起動 (http://localhost:3000)
@@ -72,7 +78,7 @@ audit: ## 依存関係の脆弱性監査 (bun audit)
 
 # ── SonarQube ──────────────────────────────────────────────────────────────────
 coverage: ## 両言語のカバレッジを生成（web-next/coverage/lcov.info + scraper/coverage.xml）
-	@# 注: devDependencies 追加直後は named volume が古い可能性あり → make build-web で更新
+	@# 注: 依存更新直後は既存 named volume が古い可能性あり → make refresh-web-deps（または make clean && make build-web）で更新
 	$(COMPOSE) run --rm --no-deps web bun run test:coverage
 	$(COMPOSE) run --rm scraper bash -c "cd scraper && uv run pytest --cov --cov-report=xml"
 

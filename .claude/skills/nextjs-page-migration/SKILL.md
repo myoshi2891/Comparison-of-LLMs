@@ -315,7 +315,7 @@ h2, h3 { scroll-margin-top: calc(var(--header-height, 60px) + 80px); }
 bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
   archive/html/<ベンダー>/<原本>.html \
   web-next/app/<provider>/<slug>/page.tsx
-echo "exit=$?"   # 0 でなければ移行漏れがある
+echo "exit=$?"   # 1 は内容の欠落・Mermaid 図ソース不一致（本文・順序・回数）・レンダラー解析の未解決、2 は引数・ファイル読み込みエラー（source-parity-audit.md §1）
 ```
 
 漏れが出た場合の分類と対処は `references/source-parity-audit.md` §1 / §5 に従う。

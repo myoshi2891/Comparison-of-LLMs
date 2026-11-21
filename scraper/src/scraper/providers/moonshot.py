@@ -19,6 +19,87 @@ _URL = "https://platform.moonshot.ai/docs/pricing"
 _KIMI_K2_7_CODE_HIGHSPEED = "Kimi K2.7 Code Highspeed"
 _KIMI_K2_7_CODE = "Kimi K2.7 Code"
 
+# レコード終端・次モデルを越えず、outputより前では入力価格の$を許可する。
+# 次モデル名は "<span>Kimi</span> <span>K2.6</span>" のようにインラインタグで区切られても境界とみなす。
+_RECORD_GAP = (
+    r"(?:(?!</(?:p|div|tr|li|dl|section|article|nav|h[1-6])\b|<dt\b"
+    r"|\bkimi(?:[-\s]|<[^<>]*>)*k)[\s\S]){0,80}?"
+)
+_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
+# cached と input の間には空白か、レコード境界ではないインラインタグ（span・br 等）を許す。
+_INLINE_TAG = r"<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
+_INLINE_SEP = rf"(?:\s|{_INLINE_TAG})+"
+_OPT_INLINE_SEP = rf"(?:\s|{_INLINE_TAG})*"
+# batch input と cache-hit の入力（"input (cache hit)" / "cache hit input"）も標準入力
+# ではないため、cached input と同様に価格ごと読み飛ばす。標準入力は cache-miss 側を選ぶ。
+# "cache-hit input" のように後ろへ続く input もラベルの一部として読む（価格探索の禁止語に当たらないように）。
+# input が続く場合は必ず含め、後戻りで input を手放して cache-hit 価格を標準入力にしない。
+_CACHED_LABEL = (
+    rf"(?:\b(?:cached|batch){_INLINE_SEP}input\b"
+    rf"|\bcache(?:{_OPT_INLINE_SEP}-{_OPT_INLINE_SEP}|{_INLINE_SEP})?hit\b"
+    rf"(?:{_INLINE_SEP}input\b|(?!{_INLINE_SEP}input\b)))"
+)
+# cached input の価格を探す間も output・標準 input のラベルは越えない
+# （output 価格や、cached が N/A のときの標準 input 価格を cached 扱いにしない）。
+# インラインタグは丸ごと読み飛ばし、属性値（class="input-price" 等）をラベルとみなさない。
+# 通常文字の分岐はインラインタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
+_CACHED_PRICE_GAP = _RECORD_GAP.replace(
+    r"[\s\S]", rf"(?:{_INLINE_TAG}|(?!{_INLINE_TAG})(?!\b(?:output|input)\b)[^$])"
+)
+# タグは丸ごと読み飛ばし、属性値（data-field="input" / data-label="output" 等）をラベルとみなさない。
+# 通常文字の分岐は完結したタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
+_ANY_TAG = r"<(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
+# cached inputの価格はひとまとまりで読み飛ばし、output以降へは進まない。
+# 価格のない cached（N/A 等）はラベルだけを読み飛ばす。価格が続く場合はこの分岐を使えず、
+# cached 価格を標準入力として拾わない。
+_INPUT_PRICE_GAP = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?!\boutput\b)(?:{_ANY_TAG}|{_CACHED_LABEL}(?:{_CACHED_PRICE_GAP}\$[\d.]+(?![\d.])"
+    rf"|(?!{_CACHED_PRICE_GAP}\$))|(?!{_ANY_TAG}|{_CACHED_LABEL})[^$])",
+)
+# 標準 output の価格は batch・cached など別フィールドのラベルを越えて探さない。
+_OUTPUT_LABEL = r"(?<!batch\s)(?<!cached\s)\boutput"
+# batch/cached output は区切りの空白・インラインタグの量によらず一塊で読み飛ばす。
+# 途中で止まれないため、直後の output を標準ラベルとして誤認しない。
+_OTHER_OUTPUT_LABEL = rf"\b(?:batch|cached){_INLINE_SEP}output\b"
+# batch/cached input のラベルを越えるのは、その後ろ（output より前）に標準 input
+# （"input" または "Cache Miss"）が続く場合だけ。続かなければそのレコードは batch/cached の行であり、
+# 後続の output は標準 output ではない。
+_STD_INPUT_LABEL = (
+    rf"(?:\binput\b(?!{_OPT_INLINE_SEP}\({_OPT_INLINE_SEP}"
+    rf"cache(?:{_OPT_INLINE_SEP}-{_OPT_INLINE_SEP}|{_INLINE_SEP})?hit{_OPT_INLINE_SEP}\))"
+    rf"|\bcache(?:-|{_INLINE_SEP})?miss\b)"
+)
+_STD_INPUT_AHEAD = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?!\boutput\b)(?:{_ANY_TAG}|{_CACHED_LABEL}|(?!{_ANY_TAG}|{_CACHED_LABEL})[\s\S])",
+)
+_PRE_STD_INPUT_GAP = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?!\boutput\b)(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}"
+    rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
+)
+# 標準 input の後でも batch input のラベルは、さらに後ろに標準 input が続く場合だけ越える。
+# 続かなければ batch の行であり、後続の output は標準 output ではない。
+_BATCH_INPUT_LABEL = rf"\bbatch{_INLINE_SEP}input\b"
+_POST_STD_INPUT_OUTPUT_GAP = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}"
+    rf"|(?!{_BATCH_INPUT_LABEL}){_CACHED_LABEL}"
+    rf"|{_BATCH_INPUT_LABEL}(?={_STD_INPUT_AHEAD}{_STD_INPUT_LABEL})"
+    rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
+)
+_OUTPUT_LABEL_GAP = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL}"
+    rf"(?={_STD_INPUT_AHEAD}{_STD_INPUT_LABEL})"
+    rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
+)
+_OUTPUT_PRICE_GAP = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?:{_ANY_TAG}|(?!{_ANY_TAG})(?!\b(?:batch|cached|cache|input)\b)[^$])",
+)
+
 # フォールバック価格（USD / 1M tokens、cache-miss 標準入力価格）
 _FALLBACKS: dict[str, tuple[float, float]] = {
     "Kimi K3":                   ( 3.00, 15.00),
@@ -78,12 +159,13 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     for name in _FALLBACKS:
         # ハードコード値ではなく fallback_map を見る（既存のスクレイプ成功値を尊重）
         fb_in, fb_out = fallback_map[name]
-        key = model_key_pattern(name, _FALLBACKS)
+        # K3.1 など未登録の派生版と別レコード・遠距離の価格を拾わない。
+        key = model_key_pattern(name, _FALLBACKS) + r"(?![.\d])"
         in_price = extract_price(html, [
-            rf"{key}[^$]*?\$([\d.]+)",
+            rf"{key}{_INPUT_PRICE_GAP}\$([\d.]+)",
         ])
         out_price = extract_price(html, [
-            rf"{key}[^$]*?output[^$]*?\$([\d.]+)",
+            rf"{key}(?:{_PRE_STD_INPUT_GAP}{_STD_INPUT_LABEL}{_POST_STD_INPUT_OUTPUT_GAP}|{_OUTPUT_LABEL_GAP}){_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
         ])
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)

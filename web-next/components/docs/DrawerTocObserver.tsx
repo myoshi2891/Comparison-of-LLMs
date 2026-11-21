@@ -99,8 +99,14 @@ export default function DrawerTocObserver({
       }
     };
     const resize = () => {
+      const menuHadFocus = document.activeElement === menu;
       sync(window.innerWidth <= 900 && Boolean(root?.classList.contains(styles.open)));
       update();
+      // デスクトップ幅ではメニューボタンが非表示になる。そこに残ったフォーカスを、現在のセクションの
+      // 目次リンク（無ければ先頭）へ移す。sync で inert を解除し、update で選択を確定した後に移す。
+      // メニュー以外（目次内など）にあるフォーカスは動かさない。
+      if (window.innerWidth > 900 && menuHadFocus)
+        (links.find((a) => a.getAttribute("aria-current") === "location") ?? links[0])?.focus();
     };
     // 原本と同じUL単位で集計し、進捗DOMもそのリスト直前の表示へ限定する。
     const disposeChecklists = Array.from(
@@ -153,6 +159,9 @@ export default function DrawerTocObserver({
         dispose();
       });
       root?.classList.remove(styles.open);
+      // 開状態のまま解除されても、メニューの aria 状態を閉に戻す。
+      menu?.setAttribute("aria-expanded", "false");
+      menu?.setAttribute("aria-label", "目次を開く");
       if (sidebar) sidebar.inert = false;
       if (guideContent) guideContent.inert = false;
     };

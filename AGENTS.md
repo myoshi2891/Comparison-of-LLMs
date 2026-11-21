@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Updated 2026-11-12
+Updated 2026-11-16
 
 AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツール向けの入り口。
 本リポジトリでは **CLAUDE.md が正本** とし、AGENTS.md はその委譲 pointer として機能する。
@@ -27,10 +27,10 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
   ```bash
   bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
     archive/{html|md}/<ベンダー>/<原本>.{html|md|markdown} web-next/app/<provider>/<slug>/page.tsx
-  echo "exit=$?"   # 0 以外は移行漏れ → コミット禁止
+  echo "exit=$?"   # 1 は比較不一致（欠落・Mermaid ソース不一致）またはレンダラー解析の未解決、2 は引数・ファイル読み込みエラー → 0 以外はコミット禁止
   ```
 
-  運用手順と偽陽性の分類は `.claude/skills/nextjs-page-migration/references/source-parity-audit.md` を参照。
+  終了コード別の解釈・対処と偽陽性の分類は `.claude/skills/nextjs-page-migration/references/source-parity-audit.md` を参照。
 - **R5（テスト強度の下限）**: 契約テストは件数のみ・存在のみ・部分一致のみの検証を禁止し、
   見出しは `toEqual([...EXPECTED_H2])` の順序込み完全一致で検証する（詳細は `.claude/rules/tdd-mandatory-cycle.md`）
 - **legacy/ 配下の編集禁止**（Phase A–F 中は凍結）
@@ -43,11 +43,11 @@ AGENTS.md は Codex / Cursor / Cline など AGENTS.md 規約を読む AI ツー�
 ## 検証コマンド
 
 ```bash
-(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 237 files / 2999 tests pass（2026-11-12 実測。追加レビュー対応後、全 Green ✅）
-(cd web-next && bun run typecheck)   # OK（2026-11-12 実測）
-(cd web-next && bun run build)       # OK（2026-11-12 実測。114静的ページ生成）
-(cd web-next && bun run lint)        # OK（649 files / 0 diagnostics。2026-11-12 実測）
-(cd scraper && uv run pytest)        # 122 tests pass（2026-11-12 実測）
+(cd web-next && NODE_OPTIONS=--no-experimental-webstorage bun run test -- --maxWorkers=1 --testTimeout=30000) # 240 files / 3077 tests pass（2026-11-16 レビュー7件修正後の実測）
+(cd web-next && bun run typecheck)   # OK（2026-11-16 実測）
+(cd web-next && bun run build)       # 最後の成功: 2026-11-14（115静的ページ生成）。11月15日はポート権限制限で失敗、制限外の再試行も同じ失敗
+(cd web-next && bun run lint)        # OK（657 files / 0 diagnostics。2026-11-16 実測）
+(cd scraper && uv run pytest)        # 145 tests＋39 subtests pass（2026-11-16 レビュー14件修正後の実測）
 ```
 
 ## 次セッション再開プロンプト
