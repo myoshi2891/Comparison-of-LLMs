@@ -726,7 +726,9 @@ async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
                 await asyncio.wait_for(state.send_frame(camera.latest_jpeg), timeout=turn_timeout)
                 # 送信が取り消し・失敗しても、プロンプトは受理された可能性があり完了を確認できない。
                 # そのため送信も try の中で行い、下の例外処理でセッションを使用不可にする。
-                await state.session.send_realtime_input(text=HEARTBEAT_TEXT)
+                await asyncio.wait_for(
+                    state.session.send_realtime_input(text=HEARTBEAT_TEXT), timeout=turn_timeout
+                )
                 # いま送ったターンが終わるまでゲートを離さない。受信側の終了やセッション切断で
                 # turn_complete が届かない場合に無期限に止まらないよう、待機に上限を設ける。
                 await asyncio.wait_for(state.turn_done.wait(), timeout=turn_timeout)
