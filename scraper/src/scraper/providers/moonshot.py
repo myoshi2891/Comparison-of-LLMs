@@ -44,13 +44,16 @@ _CACHED_LABEL = (
 _CACHED_PRICE_GAP = _RECORD_GAP.replace(
     r"[\s\S]", rf"(?:{_INLINE_TAG}|(?!{_INLINE_TAG})(?!\b(?:output|input)\b)[^$])"
 )
+# タグは丸ごと読み飛ばし、属性値（data-field="input" / data-label="output" 等）をラベルとみなさない。
+# 通常文字の分岐は完結したタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
+_ANY_TAG = r"<[^<>]*>"
 # cached inputの価格はひとまとまりで読み飛ばし、output以降へは進まない。
 # 価格のない cached（N/A 等）はラベルだけを読み飛ばす。価格が続く場合はこの分岐を使えず、
 # cached 価格を標準入力として拾わない。
 _INPUT_PRICE_GAP = _RECORD_GAP.replace(
     r"[\s\S]",
-    rf"(?!\boutput\b)(?:{_CACHED_LABEL}(?:{_CACHED_PRICE_GAP}\$[\d.]+(?![\d.])"
-    rf"|(?!{_CACHED_PRICE_GAP}\$))|(?!{_CACHED_LABEL})[^$])",
+    rf"(?!\boutput\b)(?:{_ANY_TAG}|{_CACHED_LABEL}(?:{_CACHED_PRICE_GAP}\$[\d.]+(?![\d.])"
+    rf"|(?!{_CACHED_PRICE_GAP}\$))|(?!{_ANY_TAG}|{_CACHED_LABEL})[^$])",
 )
 # 標準 output の価格は batch・cached など別フィールドのラベルを越えて探さない。
 _OUTPUT_LABEL = r"(?<!batch\s)(?<!cached\s)\boutput"
@@ -60,18 +63,29 @@ _OTHER_OUTPUT_LABEL = rf"\b(?:batch|cached){_INLINE_SEP}output\b"
 # batch/cached input のラベルを越えるのは、その後ろ（output より前）に標準 input
 # （"input" または "Cache Miss"）が続く場合だけ。続かなければそのレコードは batch/cached の行であり、
 # 後続の output は標準 output ではない。
-# タグは丸ごと読み飛ばし、属性値（data-field="input" 等）を標準 input のラベルとみなさない。
-# 通常文字の分岐は完結したタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
-_ANY_TAG = r"<[^<>]*>"
+_STD_INPUT_LABEL = (
+    rf"(?:\binput\b(?!\s*\(\s*cache(?:-|{_INLINE_SEP})?hit\s*\))"
+    rf"|\bcache(?:-|{_INLINE_SEP})?miss\b)"
+)
 _STD_INPUT_AHEAD = _RECORD_GAP.replace(
     r"[\s\S]",
     rf"(?!\boutput\b)(?:{_ANY_TAG}|{_CACHED_LABEL}|(?!{_ANY_TAG}|{_CACHED_LABEL})[\s\S])",
 )
+_PRE_STD_INPUT_GAP = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?!\boutput\b)(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}"
+    rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
+)
+_POST_STD_INPUT_OUTPUT_GAP = _RECORD_GAP.replace(
+    r"[\s\S]",
+    rf"(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL}"
+    rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
+)
 _OUTPUT_LABEL_GAP = _RECORD_GAP.replace(
     r"[\s\S]",
-    rf"(?:{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL}"
-    rf"(?={_STD_INPUT_AHEAD}(?:\binput\b|\bcache(?:-|{_INLINE_SEP})?miss\b))"
-    rf"|(?!{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
+    rf"(?:{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL}"
+    rf"(?={_STD_INPUT_AHEAD}{_STD_INPUT_LABEL})"
+    rf"|(?!{_ANY_TAG}|{_OTHER_OUTPUT_LABEL}|{_CACHED_LABEL})[\s\S])",
 )
 _OUTPUT_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"(?!\b(?:batch|cached|cache|input)\b)[^$]")
 
@@ -140,7 +154,7 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             rf"{key}{_INPUT_PRICE_GAP}\$([\d.]+)",
         ])
         out_price = extract_price(html, [
-            rf"{key}{_OUTPUT_LABEL_GAP}{_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
+            rf"{key}(?:{_PRE_STD_INPUT_GAP}{_STD_INPUT_LABEL}{_POST_STD_INPUT_OUTPUT_GAP}|{_OUTPUT_LABEL_GAP}){_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
         ])
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)

@@ -561,6 +561,11 @@ class TestMoonshot:
             '<p>Kimi K3 cache hit $0.25 cached input $0.2 batch input $1.6 input $3.25 output $16.50</p>',
             # cached 価格を囲むタグの属性値（input-price 等）で cached の価格探索を打ち切らない。
             '<p>Kimi K3 cached input <span class="input-price">$0.25</span> input $3.25 output $16.50</p>',
+            # 標準 input が cached input より先にあるレコードでも標準 input と output を正しく抽出する。
+            '<p>Kimi K3 input $3.25 cached input $0.25 output $16.50</p>',
+            # タグ属性内の output（data-label="output" 等）を標準 output ラベルと誤認しない。
+            '<p>Kimi K3 <span data-label="output">input</span> $3.25 output $16.50</p>',
+            '<p>Kimi K3 input $3.25 <span class="output-col">$9.99</span> output $16.50</p>',
         ):
             with patch("scraper.providers.moonshot.get_page_text", return_value=html):
                 model = _find(moonshot.scrape(), "Kimi K3")
