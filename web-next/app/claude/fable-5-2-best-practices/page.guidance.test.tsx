@@ -148,3 +148,42 @@ it("モバイルの目次ボタンは Tabler のスタイルシートがなく�
   ]);
   expect(button?.querySelector("i.ti-menu-2")?.getAttribute("aria-hidden")).toBe("true");
 });
+
+it("図3: low が品質基準を満たしたときは1段下げ確認を経由せず直接 FIX へ進む", () => {
+  const { labels, edges } = diagram("図3");
+  const fromF = edges.find((e) => e.from === "F" && e.label === "満たす");
+  expect(fromF?.to).toBe("G0");
+  expect(labels.get("G0")).toMatch(/low/);
+  expect(edges.some((e) => e.from === "G0" && e.label === "はい" && e.to === "FIX")).toBe(true);
+  expect(edges.some((e) => e.from === "G0" && e.label === "いいえ" && e.to === "G")).toBe(true);
+  expect(edges.some((e) => e.from === "G" && e.label === "いいえ" && e.to === "FIX")).toBe(true);
+});
+
+it("6.5節: omitted を最安と主張せず、ストリーミング表示と応答後確認を区別する", () => {
+  const { container } = render(<Page />);
+  const omittedRow = Array.from(container.querySelectorAll("tr")).find((r) =>
+    text(r).startsWith('"omitted"(既定)')
+  );
+  expect(text(omittedRow)).not.toMatch(/最安/);
+  expect(text(omittedRow)).toMatch(/同額課金/);
+  const s65 = container.querySelector("#s6-5");
+  const callout = s65?.parentElement?.querySelectorAll("[data-variant='info']");
+  const s65Callout = Array.from(callout ?? []).find((c) =>
+    text(c).includes("ベータ機能のヘッダ名")
+  );
+  expect(text(s65Callout)).toMatch(/ストリーミングで進捗イベントを受信/);
+  expect(text(s65Callout)).toMatch(/応答完了後の確認例/);
+});
+
+it("確度ラベル表とセットアップコマンド pre がキーボードフォーカス可能でアクセシブル名を持つ", () => {
+  const { container } = render(<Page />);
+  const confidenceWrap = container.querySelector("#s0 [role='region']");
+  expect(confidenceWrap?.getAttribute("tabindex")).toBe("0");
+  expect(confidenceWrap?.getAttribute("aria-label")).toBeTruthy();
+  const setupPre = Array.from(container.querySelectorAll("pre")).find((p) =>
+    text(p).includes("claude --model claude-fable-5-2")
+  );
+  expect(setupPre?.getAttribute("tabindex")).toBe("0");
+  expect(setupPre?.getAttribute("role")).toBe("region");
+  expect(setupPre?.getAttribute("aria-label")).toBeTruthy();
+});

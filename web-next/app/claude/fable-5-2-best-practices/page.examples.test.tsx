@@ -147,14 +147,20 @@ assert requests[1]["messages"] == requests[2]["messages"]
 it("agent_loopの各リクエストがトップレベルのキャッシュを有効にする", () => {
   python(
     `
-import ast, json, sys
+import ast, copy, json, sys
 code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
 fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
-requests = [n.args[0] for n in ast.walk(fn) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "call"]
+requests = []
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return {"stop_reason": "end_turn", "content": []}
+scope = {"call": call, "copy": copy}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+scope["agent_loop"]("task", [], None)
 assert len(requests) == 1
-body = requests[0]
-cache = next(v for k, v in zip(body.keys, body.values) if ast.literal_eval(k) == "cache_control")
-assert ast.literal_eval(cache) == {"type": "ephemeral"}
+assert requests[0]["cache_control"] == {"type": "ephemeral"}
+assert requests[0]["max_tokens"] == 32_000
+assert "container" not in requests[0]
 `,
     examples()
   );
@@ -439,28 +445,43 @@ assert executed == [1, 2, 3, 4]
   );
 });
 
-it("PostToolUseは引用符・改行・シェル構文を含むパスをそのままPrettierへ渡す", () => {
+it("PostToolUseはローカル導入済みのPrettierのみを呼び、未導入時は診断を出してスキップする", () => {
   const code = examples().find((c) => c.includes('"PostToolUse"'));
   python(
     `
 import json, os, pathlib, subprocess, sys, tempfile
 settings = json.loads(json.load(sys.stdin))
 command = settings["hooks"]["PostToolUse"][0]["hooks"][0]["command"]
+assert "npx" not in command
 with tempfile.TemporaryDirectory() as directory:
     root = pathlib.Path(directory)
-    stub = root / "npx"
+    # 1. ローカルの prettier が無い場合は失敗せず、診断を stderr に出してスキップする
+    npx_stub = root / "npx"
+    npx_stub.write_text('#!/bin/sh\\ntouch "$ROOT/NPX_CALLED"\\n')
+    npx_stub.chmod(0o755)
+    env = {**os.environ, "PATH": directory + os.pathsep + os.environ["PATH"], "ROOT": directory}
+    missing = subprocess.run(command, shell=True, input=json.dumps({"tool_input": {"file_path": "a.ts"}}),
+        text=True, cwd=directory, env=env, capture_output=True, check=True)
+    assert "prettier not installed locally" in missing.stderr
+    assert not (root / "NPX_CALLED").exists()
+
+    # 2. ./node_modules/.bin/prettier がある場合は引用符・改行・シェル構文を含むパスをそのまま渡す
+    bin_dir = root / "node_modules" / ".bin"
+    bin_dir.mkdir(parents=True)
+    stub = bin_dir / "prettier"
     stub.write_text('#!/bin/sh\\nprintf "%s\\\\0" "$@" >> "$CAPTURE"\\n')
     stub.chmod(0o755)
     capture = root / "args"
-    env = {**os.environ, "PATH": directory + os.pathsep + os.environ["PATH"], "CAPTURE": str(capture)}
+    env["CAPTURE"] = str(capture)
     paths = ["space name.ts", "quote'\\"$(touch PWNED).tsx", "line\\nbreak.js", "--option.ts", "ignored.py"]
     for path in paths:
         subprocess.run(command, shell=True, input=json.dumps({"tool_input": {"file_path": path}}),
             text=True, cwd=directory, env=env, check=True)
     actual = capture.read_bytes().split(b"\\0")[:-1]
-    expected = [arg.encode() for path in paths[:-1] for arg in ("prettier", "--write", "--", path)]
+    expected = [arg.encode() for path in paths[:-1] for arg in ("--write", "--", path)]
     assert actual == expected, actual
     assert not (root / "PWNED").exists()
+    assert not (root / "NPX_CALLED").exists()
 `,
     code
   );
@@ -605,6 +626,100 @@ except RuntimeError:
 else:
     raise AssertionError("mismatched approval must stay refused")
 assert calls == ["claude-opus-4-8"]
+`,
+    examples()
+  );
+});
+
+it("agent_loopはmax_tokens引数・model_context_window_exceeded・refusal非汚染・container ID引き継ぎを扱う", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+
+# 1. model_context_window_exceeded と refusal は messages と checkpoint を変更せずに返す
+for reason in ("max_tokens", "model_context_window_exceeded", "refusal"):
+    checkpoint = {"messages": [{"role": "user", "content": "saved"}]}
+    snapshot = copy.deepcopy(checkpoint)
+    seen = []
+    def call(body):
+        seen.append(copy.deepcopy(body))
+        return {"stop_reason": reason, "content": [{"type": "text", "text": "partial"}], "container": {"id": "ctr_bad"}}
+    scope = {"call": call, "copy": copy}
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+    res = scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=checkpoint, max_tokens=64_000)
+    assert res["stop_reason"] == reason
+    assert seen[0]["max_tokens"] == 64_000
+    assert checkpoint == snapshot, (reason, checkpoint)
+
+# 2. container ID を checkpoint に保存し、pause_turn・API失敗・ターン上限後の再開に含める
+checkpoint, requests = {}, []
+def call_container(body):
+    requests.append(copy.deepcopy(body))
+    if len(requests) == 1:
+        return {"stop_reason": "pause_turn", "content": [{"type": "thinking", "signature": "s1"}], "container": {"id": "ctr_123"}}
+    if len(requests) == 2:
+        raise RuntimeError("transient")
+    return {"stop_reason": "end_turn", "content": [{"type": "text", "text": "ok"}]}
+scope = {"call": call_container, "copy": copy}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+try:
+    scope["agent_loop"]("task", [], None, max_turns=3, checkpoint=checkpoint)
+except RuntimeError:
+    pass
+assert checkpoint["container_id"] == "ctr_123"
+assert "container" not in requests[0]
+assert requests[1]["container"] == "ctr_123"
+scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=checkpoint)
+assert requests[2]["container"] == "ctr_123"
+`,
+    examples()
+  );
+});
+
+it("usdは非課金確認済みのrefusalのみ0を返し、sweepはリクエスト失敗時も完了済み結果を保持する", () => {
+  python(
+    `
+import ast, json, sys, types
+code = next(c for c in json.load(sys.stdin) if "def sweep(" in c)
+nodes = [n for n in ast.parse(code).body if
+    isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id in ("API", "PRICE") for t in n.targets)
+    or isinstance(n, ast.FunctionDef) and n.name in ("usd", "run_once", "sweep")]
+calls = []
+class FakeResp:
+    def __init__(self, data):
+        self._data = data
+    def raise_for_status(self):
+        pass
+    def json(self):
+        return self._data
+def fake_post(url, headers=None, json=None, timeout=None):
+    calls.append(json["output_config"]["effort"])
+    if len(calls) == 1:
+        return FakeResp({"stop_reason": "end_turn", "content": [{"type": "text", "text": "ok"}],
+            "usage": {"input_tokens": 100000, "output_tokens": 10000}})
+    if len(calls) == 2:
+        raise RuntimeError("network timeout")
+    if len(calls) == 3:
+        return FakeResp({"stop_reason": "refusal", "stop_details": {"category": "cyber", "billed": False},
+            "content": [], "usage": {"input_tokens": 100000, "output_tokens": 10000}})
+    return FakeResp({"stop_reason": "refusal", "stop_details": {"category": "cyber"},
+        "content": [], "usage": {"input_tokens": 100000, "output_tokens": 10000}})
+scope = {"HEADERS": {}, "time": __import__("time"), "httpx": types.SimpleNamespace(post=fake_post)}
+exec(compile(ast.Module(body=nodes, type_ignores=[]), "example", "exec"), scope)
+
+usage = {"input_tokens": 100000, "output_tokens": 10000}
+assert scope["usd"](usage, {"stop_reason": "refusal", "stop_details": {"billed": False}}) == 0.0
+assert scope["usd"](usage, {"stop_reason": "refusal"}) > 0
+assert scope["usd"](usage, {"stop_reason": "end_turn", "stop_details": {"billed": False}}) > 0
+
+rows = scope["sweep"]([{"id": "t1", "prompt": "p", "check": lambda t: t == "ok"}], levels=("low", "medium", "high", "xhigh"))
+assert len(rows) == 4
+assert rows[0]["status"] == "ok" and rows[0]["passed"] is True and rows[0]["usd"] > 0
+assert rows[1]["status"] == "request_error" and rows[1]["passed"] is None and "RuntimeError" in rows[1]["error"]
+assert rows[2]["status"] == "ok" and rows[2]["usd"] == 0.0 and rows[2]["passed"] is False
+assert rows[3]["status"] == "ok" and rows[3]["usd"] > 0 and rows[3]["passed"] is False
 `,
     examples()
   );
