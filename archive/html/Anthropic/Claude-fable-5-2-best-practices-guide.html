@@ -1402,12 +1402,14 @@
                   Q5 -- "いいえ" --> EVAL{"Fable の構成で　evals が基準を満たす?"}
                   HYBRID --> EVAL
                   EVAL -- "はい" --> DONE
-                  EVAL -- "いいえ" --> RETRY["effort・プロンプト・分担を見直して　選定からやり直す"]
-                  RETRY --> Q5
+                  EVAL -- "いいえ" --> RETRY{"effort・プロンプト・分担の見直しで　改善余地がある?"}
+                  RETRY -- "分担を再調整" --> Q5
+                  RETRY -- "モデル選定からやり直す" --> Q1
+                  RETRY -- "見込みなし" --> STOP["導入を見送り・人間へエスカレーション"]
 
                   class FABLE,HYBRID hub
                   class DONE,HAIKU,OPUS done
-                  class RETRY box
+                  class RETRY,STOP box
             </script>
           </div>
           <h3 id="s3-3">3.3 タスク別の使い分け表</h3>
@@ -2006,7 +2008,13 @@
                               continue
                           res["task"] = task["id"]
                           # 正常終了(end_turn)し、自社の合否判定関数が受理した応答だけを合格にする
-                          res["passed"] = res["stop_reason"] == "end_turn" and task["check"](res["text"])
+                          try:
+                              res["passed"] = res["stop_reason"] == "end_turn" and bool(task["check"](res["text"]))
+                          except Exception as error:
+                              # 採点関数の例外は応答計測(時間・費用等)を保持したまま採点失敗として記録し、次の effort へ進む
+                              res["status"] = "check_error"
+                              res["error"] = f"{type(error).__name__}: {error}"
+                              res["passed"] = None
                           rows.append(res)
                   return rows
             </script>
@@ -2607,12 +2615,12 @@
                     Opus 5.5 / Sonnet 5.5 / Haiku 5.5 / Fable 5.1 / Mythos 5.1 / Opus 5 などから
                     Fable 5.2 へ移る
                   </td>
-                  <td>過去の推論を引き継げる(Claude API と Google Cloud の Google 管理版)</td>
+                  <td>過去の推論を引き継げる(Claude API と Google Cloud の Google 管理版のみ)</td>
                   <td>公式 (<a class="src-link" href="#S3">S3</a>)</td>
                 </tr>
                 <tr>
                   <td>Fable 5.2 と Mythos 5.2 の間を移る</td>
-                  <td>互いの思考ブロックを読める</td>
+                  <td>互いの思考ブロックを読める(Claude API と Google Cloud の Google 管理版のみ)</td>
                   <td>公式 (<a class="src-link" href="#S3">S3</a>)</td>
                 </tr>
                 <tr>
@@ -4015,6 +4023,11 @@
                   <td>上記を再実行した分</td>
                   <td>切替でキャッシュが失われる場合がある</td>
                 </tr>
+                <tr>
+                  <td>従量課金ツール費</td>
+                  <td>実行回数 × ツール単価(Web 検索など)</td>
+                  <td>トークン費とは別に加算</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -4031,6 +4044,7 @@
 
 
               def estimate_usd(usage: dict, mode: str = "standard") -> float:
+                  """usage からトークン費用(USD)のみを見積もる。Web 検索等の従量課金ツール費は別途加算する。"""
                   r = RATES[mode]
                   cache = usage.get("cache_creation") or {}
                   # キャッシュ件数は null で返ることがあるため、0 として扱う
@@ -4189,7 +4203,8 @@
               >と<strong>最大ターン数</strong>を決め、ハーネスで強制する。
             </li>
             <li>
-              実行ごとに「入力・出力・キャッシュ・サブエージェント数・所要時間・差分行数」を記録する。
+              実行ごとに「入力・出力・キャッシュ・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(トークン費用の見積もり関数
+              <code>estimate_usd</code> とは別にツール費も上限へ合算する)。
             </li>
             <li>
               週次で<strong>タスク種別ごとの平均コスト</strong>を見て、effort と構成を見直す。

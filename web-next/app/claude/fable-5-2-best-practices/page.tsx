@@ -23,7 +23,7 @@ const LIGHT_THEME = {
 const DIAGRAM_0 =
   'flowchart LR\n    BASE["同一の基盤モデル"]\n    FABLE["Claude Fable 5.2　全ユーザーが利用可能　cyber・bio の安全装置あり"]\n    MYTHOS["Claude Mythos 5.2　認証済み組織のみ　cyber・bio の制限を緩和"]\n    CVP["Cyber Verification Program"]\n    LSVP["Life Sciences Verification Program"]\n    SEC["Claude Security　Enterprise プラン"]\n\n    BASE --> FABLE\n    BASE --> MYTHOS\n    CVP --> MYTHOS\n    LSVP --> MYTHOS\n    MYTHOS --> SEC\n\n    class BASE,FABLE hub\n    class MYTHOS box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_1 =
-  'flowchart TD\n    START["新しいタスク"] --> Q1{"仕様は明確で　1〜数ファイルで完結する?"}\n    Q1 -- "はい" --> Q2{"大量・低遅延・低コストが最優先?"}\n    Q2 -- "はい" --> HAIKU["Haiku 5.5・Sonnet 5.5"]\n    Q2 -- "いいえ" --> OPUS["Opus 5.5 を medium〜high で試す"]\n    Q1 -- "いいえ" --> Q3{"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?"}\n    Q3 -- "はい" --> FABLE["Fable 5.2 を high で試す"]\n    Q3 -- "いいえ" --> OPUS\n    OPUS --> Q4{"Opus の高 effort でも　evals が基準未達?"}\n    Q4 -- "はい" --> FABLE\n    Q4 -- "いいえ" --> DONE["そのまま運用"]\n    FABLE --> Q5{"一部だけが難所?"}\n    Q5 -- "はい" --> HYBRID["小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行"]\n    Q5 -- "いいえ" --> EVAL{"Fable の構成で　evals が基準を満たす?"}\n    HYBRID --> EVAL\n    EVAL -- "はい" --> DONE\n    EVAL -- "いいえ" --> RETRY["effort・プロンプト・分担を見直して　選定からやり直す"]\n    RETRY --> Q5\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\n    class RETRY box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
+  'flowchart TD\n    START["新しいタスク"] --> Q1{"仕様は明確で　1〜数ファイルで完結する?"}\n    Q1 -- "はい" --> Q2{"大量・低遅延・低コストが最優先?"}\n    Q2 -- "はい" --> HAIKU["Haiku 5.5・Sonnet 5.5"]\n    Q2 -- "いいえ" --> OPUS["Opus 5.5 を medium〜high で試す"]\n    Q1 -- "いいえ" --> Q3{"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?"}\n    Q3 -- "はい" --> FABLE["Fable 5.2 を high で試す"]\n    Q3 -- "いいえ" --> OPUS\n    OPUS --> Q4{"Opus の高 effort でも　evals が基準未達?"}\n    Q4 -- "はい" --> FABLE\n    Q4 -- "いいえ" --> DONE["そのまま運用"]\n    FABLE --> Q5{"一部だけが難所?"}\n    Q5 -- "はい" --> HYBRID["小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行"]\n    Q5 -- "いいえ" --> EVAL{"Fable の構成で　evals が基準を満たす?"}\n    HYBRID --> EVAL\n    EVAL -- "はい" --> DONE\n    EVAL -- "いいえ" --> RETRY{"effort・プロンプト・分担の見直しで　改善余地がある?"}\n    RETRY -- "分担を再調整" --> Q5\n    RETRY -- "モデル選定からやり直す" --> Q1\n    RETRY -- "見込みなし" --> STOP["導入を見送り・人間へエスカレーション"]\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\n    class RETRY,STOP box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_2 =
   'flowchart TD\n    A["タスクを分類する"] --> B{"仕様が明確で　短時間で終わる?"}\n    B -- "はい" --> LOW["low から試す"]\n    B -- "いいえ" --> C{"対話的に人が待っている?"}\n    C -- "はい" --> MED["medium から試す"]\n    C -- "いいえ" --> D{"長時間・無人・　難度が高い?"}\n    D -- "はい" --> HIGH["high を起点にする"]\n    D -- "いいえ" --> MED\n    LOW --> E["自社 evals で評価する"]\n    MED --> E\n    HIGH --> E\n    E --> F{"品質は基準を満たすか?"}\n    F -- "満たす" --> G0{"すでに low か?"}\n    G0 -- "はい" --> FIX["その effort で確定"]\n    G0 -- "いいえ" --> G{"1段下げても満たすか?"}\n    G -- "はい" --> DOWN["1段下げて再評価"]\n    DOWN --> E\n    G -- "いいえ" --> FIX\n    F -- "満たさない" --> H{"high 未満?"}\n    H -- "はい" --> UP["1段上げて再評価"]\n    UP --> E\n    H -- "いいえ" --> I{"プロンプトや　ハーネスに原因がない?"}\n    I -- "原因あり" --> PROMPT["8章の9パターンを確認"]\n    I -- "原因なし" --> XH["xhigh を試し　効果とコストを測定"]\n\n    class LOW,MED,HIGH,XH hub\n    class FIX done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_3 =
@@ -2610,18 +2610,73 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"            res["}
+                    {"            "}
+                    <span className="hljs-keyword">{"try"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                res["}
                     <span className="hljs-string">{'"passed"'}</span>
                     {"] = res["}
                     <span className="hljs-string">{'"stop_reason"'}</span>
                     {"] == "}
                     <span className="hljs-string">{'"end_turn"'}</span>{" "}
-                    <span className="hljs-keyword">{"and"}</span>
-                    {" task["}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"bool"}</span>
+                    {"(task["}
                     <span className="hljs-string">{'"check"'}</span>
                     {"](res["}
                     <span className="hljs-string">{'"text"'}</span>
-                    {"])"}
+                    {"]))"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"except"}</span>
+                    {" Exception "}
+                    <span className="hljs-keyword">{"as"}</span>
+                    {" error:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-comment">
+                      {
+                        "# 採点関数の例外は応答計測(時間・費用等)を保持したまま採点失敗として記録し、次の effort へ進む"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                res["}
+                    <span className="hljs-string">{'"status"'}</span>
+                    {"] = "}
+                    <span className="hljs-string">{'"check_error"'}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                res["}
+                    <span className="hljs-string">{'"error"'}</span>
+                    {"] = "}
+                    <span className="hljs-string">
+                      {'f"'}
+                      <span className="hljs-subst">
+                        {"{"}
+                        <span className="hljs-built_in">{"type"}</span>
+                        {"(error).__name__}"}
+                      </span>
+                      {": "}
+                      <span className="hljs-subst">{"{error}"}</span>
+                      {'"'}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                res["}
+                    <span className="hljs-string">{'"passed"'}</span>
+                    {"] = "}
+                    <span className="hljs-literal">{"None"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>{"            rows.append(res)"}</span>
@@ -4563,7 +4618,9 @@ export default function Page() {
                         " Opus 5.5 / Sonnet 5.5 / Haiku 5.5 / Fable 5.1 / Mythos 5.1 / Opus 5 などから Fable 5.2 へ移る "
                       }
                     </td>
-                    <td>{"過去の推論を引き継げる(Claude API と Google Cloud の Google 管理版)"}</td>
+                    <td>
+                      {"過去の推論を引き継げる(Claude API と Google Cloud の Google 管理版のみ)"}
+                    </td>
                     <td>
                       {"公式 ("}
                       <a className={styles["src-link"]} href="#S3">
@@ -4574,7 +4631,11 @@ export default function Page() {
                   </tr>
                   <tr>
                     <td>{"Fable 5.2 と Mythos 5.2 の間を移る"}</td>
-                    <td>{"互いの思考ブロックを読める"}</td>
+                    <td>
+                      {
+                        "互いの思考ブロックを読める(Claude API と Google Cloud の Google 管理版のみ)"
+                      }
+                    </td>
                     <td>
                       {"公式 ("}
                       <a className={styles["src-link"]} href="#S3">
@@ -7149,6 +7210,11 @@ export default function Page() {
                     <td>{"上記を再実行した分"}</td>
                     <td>{"切替でキャッシュが失われる場合がある"}</td>
                   </tr>
+                  <tr>
+                    <td>{"従量課金ツール費"}</td>
+                    <td>{"実行回数 × ツール単価(Web 検索など)"}</td>
+                    <td>{"トークン費とは別に加算"}</td>
+                  </tr>
                 </tbody>
               </table>{" "}
             </div>{" "}
@@ -7274,6 +7340,15 @@ export default function Page() {
                     {") -> "}
                     <span className="hljs-built_in">{"float"}</span>
                     {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-string">
+                      {
+                        '"""usage からトークン費用(USD)のみを見積もる。Web 検索等の従量課金ツール費は別途加算する。"""'
+                      }
+                    </span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>{"    r = RATES[mode]"}</span>
@@ -7717,8 +7792,10 @@ export default function Page() {
               </li>{" "}
               <li>
                 {
-                  " 実行ごとに「入力・出力・キャッシュ・サブエージェント数・所要時間・差分行数」を記録する。 "
+                  " 実行ごとに「入力・出力・キャッシュ・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(トークン費用の見積もり関数 "
                 }
+                <code>{"estimate_usd"}</code>
+                {" とは別にツール費も上限へ合算する)。 "}
               </li>{" "}
               <li>
                 {" 週次で"}

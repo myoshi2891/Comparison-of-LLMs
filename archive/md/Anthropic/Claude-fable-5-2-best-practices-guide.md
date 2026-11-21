@@ -183,8 +183,10 @@ flowchart TD
     Q5 -- "いいえ" --> EVAL{"Fable の構成で<br/>evals が基準を満たす?"}
     HYBRID --> EVAL
     EVAL -- "はい" --> DONE
-    EVAL -- "いいえ" --> RETRY["effort・プロンプト・分担を見直して<br/>選定からやり直す"]
-    RETRY --> Q5
+    EVAL -- "いいえ" --> RETRY{"effort・プロンプト・分担の見直しで<br/>改善余地がある?"}
+    RETRY -- "分担を再調整" --> Q5
+    RETRY -- "モデル選定からやり直す" --> Q1
+    RETRY -- "見込みなし" --> STOP["導入を見送り・人間へエスカレーション"]
 
     classDef main fill:#e8eefc,stroke:#3b5bdb,color:#1b1f3b
     classDef ok fill:#e6f4ea,stroke:#2b8a3e,color:#0b2e13
@@ -409,7 +411,13 @@ def sweep(tasks: list[dict], levels=("low", "medium", "high", "xhigh")) -> list[
                 continue
             res["task"] = task["id"]
             # 正常終了(end_turn)し、自社の合否判定関数が受理した応答だけを合格にする
-            res["passed"] = res["stop_reason"] == "end_turn" and task["check"](res["text"])
+            try:
+                res["passed"] = res["stop_reason"] == "end_turn" and bool(task["check"](res["text"]))
+            except Exception as error:
+                # 採点関数の例外は応答計測(時間・費用等)を保持したまま採点失敗として記録し、次の effort へ進む
+                res["status"] = "check_error"
+                res["error"] = f"{type(error).__name__}: {error}"
+                res["passed"] = None
             rows.append(res)
     return rows
 ```
@@ -695,8 +703,8 @@ flowchart TD
 
 | 状況 | 結果 | 確度 |
 | --- | --- | --- |
-| Opus 5.5 / Sonnet 5.5 / Haiku 5.5 / Fable 5.1 / Mythos 5.1 / Opus 5 などから Fable 5.2 へ移る | 過去の推論を引き継げる(Claude API と Google Cloud の Google 管理版) | 公式 (S3) |
-| Fable 5.2 と Mythos 5.2 の間を移る | 互いの思考ブロックを読める | 公式 (S3) |
+| Opus 5.5 / Sonnet 5.5 / Haiku 5.5 / Fable 5.1 / Mythos 5.1 / Opus 5 などから Fable 5.2 へ移る | 過去の推論を引き継げる(Claude API と Google Cloud の Google 管理版のみ) | 公式 (S3) |
+| Fable 5.2 と Mythos 5.2 の間を移る | 互いの思考ブロックを読める(Claude API と Google Cloud の Google 管理版のみ) | 公式 (S3) |
 | **Fable 5.2 から他のモデルへ移る** | 移った先のターンでは、Fable 5.2 の推論を失う(Opus 5.5、Fable 5.1、フォールバック先の Opus 4.8 / Opus 5 を含む) | 公式 (S3) |
 | 別のアカウントが Fable 5.2 の思考ブロックを送る | ブロックは破棄され、リクエスト自体は成功する(破棄分は課金されない) | 公式 (S3) |
 
@@ -1179,6 +1187,7 @@ Claude Managed Agents で advisor を設定している場合、advisor のモ�
 | 出力(**思考 + 本文**) | トークン数 × $40 / 百万 | 思考トークンも出力として課金される |
 | サブエージェント | 上記を各エージェントについて合算 | 費用の大きな割合を占めることがある |
 | 再試行・フォールバック | 上記を再実行した分 | 切替でキャッシュが失われる場合がある |
+| 従量課金ツール費 | 実行回数 × ツール単価(Web 検索など) | トークン費とは別に加算 |
 
 ```python
 RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inference_geo="us" は全項目 1.1 倍)
@@ -1190,6 +1199,7 @@ RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inf
 
 
 def estimate_usd(usage: dict, mode: str = "standard") -> float:
+    """usage からトークン費用(USD)のみを見積もる。Web 検索等の従量課金ツール費は別途加算する。"""
     r = RATES[mode]
     cache = usage.get("cache_creation") or {}
     # キャッシュ件数は null で返ることがあるため、0 として扱う
@@ -1243,7 +1253,7 @@ print(round(estimate_usd(example, "fast"), 2))  # 0.80 + 0.06 + 2.40 = 3.26
 ### 11.4 予算ガードの考え方 [私見]
 
 1. **1タスクあたりの上限金額**と**最大ターン数**を決め、ハーネスで強制する。
-2. 実行ごとに「入力・出力・キャッシュ・サブエージェント数・所要時間・差分行数」を記録する。
+2. 実行ごとに「入力・出力・キャッシュ・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(トークン費用の見積もり関数 `estimate_usd` とは別にツール費も上限へ合算する)。
 3. 週次で**タスク種別ごとの平均コスト**を見て、effort と構成を見直す。
 4. 上限に達したら、**途中経過を保存して人に引き継ぐ**(破棄しない)。
 

@@ -139,14 +139,14 @@ it("モバイルの目次ボタンは Tabler のスタイルシートがなく�
       });
   });
   expect(found.content).toBe('"\\2630"');
-  const { container } = render(<Page />);
-  const button = container.querySelector("#fable52-menu");
+  const { getByRole } = render(<Page />);
+  const button = getByRole("button", { name: "目次を開く" });
   // アクセシブルな名前と開閉状態は従来どおり。
-  expect([button?.getAttribute("aria-label"), button?.getAttribute("aria-expanded")]).toEqual([
+  expect([button.getAttribute("aria-label"), button.getAttribute("aria-expanded")]).toEqual([
     "目次を開く",
     "false",
   ]);
-  expect(button?.querySelector("i.ti-menu-2")?.getAttribute("aria-hidden")).toBe("true");
+  expect(button.querySelector("i.ti-menu-2")?.getAttribute("aria-hidden")).toBe("true");
 });
 
 it("図3: low が品質基準を満たしたときは1段下げ確認を経由せず直接 FIX へ進む", () => {

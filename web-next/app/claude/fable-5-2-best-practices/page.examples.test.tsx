@@ -720,6 +720,20 @@ assert rows[0]["status"] == "ok" and rows[0]["passed"] is True and rows[0]["usd"
 assert rows[1]["status"] == "request_error" and rows[1]["passed"] is None and "RuntimeError" in rows[1]["error"]
 assert rows[2]["status"] == "ok" and rows[2]["usd"] == 0.0 and rows[2]["passed"] is False
 assert rows[3]["status"] == "ok" and rows[3]["usd"] > 0 and rows[3]["passed"] is False
+
+# 採点関数 task["check"] が例外を送出しても、応答計測(時間・費用等)を保持し request_error とは区別して次へ進む
+calls.clear()
+def flaky_check(text):
+    if text == "ok":
+        raise ValueError("grader crashed")
+    return True
+check_rows = scope["sweep"]([{"id": "t2", "prompt": "p", "check": flaky_check}], levels=("low", "medium", "high", "xhigh"))
+assert len(check_rows) == 4
+assert check_rows[0]["status"] == "check_error"
+assert check_rows[0]["passed"] is None
+assert check_rows[0]["usd"] > 0 and check_rows[0]["sec"] >= 0
+assert "ValueError: grader crashed" in check_rows[0]["error"]
+assert check_rows[1]["status"] == "request_error"
 `,
     examples()
   );

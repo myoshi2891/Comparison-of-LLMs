@@ -2748,7 +2748,7 @@
                   ],
                   [
                     "diagram",
-                    "flowchart TD\n    START[\"新しいタスク\"] --> Q1{\"仕様は明確で　1〜数ファイルで完結する?\"}\n    Q1 -- \"はい\" --> Q2{\"大量・低遅延・低コストが最優先?\"}\n    Q2 -- \"はい\" --> HAIKU[\"Haiku 5.5・Sonnet 5.5\"]\n    Q2 -- \"いいえ\" --> OPUS[\"Opus 5.5 を medium〜high で試す\"]\n    Q1 -- \"いいえ\" --> Q3{\"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?\"}\n    Q3 -- \"はい\" --> FABLE[\"Fable 5.2 を high で試す\"]\n    Q3 -- \"いいえ\" --> OPUS\n    OPUS --> Q4{\"Opus の高 effort でも　evals が基準未達?\"}\n    Q4 -- \"はい\" --> FABLE\n    Q4 -- \"いいえ\" --> DONE[\"そのまま運用\"]\n    FABLE --> Q5{\"一部だけが難所?\"}\n    Q5 -- \"はい\" --> HYBRID[\"小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行\"]\n    Q5 -- \"いいえ\" --> EVAL{\"Fable の構成で　evals が基準を満たす?\"}\n    HYBRID --> EVAL\n    EVAL -- \"はい\" --> DONE\n    EVAL -- \"いいえ\" --> RETRY[\"effort・プロンプト・分担を見直して　選定からやり直す\"]\n    RETRY --> Q5\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\n    class RETRY box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
+                    "flowchart TD\n    START[\"新しいタスク\"] --> Q1{\"仕様は明確で　1〜数ファイルで完結する?\"}\n    Q1 -- \"はい\" --> Q2{\"大量・低遅延・低コストが最優先?\"}\n    Q2 -- \"はい\" --> HAIKU[\"Haiku 5.5・Sonnet 5.5\"]\n    Q2 -- \"いいえ\" --> OPUS[\"Opus 5.5 を medium〜high で試す\"]\n    Q1 -- \"いいえ\" --> Q3{\"曖昧な要件の探索・全体設計・　大規模移行・数時間の無人実行?\"}\n    Q3 -- \"はい\" --> FABLE[\"Fable 5.2 を high で試す\"]\n    Q3 -- \"いいえ\" --> OPUS\n    OPUS --> Q4{\"Opus の高 effort でも　evals が基準未達?\"}\n    Q4 -- \"はい\" --> FABLE\n    Q4 -- \"いいえ\" --> DONE[\"そのまま運用\"]\n    FABLE --> Q5{\"一部だけが難所?\"}\n    Q5 -- \"はい\" --> HYBRID[\"小型モデルが主担当 + Fable を advisor に　または Fable が指揮し小型モデルが実行\"]\n    Q5 -- \"いいえ\" --> EVAL{\"Fable の構成で　evals が基準を満たす?\"}\n    HYBRID --> EVAL\n    EVAL -- \"はい\" --> DONE\n    EVAL -- \"いいえ\" --> RETRY{\"effort・プロンプト・分担の見直しで　改善余地がある?\"}\n    RETRY -- \"分担を再調整\" --> Q5\n    RETRY -- \"モデル選定からやり直す\" --> Q1\n    RETRY -- \"見込みなし\" --> STOP[\"導入を見送り・人間へエスカレーション\"]\n\n    class FABLE,HYBRID hub\n    class DONE,HAIKU,OPUS done\n    class RETRY,STOP box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
                   ]
                 ]
               ],
@@ -4622,7 +4622,7 @@
                     [
                       [
                         "code",
-                        "import copy\nimport os\nimport time\n\nimport httpx\n\nAPI = \"https://api.anthropic.com/v1/messages\"\nHEADERS = {\n    \"x-api-key\": os.environ[\"ANTHROPIC_API_KEY\"],\n    \"anthropic-version\": \"2023-06-01\",\n    \"content-type\": \"application/json\",\n}\n# USD / 百万トークン(標準速度。公式価格表より)\nPRICE = {\"in\": 8.0, \"out\": 40.0, \"cache_read\": 0.20, \"cache_write_5m\": 10.0, \"cache_write_1h\": 16.0}\n\n\ndef usd(usage: dict, response: dict | None = None) -> float:\n    \"\"\"usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。\"\"\"\n    # refusal 単体では非課金と断定しない。stop_details.billed is False で非課金が確認できた場合のみ 0 とする\n    if (\n        response is not None\n        and response.get(\"stop_reason\") == \"refusal\"\n        and (response.get(\"stop_details\") or {}).get(\"billed\") is False\n    ):\n        return 0.0\n    cache = usage.get(\"cache_creation\") or {}\n    # キャッシュ件数は null で返ることがあるため、0 として扱う\n    write_5m = cache.get(\"ephemeral_5m_input_tokens\") or 0\n    write_1h = cache.get(\"ephemeral_1h_input_tokens\") or 0\n    # TTL 内訳に含まれない集計分は、既定の5分書き込み単価で課金する\n    write_5m += max(0, (usage.get(\"cache_creation_input_tokens\") or 0) - write_5m - write_1h)\n    return (\n        usage.get(\"input_tokens\", 0) * PRICE[\"in\"]\n        + usage.get(\"output_tokens\", 0) * PRICE[\"out\"]\n        + (usage.get(\"cache_read_input_tokens\") or 0) * PRICE[\"cache_read\"]\n        + write_5m * PRICE[\"cache_write_5m\"]\n        + write_1h * PRICE[\"cache_write_1h\"]\n    ) / 1_000_000\n\n\ndef run_once(prompt: str, effort: str, max_tokens: int = 32_000) -> dict:\n    body = {\n        \"model\": \"claude-fable-5-2\",\n        \"max_tokens\": max_tokens,  # 思考トークンと本文の合計に対する上限\n        \"output_config\": {\"effort\": effort},\n        \"messages\": [{\"role\": \"user\", \"content\": prompt}],\n    }\n    t0 = time.time()\n    r = httpx.post(API, headers=HEADERS, json=body, timeout=900)\n    r.raise_for_status()\n    data = r.json()\n    text = \"\".join(b.get(\"text\", \"\") for b in data[\"content\"] if b[\"type\"] == \"text\")\n    return {\n        \"status\": \"ok\",\n        \"effort\": effort,\n        \"sec\": round(time.time() - t0, 1),\n        \"usd\": round(usd(data[\"usage\"], data), 4),\n        \"out_tokens\": data[\"usage\"][\"output_tokens\"],\n        \"stop_reason\": data[\"stop_reason\"],\n        \"text\": text,\n    }\n\n\ndef sweep(tasks: list[dict], levels=(\"low\", \"medium\", \"high\", \"xhigh\")) -> list[dict]:\n    rows = []\n    for task in tasks:\n        for level in levels:\n            try:\n                res = run_once(task[\"prompt\"], level)\n            except Exception as error:\n                # 後続リクエストが失敗しても完了済みの計測結果を保持し、品質不合格とは別行で記録する\n                rows.append({\n                    \"task\": task[\"id\"],\n                    \"effort\": level,\n                    \"status\": \"request_error\",\n                    \"error\": f\"{type(error).__name__}: {error}\",\n                    \"passed\": None,\n                })\n                continue\n            res[\"task\"] = task[\"id\"]\n            # 正常終了(end_turn)し、自社の合否判定関数が受理した応答だけを合格にする\n            res[\"passed\"] = res[\"stop_reason\"] == \"end_turn\" and task[\"check\"](res[\"text\"])\n            rows.append(res)\n    return rows"
+                        "import copy\nimport os\nimport time\n\nimport httpx\n\nAPI = \"https://api.anthropic.com/v1/messages\"\nHEADERS = {\n    \"x-api-key\": os.environ[\"ANTHROPIC_API_KEY\"],\n    \"anthropic-version\": \"2023-06-01\",\n    \"content-type\": \"application/json\",\n}\n# USD / 百万トークン(標準速度。公式価格表より)\nPRICE = {\"in\": 8.0, \"out\": 40.0, \"cache_read\": 0.20, \"cache_write_5m\": 10.0, \"cache_write_1h\": 16.0}\n\n\ndef usd(usage: dict, response: dict | None = None) -> float:\n    \"\"\"usage から概算費用(USD)を計算する。思考トークンは output に含まれて課金される。\"\"\"\n    # refusal 単体では非課金と断定しない。stop_details.billed is False で非課金が確認できた場合のみ 0 とする\n    if (\n        response is not None\n        and response.get(\"stop_reason\") == \"refusal\"\n        and (response.get(\"stop_details\") or {}).get(\"billed\") is False\n    ):\n        return 0.0\n    cache = usage.get(\"cache_creation\") or {}\n    # キャッシュ件数は null で返ることがあるため、0 として扱う\n    write_5m = cache.get(\"ephemeral_5m_input_tokens\") or 0\n    write_1h = cache.get(\"ephemeral_1h_input_tokens\") or 0\n    # TTL 内訳に含まれない集計分は、既定の5分書き込み単価で課金する\n    write_5m += max(0, (usage.get(\"cache_creation_input_tokens\") or 0) - write_5m - write_1h)\n    return (\n        usage.get(\"input_tokens\", 0) * PRICE[\"in\"]\n        + usage.get(\"output_tokens\", 0) * PRICE[\"out\"]\n        + (usage.get(\"cache_read_input_tokens\") or 0) * PRICE[\"cache_read\"]\n        + write_5m * PRICE[\"cache_write_5m\"]\n        + write_1h * PRICE[\"cache_write_1h\"]\n    ) / 1_000_000\n\n\ndef run_once(prompt: str, effort: str, max_tokens: int = 32_000) -> dict:\n    body = {\n        \"model\": \"claude-fable-5-2\",\n        \"max_tokens\": max_tokens,  # 思考トークンと本文の合計に対する上限\n        \"output_config\": {\"effort\": effort},\n        \"messages\": [{\"role\": \"user\", \"content\": prompt}],\n    }\n    t0 = time.time()\n    r = httpx.post(API, headers=HEADERS, json=body, timeout=900)\n    r.raise_for_status()\n    data = r.json()\n    text = \"\".join(b.get(\"text\", \"\") for b in data[\"content\"] if b[\"type\"] == \"text\")\n    return {\n        \"status\": \"ok\",\n        \"effort\": effort,\n        \"sec\": round(time.time() - t0, 1),\n        \"usd\": round(usd(data[\"usage\"], data), 4),\n        \"out_tokens\": data[\"usage\"][\"output_tokens\"],\n        \"stop_reason\": data[\"stop_reason\"],\n        \"text\": text,\n    }\n\n\ndef sweep(tasks: list[dict], levels=(\"low\", \"medium\", \"high\", \"xhigh\")) -> list[dict]:\n    rows = []\n    for task in tasks:\n        for level in levels:\n            try:\n                res = run_once(task[\"prompt\"], level)\n            except Exception as error:\n                # 後続リクエストが失敗しても完了済みの計測結果を保持し、品質不合格とは別行で記録する\n                rows.append({\n                    \"task\": task[\"id\"],\n                    \"effort\": level,\n                    \"status\": \"request_error\",\n                    \"error\": f\"{type(error).__name__}: {error}\",\n                    \"passed\": None,\n                })\n                continue\n            res[\"task\"] = task[\"id\"]\n            # 正常終了(end_turn)し、自社の合否判定関数が受理した応答だけを合格にする\n            try:\n                res[\"passed\"] = res[\"stop_reason\"] == \"end_turn\" and bool(task[\"check\"](res[\"text\"]))\n            except Exception as error:\n                # 採点関数の例外は応答計測(時間・費用等)を保持したまま採点失敗として記録し、次の effort へ進む\n                res[\"status\"] = \"check_error\"\n                res[\"error\"] = f\"{type(error).__name__}: {error}\"\n                res[\"passed\"] = None\n            rows.append(res)\n    return rows"
                       ]
                     ]
                   ]
@@ -6370,7 +6370,7 @@
                                 [
                                   [
                                     "text",
-                                    "過去の推論を引き継げる(Claude API と Google Cloud の Google 管理版)"
+                                    "過去の推論を引き継げる(Claude API と Google Cloud の Google 管理版のみ)"
                                   ]
                                 ]
                               ],
@@ -6397,7 +6397,16 @@
                             {},
                             [
                               ["td", {}, [["text", "Fable 5.2 と Mythos 5.2 の間を移る"]]],
-                              ["td", {}, [["text", "互いの思考ブロックを読める"]]],
+                              [
+                                "td",
+                                {},
+                                [
+                                  [
+                                    "text",
+                                    "互いの思考ブロックを読める(Claude API と Google Cloud の Google 管理版のみ)"
+                                  ]
+                                ]
+                              ],
                               [
                                 "td",
                                 {},
@@ -11609,6 +11618,15 @@
                               ["td", {}, [["text", "上記を再実行した分"]]],
                               ["td", {}, [["text", "切替でキャッシュが失われる場合がある"]]]
                             ]
+                          ],
+                          [
+                            "tr",
+                            {},
+                            [
+                              ["td", {}, [["text", "従量課金ツール費"]]],
+                              ["td", {}, [["text", "実行回数 × ツール単価(Web 検索など)"]]],
+                              ["td", {}, [["text", "トークン費とは別に加算"]]]
+                            ]
                           ]
                         ]
                       ]
@@ -11635,7 +11653,7 @@
                     [
                       [
                         "code",
-                        "RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inference_geo=\"us\" は全項目 1.1 倍)\n    \"standard\": {\"in\": 8.0, \"out\": 40.0, \"cache_read\": 0.20, \"cache_write_5m\": 10.0, \"cache_write_1h\": 16.0},\n    # batch・fast のキャッシュ単価は、公式の倍率(5分書き込み 1.25 倍・1時間書き込み 2 倍・読み出し 0.025 倍)を各モードの入力単価に掛けた値\n    \"batch\": {\"in\": 4.0, \"out\": 20.0, \"cache_read\": 0.10, \"cache_write_5m\": 5.0, \"cache_write_1h\": 8.0},\n    \"fast\": {\"in\": 16.0, \"out\": 80.0, \"cache_read\": 0.40, \"cache_write_5m\": 20.0, \"cache_write_1h\": 32.0},\n}\n\n\ndef estimate_usd(usage: dict, mode: str = \"standard\") -> float:\n    r = RATES[mode]\n    cache = usage.get(\"cache_creation\") or {}\n    # キャッシュ件数は null で返ることがあるため、0 として扱う\n    read = usage.get(\"cache_read_input_tokens\") or 0\n    write_5m = cache.get(\"ephemeral_5m_input_tokens\") or 0\n    write_1h = cache.get(\"ephemeral_1h_input_tokens\") or 0\n    write_other = max(0, (usage.get(\"cache_creation_input_tokens\") or 0) - write_5m - write_1h)\n    write_5m += write_other\n    cached = read or write_5m or write_1h or usage.get(\"cache_creation_input_tokens\") or 0\n    if cached and any(key not in r for key in (\"cache_read\", \"cache_write_5m\", \"cache_write_1h\")):\n        raise ValueError(\"このモードのキャッシュ単価を確認・設定してから見積もってください\")\n    return (\n        usage.get(\"input_tokens\", 0) * r[\"in\"]\n        + usage.get(\"output_tokens\", 0) * r[\"out\"]\n        + (read * r[\"cache_read\"] if read else 0)\n        + (write_5m * r[\"cache_write_5m\"] if write_5m else 0)\n        + (write_1h * r[\"cache_write_1h\"] if write_1h else 0)\n    ) / 1_000_000\n\n\n# 例: 未キャッシュ入力5万 + キャッシュ読み出し15万 + 出力3万(思考込み)\nexample = {\"input_tokens\": 50_000, \"cache_read_input_tokens\": 150_000, \"output_tokens\": 30_000}\nprint(round(estimate_usd(example), 2))  # 0.40 + 0.03 + 1.20 = 1.63\nprint(round(estimate_usd(example, \"fast\"), 2))  # 0.80 + 0.06 + 2.40 = 3.26"
+                        "RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inference_geo=\"us\" は全項目 1.1 倍)\n    \"standard\": {\"in\": 8.0, \"out\": 40.0, \"cache_read\": 0.20, \"cache_write_5m\": 10.0, \"cache_write_1h\": 16.0},\n    # batch・fast のキャッシュ単価は、公式の倍率(5分書き込み 1.25 倍・1時間書き込み 2 倍・読み出し 0.025 倍)を各モードの入力単価に掛けた値\n    \"batch\": {\"in\": 4.0, \"out\": 20.0, \"cache_read\": 0.10, \"cache_write_5m\": 5.0, \"cache_write_1h\": 8.0},\n    \"fast\": {\"in\": 16.0, \"out\": 80.0, \"cache_read\": 0.40, \"cache_write_5m\": 20.0, \"cache_write_1h\": 32.0},\n}\n\n\ndef estimate_usd(usage: dict, mode: str = \"standard\") -> float:\n    \"\"\"usage からトークン費用(USD)のみを見積もる。Web 検索等の従量課金ツール費は別途加算する。\"\"\"\n    r = RATES[mode]\n    cache = usage.get(\"cache_creation\") or {}\n    # キャッシュ件数は null で返ることがあるため、0 として扱う\n    read = usage.get(\"cache_read_input_tokens\") or 0\n    write_5m = cache.get(\"ephemeral_5m_input_tokens\") or 0\n    write_1h = cache.get(\"ephemeral_1h_input_tokens\") or 0\n    write_other = max(0, (usage.get(\"cache_creation_input_tokens\") or 0) - write_5m - write_1h)\n    write_5m += write_other\n    cached = read or write_5m or write_1h or usage.get(\"cache_creation_input_tokens\") or 0\n    if cached and any(key not in r for key in (\"cache_read\", \"cache_write_5m\", \"cache_write_1h\")):\n        raise ValueError(\"このモードのキャッシュ単価を確認・設定してから見積もってください\")\n    return (\n        usage.get(\"input_tokens\", 0) * r[\"in\"]\n        + usage.get(\"output_tokens\", 0) * r[\"out\"]\n        + (read * r[\"cache_read\"] if read else 0)\n        + (write_5m * r[\"cache_write_5m\"] if write_5m else 0)\n        + (write_1h * r[\"cache_write_1h\"] if write_1h else 0)\n    ) / 1_000_000\n\n\n# 例: 未キャッシュ入力5万 + キャッシュ読み出し15万 + 出力3万(思考込み)\nexample = {\"input_tokens\": 50_000, \"cache_read_input_tokens\": 150_000, \"output_tokens\": 30_000}\nprint(round(estimate_usd(example), 2))  # 0.40 + 0.03 + 1.20 = 1.63\nprint(round(estimate_usd(example, \"fast\"), 2))  # 0.80 + 0.06 + 2.40 = 3.26"
                       ]
                     ]
                   ]
@@ -12169,8 +12187,10 @@
                     [
                       [
                         "text",
-                        "実行ごとに「入力・出力・キャッシュ・サブエージェント数・所要時間・差分行数」を記録する。"
-                      ]
+                        "実行ごとに「入力・出力・キャッシュ・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(トークン費用の見積もり関数"
+                      ],
+                      ["code", {}, [["text", "estimate_usd"]]],
+                      ["text", "とは別にツール費も上限へ合算する)。"]
                     ]
                   ],
                   [

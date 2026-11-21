@@ -271,13 +271,19 @@ it("開いたままのresizeでは利用者のフォーカス位置を奪わな�
 it.each([
   ["Escape", () => fireEvent.keyDown(document, { key: "Escape" })],
   ["メニュー", () => fireEvent.click(menu())],
-  ["目次リンク", () => fireEvent.click(links()[0])],
 ])("%sで閉じると本文のinertを解除し開いた要素へフォーカスを戻す", (_label, closeDrawer) => {
   render(<Harness />);
   fireEvent.click(menu());
   closeDrawer();
   expect(guideContent().inert).toBe(false);
   expect(document.activeElement).toBe(menu());
+});
+it("目次リンクで閉じると本文のinertを解除しドロワーを非活性にする", () => {
+  render(<Harness />);
+  fireEvent.click(menu());
+  fireEvent.click(links()[0]);
+  expect(guideContent().inert).toBe(false);
+  expect(sidebar().inert).toBe(true);
 });
 it("背景クリックでフォーカスが背景へ移っていても開いた要素へ戻す", () => {
   render(<Harness />);
@@ -311,15 +317,18 @@ it("メニューにフォーカスがある状態でdesktopへ広げると、非
   expect(document.activeElement).toBe(links()[0]);
   expect(sidebar().inert).toBe(false);
 });
-it("メニューにフォーカスがある状態でdesktopへ広げると、現在のセクションの目次リンクへ移す", () => {
+it("メニューにフォーカスがある状態でdesktopへ広げると、resize後の現在セクションの目次リンクへaria-currentとフォーカスを移す", () => {
   render(<Harness />);
   position = 1000;
   fireEvent.scroll(window);
   expect(active()).toEqual(["#s1"]);
   menu().focus();
+  // resize 時に現在セクションが変わる状況を作り、update() 後のリンクへ aria-current とフォーカスが移ることを検証する。
+  position = 2000;
   Object.defineProperty(window, "innerWidth", { value: 901, configurable: true });
   fireEvent.resize(window);
-  expect(document.activeElement).toBe(links()[1]);
+  expect(active()).toEqual(["#s2"]);
+  expect(document.activeElement).toBe(links()[2]);
 });
 it("目次リンクにフォーカスがある状態でdesktopへ広げても、目次内のフォーカスを動かさない", () => {
   render(<Harness />);
