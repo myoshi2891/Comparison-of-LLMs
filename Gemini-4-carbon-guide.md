@@ -354,7 +354,7 @@ flowchart TD
     D -- "はい" --> E["タスクを分割して対応"]
     D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
     F --> API{"どのAPIで呼び出すか"}
-    API -- "GenerateContent" --> GACC["各セグメントの出力partsを順に蓄積<br/>自前ストリームは最新continuation_tokenをチェックポイント保存し<br/>チェックポイント後のpartsは未確定バッファへ分けて保持<br/>SDKの自動継続のusageは累積値なので合算せず最後の値を使う<br/>自前RESTループではセグメントごとのusageを合算する"]
+    API -- "GenerateContent" --> GACC["現在のモデルターンの各セグメントの出力partsを順に蓄積(新しいモデルターンの開始時に蓄積を空にする)<br/>自前ストリームは最新continuation_tokenをチェックポイント保存し<br/>チェックポイント後のpartsは未確定バッファへ分けて保持<br/>SDKの自動継続のusageは累積値なので合算せず最後の値を使う<br/>自前RESTループではセグメントごとのusageを合算する"]
     GACC --> GDROP{"自前ストリームが<br/>finishReason 前に切断されたか"}
     GDROP -- "はい チェックポイントあり" --> GRES["未確定バッファのpartsを破棄し<br/>最新チェックポイントまでの蓄積は保持<br/>保存済みcontinuation_tokenで元のリクエストを再送して再開"]
     GDROP -- "はい チェックポイントなし" --> GRST["未確定バッファを破棄し<br/>continuation_tokenなしで最初から再送"]
@@ -363,9 +363,9 @@ flowchart TD
     GDROP -- "いいえ" --> CONT{"finishReason は何か"}
     CONT -- "CONTINUATION" --> NEXT["未確定バッファを確定し最新continuation_tokenを更新<br/>元の contents systemInstruction tools<br/>generationConfig(maxOutputTokens と設定時の thinkingConfig を含む)を<br/>毎hopそのまま再送し 最新の continuation_token を付ける"]
     NEXT --> GACC
-    CONT -- "STOP" --> GFC{"蓄積したpartsに<br/>functionCallがあるか"}
+    CONT -- "STOP" --> GFC{"現在のモデルターンの蓄積partsに<br/>functionCallがあるか(過去ターンは判定しない)"}
     GFC -- "はい" --> GACT["各functionCallを承認ゲートに通す 12.2節<br/>承認したものだけ実行し functionResponse を返す<br/>拒否は拒否結果を functionResponse として返す"]
-    GACT --> GCALL["蓄積したpartsを会話履歴に保持し<br/>functionResponse を含めて次のリクエストを送る<br/>最終回答が得られるまで繰り返す"]
+    GACT --> GCALL["現在のモデルターンのpartsを会話履歴に保持して蓄積を空にし<br/>functionResponse を含めて次のリクエストを送る<br/>最終回答が得られるまで繰り返す"]
     GCALL --> GACC
     GFC -- "いいえ" --> GJOIN["蓄積した全セグメントのpartsを会話履歴に保持<br/>表示する回答は思考サマリーでないtextパートだけを結合"]
     GJOIN --> G["累積トークンと課金を監視"]

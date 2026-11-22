@@ -422,7 +422,7 @@ from google.genai import types
 from decisions_client import THRESHOLD, decide
 
 # 安全フィルタによる拒否を示す error.code。公式ドキュメントで最新の値を確認して追加する。
-SAFETY_ERROR_CODES = {"safety", "prohibited_content"}
+SAFETY_ERROR_CODES = {"safety", "prohibited_content", "blocklist", "image_safety", "content_blocked"}
 
 
 def error_code(response: httpx.Response) -> str | None:
@@ -480,7 +480,7 @@ async def screen_input(message: types.Content | None) -> types.Content | None:
     try:
         result = await decide(text, GUARD)
     except httpx.HTTPStatusError as err:
-        # 安全フィルタ(error.code が safety / prohibited_content など)は HTTP 400 で返り、
+        # 安全フィルタ(error.code が safety / prohibited_content / blocklist / image_safety / content_blocked など)は HTTP 400 で返り、
         # answers を持たない。安全フィルタの拒否だけを LLM へ渡さず定型文で止める。
         if err.response.status_code == 400 and error_code(err.response) in SAFETY_ERROR_CODES:
             return blocked("このリクエストには対応できません。")
