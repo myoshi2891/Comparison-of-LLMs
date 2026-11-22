@@ -27,8 +27,15 @@ _RECORD_GAP = (
     r"|\bkimi(?:[-\s]|<[^<>]*>)*k)[\s\S]){0,80}?"
 )
 _PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
+# タグは丸ごと読み飛ばし、属性値（data-field="input" / data-label="output" 等）をラベルとみなさない。
+# 通常文字の分岐は完結したタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
+_ANY_TAG = r"<(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
 # 次の Kimi モデル見出し（レコード境界）。
-_NEXT_KIMI_RECORD = re.compile(r"\bkimi(?:[-\s]|<[^<>]*>)*k", re.IGNORECASE)
+# 完結した HTML タグ（属性値を含む）は丸ごと読み飛ばし、可視テキスト上の次モデル名だけを境界にする。
+_NEXT_KIMI_RECORD = re.compile(
+    rf"{_ANY_TAG}|(\bkimi(?:[-\s]|{_ANY_TAG})*k)",
+    re.IGNORECASE,
+)
 # cached と input の間には空白か、レコード境界ではないインラインタグ（span・br 等）を許す。
 _INLINE_TAG = r"<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
 _INLINE_SEP = rf"(?:\s|{_INLINE_TAG})+"
@@ -49,9 +56,6 @@ _CACHED_LABEL = (
 _CACHED_PRICE_GAP = _RECORD_GAP.replace(
     r"[\s\S]", rf"(?:{_INLINE_TAG}|(?!{_INLINE_TAG})(?!\b(?:output|input)\b)[^$])"
 )
-# タグは丸ごと読み飛ばし、属性値（data-field="input" / data-label="output" 等）をラベルとみなさない。
-# 通常文字の分岐は完結したタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
-_ANY_TAG = r"<(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
 # cached inputの価格はひとまとまりで読み飛ばし、output以降へは進まない。
 # 価格のない cached（N/A 等）はラベルだけを読み飛ばす。価格が続く場合はこの分岐を使えず、
 # cached 価格を標準入力として拾わない。
@@ -175,7 +179,11 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         for begin in key_starts:
             # 同一モデルの繰り返し記載は同じレコードとして扱い、別の Kimi モデルの見出しで区切る。
             boundary = next(
-                (m for m in _NEXT_KIMI_RECORD.finditer(html, begin + 1) if m.start() not in key_starts),
+                (
+                    m
+                    for m in _NEXT_KIMI_RECORD.finditer(html, begin + 1)
+                    if m.group(1) is not None and m.start() not in key_starts
+                ),
                 None,
             )
             record = html[begin: boundary.start() if boundary else len(html)]
