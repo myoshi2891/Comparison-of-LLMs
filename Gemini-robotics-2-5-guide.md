@@ -315,6 +315,13 @@ def consensus_point(image_path: str, target: str, max_spread: float, n: int = 5)
     max_spread は中央値からの許容距離(0〜1000 の正規化単位)。一般的な既定値はないため、
     把持の許容誤差など作業要件から決めて渡す。
     """
+    if (
+        not isinstance(max_spread, (int, float))
+        or isinstance(max_spread, bool)
+        or not math.isfinite(max_spread)
+        or max_spread < 0
+    ):
+        raise ValueError("max_spread must be a finite non-negative number")
     ys, xs = [], []
     for _ in range(n):
         try:

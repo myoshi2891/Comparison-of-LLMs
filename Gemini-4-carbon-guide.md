@@ -350,13 +350,13 @@ flowchart TD
     NB -- "いいえ" --> NR["通常の非ストリーミング REST<br/>generateContent をそのまま呼び出す"]
     NB -- "はい" --> D
     B -- "いいえ" --> SAPI{"どのAPIのストリーミングか"}
-    SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>generate_content_stream で逐次出力"]
+    SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>generate_content_stream で逐次出力<br/>最終チャンクの finishReason を確認し MAX_TOKENS や異常終了は未完了失敗として扱う(部分出力を完了扱いにしない)"]
     SAPI -- "Interactions" --> SACC
     B -- "はい" --> D{"遅延に敏感か"}
     D -- "はい" --> E["タスクを分割して対応"]
     D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
     F --> API{"どのAPIで呼び出すか"}
-    API -- "GenerateContent" --> GACC["現在のモデルターンの各セグメントの出力partsを順に蓄積(新しいモデルターンの開始時に蓄積を空にする)<br/>自前ストリームは最新continuation_tokenをチェックポイント保存し<br/>チェックポイント後のpartsは未確定バッファへ分けて保持<br/>SDKのストリームでも自動継続を無効にし、このチェックポイント付き自前ループで継続する<br/>自前ループ(SDK・RESTとも)ではセグメントごとのusageを合算する"]
+    API -- "GenerateContent" --> GACC["現在のモデルターンの各セグメントの出力partsを順に蓄積(新しいモデルターンの開始時に蓄積を空にする)<br/>自前ストリームは新しいcontinuation_tokenが届くたびに未確定バッファのpartsを確定蓄積へ移してから最新continuation_tokenをチェックポイント保存し<br/>チェックポイント後のpartsは次のチェックポイントまで未確定バッファへ分けて保持<br/>SDKのストリームでも自動継続を無効にし、このチェックポイント付き自前ループで継続する<br/>自前ループ(SDK・RESTとも)ではセグメントごとのusageを合算する"]
     GACC --> GDROP{"自前ストリームが<br/>finishReason 前に切断されたか"}
     GDROP -- "はい チェックポイントあり" --> GRES["未確定バッファのpartsを破棄し<br/>最新チェックポイントまでの蓄積は保持<br/>保存済みcontinuation_tokenで元のリクエストを再送して再開"]
     GDROP -- "はい チェックポイントなし" --> GRST["未確定バッファを破棄し<br/>continuation_tokenなしで最初から再送"]
@@ -365,7 +365,8 @@ flowchart TD
     GDROP -- "いいえ" --> CONT{"finishReason は何か"}
     CONT -- "CONTINUATION" --> NEXT["未確定バッファを確定し最新continuation_tokenを更新<br/>元の contents systemInstruction tools<br/>generationConfig(maxOutputTokens と設定時の thinkingConfig を含む)を<br/>毎hopそのまま再送し 最新の continuation_token を付ける"]
     NEXT --> GACC
-    CONT -- "STOP" --> GFC{"現在のモデルターンの蓄積partsに<br/>functionCallがあるか(過去ターンは判定しない)"}
+    CONT -- "STOP" --> GCOMMIT["未確定バッファのpartsを確定蓄積へ移す"]
+    GCOMMIT --> GFC{"現在のモデルターンの蓄積partsに<br/>functionCallがあるか(過去ターンは判定しない)"}
     GFC -- "はい" --> GACT["各functionCallを承認ゲートに通す 12.2節<br/>承認したものだけ実行し functionResponse を返す<br/>拒否は拒否結果を functionResponse として返す"]
     GACT --> GCALL["現在のモデルターンのpartsを会話履歴に保持して蓄積を空にし<br/>functionResponse を含めて次のリクエストを送る<br/>最終回答が得られるまで繰り返す"]
     GCALL --> GACC

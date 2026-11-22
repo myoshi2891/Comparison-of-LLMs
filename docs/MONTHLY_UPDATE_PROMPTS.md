@@ -203,12 +203,16 @@ web-next/app/page.tsx と web-next/components/HomePage.tsx を読んで現状を
 2. [コピー] bash update.sh --no-scrape で web-next/data/pricing.json と
    web-next/public/pricing.json に最新データをコピーする
 
-3. [UI 確認] web-next/components/HomePage.tsx の モデル表示ロジック（ApiTable / SubTable）に
+3. [鮮度更新] web-next/lib/page-registry.ts の Home エントリ（slug: "/"）の
+   lastReviewed を当日の日付（YYYY-MM-DD）に更新する
+   （addedAt は暗黙に変更せず、更新要否は別途判断する）
+
+4. [UI 確認] web-next/components/HomePage.tsx の モデル表示ロジック（ApiTable / SubTable）に
    新規モデル対応漏れがないか確認する
    - 表示名・通貨表記・カラーインデックスが正しいか
    - Zod スキーマ（web-next/lib/pricing.ts）が新フィールドを受け入れるか
 
-4. 型エラーがあれば web-next/types/pricing.ts と web-next/lib/pricing.ts の
+5. 型エラーがあれば web-next/types/pricing.ts と web-next/lib/pricing.ts の
    _AssertParity を確認して修正する（Pydantic モデルが SSoT）
 
 変更は最小 diff で。
