@@ -1471,7 +1471,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         const orParts = splitTop(s, "||");
         if (orParts.length > 1) return orParts.every(part => neverTrue(part, at));
         const andParts = splitTop(s, "&&");
-        if (andParts.length > 1) return andParts.some(part => neverTrue(part, at));
+        if (andParts.length > 1) {
+          for (const part of andParts) {
+            if (neverTrue(part, at)) return true;
+            if (!alwaysTrue(part, at)) return false;
+          }
+          return false;
+        }
         return false;
       };
       const alwaysTrue = (condition, at) => {
@@ -1709,17 +1715,17 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       return Array.from(literalSource.matchAll(new RegExp(`(?<![\\w$.])${name}\\s*=\\s*(\\w+)\\s*;`, "g")))
         .some(copy => mayBeCardOwner(copy[1], next));
     };
-    const mayBeScriptContainer = (reference, at, seen = new Set()) => {
+    const mayBeScriptContainer = (reference, at, onlyContaining = false, seen = new Set()) => {
       if (mayBeCardOwner(reference)) return true;
       const q = query.exec(reference);
-      if (q && mayBeCardOwner(q[1])) return selectedScript.mayContainScript?.(q[3]) ?? true;
+      if (q && mayBeCardOwner(q[1])) return selectedScript.mayContainScript?.(q[3], onlyContaining) ?? true;
       if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
       const next = new Set(seen).add(reference);
       const bound = bindingAt(reference, at);
-      if (bound && mayBeScriptContainer(bound.value, bound.at, next)) return true;
+      if (bound && mayBeScriptContainer(bound.value, bound.at, onlyContaining, next)) return true;
       const copies = new RegExp(`\\b${reference}\\s*=\\s*([^;]+);`, "g");
       return Array.from(literalSource.matchAll(copies))
-        .some(copy => mayBeScriptContainer(copy[1].trim(), copy.index, next));
+        .some(copy => mayBeScriptContainer(copy[1].trim(), copy.index, onlyContaining, next));
     };
     const mayBeCardScript = (reference, at, seen = new Set()) => {
       if (mayBeSelectedScript(reference, at)) return true;
@@ -1737,12 +1743,21 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const receiver = String.raw`(\w+(?:\.querySelector\(\s*(['"])([^'"\n]*)\2\s*\))?)\s*\.\s*`;
     const scriptEdits = new RegExp(`${receiver}(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text))\\s*\\(|outerHTML\\s*=(?!=))`, "g");
     const ownerEdits = new RegExp(`${receiver}(?:(?:removeChild|replaceChild|insertBefore|prepend|replaceChildren|insertAdjacent(?:HTML|Element|Text))\\s*\\(|(?:innerHTML|outerHTML|textContent|innerText)\\s*=(?!=))`, "g");
+    const wrapperAppendEdits = new RegExp(`${receiver}(?:append|appendChild)\\s*\\(`, "g");
+    const isSvgOnlyEdit = edit => {
+      if (!/\binnerHTML\s*=\s*$/.test(edit[0])) return false;
+      const rhs = /^\s*(['"])((?:[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n](?!\s*(?:[([`.+\-*/%<>=!&|^?:,\\]|\b(?:in|instanceof)\b)))/.exec(rawSource.slice(edit.index + edit[0].length));
+      if (!rhs) return false;
+      const html = decodeQuotedEntryEscapes(rhs[2], true);
+      return html !== undefined && /^\s*<svg\b[\s\S]*<\/svg>\s*$/i.test(html) && !/<script\b/i.test(html);
+    };
     // Changing a script's type can move a typed query (script[type="text/plain"]) to another script.
     // Attribute writes with a literal non-type name keep the selection; computed names stay unresolved.
     const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute)\\s*\\(\\s*(?!(['"])(?!type\\4)[^'"\\n]*\\4)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
     if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index) || mayBeScriptContainer(edit[1], edit.index)) ||
       Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeCardScript(edit[1], edit.index)) ||
-      Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeScriptContainer(edit[1], edit.index))) return false;
+      Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit))) ||
+      Array.from(literalSource.matchAll(wrapperAppendEdits)).some(edit => !mayBeCardOwner(edit[1]) && mayBeScriptContainer(edit[1], edit.index))) return false;
     return { base: usesValidatedDedent ? dedentedPayload : payload };
   };
   // Strings/comments are already masked. Balance parentheses so later ASI
@@ -2092,14 +2107,17 @@ function materializePlainTextCards(src) {
           availableAt: at => renderer.deferredModule || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition > start + marker.index),
           cardAvailableAt: at => renderer.deferredModule || renderer.segments.some(segment =>
-            segment.start <= at && at <= segment.end && segment.documentPosition > start),
+            segment.start <= at && at <= segment.end && segment.documentPosition >= start),
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1,
           // Whether an element matched by `selector` inside the card can contain the selected
-          // script (or any script, for complex selectors that cannot be statically matched).
-          mayContainScript: selector => {
+          // script or precede it (so an edit could insert a matching script before it).
+          mayContainScript: (selector, onlyContaining = false) => {
             if (!/^(?:[A-Za-z][\w-]*)?(?:[.#]-?[A-Za-z_][\w-]*)*$/.test(selector) || !selector) return true;
             const matches = extractElementContents(card.content, tag => matchesCardSelector(tag, selector), true);
-            return matches.some(el => /<script data-audit-payload="\d+"><\/script>/.test(el.content));
+            return matches.some(el =>
+              /<script data-audit-payload="\d+"><\/script>/.test(el.content) ||
+              (!onlyContaining && el.index < marker.index)
+            );
           },
           // Whether the card contains an element for a single-class selector outside inert
           // <template> contents, so a per-card query for it is never null (`!host` cannot skip).

@@ -1997,12 +1997,18 @@ test("marks edits to a queried descendant wrapper containing the selected script
   "card.querySelector('.source-wrap').innerHTML = '';",
   "const wrap = card.querySelector('.source-wrap'); wrap.innerHTML = '';",
   "card.querySelector('.source-wrap').remove();",
+  "card.querySelector('.diagram-wrap').innerHTML = '<scr' + 'ipt>flowchart LR\\nX --> Y</scr' + 'ipt>';",
+  "const host = card.querySelector('.diagram-wrap'); host.insertAdjacentHTML('beforeend', '<scr' + 'ipt>flowchart LR\\nX --> Y</scr' + 'ipt>');",
+  "card.querySelector('.diagram-wrap').prepend(document.createElement('script'));",
  ]) {
   const result = audit(`${card}<script>${select} ${edit} ${read}</script>`, page);
   assert.equal(result.status, 1, edit);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart'], edit);
  }
  assert.equal(audit(`${card}<script>${select} card.querySelector('.diagram-wrap').innerHTML = '<svg></svg>'; ${read}</script>`, page).status, 0);
+ // A classic script inside the card (at the card's opening position) has access to the parent card,
+ // as long as the payload script precedes it.
+ assert.equal(audit(`<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script><script>${select} ${read}</script></div>`, page).status, 0);
 });
 
 test("rejects loop index writes inside functions defined outside the loop", () => {
@@ -2029,6 +2035,14 @@ test("rejects shadowed nested block declarations in loop-guard readiness proof w
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1'], init);
  }
  assert.equal(audit(`${source}<script>let ready = true; ${loop}</script>`, page).status, 0);
+ const throwingGuard = "var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (JSON.parse('{') && false) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }";
+ const throwingResult = audit(`${source}<script>${throwingGuard}</script>`, page);
+ assert.equal(throwingResult.status, 1);
+ assert.deepEqual(throwingResult.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1']);
+ for (const falseGuard of ["false", "false && JSON.parse('{')", "true && false"]) {
+  const okGuard = `var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (${falseGuard}) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }`;
+  assert.equal(audit(`${source}<script>${okGuard}</script>`, page).status, 0, falseGuard);
+ }
 });
 
 test("extracts literal mermaid.render source argument even when preceded or followed by comments", () => {
@@ -2062,6 +2076,12 @@ test("normalizes CRLF script payloads and ignores template text/plain payloads",
 	const card = payload => `<div class="diagram-card"><script type="text/plain">${payload}</script></div>`;
 	assert.equal(audit(card(chart), page).status, 0);
 	assert.equal(audit(card(chart.replace(/\n/g, "\r\n")), page).status, 0);
+	const suffix = "\nclassDef hub fill:#eee;";
+	const joinRenderer = `<script>var CLASSDEFS = ${JSON.stringify(suffix)}; var card = document.querySelector('.diagram-card'); var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS);</script>`;
+	const joinedWithBlankLine = `const D0 = ${JSON.stringify(`${chart}\n${suffix}`)};<MermaidDiagram chart={D0} />`;
+	const joinedWithoutBlankLine = `const D0 = ${JSON.stringify(`${chart}${suffix}`)};<MermaidDiagram chart={D0} />`;
+	assert.equal(audit(`${card(`${chart}\r`)}${joinRenderer}`, joinedWithBlankLine).status, 0);
+	assert.equal(audit(`${card(`${chart}\r`)}${joinRenderer}`, joinedWithoutBlankLine).status, 1);
 	const detached = `<template><script type="text/plain" data-for="c">WRONG</script></template><pre><code id="c"></code></pre>`;
 	assert.equal(audit(detached, "<pre>{\"\"}</pre>").status, 0);
 	// Control: the same text inside the visible block must fail the audit.
