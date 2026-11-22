@@ -1694,7 +1694,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (loops.some(loop => loop.start < initialBinding.at && initialBinding.at < loop.end)) return true;
       return false;
     };
-    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\.(?:textContent|text)\b|\[\s*(?:(['"])(?:textContent|text)\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
+    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\s*\.\s*(?:textContent|text)\b|\s*\[\s*(?:(['"])(?:textContent|text)\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
     if ([...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
@@ -1868,6 +1868,22 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   const literal = complete && initializer[1];
   if (!literal) return null;
   const initializedAt = declaration.index + initializer[0].length;
+  // Textual order is not reachability. Certify CLASSDEFS only when each render call is
+  // established as reachable: no unconditional exit at the declaration's block level before
+  // the call, and every block entered beyond the declaration is a loop or function body
+  // (if/else/switch/try may skip the call). Anything else stays unresolved.
+  const loopOrFunctionHead = /(?:\b(?:for|while)\s*\((?:[^{}()]|\([^{}()]*\))*\)|\bfunction\b[^{}]*\)|=>)\s*$/;
+  for (const use of renderUses) {
+    const callPath = paths.get(use.call);
+    if (callPath.slice(declarationPath.length).some(block => !loopOrFunctionHead.test(executable.slice(0, block)))) return null;
+    let depth = 0;
+    for (let i = initializedAt; i < use.call; i++) {
+      if (executable[i] === "{") depth++;
+      else if (executable[i] === "}") depth--;
+      else if (depth === 0 && /\b(?:return|throw|break|continue)\b/.test(executable.slice(i, use.call)) &&
+          /^(?:return|throw|break|continue)\b/.test(executable.slice(i)) && !/[\w$]/.test(executable[i - 1] ?? "")) return null;
+    }
+  }
   if (!initializerRunsBefore(executable, declaration.index, initializedAt, declarationPath, renderUses.map(use => use.call))) return null;
   const parts = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2], true));
   return parts.some(part => part === undefined) ? null : renderUses[0].base + parts.join("");

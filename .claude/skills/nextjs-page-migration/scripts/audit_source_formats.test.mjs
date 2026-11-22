@@ -940,8 +940,14 @@ test("requires src initialization to execute before rendering", () => {
    `${init} ${render}`,
    `function draw() { ${init} ${render} } draw();`,
    `${init} function draw() { ${render} } draw();`,
-   `if (enabled) { ${init} ${render} }`,
   ]) assert.equal(audit(`${card}<script>const CLASSDEFS = ''; ${body}</script>`, page).status, 0, body);
+  // A conditional block may skip the render, so reachability is not established for CLASSDEFS.
+  const conditional = audit(`${card}<script>const CLASSDEFS = ''; if (enabled) { ${init} ${render} }</script>`, page);
+  if (suffix) assert.deepEqual(conditional.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+  else assert.equal(conditional.status, 0);
+  // Straight-line rendering stays eligible, but an unconditional exit before it does not.
+  assert.equal(audit(`${card}<script>const CLASSDEFS = ''; ${init} ${render}</script>`, page).status, 0);
+  if (suffix) assert.deepEqual(audit(`${card}<script>const CLASSDEFS = ''; ${init} return; ${render}</script>`, page).data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
 });
 
@@ -2039,8 +2045,15 @@ test("splits class tokens on ASCII whitespace only", () => {
 	const script = "<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>";
 	const card = cls => `<div class="${cls}"><script type="text/plain">${chart}</script></div>`;
 	// 通常の空白はトークンを区切る（対照）。NBSP はトークンの一部になりカードではない。
-	assert.equal(audit(`${card("diagram-card x")}${script}`, page).status, 0);
-	assert.notEqual(audit(`${card("diagram-card\u00a0x")}${script}`, page).status, 0);
+	const ordinary = audit(`${card("diagram-card x")}${script}`, page);
+	assert.equal(ordinary.status, 0);
+	assert.equal(ordinary.data.counts.mermaidSources.source, 1);
+	assert.equal(ordinary.data.counts.mermaidSources.page, 1);
+	assert.deepEqual(ordinary.data.unresolvedMermaidSources, []);
+	const nbsp = audit(`${card("diagram-card\u00a0x")}${script}`, page);
+	assert.notEqual(nbsp.status, 0);
+	assert.equal(nbsp.data.counts.mermaidSources.source, 0);
+	assert.deepEqual(nbsp.data.unresolvedMermaidSources, []);
 });
 
 test("normalizes CRLF script payloads and ignores template text/plain payloads", () => {
@@ -2062,4 +2075,19 @@ test("keeps escaped mermaid render spellings unresolved", () => {
 	const run = call => audit(`${source}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; ${call} }</script>`, page).status;
 	assert.equal(run("mermaid.render('x', src);"), 0);
 	assert.equal(run("mermaid.\\u0072ender('x', src);"), 1);
+});
+
+test("detects text writes with whitespace around the member-access dot", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const read = "var card = document.querySelector('.diagram-card'); var script = card.querySelector('script'); ";
+	const render = " var src = script.textContent; mermaid.render('x', src);";
+	assert.equal(audit(`${card}<script>${read}${render}</script>`, page).status, 0);
+	for (const write of ["script . textContent = 'x';", "script\n.\ntext = 'x';"]) {
+		const result = audit(`${card}<script>${read}${write}${render}</script>`, page);
+		assert.notEqual(result.status, 0, write);
+	}
+	// A write after the synchronous capture does not alter the captured string.
+	assert.equal(audit(`${card}<script>${read}var src = script.textContent; mermaid.render('x', src); script . textContent = 'x';</script>`, page).status, 0);
 });
