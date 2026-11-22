@@ -1486,7 +1486,15 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         const andParts = splitTop(s, "&&");
         if (andParts.length > 1) return andParts.every(part => alwaysTrue(part, at));
         const orParts = splitTop(s, "||");
-        if (orParts.length > 1) return orParts.some(part => alwaysTrue(part, at));
+        if (orParts.length > 1) {
+          // Operands run left to right: a true operand counts only when every earlier one is
+          // proven to evaluate false (and so completes normally) before it is reached.
+          for (const part of orParts) {
+            if (alwaysTrue(part, at)) return true;
+            if (!neverTrue(part, at)) return false;
+          }
+          return false;
+        }
         return false;
       };
       /** Condition text of a `(...)` group closed at `closeParen` when it follows `if` (not `else if`). */
@@ -1594,6 +1602,16 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if (close <= open || ![ownerBinding.at, at].every(position => position > open && position < close)) return false;
         // The index is a loop-header `var`; reading it from a callback sees its final value.
         if (sharedAcrossDeferredRead(loop.index + loop[0].indexOf("var"), ownerBinding.at)) return false;
+        // A closer let/const/catch/parameter declaration of the index name shadows the header
+        // binding, so `cards[index]` no longer reads the loop index: unresolved.
+        const indexName = indexed[2];
+        const shadowDeclaration = new RegExp(`(?<![\\w$.])(?:let|const)\\s+${indexName}(?![\\w$])|catch\\s*\\(\\s*${indexName}\\s*\\)`);
+        if (shadowDeclaration.test(executable.slice(open, close))) return false;
+        const parameterShadow = new RegExp(`(?<![\\w$.])${indexName}(?![\\w$])`);
+        if (functions.some(fn => fn.body < ownerBinding.at && ownerBinding.at < fn.end && fn.start > loop.index &&
+          parameterShadow.test(executable.slice(fn.start, fn.body).replace(/^function\s+[\w$]+/, "function")))) return false;
+        if (functions.some(fn => fn.body < at && at < fn.end && fn.start > loop.index &&
+          parameterShadow.test(executable.slice(fn.start, fn.body).replace(/^function\s+[\w$]+/, "function")))) return false;
         // break/return/throw outside nested callbacks end the traversal early and may leave
         // later selected cards unvisited. `continue` still advances to the next card.
         const nested = functions.filter(fn => fn.body > open && fn.end <= close + 1);
@@ -1957,6 +1975,14 @@ function materializePlainTextCards(src) {
   const executableScripts = scripts.filter(script => {
     // Scripts inside uninstantiated template content are not renderers for document cards.
     if (script.inTemplate) return false;
+    // A script with src ignores its child text; external renderer code is not inspectable here.
+    if (readHtmlAttribute(script.attributes, "src") !== undefined) {
+      const src = readHtmlAttribute(script.attributes, "src").trim();
+      if (!/^(?:https?:)?\/\//i.test(src) && src !== "" && !unresolvedMermaidSources.includes(`external-script:${src}`)) {
+        unresolvedMermaidSources.push(`external-script:${src}`);
+      }
+      return false;
+    }
     // nomodule scripts are skipped by module-capable browsers; they stay in the DOM inventory.
     const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
     // nomodule only suppresses classic scripts; module scripts run regardless.

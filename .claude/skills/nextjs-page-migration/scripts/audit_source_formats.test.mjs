@@ -2009,6 +2009,9 @@ test("marks edits to a queried descendant wrapper containing the selected script
  // A classic script inside the card (at the card's opening position) has access to the parent card,
  // as long as the payload script precedes it.
  assert.equal(audit(`<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script><script>${select} ${read}</script></div>`, page).status, 0);
+  // The card lookup runs exactly at the card content start (cardAvailableAt equality boundary):
+  // a classic script right after the opening tag, then the payload, then a typed-selector read.
+  assert.equal(audit(`<div id="chart" class="diagram-card"><script>${select}</script><script type="text/plain">${chart}</script><script>const src = card.querySelector('script[type="text/plain"]').textContent; mermaid.render('id', src);</script></div>`, page).status, 0);
 });
 
 test("rejects loop index writes inside functions defined outside the loop", () => {
