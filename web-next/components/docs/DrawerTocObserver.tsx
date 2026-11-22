@@ -54,7 +54,9 @@ export default function DrawerTocObserver({
     const close = () => sync(false);
     // サイトメニューを開くときはドロワーを閉じる。フォーカスはサイトのハンバーガーに残す。
     const closeForSiteMenu = () => {
-      if (wasOpen) sync(false, false);
+      if (!wasOpen) return;
+      sync(false, false);
+      siteHamburger?.focus();
     };
     const toggle = () => sync(!root?.classList.contains(styles.open));
     /** 開いたモバイルドロワーでは、Tab 移動をメニューと目次リンクの間で DOM 順に循環させる。 */
