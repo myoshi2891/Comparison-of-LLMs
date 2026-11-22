@@ -684,6 +684,16 @@ class TestMoonshot:
             matched = re.search(gap, text, re.IGNORECASE | re.DOTALL)
             assert matched is not None and matched.group(1) == "3.25", text
 
+    def test_cached_input_separated_by_html_whitespace_entity_is_skipped(self):
+        for html in (
+            "<p>Kimi K3 Cached&nbsp;Input $0.25 / Input $3.25 / Output $16.50</p>",
+            "<p>Kimi K3 Cached&#160;Input $0.25 / Input $3.25 / Output $16.50</p>",
+            "<p>Kimi K3 Cache&nbsp;Hit&nbsp;Input $0.25 / Cache&nbsp;Miss $3.25 / Output $16.50</p>",
+        ):
+            with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+                model = _find(moonshot.scrape(), "Kimi K3")
+            assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success"), html
+
     def test_cached_input_gap_fails_promptly_with_repeated_inline_tags(self):
         # cached 価格が N/A でインラインタグが連続しても、タグの読み方が分岐して指数的に後戻りしない。
         import time

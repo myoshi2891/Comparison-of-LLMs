@@ -36,10 +36,11 @@ _NEXT_KIMI_RECORD = re.compile(
     rf"{_ANY_TAG}|(\bkimi(?:[-\s]|{_ANY_TAG})*k)",
     re.IGNORECASE,
 )
-# cached と input の間には空白か、レコード境界ではないインラインタグ（span・br 等）を許す。
+# cached と input の間には空白、HTML 空白エンティティ（&nbsp; 等）、またはレコード境界ではないインラインタグ（span・br 等）を許す。
+_HTML_WS_ENTITY = r"&(?:nbsp|ensp|emsp|thinsp|#0*(?:9|10|12|13|32|160)|#x0*(?:9|a|c|d|20|a0));"
 _INLINE_TAG = r"<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
-_INLINE_SEP = rf"(?:\s|{_INLINE_TAG})+"
-_OPT_INLINE_SEP = rf"(?:\s|{_INLINE_TAG})*"
+_INLINE_SEP = rf"(?:\s|{_HTML_WS_ENTITY}|{_INLINE_TAG})+"
+_OPT_INLINE_SEP = rf"(?:\s|{_HTML_WS_ENTITY}|{_INLINE_TAG})*"
 # batch input と cache-hit の入力（"input (cache hit)" / "cache hit input"）も標準入力
 # ではないため、cached input と同様に価格ごと読み飛ばす。標準入力は cache-miss 側を選ぶ。
 # "cache-hit input" のように後ろへ続く input もラベルの一部として読む（価格探索の禁止語に当たらないように）。
