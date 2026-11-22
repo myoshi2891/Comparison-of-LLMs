@@ -349,7 +349,9 @@ flowchart TD
     M -- "非ストリーミング REST" --> NB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
     NB -- "いいえ" --> C
     NB -- "はい" --> D
-    B -- "いいえ" --> CS["通常のストリーミング<br/>generate_content_stream で逐次出力"]
+    B -- "いいえ" --> SAPI{"どのAPIのストリーミングか"}
+    SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>generate_content_stream で逐次出力"]
+    SAPI -- "Interactions" --> SACC
     B -- "はい" --> D{"遅延に敏感か"}
     D -- "はい" --> E["タスクを分割して対応"]
     D -- "いいえ" --> F["long decode を使う<br/>v1beta1 と max_output_tokens を設定"]
@@ -383,8 +385,8 @@ flowchart TD
     IPOLL --> ICOLL["終端状態になった interaction の<br/>結合済み出力と usage を1回だけ蓄積"]
     ICOLL --> IST
     IST -- "requires_action" --> IACT["ツール呼び出しを承認ゲートに通す 12.2節"]
-    IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>store=True はこのinteractionのidで結果を送る<br/>store=False は元の入力 返されたmodelのsteps<br/>function_resultを次のリクエストに含める"]
-    IACT -- "拒否" --> IREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくstoreで分ける"]
+    IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>(ツールBなど別ツールへのアクセスを後続ターンで維持)<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力 同じtools宣言 返されたmodelのsteps<br/>function_resultを次のリクエストに含める"]
+    IACT -- "拒否" --> IREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
     IRUN --> ACC
     IREJ --> ACC
     IST -- "requires_continuation store=True<br/>automatic_continuation=False の自前ループ" --> ISS["previous_interaction_id と continuation_token に加え<br/>元のモデルと max_output_tokens を含む生成設定を<br/>毎hop再送して継続を送る"]
@@ -398,7 +400,7 @@ flowchart TD
     IRES --> ACC
     IINC -- "いいえ" --> ERR["例外として扱い 部分出力を採用しない"]
     IST -- "failed cancelled" --> ERR
-    API -- "Interactions ストリーミング" --> SACC["受信イベントのテキストを順に蓄積<br/>usageはhop内で累積値なので最新値だけ保持<br/>最後に受信したevent_idを受信位置のカーソルとして保存<br/>continuation_tokenを受け取ったらチェックポイントとして別に保存"]
+    API -- "Interactions ストリーミング" --> SACC["step.deltaイベントのうちstepがmodel_outputかつ<br/>delta.typeがtextのものだけを回答バッファに順に追記<br/>(thought_summaryのテキストは回答バッファに入れず必要なら別バッファへ保存)<br/>usageはhop内で累積値なので最新値だけ保持<br/>最後に受信したevent_idを受信位置のカーソルとして保存<br/>continuation_tokenを受け取ったらチェックポイントとして別に保存"]
     SACC --> SDROP{"ストリームが終了イベントの前に切断されたか"}
     SDROP -- "はい" --> SUSE["中断したhopで最後に受け取ったusageは暫定値として保持<br/>同じバックグラウンドinteractionを再開して最終usageを受け取ったら置き換え<br/>usageは累積値なので両方を合算しない<br/>後続のusageが届かなければ最後に受け取った値をそのinteractionの値とし<br/>受け取っていなければ usage 不明と記録"]
     SUSE --> SCP{"バックグラウンド実行か /<br/>continuation_tokenを保存済みか"}
@@ -413,8 +415,8 @@ flowchart TD
     SDROP -- "いいえ 終了イベントを受信" --> SHOP["このhopの最終usageを確定し<br/>hopごとの最終値を合算する"]
     SHOP --> SST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
     SST -- "requires_action" --> SACT["ツール呼び出しを承認ゲートに通す 12.2節"]
-    SACT -- "承認" --> SRUN["クライアント側でツールを実行し<br/>store=True はこのinteractionのidで結果を送る<br/>store=False は元の入力 返されたmodelのsteps<br/>function_resultを次のリクエストに含める"]
-    SACT -- "拒否" --> SREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくstoreで分ける"]
+    SACT -- "承認" --> SRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力 同じtools宣言 返されたmodelのsteps<br/>function_resultを次のリクエストに含める"]
+    SACT -- "拒否" --> SREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
     SRUN --> SACC
     SREJ --> SACC
     SST -- "requires_continuation" --> SAUTO{"SDKの自動継続を無効にしたか<br/>automatic_continuation=False"}
@@ -434,7 +436,7 @@ flowchart TD
 
 GenerateContentで `MAX_TOKENS` に達した応答に `continuation_token` が付いている場合は、蓄積済みのpartsを保持したまま `max_output_tokens`(hopをまたいだ累積の上限)を引き上げ、同じトークンで再開します。`STOP` になるまで部分出力は採用せず、トークンがない場合は未完了として扱います。Interactions APIで `incomplete` になった場合も同様に、`continuation_token` が返されていれば完了済みのhopの出力を保持したまま `max_output_tokens` を引き上げて継続し、トークンがなければ未完了として例外にします。`failed` と `cancelled` は従来どおり例外です(再開の可否と引数は[公式Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode)で確認してください)。
 
-`requires_action` はモデルがツール呼び出しを求めた状態で、完了ではありません。12.2節の承認ゲートを通し、承認された場合だけクライアント側でツールを実行します。`store=True` では結果をこのinteractionの `id` で送り、`store=False` ではサーバーがツール呼び出しの履歴を復元できないため、元の入力・返されたmodelのsteps・`function_result` を次のリクエストにまとめて送ります。`requires_continuation` に対して `continuation_token` で手動の継続を送るのは、SDKの自動継続を `automatic_continuation=False` で無効にした自前ループに限ります。`incomplete` は終了状態なので、自動継続の設定にかかわらず、上の手順で `max_output_tokens` を引き上げて再開します。`store=False` の自前ループでは、サーバーに前のhopが残らないため、hopごとに元の入力・モデル・ツール・system instruction(設定時)・生成設定を毎回再送し、`continuation_token` を付けます(`store=True` は従来どおり `previous_interaction_id` を付けます)。自動継続が有効なままでは、SDKのストリームが次のhopを続けるため、自前で別のhopを開始しないでください。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
+`requires_action` はモデルがツール呼び出しを求めた状態で、完了ではありません。12.2節の承認ゲートを通し、承認された場合だけクライアント側でツールを実行します。後続ターンでも他のツール(ツールBなど)を引き続き呼び出せるよう、結果を送るすべてのリクエストで元の同じ `tools` 宣言を再送します。`store=True` では結果をこのinteractionの `id` と同じ `tools` 宣言とともに送り、`store=False` ではサーバーがツール呼び出しの履歴を復元できないため、元の入力・同じ `tools` 宣言・返されたmodelのsteps・`function_result` を次のリクエストにまとめて送ります。`requires_continuation` に対して `continuation_token` で手動の継続を送るのは、SDKの自動継続を `automatic_continuation=False` で無効にした自前ループに限ります。`incomplete` は終了状態なので、自動継続の設定にかかわらず、上の手順で `max_output_tokens` を引き上げて再開します。`store=False` の自前ループでは、サーバーに前のhopが残らないため、hopごとに元の入力・モデル・ツール・system instruction(設定時)・生成設定を毎回再送し、`continuation_token` を付けます(`store=True` は従来どおり `previous_interaction_id` を付けます)。自動継続が有効なままでは、SDKのストリームが次のhopを続けるため、自前で別のhopを開始しないでください。再接続の引数名・イベント形式・対応SDKバージョンは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)とストリーミングの公式ドキュメントで確認してください。
 
 ---
 

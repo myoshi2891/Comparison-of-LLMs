@@ -230,6 +230,12 @@ flowchart TD
 
 ER 2 は画像に対して **正規化座標 `[y, x]`(0〜1000)** と **ラベル** の JSON を返します。✅ 座標の順序が一般的な `(x, y)` と**逆**なので、変換ミスが典型的なバグ源です。
 
+以降のコード例を実行する前に、公式の Google Gen AI SDK(`google-genai`)をインストールしてください。
+
+```bash
+pip install google-genai
+```
+
 ```python
 import json
 import re

@@ -405,6 +405,8 @@ while True:
         # 含まれるかは公式資料で確認し、含まれる場合は重複して結合しないよう調整する。
         parts.append(model_text(interaction))
         max_output_tokens = min(max_output_tokens * 2, MAX_OUTPUT_CEILING)  # hopをまたいだ累積の上限として引き上げる
+        # 注意: 継続の create 応答を通信断などで失うと成否が不明になり、前hopのIDから再送すると別の課金分岐が始まり得る。
+        # その継続 create の成否が分かるまでは、同じ継続リクエストを再送しないこと。
         interaction = client.interactions.create(
             model="gemini-4-hydrogen",
             previous_interaction_id=interaction_id,  # store=True のため元の入力は再送しない
@@ -427,7 +429,7 @@ print(text)  # 生成された差分を表示する
 
 なお、Paid tier で `background=True` と `store=True` を使って保存した interaction は既定で **55日間** 保持されます。保持期間は設定で変更可能であり、保存済み interaction は使用後に削除してください。`store=False` は interaction の保存を無効にしますが、ゼロデータ保持を保証するものではなく、プロンプトとレスポンスは不正利用の監視のために保持される場合があります。より厳しいデータ保持要件（短期保持など）がある場合は `store=False` によるステートレスなフォアグラウンド継続を選択し、ゼロデータ保持が必須のワークロードでは、Vertex AI を使うだけでは保持ゼロは保証されません。`store=False` を必ず指定したうえで、適用されるログ記録・キャッシュ・グラウンディングの制限（Google 検索によるグラウンディングの制限を含む）を公式ドキュメントで確認してから利用してください。
 
-ポーリング中にプロセスが落ちたり `interactions.get` が失敗したりしても、`create` をやり直すと**別のジョブ**が始まり、課金も二重になります。継続するたびに、**各hopの `interaction_id`、そのhopで受け取ったテキスト、およびその時点の `max_output_tokens`(出力トークン上限)**を順序付きで永続化しておいてください。最新のinteractionが前のhopの出力を含むとは限らないため、復旧時は保存済みの前hopまでのテキストを `parts` に戻し、保存済みの `max_output_tokens` も復元したうえで、最新の `interaction_id` で `client.interactions.get(id=interaction_id)` から状態確認を再開して、そのhop以降の出力だけを追記します。ポーリング失敗が複数回続いても初期値へ戻さず、永続化しておいた `max_output_tokens` を引き継いでください(継続時に前hopの出力がどう返るかは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)で確認してください)。不要になったジョブは、同じIDに対してAPIリファレンスのキャンセル操作を使って止めます(メソッド名・対応SDKバージョンは[Interactions APIリファレンス](https://ai.google.dev/api/interactions-api)で確認)。
+ポーリング中にプロセスが落ちたり `interactions.get` が失敗したりしても、`create` をやり直すと**別のジョブ**が始まり、課金も二重になります。また、`incomplete` 後の継続 `client.interactions.create` のレスポンスを通信断などで受け取れなかった場合は、その継続hopが作られたかどうかが不明になるため、前hopから継続 `create` を再送すると別の課金ブランチが始まり得ます。その継続リクエストの結果が分かるまでは継続を再送しないでください。継続するたびに、**各hopの `interaction_id`、そのhopで受け取ったテキスト、およびその時点の `max_output_tokens`(出力トークン上限)**を順序付きで永続化しておいてください。最新のinteractionが前のhopの出力を含むとは限らないため、復旧時は保存済みの前hopまでのテキストを `parts` に戻し、保存済みの `max_output_tokens` も復元したうえで、最新の `interaction_id` で `client.interactions.get(id=interaction_id)` から状態確認を再開して、そのhop以降の出力だけを追記します。ポーリング失敗が複数回続いても初期値へ戻さず、永続化しておいた `max_output_tokens` を引き継いでください(継続時に前hopの出力がどう返るかは[公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation)で確認してください)。不要になったジョブは、同じIDに対してAPIリファレンスのキャンセル操作を使って止めます(メソッド名・対応SDKバージョンは[Interactions APIリファレンス](https://ai.google.dev/api/interactions-api)で確認)。
 
 **Long Decode の運用ルール**
 
