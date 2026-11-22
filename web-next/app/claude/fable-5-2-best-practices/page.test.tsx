@@ -149,6 +149,37 @@ it("目次19リンクの文言・順序・アンカー解決・全ID一意性・
     .map((a) => decodeURIComponent((a.getAttribute("href") ?? "").slice(1)))
     .filter((id) => !id || !idSet.has(id));
   expect(unresolved).toEqual([]);
+  // 出典リンク(#S*)は4列の公式出典表を含め、同じ出典番号・期待URLを持つ参考文献行へ解決する。
+  const expectedSourceUrls = new Map<string, string>();
+  for (const table of expected.tables) {
+    for (const row of table.slice(1)) {
+      const id = row[0]?.[3] ?? "";
+      if (/^S\d+$/.test(id)) {
+        const url = row.find((cell) => /^https?:\/\//.test(cell[3] ?? ""))?.[3] ?? "";
+        expectedSourceUrls.set(id, url);
+      }
+    }
+  }
+  const sourceRowById = new Map(
+    Array.from(container.querySelectorAll("tr[id]"))
+      .filter((tr) => /^S\d+$/.test(tr.id))
+      .map((tr) => [
+        tr.id,
+        {
+          number: text(tr.querySelector("td") as Element),
+          url: tr.querySelector('a[href^="http"]')?.getAttribute("href") ?? "",
+        },
+      ])
+  );
+  expect(sourceRowById.size).toBe(expectedSourceUrls.size);
+  const sourceLinks = Array.from(container.querySelectorAll('a[href^="#S"]'));
+  expect(sourceLinks.length).toBeGreaterThan(0);
+  for (const a of sourceLinks) {
+    const id = decodeURIComponent((a.getAttribute("href") ?? "").slice(1));
+    const row = sourceRowById.get(id);
+    expect(row).toEqual({ number: id, url: expectedSourceUrls.get(id) });
+    expect(text(a)).toBe(id);
+  }
   const h3ById = new Map(Array.from(container.querySelectorAll("h3")).map((e) => [e.id, text(e)]));
   const subsectionLinks = Array.from(container.querySelectorAll('a[href^="#s"]'))
     .map((a) => decodeURIComponent((a.getAttribute("href") ?? "").slice(1)))

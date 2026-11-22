@@ -2149,7 +2149,7 @@ export default function Page() {
                     {"    "}
                     <span className="hljs-comment">
                       {
-                        "# 出力トークン 0 の事前拒否(pre-output refusal)は入力トークンも非課金(billed 明示時はそれに従う)"
+                        "# 出力トークン 0 の事前拒否(pre-output refusal)は billed 明示時にそれに従い、未指定時は課金対象カテゴリ以外を非課金とする"
                       }
                     </span>
                   </span>
@@ -2170,12 +2170,30 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"        billed = (response.get("}
+                    {"        details = response.get("}
                     <span className="hljs-string">{'"stop_details"'}</span>
                     {") "}
                     <span className="hljs-keyword">{"or"}</span>
-                    {" {}).get("}
+                    {" {}"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        billed = details.get("}
                     <span className="hljs-string">{'"billed"'}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        billable_pre_output = details.get("}
+                    <span className="hljs-string">{'"category"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" ("}
+                    <span className="hljs-string">{'"bio"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"frontier_llm"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"reasoning_extraction"'}</span>
                     {")"}
                   </span>
                   {"\n"}
@@ -2186,9 +2204,17 @@ export default function Page() {
                     <span className="hljs-keyword">{"is"}</span>{" "}
                     <span className="hljs-literal">{"False"}</span>{" "}
                     <span className="hljs-keyword">{"or"}</span>
-                    {" (billed "}
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            billed "}
                     <span className="hljs-keyword">{"is"}</span>{" "}
-                    <span className="hljs-literal">{"None"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
                     <span className="hljs-keyword">{"and"}</span>
                     {" (usage.get("}
                     <span className="hljs-string">{'"output_tokens"'}</span>
@@ -2197,8 +2223,16 @@ export default function Page() {
                     <span className="hljs-number">{"0"}</span>
                     {") == "}
                     <span className="hljs-number">{"0"}</span>
-                    {"):"}
                   </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>
+                    {" billable_pre_output"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"        ):"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"            "}
@@ -3716,6 +3750,40 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"            "}
                     <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                checkpoint["}
+                    <span className="hljs-string">{'"messages"'}</span>
+                    {"] = "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {"(messages)"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" container_id "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    checkpoint["}
+                    <span className="hljs-string">{'"container_id"'}</span>
+                    {"] = container_id"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"if"}</span>
                     {" on_text "}
                     <span className="hljs-keyword">{"is"}</span>{" "}
                     <span className="hljs-keyword">{"not"}</span>{" "}
@@ -3754,40 +3822,6 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"            "}
-                    <span className="hljs-keyword">{"if"}</span>
-                    {" checkpoint "}
-                    <span className="hljs-keyword">{"is"}</span>{" "}
-                    <span className="hljs-keyword">{"not"}</span>{" "}
-                    <span className="hljs-literal">{"None"}</span>
-                    {":"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"                checkpoint["}
-                    <span className="hljs-string">{'"messages"'}</span>
-                    {"] = "}
-                    <span className="hljs-built_in">{"list"}</span>
-                    {"(messages)"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"                "}
-                    <span className="hljs-keyword">{"if"}</span>
-                    {" container_id "}
-                    <span className="hljs-keyword">{"is"}</span>{" "}
-                    <span className="hljs-keyword">{"not"}</span>{" "}
-                    <span className="hljs-literal">{"None"}</span>
-                    {":"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"                    checkpoint["}
-                    <span className="hljs-string">{'"container_id"'}</span>
-                    {"] = container_id"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"            "}
                     <span className="hljs-keyword">{"continue"}</span>
                   </span>
                   {"\n"}
@@ -3816,6 +3850,28 @@ export default function Page() {
                     <span className="hljs-string">{'"completed"'}</span>
                     {"] = "}
                     <span className="hljs-literal">{"True"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                checkpoint["}
+                    <span className="hljs-string">{'"final_response"'}</span>
+                    {"] = data"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" container_id "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    checkpoint["}
+                    <span className="hljs-string">{'"container_id"'}</span>
+                    {"] = container_id"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3861,6 +3917,47 @@ export default function Page() {
                     {"            "}
                     <span className="hljs-keyword">{"return"}</span>
                     {" data"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}></span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" on_text "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" block "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" data["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"]:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" block.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"text"'}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" block.get("}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    on_text(block["}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {"])"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}></span>

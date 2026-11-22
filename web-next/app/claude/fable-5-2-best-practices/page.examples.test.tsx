@@ -711,10 +711,17 @@ exec(compile(ast.Module(body=nodes, type_ignores=[]), "example", "exec"), scope)
 
 usage = {"input_tokens": 100000, "output_tokens": 10000}
 pre_output_usage = {"input_tokens": 100000, "output_tokens": 0}
+one_million_pre_output = {"input_tokens": 1_000_000, "output_tokens": 0}
 assert scope["usd"](usage, {"stop_reason": "refusal", "stop_details": {"billed": False}}) == 0.0
-# stop_details.billed が無い公式レスポンス形式では、出力トークン 0 の事前拒否(pre-output refusal)を非課金(0.0)とする
+# stop_details.billed が無い公式レスポンス形式では、非課金カテゴリの事前拒否(pre-output refusal)は 0.0
 assert scope["usd"](pre_output_usage, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": "cyber"}}) == 0.0
+assert scope["usd"](pre_output_usage, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": "general_harms"}}) == 0.0
 assert scope["usd"](pre_output_usage, {"stop_reason": "refusal"}) == 0.0
+# bio / frontier_llm / reasoning_extraction の事前拒否は billed 未指定時は入力トークンに課金される(1M bio 入力 = $8.0)
+for category in ("bio", "frontier_llm", "reasoning_extraction"):
+    assert scope["usd"](one_million_pre_output, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": category}}) == 8.0, category
+    # 明示的に billed=False の場合は非課金を優先する
+    assert scope["usd"](one_million_pre_output, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": category, "billed": False}}) == 0.0, category
 # 出力トークンが発生した拒否や billed=True の拒否、通常応答は従来どおり課金する
 assert scope["usd"](usage, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": "cyber"}}) > 0
 assert scope["usd"](pre_output_usage, {"stop_reason": "refusal", "stop_details": {"billed": True}}) > 0
@@ -778,7 +785,7 @@ except ValueError:
     pass
 else:
     raise AssertionError("completed checkpoint must not be resumed")
-# 最終応答のon_textコールバックが失敗しても、checkpointは完了済みとして残る
+# 最終応答のon_textコールバックが失敗しても、checkpointは完了済みかつfinal_responseを保持しAPI再実行なしで回収できる
 requests.clear()
 replies[:] = [done]
 failing_checkpoint = {}
@@ -791,6 +798,38 @@ except RuntimeError:
 else:
     raise AssertionError("callback error should propagate")
 assert failing_checkpoint["completed"] is True
+assert failing_checkpoint["final_response"] is done
+# pause_turnのon_textが失敗しても、messagesとcontainer_idはcheckpointへ保存済みで再開できる
+requests.clear()
+paused_with_ctr = {"stop_reason": "pause_turn", "content": [{"type": "text", "text": "p1"}], "container": {"id": "ctr_pause"}}
+replies[:] = [paused_with_ctr, done]
+pause_cp = {}
+try:
+    scope["agent_loop"]("task", [], None, max_turns=3, checkpoint=pause_cp, on_text=fail_on_text)
+except RuntimeError:
+    pass
+else:
+    raise AssertionError("pause_turn callback error should propagate")
+assert pause_cp["messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused_with_ctr["content"]}]
+assert pause_cp["container_id"] == "ctr_pause"
+resumed = []
+assert scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=pause_cp, on_text=resumed.append) is done
+assert requests[1]["messages"] == pause_cp["messages"]
+assert requests[1]["container"] == "ctr_pause"
+assert resumed == ["final."]
+# tool_use応答に含まれるtextブロックもon_textへちょうど1回通知される(refusal/max_tokensでは通知しない)
+requests.clear()
+tool_reply = {"stop_reason": "tool_use", "content": [{"type": "text", "text": "checking..."}, {"type": "tool_use", "id": "t1", "name": "read", "input": {}}]}
+replies[:] = [tool_reply, done]
+tool_texts = []
+assert scope["agent_loop"]("task", [], lambda _n, _a: "ok", max_turns=3, on_text=tool_texts.append) is done
+assert tool_texts == ["checking...", "final."]
+for early_reason in ("refusal", "max_tokens"):
+    requests.clear()
+    replies[:] = [{"stop_reason": early_reason, "content": [{"type": "text", "text": "ignored"}]}]
+    early_texts = []
+    assert scope["agent_loop"]("task", [], None, max_turns=2, on_text=early_texts.append)["stop_reason"] == early_reason
+    assert early_texts == []
 `,
     examples()
   );
