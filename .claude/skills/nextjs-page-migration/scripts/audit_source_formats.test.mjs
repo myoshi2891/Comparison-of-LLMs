@@ -2114,3 +2114,70 @@ test("detects text writes with whitespace around the member-access dot", () => {
 	// A write after the synchronous capture does not alter the captured string.
 	assert.equal(audit(`${card}<script>${read}var src = script.textContent; mermaid.render('x', src); script . textContent = 'x';</script>`, page).status, 0);
 });
+
+test("skips external-script marker for non-executable or nomodule classic scripts", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	for (const ignored of [
+		'<script type="text/plain" src="./notes.txt"></script>',
+		'<script type="application/json" src="./data.json"></script>',
+		'<script nomodule src="./legacy.js"></script>',
+	]) {
+		const res = audit(`${card}${ignored}`, page);
+		assert.equal(res.status, 0, ignored);
+		assert.deepEqual(res.data.unresolvedMermaidSources, [], ignored);
+	}
+	for (const exec of [
+		'<script src="./render.js"></script>',
+		'<script type="module" nomodule src="./render.js"></script>',
+	]) {
+		const res = audit(`${card}${exec}`, page);
+		assert.equal(res.status, 1, exec);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["external-script:./render.js"], exec);
+	}
+});
+
+test("evaluates || lower precedence than && in alwaysTrue guards", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	for (const cond of ["true || false", "true && true", "true || false && false", "false && false || true"]) {
+		const script = `<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (${cond}) { var src = card.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
+		assert.equal(audit(`${card}${script}`, page).status, 0, cond);
+	}
+});
+
+test("rejects card owner append that can move an existing script while allowing fresh nodes", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div id="chart" class="diagram-card"><script type="text/plain">${chart}</script><script type="text/plain">flowchart LR\nX --> Y</script></div>`;
+	const select = "var card = document.querySelector('#chart');";
+	const read = "var src = card.querySelector('script').textContent; mermaid.render('x', src);";
+	assert.equal(audit(`${card}<script>${select} card.append(document.createElement('p')); ${read}</script>`, page).status, 0);
+	for (const edit of [
+		"card.appendChild(card.querySelector('script'));",
+		"var s = card.querySelector('script'); card.append(s);",
+	]) {
+		const res = audit(`${card}<script>${select} ${edit} ${read}</script>`, page);
+		assert.equal(res.status, 1, edit);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:chart"], edit);
+	}
+});
+
+test("rejects indexed traversal when class changes can precede querySelectorAll or prior matches lack scripts", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const loop = "for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }";
+	// Class change before querySelectorAll -> unresolved; after synchronous querySelectorAll -> eligible.
+	const beforeQuery = audit(`${card}<script>document.body.classList.remove('diagram-card'); var cards = document.querySelectorAll('.diagram-card'); ${loop}</script>`, page);
+	assert.equal(beforeQuery.status, 1);
+	const afterQuery = audit(`${card}<script>var cards = document.querySelectorAll('.diagram-card'); cards[0].classList.remove('diagram-card'); ${loop}</script>`, page);
+	assert.equal(afterQuery.status, 0);
+	// Earlier selector match without a script aborts the loop before reaching the expected card.
+	const brokenPrior = `<div class="diagram-card"><p>empty</p></div>${card}`;
+	const priorRes = audit(`${brokenPrior}<script>var cards = document.querySelectorAll('.diagram-card'); ${loop}</script>`, page);
+	assert.equal(priorRes.status, 1);
+	assert.deepEqual(priorRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+});

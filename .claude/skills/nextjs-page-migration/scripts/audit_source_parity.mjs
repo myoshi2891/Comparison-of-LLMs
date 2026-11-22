@@ -1483,8 +1483,6 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const alwaysTrue = (condition, at) => {
         const s = unwrapParens(condition);
         if (provenBool(s, at) === true) return true;
-        const andParts = splitTop(s, "&&");
-        if (andParts.length > 1) return andParts.every(part => alwaysTrue(part, at));
         const orParts = splitTop(s, "||");
         if (orParts.length > 1) {
           // Operands run left to right: a true operand counts only when every earlier one is
@@ -1495,6 +1493,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           }
           return false;
         }
+        const andParts = splitTop(s, "&&");
+        if (andParts.length > 1) return andParts.every(part => alwaysTrue(part, at));
         return false;
       };
       /** Condition text of a `(...)` group closed at `closeParen` when it follows `if` (not `else if`). */
@@ -1586,9 +1586,54 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const all = collection && /^document\.querySelectorAll\(\s*(['"])(.*?)\1\s*\)$/.exec(collection);
       // The supported indexed traversal visits the selected cards in order.
       if (!all || !matchesCardSelector(cardTag, all[2])) return false;
+      // Every selector match preceding this card must also be able to complete the loop's
+      // script lookup; otherwise a null.textContent TypeError aborts the loop before this card.
+      if (selectedScript.priorMatchesComplete && !selectedScript.priorMatchesComplete(all[2], selected[3] === "script")) return false;
       // querySelectorAll returns a static list of the elements parsed when its initializer ran.
       // A card that a classic initializer may precede is not provably in the traversed list.
       if (!selectedScript.cardAvailableAt(collectionBinding.at)) return false;
+      // A same-scope class change that can run before document.querySelectorAll can alter which
+      // elements match the card selector; changes provably after the query leave the static list intact.
+      const selectorClasses = Array.from(all[2].matchAll(/\.([\w-]+)/g), m => m[1]);
+      if (selectorClasses.length > 0) {
+        const classChangeCanPrecede = editIndex => {
+          if (editIndex <= collectionBinding.at) return true;
+          if (functions.some(fn => fn.body < collectionBinding.at && collectionBinding.at < fn.end)) return true;
+          if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
+          if (loops.some(loop => loop.start < collectionBinding.at && collectionBinding.at < loop.end)) return true;
+          return false;
+        };
+        const classChangeRe = /(?:([A-Za-z_$][\w$]*)\s*)?\.\s*(?:className\s*(?:=(?!=)|\+=)|(?:setAttribute|removeAttribute|toggleAttribute)\s*\(\s*(?!(['"])(?!class\2)[^'"\n]*\2)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\s*\(|classList\s*\.\s*(?:add|remove|toggle|replace)\s*\()/gi;
+        const changesSelectorClass = match => {
+          if (/\bclassName\s*(?:=|\+=)$/.test(match[0])) {
+            const targetName = match[1];
+            const bound = targetName && bindingAt(targetName, match.index);
+            const rhs = /^\s*(['"])((?:[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n])/.exec(literalSource.slice(match.index + match[0].length));
+            if (bound && /^document\.createElement\(\s*(['"])[A-Za-z][\w-]*\1\s*\)$/.test(bound.value) && rhs) {
+              const tokens = classTokens(rhs[2]);
+              return tokens.some(token => selectorClasses.includes(token));
+            }
+            return true;
+          }
+          if (!/\bclassList\s*\.\s*(?:add|remove|toggle|replace)\s*\($/i.test(match[0])) return true;
+          const start = match.index + match[0].length;
+          let depth = 1, end = -1;
+          for (let k = start; k < executable.length; k++) {
+            if (executable[k] === "(") depth++;
+            else if (executable[k] === ")" && --depth === 0) { end = k; break; }
+          }
+          if (end < 0) return true;
+          const args = literalSource.slice(start, end).split(",").map(s => s.trim()).filter(Boolean);
+          if (args.length === 0) return true;
+          const tokenArgs = /\btoggle\s*\($/i.test(match[0]) ? args.slice(0, 1) : args;
+          return tokenArgs.some(arg => {
+            const lit = /^(['"])((?:[^\\]|\\.)*)\1$/.exec(arg);
+            return !lit || selectorClasses.includes(lit[2]);
+          });
+        };
+        if (Array.from(literalSource.matchAll(classChangeRe))
+          .some(edit => classChangeCanPrecede(edit.index) && changesSelectorClass(edit))) return false;
+      }
       // The card initializer and this read must both run inside the body of the same loop;
       // a matching loop elsewhere in the scope proves nothing about this payload.
       const loopHeader = new RegExp(`for\\s*\\(\\s*var\\s+${indexed[2]}\\s*=\\s*0\\s*;\\s*${indexed[2]}\\s*<\\s*${indexed[1]}\\.length\\s*;\\s*${indexed[2]}\\+\\+\\s*\\)\\s*\\{`, "g");
@@ -1769,13 +1814,53 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const html = decodeQuotedEntryEscapes(rhs[2], true);
       return html !== undefined && /^\s*<svg\b[\s\S]*<\/svg>\s*$/i.test(html) && !/<script\b/i.test(html);
     };
+    const isSafeFreshAppend = edit => {
+      const start = edit.index + edit[0].length;
+      let depth = 1, end = -1;
+      for (let k = start; k < executable.length; k++) {
+        if (executable[k] === "(") depth++;
+        else if (executable[k] === ")" && --depth === 0) { end = k; break; }
+      }
+      if (end < 0) return false;
+      const args = [];
+      let argStart = start, paren = 0, bracket = 0, brace = 0;
+      for (let k = start; k < end; k++) {
+        const ch = executable[k];
+        if (ch === "(") paren++;
+        else if (ch === ")") paren--;
+        else if (ch === "[") bracket++;
+        else if (ch === "]") bracket--;
+        else if (ch === "{") brace++;
+        else if (ch === "}") brace--;
+        else if (ch === "," && paren === 0 && bracket === 0 && brace === 0) {
+          args.push(literalSource.slice(argStart, k).trim());
+          argStart = k + 1;
+        }
+      }
+      args.push(literalSource.slice(argStart, end).trim());
+      if (args.length === 0 || args.some(a => a === "")) return false;
+      const isFreshNonScriptNode = (expr, at, seen = new Set()) => {
+        const createEl = /^document\.createElement\(\s*(['"])([A-Za-z][\w-]*)\1\s*\)$/.exec(expr);
+        if (createEl) return createEl[2].toLowerCase() !== "script";
+        if (/^document\.createTextNode\(\s*(['"])(?:[^\\]|\\.)*\1\s*\)$/.test(expr)) return true;
+        if (/^(['"])(?:[^\\]|\\.)*\1$/.test(expr)) return true;
+        if (/^\w+$/.test(expr) && !seen.has(expr)) {
+          const bound = bindingAt(expr, at);
+          if (bound) return isFreshNonScriptNode(bound.value, bound.at, new Set(seen).add(expr));
+        }
+        return false;
+      };
+      return args.every(arg => isFreshNonScriptNode(arg, edit.index));
+    };
     // Changing a script's type can move a typed query (script[type="text/plain"]) to another script.
     // Attribute writes with a literal non-type name keep the selection; computed names stay unresolved.
     const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute)\\s*\\(\\s*(?!(['"])(?!type\\4)[^'"\\n]*\\4)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
     if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index) || mayBeScriptContainer(edit[1], edit.index)) ||
       Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeCardScript(edit[1], edit.index)) ||
       Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit))) ||
-      Array.from(literalSource.matchAll(wrapperAppendEdits)).some(edit => !mayBeCardOwner(edit[1]) && mayBeScriptContainer(edit[1], edit.index))) return false;
+      Array.from(literalSource.matchAll(wrapperAppendEdits)).some(edit =>
+        mayBeCardOwner(edit[1]) ? !isSafeFreshAppend(edit) : mayBeScriptContainer(edit[1], edit.index)
+      )) return false;
     return { base: usesValidatedDedent ? dedentedPayload : payload };
   };
   // Strings/comments are already masked. Balance parentheses so later ASI
@@ -1975,6 +2060,13 @@ function materializePlainTextCards(src) {
   const executableScripts = scripts.filter(script => {
     // Scripts inside uninstantiated template content are not renderers for document cards.
     if (script.inTemplate) return false;
+    // nomodule scripts are skipped by module-capable browsers; they stay in the DOM inventory.
+    const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
+    // nomodule only suppresses classic scripts; module scripts run regardless.
+    if (readHtmlAttribute(script.attributes, "nomodule") !== undefined && type !== "module") return false;
+    // The HTML standard's JavaScript MIME type essences (text/plain payloads stay excluded).
+    const isExecutableType = !type || type === "module" || /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(type);
+    if (!isExecutableType) return false;
     // A script with src ignores its child text; external renderer code is not inspectable here.
     if (readHtmlAttribute(script.attributes, "src") !== undefined) {
       const src = readHtmlAttribute(script.attributes, "src").trim();
@@ -1983,12 +2075,7 @@ function materializePlainTextCards(src) {
       }
       return false;
     }
-    // nomodule scripts are skipped by module-capable browsers; they stay in the DOM inventory.
-    const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
-    // nomodule only suppresses classic scripts; module scripts run regardless.
-    if (readHtmlAttribute(script.attributes, "nomodule") !== undefined && type !== "module") return false;
-    // The HTML standard's JavaScript MIME type essences (text/plain payloads stay excluded).
-    return !type || type === "module" || /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(type);
+    return true;
   });
   // Classic scripts share the global scope; each module has its own CLASSDEFS.
   const allScopes = [
@@ -2052,6 +2139,8 @@ function materializePlainTextCards(src) {
   });
   const scopes = allScopes.filter(scope => scope.hasRenderer);
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const templateRanges = extractElementContents(stashed, tag => /^<template(?![\w:-])/i.test(tag), true)
+    .map(template => ({ start: template.index, end: template.end }));
   const cards = extractElementContents(stashed, tag => {
     return classTokens(readHtmlAttribute(tag, "class")).some(c => c === "code-block" || c === "diagram-card");
   }, true);
@@ -2134,6 +2223,20 @@ function materializePlainTextCards(src) {
             segment.start <= at && at <= segment.end && segment.documentPosition > start + marker.index),
           cardAvailableAt: at => renderer.deferredModule || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition >= start),
+          priorMatchesComplete: (selector, anyScript) => {
+            const matches = extractElementContents(stashed, tag => matchesCardSelector(tag, selector), true);
+            for (const el of matches) {
+              if (el.index >= card.index) continue;
+              if (templateRanges.some(range => range.start < el.index && el.index < range.end)) continue;
+              const elScripts = Array.from(el.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
+                .filter(m => !scripts[Number(m[1])].inTemplate);
+              const found = anyScript
+                ? elScripts[0]
+                : elScripts.find(m => readHtmlAttribute(scripts[Number(m[1])].attributes, "type")?.toLowerCase() === "text/plain");
+              if (!found) return false;
+            }
+            return true;
+          },
           unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1,
           // Whether an element matched by `selector` inside the card can contain the selected
           // script or precede it (so an edit could insert a matching script before it).
