@@ -196,7 +196,7 @@ flowchart TD
 
 | 経路 | 使えるもの | 条件・注意 |
 |---|---|---|
-| 公開 API | **ER 2**(`gemini-robotics-er-2-preview` / `-streaming-preview`) | プレビュー。Gemini API キーが必要。制限なしの API キーは 403 になる ✅。従来の標準 API キーを使っている場合は、サービスアカウントに紐づく **auth key へ移行**する。既存の標準キーを Gemini API に制限するだけでは 2026年9月以降は使えなくなるため不十分([公式: auth key への移行](https://ai.google.dev/gemini-api/docs/api-key#migrate-to-auth-key)) |
+| 公開 API | **ER 2**(`gemini-robotics-er-2-preview` / `-streaming-preview`) | プレビュー。Gemini API キーが必要。制限なしの API キーは 403 になる ✅。Gemini API に制限した標準 API キーは引き続き利用可能だが、従来の標準 API キーを使っている場合はサービスアカウントに紐づく **auth key への移行を推奨**([公式: auth key への移行](https://ai.google.dev/gemini-api/docs/api-key#migrate-to-auth-key)) |
 | 企業向け | Gemini Enterprise Agent Platform(ER 2 の private preview) | ✅ |
 | アーリーアクセス | **VLA / On-Device 2**(トラステッドテスターのフォーム経由) | 100 以上のトラステッドテスターと待機リストがあると記載 📰 |
 | パートナー | **GR 2.5** | Agile、Apptronik、Mercedes-Benz が名指しされている ✅ |
@@ -1022,7 +1022,7 @@ def wilson_interval(successes: int, trials: int, z: float = 1.96) -> tuple[float
 1. **シャドーモード**: 最初はロボットを動かさず、ER の判断だけを記録して人間の作業と突き合わせる。
 2. **失敗動画を捨てない。** Argon の「失敗動画から原因を仮説化し、シミュレーションと実機で検証する」ループ(✅ 公式)を日常運用に組み込む。
 3. **バージョン固定と回帰テスト**: ER 1.6 の終了のように、プレビューのモデルは入れ替わります。✅ モデル ID を設定ファイルに外出しし、**固定のテストシナリオ**を CI に置く。
-4. **API キーを auth key へ移行する**: 制限なしのキーは 403 になる。✅ 従来の標準キーは制限を付けても 2026年9月以降は使えなくなるため、サービスアカウントに紐づく auth key へ移行する。✅
+4. **API キーは制限付きにするか auth key へ移行する**: 制限なしのキーは 403 になる。✅ Gemini API に制限した標準キーは引き続き利用できるが、サービスアカウントに紐づく auth key への移行を推奨する。✅
 5. **コストの把握**: 動画入力や高い thinking は計算コストが増える。✅ 料金は公式の価格ページで確認する。
 
 ---
@@ -1113,7 +1113,7 @@ def wilson_interval(successes: int, trials: int, z: float = 1.96) -> tuple[float
 ### 計画・アクセス
 - [ ] GR 2.5 のパートナーアクセスの有無を確認した(なければ ER 2 + 抽象化された VLA で設計)
 - [ ] ER 1.6 のモデル ID が残っていないことを確認した(2026-08-31 終了)
-- [ ] 標準 API キーを auth key へ移行した(制限なしは 403、制限付きの標準キーも 2026年9月以降は不可)
+- [ ] Gemini API キーを制限付きにするか、推奨の auth key へ移行した(制限なしの標準キーは 403、制限付きの標準キーは引き続き利用可)
 
 ### 実装
 - [ ] ER の座標 `[y, x]`(0〜1000)の変換関数を 1 か所に集約し、画像上に描画して確認した

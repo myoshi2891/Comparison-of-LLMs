@@ -347,7 +347,7 @@ flowchart TD
     SB -- "いいえ" --> C["通常の generate_content"]
     SB -- "はい" --> D
     M -- "非ストリーミング REST" --> NB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
-    NB -- "いいえ" --> C
+    NB -- "いいえ" --> NR["通常の非ストリーミング REST<br/>generateContent をそのまま呼び出す"]
     NB -- "はい" --> D
     B -- "いいえ" --> SAPI{"どのAPIのストリーミングか"}
     SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>generate_content_stream で逐次出力"]
@@ -385,18 +385,18 @@ flowchart TD
     IPOLL --> ICOLL["終端状態になった interaction の<br/>結合済み出力と usage を1回だけ蓄積"]
     ICOLL --> IST
     IST -- "requires_action" --> IACT["ツール呼び出しを承認ゲートに通す 12.2節"]
-    IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>(ツールBなど別ツールへのアクセスを後続ターンで維持)<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力 同じtools宣言 返されたmodelのsteps<br/>function_resultを次のリクエストに含める"]
+    IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>(ツールBなど別ツールへのアクセスを後続ターンで維持)<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>最新のmodelのstepsとfunction_result 同じtools宣言を含めて再送する"]
     IACT -- "拒否" --> IREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
     IRUN --> ACC
     IREJ --> ACC
-    IST -- "requires_continuation store=True<br/>automatic_continuation=False の自前ループ" --> ISS["previous_interaction_id と continuation_token に加え<br/>元のモデルと max_output_tokens を含む生成設定を<br/>毎hop再送して継続を送る"]
+    IST -- "requires_continuation store=True<br/>automatic_continuation=False の自前ループ" --> ISS["previous_interaction_id と continuation_token に加え<br/>元のモデル 元のtools宣言(設定時) system instruction(設定時)<br/>max_output_tokens を含む生成設定を毎hop再送して継続を送る"]
     IST -- "requires_continuation store=False<br/>automatic_continuation=False の自前ループ" --> ISL["元の入力と同じモデル ツール system instruction(設定時) 生成設定に<br/>continuation_token を付けて再送する"]
     ISS --> ACC
     ISL --> ACC
     IST -- "completed" --> JOIN["蓄積した全hopの出力を結合して採用"]
     JOIN --> G
     IST -- "incomplete" --> IINC{"continuation_token が返されたか"}
-    IINC -- "はい" --> IRES["蓄積したhopの出力を保持し<br/>max_output_tokens を累積の上限として引き上げ<br/>store=True は previous_interaction_id と continuation_token で継続<br/>store=False は元の入力 モデル ツール system instruction(設定時) 生成設定に continuation_token を付けて再送"]
+    IINC -- "はい" --> IRES["蓄積したhopの出力を保持し<br/>max_output_tokens を累積の上限として引き上げ<br/>store=True は previous_interaction_id と continuation_token に加え 元のモデル ツール(設定時) system instruction(設定時) 生成設定を再送して継続<br/>store=False は元の入力 モデル ツール system instruction(設定時) 生成設定に continuation_token を付けて再送"]
     IRES --> ACC
     IINC -- "いいえ" --> ERR["例外として扱い 部分出力を採用しない"]
     IST -- "failed cancelled" --> ERR
@@ -405,7 +405,7 @@ flowchart TD
     SDROP -- "はい" --> SUSE["中断したhopで最後に受け取ったusageは暫定値として保持<br/>同じバックグラウンドinteractionを再開して最終usageを受け取ったら置き換え<br/>usageは累積値なので両方を合算しない<br/>後続のusageが届かなければ最後に受け取った値をそのinteractionの値とし<br/>受け取っていなければ usage 不明と記録"]
     SUSE --> SCP{"バックグラウンド実行か /<br/>continuation_tokenを保存済みか"}
     SCP -- "store=True バックグラウンド<br/>(トークン有無を問わず)" --> SLEI["受信済みの出力を保持し チェックポイントから再生成しない<br/>同じinteraction idへ 最後に受信したevent_idを<br/>last_event_idとして付けて再接続し それ以降のイベントだけを追記"]
-    SCP -- "フォアグラウンド store=True<br/>continuation_token保存済み" --> SRES["チェックポイント以降に受信した出力を破棄<br/>(再生成テキストはevent_idでは重複除去できない)<br/>同じinteraction idに保存済みcontinuation_tokenを付けて再開し追記"]
+    SCP -- "フォアグラウンド store=True<br/>continuation_token保存済み" --> SRES["チェックポイント以降に受信した出力を破棄<br/>(再生成テキストはevent_idでは重複除去できない)<br/>同じinteraction idと保存済みcontinuation_tokenに加え<br/>元のモデル ツール(設定時) system instruction(設定時) 生成設定を再送して再開し追記"]
     SCP -- "フォアグラウンド store=False<br/>continuation_token保存済み" --> SSL["元の入力 モデル ツール system instruction(設定時) 生成設定に<br/>保存済みのcontinuation_tokenを付けて再送<br/>チェックポイント以降に受信した出力は破棄して再生成分で置き換える"]
     SCP -- "それ以外<br/>トークン未保存のフォアグラウンド等" --> SRST["完了済みのツール結果(function_result)を保持または<br/>永続的な冪等キー(idempotency key)で安全にリプレイ<br/>未完了分の未チェックポイント出力だけを破棄し<br/>continuation_tokenなしで再送"]
     SRES --> SACC
@@ -415,18 +415,18 @@ flowchart TD
     SDROP -- "いいえ 終了イベントを受信" --> SHOP["このhopの最終usageを確定し<br/>hopごとの最終値を合算する"]
     SHOP --> SST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
     SST -- "requires_action" --> SACT["ツール呼び出しを承認ゲートに通す 12.2節"]
-    SACT -- "承認" --> SRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力 同じtools宣言 返されたmodelのsteps<br/>function_resultを次のリクエストに含める"]
+    SACT -- "承認" --> SRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>最新のmodelのstepsとfunction_result 同じtools宣言を含めて再送する"]
     SACT -- "拒否" --> SREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
     SRUN --> SACC
     SREJ --> SACC
     SST -- "requires_continuation" --> SAUTO{"SDKの自動継続を無効にしたか<br/>automatic_continuation=False"}
     SAUTO -- "いいえ 既定の自動継続" --> SWAIT["自前では次のhopを送らない<br/>SDKのストリームが継続するイベントを同じ蓄積に追記"]
     SWAIT --> SACC
-    SAUTO -- "はい 自前ループ" --> SCONT["continuation_token で次のhopをストリーミングで送る<br/>store=True は previous_interaction_id も付ける<br/>store=False は毎hop 元の入力 モデル ツール system instruction(設定時) 生成設定を再送する<br/>新しいhopのイベントを同じ蓄積に追記"]
+    SAUTO -- "はい 自前ループ" --> SCONT["continuation_token で次のhopをストリーミングで送る<br/>store=True は previous_interaction_id に加え 元のモデル ツール(設定時) system instruction(設定時) 生成設定も毎hop再送する<br/>store=False は毎hop 元の入力 モデル ツール system instruction(設定時) 生成設定を再送する<br/>新しいhopのイベントを同じ蓄積に追記"]
     SCONT --> SACC
     SST -- "completed" --> JOIN
     SST -- "incomplete" --> SINC{"continuation_token が返されたか"}
-    SINC -- "はい" --> SIRES["蓄積した出力を保持し<br/>max_output_tokens を累積の上限として引き上げ<br/>continuation_token で次のhopをストリーミングで送る<br/>store=True は previous_interaction_id も付け store=False は元の入力 モデル ツール system instruction(設定時) 生成設定を再送"]
+    SINC -- "はい" --> SIRES["蓄積した出力を保持し<br/>max_output_tokens を累積の上限として引き上げ<br/>continuation_token で次のhopをストリーミングで送る<br/>store=True は previous_interaction_id に加え 元のモデル ツール(設定時) system instruction(設定時) 生成設定も再送し store=False は元の入力 モデル ツール system instruction(設定時) 生成設定を再送"]
     SIRES --> SACC
     SINC -- "いいえ" --> ERR
     SST -- "failed cancelled" --> ERR
