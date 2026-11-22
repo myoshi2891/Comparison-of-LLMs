@@ -149,6 +149,15 @@ it("目次19リンクの文言・順序・アンカー解決・全ID一意性・
     .map((a) => decodeURIComponent((a.getAttribute("href") ?? "").slice(1)))
     .filter((id) => !id || !idSet.has(id));
   expect(unresolved).toEqual([]);
+  const h3ById = new Map(Array.from(container.querySelectorAll("h3")).map((e) => [e.id, text(e)]));
+  const subsectionLinks = Array.from(container.querySelectorAll('a[href^="#s"]'))
+    .map((a) => decodeURIComponent((a.getAttribute("href") ?? "").slice(1)))
+    .filter((id) => /^s\d+-\d+$/.test(id));
+  expect(subsectionLinks.map((id) => h3ById.get(id))).toEqual(
+    subsectionLinks.map((id) =>
+      expected.h3.find((h) => h.startsWith(`${id.slice(1).replace("-", ".")} `))
+    )
+  );
   expect(links.filter((e) => e.getAttribute("aria-current") === "location")).toEqual([links[0]]);
   expect(links[0].classList.contains(styles.active)).toBe(true);
 });

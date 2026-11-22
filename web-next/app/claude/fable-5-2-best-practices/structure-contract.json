@@ -4551,7 +4551,7 @@
                   ],
                   [
                     "diagram",
-                    "flowchart TD\n    A[\"タスクを分類する\"] --> B{\"仕様が明確で　短時間で終わる?\"}\n    B -- \"はい\" --> LOW[\"low から試す\"]\n    B -- \"いいえ\" --> C{\"対話的に人が待っている?\"}\n    C -- \"はい\" --> MED[\"medium から試す\"]\n    C -- \"いいえ\" --> D{\"長時間・無人・　難度が高い?\"}\n    D -- \"はい\" --> HIGH[\"high を起点にする\"]\n    D -- \"いいえ\" --> MED\n    LOW --> E[\"自社 evals で評価する\"]\n    MED --> E\n    HIGH --> E\n    E --> F{\"品質は基準を満たすか?\"}\n    F -- \"満たす\" --> G0{\"すでに low か?\"}\n    G0 -- \"はい\" --> FIX[\"その effort で確定\"]\n    G0 -- \"いいえ\" --> G{\"1段下げても満たすか?\"}\n    G -- \"はい\" --> DOWN[\"1段下げて再評価\"]\n    DOWN --> E\n    G -- \"いいえ\" --> FIX\n    F -- \"満たさない\" --> H{\"high 未満?\"}\n    H -- \"はい\" --> UP[\"1段上げて再評価\"]\n    UP --> E\n    H -- \"いいえ\" --> I{\"プロンプトや　ハーネスに原因がない?\"}\n    I -- \"原因あり\" --> PROMPT[\"8章の9パターンを確認\"]\n    I -- \"原因なし\" --> XH[\"xhigh を試し　効果とコストを測定\"]\n\n    class LOW,MED,HIGH,XH hub\n    class FIX done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
+                    "flowchart TD\n    A[\"タスクを分類する\"] --> B{\"仕様が明確で　短時間で終わる?\"}\n    B -- \"はい\" --> LOW[\"low から試す\"]\n    B -- \"いいえ\" --> C{\"対話的に人が待っている?\"}\n    C -- \"はい\" --> MED[\"medium から試す\"]\n    C -- \"いいえ\" --> D{\"長時間・無人・　難度が高い?\"}\n    D -- \"はい\" --> HIGH[\"high を起点にする\"]\n    D -- \"いいえ\" --> MED\n    LOW --> E[\"自社 evals で評価する\"]\n    MED --> E\n    HIGH --> E\n    E --> F{\"品質は基準を満たすか?\"}\n    F -- \"満たす\" --> G0{\"すでに low か?\"}\n    G0 -- \"はい\" --> FIX[\"その effort で確定\"]\n    G0 -- \"いいえ\" --> G{\"1段下げても満たすか?\"}\n    G -- \"はい\" --> DOWN{\"1段下げて再評価　基準を満たすか?\"}\n    DOWN -- \"満たす\" --> G0\n    DOWN -- \"満たさない\" --> FIX\n    G -- \"いいえ\" --> FIX\n    F -- \"満たさない\" --> H{\"high 未満?\"}\n    H -- \"はい\" --> UP[\"1段上げて再評価\"]\n    UP --> E\n    H -- \"いいえ\" --> I{\"プロンプトや　ハーネスに原因がない?\"}\n    I -- \"原因あり\" --> PROMPT[\"8章の9パターンを確認\"]\n    I -- \"原因なし\" --> XH[\"xhigh を試し　効果とコストを測定\"]\n\n    class LOW,MED,HIGH,XH hub\n    class FIX done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
                   ]
                 ]
               ],
@@ -5278,7 +5278,11 @@
                                 "td",
                                 {},
                                 [
-                                  ["text", "JSON 出力は"], ["code", {}, [["text", "output_config.format"]]], ["text", "を外して応答 JSON を自前で検証し、strict ツール利用は"], ["code", {}, [["text", "strict: true"]]], ["text", "を外してツール入力を自前で検証する"]
+                                  ["text", "JSON 出力は"],
+                                  ["code", {}, [["text", "output_config.format"]]],
+                                  ["text", "を外して応答 JSON を自前で検証し、strict ツール利用は"],
+                                  ["code", {}, [["text", "strict: true"]]],
+                                  ["text", "を外してツール入力を自前で検証する"]
                                 ]
                               ],
                               [
@@ -9307,7 +9311,21 @@
                                 "td",
                                 {},
                                 [
-                                  ["text", "公式ドキュメントの記載 ("], ["a", {"class": "src-link", "href": "#S8"}, [["text", "S8"]]], ["text", ")。Google Cloud Agent Platform で非対話 fast mode を使うには Claude Code v2.1.322 以上と Fable リージョン"], ["code", {}, [["text", "global"]]], ["text", "/"], ["code", {}, [["text", "us"]]], ["text", "/"], ["code", {}, [["text", "eu"]]], ["text", "が必要(その他のリージョンではコマンドが成功しても標準速度で動作する場合がある)"]
+                                  ["text", "公式ドキュメントの記載 ("],
+                                  ["a", { "class": "src-link", "href": "#S8" }, [["text", "S8"]]],
+                                  [
+                                    "text",
+                                    ")。Google Cloud Agent Platform で非対話 fast mode を使うには Claude Code v2.1.322 以上と Fable リージョン"
+                                  ],
+                                  ["code", {}, [["text", "global"]]],
+                                  ["text", "/"],
+                                  ["code", {}, [["text", "us"]]],
+                                  ["text", "/"],
+                                  ["code", {}, [["text", "eu"]]],
+                                  [
+                                    "text",
+                                    "が必要(その他のリージョンではコマンドが成功しても標準速度で動作する場合がある)"
+                                  ]
                                 ]
                               ]
                             ]
@@ -12175,7 +12193,15 @@
                     "li",
                     {},
                     [
-                      ["text", "実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は"], ["code", {}, [["text", "estimate_usd"]]], ["text", "の値をそのまま使い、リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。"]
+                      [
+                        "text",
+                        "実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は"
+                      ],
+                      ["code", {}, [["text", "estimate_usd"]]],
+                      [
+                        "text",
+                        "の値をそのまま使い、リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。"
+                      ]
                     ]
                   ],
                   [

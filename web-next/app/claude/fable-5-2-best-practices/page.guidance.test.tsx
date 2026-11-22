@@ -47,6 +47,26 @@ it("図2: Fable の構成は evals に合格した場合だけ「そのまま運
   // Fable を含む構成（FABLE・HYBRID）は必ずこの判定を経由する。
   expect(edges.filter((e) => e.from === "Q5").map((e) => e.to)).not.toContain("DONE");
   expect(edges.some((e) => e.from === "HYBRID" && e.to === gate)).toBe(true);
+  const canReach = (start: string, target: string, activeEdges = edges) => {
+    const visited = new Set<string>();
+    const queue = [start];
+    while (queue.length > 0) {
+      const curr = queue.shift() as string;
+      if (curr === target) return true;
+      if (visited.has(curr)) continue;
+      visited.add(curr);
+      for (const e of activeEdges) if (e.from === curr) queue.push(e.to);
+    }
+    return false;
+  };
+  const withoutEvalPassAndRestart = edges.filter(
+    (e) =>
+      !(e.from === gate && e.label === "はい" && e.to === "DONE") &&
+      !(e.from === "RETRY" && e.to === "Q1")
+  );
+  expect(canReach("FABLE", "DONE", withoutEvalPassAndRestart)).toBe(false);
+  expect(canReach("HYBRID", "DONE", withoutEvalPassAndRestart)).toBe(false);
+  expect(canReach("START", "DONE", withoutEvalPassAndRestart)).toBe(true);
   const failed = edges.find((e) => e.from === gate && e.label === "いいえ");
   expect(failed?.to).toBeTruthy();
   expect(failed?.to).not.toBe("DONE");
@@ -149,7 +169,7 @@ it("モバイルの目次ボタンは Tabler のスタイルシートがなく�
   expect(button.querySelector("i.ti-menu-2")?.getAttribute("aria-hidden")).toBe("true");
 });
 
-it("図3: low が品質基準を満たしたときは1段下げ確認を経由せず直接 FIX へ進む", () => {
+it("図3: low が品質基準を満たしたときは1段下げ確認を経由せず直接 FIX へ進み、再訪した effort で循環しない", () => {
   const { labels, edges } = diagram("図3");
   const fromF = edges.find((e) => e.from === "F" && e.label === "満たす");
   expect(fromF?.to).toBe("G0");
@@ -157,6 +177,14 @@ it("図3: low が品質基準を満たしたときは1段下げ確認を経由�
   expect(edges.some((e) => e.from === "G0" && e.label === "はい" && e.to === "FIX")).toBe(true);
   expect(edges.some((e) => e.from === "G0" && e.label === "いいえ" && e.to === "G")).toBe(true);
   expect(edges.some((e) => e.from === "G" && e.label === "いいえ" && e.to === "FIX")).toBe(true);
+  // 1段下げて基準未達だった場合は、上げる前の元の effort で確定して終了し、DOWN → E → UP → E で循環しない。
+  const fromDown = edges.find((e) => e.from === "G" && e.label === "はい")?.to;
+  expect(fromDown).toBe("DOWN");
+  expect(edges.some((e) => e.from === "DOWN" && e.to === "E")).toBe(false);
+  expect(edges.some((e) => e.from === "DOWN" && e.label === "満たす" && e.to === "G0")).toBe(true);
+  expect(edges.some((e) => e.from === "DOWN" && e.label === "満たさない" && e.to === "FIX")).toBe(
+    true
+  );
 });
 
 it("6.5節: omitted を最安と主張せず、ストリーミング表示と応答後確認を区別する", () => {
