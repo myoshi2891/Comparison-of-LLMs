@@ -73,7 +73,10 @@ describe("pageRegistry", () => {
     expect(home?.addedAt).toBe(PRICING_PUBLICATION_DATE);
     // 為替のみの更新などで確認日だけ進む場合があるため、公開日以降の有効な日付であればよい。
     expect(home?.lastReviewed).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    expect(Number.isNaN(Date.parse(home?.lastReviewed ?? ""))).toBe(false);
+    // Date.parse は 2026-02-31 のような存在しない日付を繰り上げるため、往復して厳密に検証する。
+    const parsedReview = new Date(`${home?.lastReviewed}T00:00:00Z`);
+    expect(Number.isNaN(parsedReview.getTime())).toBe(false);
+    expect(parsedReview.toISOString().slice(0, 10)).toBe(home?.lastReviewed);
     expect(home?.lastReviewed && home.lastReviewed >= PRICING_PUBLICATION_DATE).toBe(true);
   });
 

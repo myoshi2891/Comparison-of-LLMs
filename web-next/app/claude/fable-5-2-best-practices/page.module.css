@@ -826,4 +826,8 @@ body:has(.root) :global(nav[aria-label="関連ページ"]) {
 /* Tabler のスタイルシートを読めない場合も、目次ボタンを見分けられるようページ内でアイコンを描く。 */
 .root .mobile-bar :global(button) :global(i.ti-menu-2)::before {
   content: "\2630";
+  /* ti クラスの Tabler フォントには U+2630 がないため、明示的にシステムフォントで描く。 */
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-style: normal;
+  font-weight: 400;
 }
