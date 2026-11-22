@@ -1153,7 +1153,7 @@ function loopExtents(executable) {
   return loops;
 }
 
-function initializerRunsBefore(executable, declarationIndex, initializedAt, declarationPath, positions) {
+function initializerRunsBefore(executable, declarationIndex, initializedAt, declarationPath, positions, segments = []) {
   // An unbraced conditional/loop may skip the initializer. Require an ordinary
   // statement boundary rather than treating a lexical declaration as dominance.
   const previous = executable.slice(0, declarationIndex).trimEnd().at(-1);
@@ -1165,6 +1165,7 @@ function initializerRunsBefore(executable, declarationIndex, initializedAt, decl
   // Unsupported callable syntax needs a parser to prove activation order.
   if (/=>\s*(?!\s*\{)/.test(executable) || /\bclass\b/.test(executable) ||
       Array.from(executable.matchAll(/\bfunction\b/g)).some(head => !functions.some(fn => fn.start === head.index))) return false;
+  const segmentOf = index => segments.findIndex(segment => segment.start <= index && index <= segment.end);
   const checked = new Set();
   const active = new Set();
   const followsInitialization = position => {
@@ -1174,10 +1175,14 @@ function initializerRunsBefore(executable, declarationIndex, initializedAt, decl
       if (active.has(fn) || fn.start < initializedAt) return false;
       active.add(fn);
       if (fn.name) {
+        const fnSegment = segmentOf(fn.start);
         const references = executable.matchAll(new RegExp(`(?<![\\w$])${fn.name.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
         let hasReference = false;
         for (const reference of references) {
           if (reference.index === fn.nameIndex) continue;
+          // A reference in an earlier classic script cannot activate a function declared in a later script.
+          const refSegment = segmentOf(reference.index);
+          if (fnSegment >= 0 && refSegment >= 0 && refSegment < fnSegment) continue;
           hasReference = true;
           if (!followsInitialization(reference.index)) return false;
         }
@@ -1577,9 +1582,61 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (!selectedScript.availableAt(at)) return false;
       const ownerBinding = bindingAt(selected[1], at);
       const owner = ownerBinding?.value;
+      // Same-scope class/id changes that can run before the query can alter which
+      // elements match the card selector; changes provably after the query leave
+      // an already-captured element or static NodeList intact.
+      const selectorValidAt = (selector, queryAt) => {
+        const editCanPrecede = editIndex => {
+          if (editIndex <= queryAt) return true;
+          if (functions.some(fn => fn.body < queryAt && queryAt < fn.end)) return true;
+          if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
+          if (loops.some(loop => loop.start < queryAt && queryAt < loop.end)) return true;
+          return false;
+        };
+        const selectorClasses = Array.from(selector.matchAll(/\.([\w-]+)/g), m => m[1]);
+        if (selectorClasses.length > 0) {
+          const classChangeRe = /(?:([A-Za-z_$][\w$]*)\s*)?\.\s*(?:className\s*(?:=(?!=)|\+=)|(?:setAttribute|removeAttribute|toggleAttribute)\s*\(\s*(?!(['"])(?!class\2)[^'"\n]*\2)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\s*\(|classList\s*\.\s*(?:add|remove|toggle|replace)\s*\()/gi;
+          const changesSelectorClass = match => {
+            if (/\bclassName\s*(?:=|\+=)$/.test(match[0])) {
+              const targetName = match[1];
+              const bound = targetName && bindingAt(targetName, match.index);
+              const rhs = /^\s*(['"])((?:[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n])/.exec(literalSource.slice(match.index + match[0].length));
+              if (bound && /^document\.createElement\(\s*(['"])[A-Za-z][\w-]*\1\s*\)$/.test(bound.value) && rhs) {
+                const tokens = classTokens(rhs[2]);
+                return tokens.some(token => selectorClasses.includes(token));
+              }
+              return true;
+            }
+            if (!/\bclassList\s*\.\s*(?:add|remove|toggle|replace)\s*\($/i.test(match[0])) return true;
+            const start = match.index + match[0].length;
+            let depth = 1, end = -1;
+            for (let k = start; k < executable.length; k++) {
+              if (executable[k] === "(") depth++;
+              else if (executable[k] === ")" && --depth === 0) { end = k; break; }
+            }
+            if (end < 0) return true;
+            const args = literalSource.slice(start, end).split(",").map(s => s.trim()).filter(Boolean);
+            if (args.length === 0) return true;
+            const tokenArgs = /\btoggle\s*\($/i.test(match[0]) ? args.slice(0, 1) : args;
+            return tokenArgs.some(arg => {
+              const lit = /^(['"])((?:[^\\]|\\.)*)\1$/.exec(arg);
+              return !lit || selectorClasses.includes(lit[2]);
+            });
+          };
+          if (Array.from(literalSource.matchAll(classChangeRe))
+            .some(edit => editCanPrecede(edit.index) && changesSelectorClass(edit))) return false;
+        }
+        const selectorIds = Array.from(selector.matchAll(/#([\w-]+)/g), m => m[1]);
+        if (selectorIds.length > 0) {
+          const idChangeRe = /\.\s*(?:id\s*(?:=(?!=)|\+=)|(?:setAttribute|removeAttribute|toggleAttribute)\s*\(\s*(?!(['"])(?!id\1)[^'"\n]*\1)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\s*\()/gi;
+          if (Array.from(literalSource.matchAll(idChangeRe))
+            .some(edit => editCanPrecede(edit.index))) return false;
+        }
+        return true;
+      };
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
       // The query runs where its initializer runs; before the card is parsed it returns null.
-      if (direct) return selectedScript.cardAvailableAt(ownerBinding.at) && selectedScript.unique(direct[2]);
+      if (direct) return selectedScript.cardAvailableAt(ownerBinding.at) && selectedScript.unique(direct[2]) && selectorValidAt(direct[2], ownerBinding.at);
       const indexed = owner && /^(\w+)\[(\w+)\]$/.exec(owner);
       const collectionBinding = indexed && bindingAt(indexed[1], ownerBinding.at);
       const collection = collectionBinding?.value;
@@ -1592,48 +1649,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       // querySelectorAll returns a static list of the elements parsed when its initializer ran.
       // A card that a classic initializer may precede is not provably in the traversed list.
       if (!selectedScript.cardAvailableAt(collectionBinding.at)) return false;
-      // A same-scope class change that can run before document.querySelectorAll can alter which
-      // elements match the card selector; changes provably after the query leave the static list intact.
-      const selectorClasses = Array.from(all[2].matchAll(/\.([\w-]+)/g), m => m[1]);
-      if (selectorClasses.length > 0) {
-        const classChangeCanPrecede = editIndex => {
-          if (editIndex <= collectionBinding.at) return true;
-          if (functions.some(fn => fn.body < collectionBinding.at && collectionBinding.at < fn.end)) return true;
-          if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
-          if (loops.some(loop => loop.start < collectionBinding.at && collectionBinding.at < loop.end)) return true;
-          return false;
-        };
-        const classChangeRe = /(?:([A-Za-z_$][\w$]*)\s*)?\.\s*(?:className\s*(?:=(?!=)|\+=)|(?:setAttribute|removeAttribute|toggleAttribute)\s*\(\s*(?!(['"])(?!class\2)[^'"\n]*\2)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\s*\(|classList\s*\.\s*(?:add|remove|toggle|replace)\s*\()/gi;
-        const changesSelectorClass = match => {
-          if (/\bclassName\s*(?:=|\+=)$/.test(match[0])) {
-            const targetName = match[1];
-            const bound = targetName && bindingAt(targetName, match.index);
-            const rhs = /^\s*(['"])((?:[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n])/.exec(literalSource.slice(match.index + match[0].length));
-            if (bound && /^document\.createElement\(\s*(['"])[A-Za-z][\w-]*\1\s*\)$/.test(bound.value) && rhs) {
-              const tokens = classTokens(rhs[2]);
-              return tokens.some(token => selectorClasses.includes(token));
-            }
-            return true;
-          }
-          if (!/\bclassList\s*\.\s*(?:add|remove|toggle|replace)\s*\($/i.test(match[0])) return true;
-          const start = match.index + match[0].length;
-          let depth = 1, end = -1;
-          for (let k = start; k < executable.length; k++) {
-            if (executable[k] === "(") depth++;
-            else if (executable[k] === ")" && --depth === 0) { end = k; break; }
-          }
-          if (end < 0) return true;
-          const args = literalSource.slice(start, end).split(",").map(s => s.trim()).filter(Boolean);
-          if (args.length === 0) return true;
-          const tokenArgs = /\btoggle\s*\($/i.test(match[0]) ? args.slice(0, 1) : args;
-          return tokenArgs.some(arg => {
-            const lit = /^(['"])((?:[^\\]|\\.)*)\1$/.exec(arg);
-            return !lit || selectorClasses.includes(lit[2]);
-          });
-        };
-        if (Array.from(literalSource.matchAll(classChangeRe))
-          .some(edit => classChangeCanPrecede(edit.index) && changesSelectorClass(edit))) return false;
-      }
+      if (!selectorValidAt(all[2], collectionBinding.at)) return false;
       // The card initializer and this read must both run inside the body of the same loop;
       // a matching loop elsewhere in the scope proves nothing about this payload.
       const loopHeader = new RegExp(`for\\s*\\(\\s*var\\s+${indexed[2]}\\s*=\\s*0\\s*;\\s*${indexed[2]}\\s*<\\s*${indexed[1]}\\.length\\s*;\\s*${indexed[2]}\\+\\+\\s*\\)\\s*\\{`, "g");
@@ -1857,7 +1873,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute)\\s*\\(\\s*(?!(['"])(?!type\\4)[^'"\\n]*\\4)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
     if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index) || mayBeScriptContainer(edit[1], edit.index)) ||
       Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeCardScript(edit[1], edit.index)) ||
-      Array.from(literalSource.matchAll(ownerEdits)).some(edit => mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit))) ||
+      Array.from(literalSource.matchAll(ownerEdits)).some(edit =>
+        mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit)) ||
+        (writeCanPrecedeRead(edit.index) && mayBeSelectedScript(edit[1], edit.index))
+      ) ||
       Array.from(literalSource.matchAll(wrapperAppendEdits)).some(edit =>
         mayBeCardOwner(edit[1]) ? !isSafeFreshAppend(edit) : mayBeScriptContainer(edit[1], edit.index)
       )) return false;
@@ -1991,6 +2010,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   // the call, and every block entered beyond the declaration is a loop or function body
   // (if/else/switch/try may skip the call). Anything else stays unresolved.
   const loopOrFunctionHead = /(?:\b(?:for|while)\s*\((?:[^{}()]|\([^{}()]*\))*\)|\bfunction\b[^{}]*\)|=>)\s*$/;
+  const exitKeyword = /(?:return|throw|break|continue)(?![\w$])/y;
   for (const use of renderUses) {
     const callPath = paths.get(use.call);
     if (callPath.slice(declarationPath.length).some(block => !loopOrFunctionHead.test(executable.slice(0, block)))) return null;
@@ -1998,11 +2018,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     for (let i = initializedAt; i < use.call; i++) {
       if (executable[i] === "{") depth++;
       else if (executable[i] === "}") depth--;
-      else if (depth === 0 && /\b(?:return|throw|break|continue)\b/.test(executable.slice(i, use.call)) &&
-          /^(?:return|throw|break|continue)\b/.test(executable.slice(i)) && !/[\w$]/.test(executable[i - 1] ?? "")) return null;
+      else if (depth === 0 && !/[\w$]/.test(executable[i - 1] ?? "")) {
+        exitKeyword.lastIndex = i;
+        if (exitKeyword.test(executable)) return null;
+      }
     }
   }
-  if (!initializerRunsBefore(executable, declaration.index, initializedAt, declarationPath, renderUses.map(use => use.call))) return null;
+  if (!initializerRunsBefore(executable, declaration.index, initializedAt, declarationPath, renderUses.map(use => use.call), selectedScript.segments)) return null;
   const parts = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2], true));
   return parts.some(part => part === undefined) ? null : renderUses[0].base + parts.join("");
 }
@@ -2217,6 +2239,7 @@ function materializePlainTextCards(src) {
         : renderer.classic && foreignWriters.every(scope => scope.deferredModule) ? "deferred" : true;
       const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
+          segments: renderer.segments,
           // Non-async module scripts run after the document is parsed; classic scripts and
           // async modules must follow this payload in document order to prove availability.
           availableAt: at => renderer.deferredModule || renderer.segments.some(segment =>

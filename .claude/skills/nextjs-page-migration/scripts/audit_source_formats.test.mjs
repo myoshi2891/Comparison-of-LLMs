@@ -2109,7 +2109,8 @@ test("detects text writes with whitespace around the member-access dot", () => {
 	assert.equal(audit(`${card}<script>${read}${render}</script>`, page).status, 0);
 	for (const write of ["script . textContent = 'x';", "script\n.\ntext = 'x';"]) {
 		const result = audit(`${card}<script>${read}${write}${render}</script>`, page);
-		assert.notEqual(result.status, 0, write);
+		assert.equal(result.status, 1, write);
+		assert.deepEqual(result.data.unresolvedMermaidSources, ["CLASSDEFS:card-0"], write);
 	}
 	// A write after the synchronous capture does not alter the captured string.
 	assert.equal(audit(`${card}<script>${read}var src = script.textContent; mermaid.render('x', src); script . textContent = 'x';</script>`, page).status, 0);
@@ -2171,8 +2172,9 @@ test("rejects indexed traversal when class changes can precede querySelectorAll 
 	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
 	const loop = "for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }";
 	// Class change before querySelectorAll -> unresolved; after synchronous querySelectorAll -> eligible.
-	const beforeQuery = audit(`${card}<script>document.body.classList.remove('diagram-card'); var cards = document.querySelectorAll('.diagram-card'); ${loop}</script>`, page);
+	const beforeQuery = audit(`${card}<script>document.getElementById('c1').classList.remove('diagram-card'); var cards = document.querySelectorAll('.diagram-card'); ${loop}</script>`, page);
 	assert.equal(beforeQuery.status, 1);
+	assert.deepEqual(beforeQuery.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
 	const afterQuery = audit(`${card}<script>var cards = document.querySelectorAll('.diagram-card'); cards[0].classList.remove('diagram-card'); ${loop}</script>`, page);
 	assert.equal(afterQuery.status, 0);
 	// Earlier selector match without a script aborts the loop before reaching the expected card.
@@ -2180,4 +2182,46 @@ test("rejects indexed traversal when class changes can precede querySelectorAll 
 	const priorRes = audit(`${brokenPrior}<script>var cards = document.querySelectorAll('.diagram-card'); ${loop}</script>`, page);
 	assert.equal(priorRes.status, 1);
 	assert.deepEqual(priorRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+});
+
+test("rejects earlier-script call activating later-script declaration, script self-edits, and direct-query pre-mutations", () => {
+	const chart = "flowchart LR\nA --> B";
+	const suffix = "\nclassDef a fill:#fff;";
+	const joinedPage = `const D0 = ${JSON.stringify(`${chart}${suffix}`)};<MermaidDiagram chart={D0} />`;
+	const basePage = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+
+	// 1. Earlier script call cannot activate a function declared in a later classic script.
+	const earlierCall = `${card}<script>var CLASSDEFS = ${JSON.stringify(suffix)}; run();</script><script>function run() { var card = document.querySelector('.diagram-card'); var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); }</script>`;
+	const earlierRes = audit(earlierCall, joinedPage);
+	assert.equal(earlierRes.status, 1);
+	assert.deepEqual(earlierRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	// Calling in the declaration's own script or a later script remains eligible.
+	const sameScriptCall = `${card}<script>var CLASSDEFS = ${JSON.stringify(suffix)};</script><script>function run() { var card = document.querySelector('.diagram-card'); var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); } run();</script>`;
+	assert.equal(audit(sameScriptCall, joinedPage).status, 0);
+	const laterScriptCall = `${card}<script>var CLASSDEFS = ${JSON.stringify(suffix)};</script><script>function run() { var card = document.querySelector('.diagram-card'); var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); }</script><script>run();</script>`;
+	assert.equal(audit(laterScriptCall, joinedPage).status, 0);
+
+	// 2. Owner edits on the selected script itself invalidate reads afterward, but not writes after synchronous capture.
+	const read = "var card = document.querySelector('#c1'); var s = card.querySelector('script'); ";
+	const render = "var src = s.textContent; mermaid.render('x', src);";
+	for (const selfEdit of ["s.innerHTML = 'x';", "s.replaceChildren('x');"]) {
+		const beforeRead = audit(`${card}<script>${read}${selfEdit} ${render}</script>`, basePage);
+		assert.equal(beforeRead.status, 1, selfEdit);
+		assert.deepEqual(beforeRead.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], selfEdit);
+		const afterRead = audit(`${card}<script>${read}${render} ${selfEdit}</script>`, basePage);
+		assert.equal(afterRead.status, 0, selfEdit);
+	}
+
+	// 3. Direct querySelector checks selector mutations before the query, preserving post-query semantics.
+	const directBeforeClass = audit(`${card}<script>document.getElementById('c1').classList.remove('diagram-card'); var card = document.querySelector('.diagram-card'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`, basePage);
+	assert.equal(directBeforeClass.status, 1);
+	assert.deepEqual(directBeforeClass.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const directAfterClass = audit(`${card}<script>var card = document.querySelector('.diagram-card'); card.classList.remove('diagram-card'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`, basePage);
+	assert.equal(directAfterClass.status, 0);
+	const directBeforeId = audit(`${card}<script>document.querySelector('.diagram-card').id = 'other'; var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`, basePage);
+	assert.equal(directBeforeId.status, 1);
+	assert.deepEqual(directBeforeId.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const directAfterId = audit(`${card}<script>var card = document.querySelector('#c1'); card.id = 'other'; var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`, basePage);
+	assert.equal(directAfterId.status, 0);
 });
