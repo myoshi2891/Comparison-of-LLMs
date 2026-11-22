@@ -223,10 +223,14 @@ curl -X POST "https://generativelanguage.googleapis.com/v1beta/decisions" \
 ### 5-3. 数値で意思決定する(`noul` の閾値例)
 
 ```python
+# 高リスク操作は Step 11 の基準(金銭の移動・取り消しにくい変更)で明示的に分類する。
+HIGH_RISK_OPERATIONS = {"refund", "payment"}
+
+
 def decide_operation(answer: dict, operation: str) -> str:
     """noul は 0.01〜0.99 に収まるため、0.9 / 0.1 のような余裕ある閾値を使う。"""
-    if operation == "refund":
-        return "needs_review"  # 返金は確率・信頼度にかかわらず人間が判断する
+    if operation in HIGH_RISK_OPERATIONS:
+        return "needs_review"  # 高リスク操作は確率・信頼度にかかわらず人間が判断する
     p = answer["noul"]
     if p >= 0.9:
         return "auto_approve"

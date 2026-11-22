@@ -729,7 +729,10 @@ async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
                 # フレームは send_frame が送信枠を確保した後に取得する(待機中に古くならない)。
                 # 取得・送信が止まってもゲートを握り続けないよう上限を設ける。タイムアウト時は
                 # 送信済みか不明なため、下の例外処理でセッションを使用不可にする。
-                await asyncio.wait_for(state.send_frame(camera.latest_jpeg), timeout=turn_timeout)
+                await asyncio.wait_for(
+                    state.send_frame(camera.latest_jpeg),
+                    timeout=turn_timeout + state.min_frame_interval,  # 送信間隔の待機分を上乗せする
+                )
                 # 送信が取り消し・失敗しても、プロンプトは受理された可能性があり完了を確認できない。
                 # そのため送信も try の中で行い、下の例外処理でセッションを使用不可にする。
                 await asyncio.wait_for(
