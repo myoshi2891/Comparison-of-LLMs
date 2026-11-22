@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 import logging
+import re
 
 from scraper.browser import get_page_text, extract_price, model_key_pattern, sanity_check
 from scraper.models import ApiModel
@@ -26,6 +27,8 @@ _RECORD_GAP = (
     r"|\bkimi(?:[-\s]|<[^<>]*>)*k)[\s\S]){0,80}?"
 )
 _PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
+# 次の Kimi モデル見出し（レコード境界）。
+_NEXT_KIMI_RECORD = re.compile(r"\bkimi(?:[-\s]|<[^<>]*>)*k", re.IGNORECASE)
 # cached と input の間には空白か、レコード境界ではないインラインタグ（span・br 等）を許す。
 _INLINE_TAG = r"<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
 _INLINE_SEP = rf"(?:\s|{_INLINE_TAG})+"
@@ -161,12 +164,26 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         fb_in, fb_out = fallback_map[name]
         # K3.1 など未登録の派生版と別レコード・遠距離の価格を拾わない。
         key = model_key_pattern(name, _FALLBACKS) + r"(?![.\d])"
-        in_price = extract_price(html, [
-            rf"{key}{_INPUT_PRICE_GAP}\$([\d.]+)",
-        ])
-        out_price = extract_price(html, [
+        in_patterns = [rf"{key}{_INPUT_PRICE_GAP}\$([\d.]+)"]
+        out_patterns = [
             rf"{key}(?:{_PRE_STD_INPUT_GAP}{_STD_INPUT_LABEL}{_POST_STD_INPUT_OUTPUT_GAP}|{_OUTPUT_LABEL_GAP}){_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
-        ])
+        ]
+        # 入力・出力は同一レコード内で組にする（別レコードの価格を混成しない）。
+        # 完全な組を持つレコードがなければ None のまま既存のフォールバック組を使う。
+        in_price = out_price = None
+        key_starts = [m.start() for m in re.finditer(key, html, re.IGNORECASE | re.DOTALL)]
+        for begin in key_starts:
+            # 同一モデルの繰り返し記載は同じレコードとして扱い、別の Kimi モデルの見出しで区切る。
+            boundary = next(
+                (m for m in _NEXT_KIMI_RECORD.finditer(html, begin + 1) if m.start() not in key_starts),
+                None,
+            )
+            record = html[begin: boundary.start() if boundary else len(html)]
+            rec_in = extract_price(record, in_patterns)
+            rec_out = extract_price(record, out_patterns)
+            if rec_in is not None and rec_out is not None:
+                in_price, out_price = rec_in, rec_out
+                break
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)
         # 片側だけ抽出できた混成ペアは採用しない（取れた側も誤抽出のことが多い）
