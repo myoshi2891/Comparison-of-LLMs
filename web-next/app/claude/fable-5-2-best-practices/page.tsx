@@ -3804,6 +3804,23 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"            "}
                     <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                checkpoint["}
+                    <span className="hljs-string">{'"completed"'}</span>
+                    {"] = "}
+                    <span className="hljs-literal">{"True"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"if"}</span>
                     {" on_text "}
                     <span className="hljs-keyword">{"is"}</span>{" "}
                     <span className="hljs-keyword">{"not"}</span>{" "}
@@ -3838,23 +3855,6 @@ export default function Page() {
                     {"                        on_text(block["}
                     <span className="hljs-string">{'"text"'}</span>
                     {"])"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"            "}
-                    <span className="hljs-keyword">{"if"}</span>
-                    {" checkpoint "}
-                    <span className="hljs-keyword">{"is"}</span>{" "}
-                    <span className="hljs-keyword">{"not"}</span>{" "}
-                    <span className="hljs-literal">{"None"}</span>
-                    {":"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"                checkpoint["}
-                    <span className="hljs-string">{'"completed"'}</span>
-                    {"] = "}
-                    <span className="hljs-literal">{"True"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -6721,7 +6721,7 @@ export default function Page() {
                   <span className={[styles.tag, styles.opinion].join(" ")}>{"私見"}</span>
                 </strong>
                 {
-                  ": 並列セッションが増えるほど、利用枠(Fable は週次上限の最大50%)と費用を速く消費します。"
+                  ": 並列セッションが増えるほど、利用枠(Fable は Pro / Team 標準席で週次上限の最大50%)と費用を速く消費します。"
                 }
                 <strong>{"主要な1〜2本だけ Fable、残りは Opus 5.5"}</strong>
                 {" にすると現実的です。 "}
@@ -9060,7 +9060,11 @@ export default function Page() {
                 {" "}
                 <label>
                   <input type="checkbox" data-guide-check="" />
-                  <span>{"利用枠の仕様(Fable は週次上限の最大50%)をチーム内で共有済み"}</span>
+                  <span>
+                    {
+                      "利用枠の仕様(Fable は Pro / Team 標準席で週次上限の最大50%)をチーム内で共有済み"
+                    }
+                  </span>
                 </label>{" "}
               </li>{" "}
             </ul>{" "}

@@ -273,6 +273,11 @@
   {
     "selector": ".root .mobile-bar :global(button) :global(i.ti-menu-2)::before",
     "media": null,
-    "declarations": [["content", "\"\\2630\"", false]]
+    "declarations": [
+      ["content", "\"\\2630\"", false],
+      ["font-family", "system-ui, -apple-system, \"Segoe UI\", sans-serif", false],
+      ["font-style", "normal", false],
+      ["font-weight", "400", false]
+    ]
   }
 ]

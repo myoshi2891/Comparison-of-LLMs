@@ -314,7 +314,7 @@ it("サイトメニューを開くとドロワーを閉じ、フォーカスは�
   render(<Harness />);
   fireEvent.click(menu());
   expect(guideContent().inert).toBe(true);
-  hamburger.focus();
+  expect(document.activeElement).toBe(links()[0]);
   fireEvent.click(hamburger);
   expect(menu().getAttribute("aria-expanded")).toBe("false");
   expect(guideContent().inert).toBe(false);

@@ -2304,12 +2304,12 @@
                                   checkpoint["container_id"] = container_id
                           continue
                       if data["stop_reason"] != "tool_use":
+                          if checkpoint is not None:
+                              checkpoint["completed"] = True
                           if on_text is not None:
                               for block in data["content"]:
                                   if block.get("type") == "text" and block.get("text"):
                                       on_text(block["text"])
-                          if checkpoint is not None:
-                              checkpoint["completed"] = True
                           return data
 
                       results = []
@@ -3613,7 +3613,7 @@
             <p>
               <strong>Fable 5.2 の注意 <span class="tag opinion">私見</span></strong
               >: 並列セッションが増えるほど、利用枠(Fable
-              は週次上限の最大50%)と費用を速く消費します。<strong
+              は Pro / Team 標準席で週次上限の最大50%)と費用を速く消費します。<strong
                 >主要な1〜2本だけ Fable、残りは Opus 5.5</strong
               >
               にすると現実的です。
@@ -4804,7 +4804,7 @@
             <li>
               <label
                 ><input type="checkbox" /><span
-                  >利用枠の仕様(Fable は週次上限の最大50%)をチーム内で共有済み</span
+                  >利用枠の仕様(Fable は Pro / Team 標準席で週次上限の最大50%)をチーム内で共有済み</span
                 ></label
               >
             </li>

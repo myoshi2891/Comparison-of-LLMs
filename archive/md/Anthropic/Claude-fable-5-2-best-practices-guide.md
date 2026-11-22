@@ -568,12 +568,12 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                     checkpoint["container_id"] = container_id
             continue
         if data["stop_reason"] != "tool_use":
+            if checkpoint is not None:
+                checkpoint["completed"] = True
             if on_text is not None:
                 for block in data["content"]:
                     if block.get("type") == "text" and block.get("text"):
                         on_text(block["text"])
-            if checkpoint is not None:
-                checkpoint["completed"] = True
             return data
 
         results = []
@@ -1053,7 +1053,7 @@ git worktree add ../myrepo-feature-b -b feature-b
 cd ../myrepo-feature-a && claude --model claude-fable-5-2
 ```
 
-> **Fable 5.2 の注意 [私見]**: 並列セッションが増えるほど、利用枠(Fable は週次上限の最大50%)と費用を速く消費します。**主要な1〜2本だけ Fable、残りは Opus 5.5** にすると現実的です。
+> **Fable 5.2 の注意 [私見]**: 並列セッションが増えるほど、利用枠(Fable は Pro / Team 標準席で週次上限の最大50%)と費用を速く消費します。**主要な1〜2本だけ Fable、残りは Opus 5.5** にすると現実的です。
 
 ### 9.7 Step F: advisor と fast mode を使う
 
@@ -1483,7 +1483,7 @@ flowchart TD
 **環境**
 - [ ] Claude Code が v2.1.321 以上
 - [ ] データ保持(30日、ZDR 不可)について、法務・セキュリティと合意済み
-- [ ] 利用枠の仕様(Fable は週次上限の最大50%)をチーム内で共有済み
+- [ ] 利用枠の仕様(Fable は Pro / Team 標準席で週次上限の最大50%)をチーム内で共有済み
 
 **モデルと effort**
 - [ ] 日常は Opus 5.5、難所は Fable 5.2、という使い分けを決めた

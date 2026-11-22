@@ -285,7 +285,10 @@ it("metadata・registry・ヒーローの日付を保持", () => {
   });
   // 確認日は月次更新で変わるため特定の値に固定せず、暦日の形式と公開日以後であることだけを確かめる。
   expect(entry?.lastReviewed).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-  expect(Number.isNaN(Date.parse(entry?.lastReviewed ?? ""))).toBe(false);
+  // Date.parse は 2026-02-30 のような存在しない日付を繰り上げるため、UTC 往復で厳密に検証する。
+  const parsedReview = new Date(`${entry?.lastReviewed}T00:00:00Z`);
+  expect(Number.isNaN(parsedReview.getTime())).toBe(false);
+  expect(parsedReview.toISOString().slice(0, 10)).toBe(entry?.lastReviewed);
   expect((entry?.lastReviewed ?? "") >= (entry?.addedAt ?? "")).toBe(true);
   const { getByTestId } = render(<Page />);
   const dates = getByTestId("hero-dates");

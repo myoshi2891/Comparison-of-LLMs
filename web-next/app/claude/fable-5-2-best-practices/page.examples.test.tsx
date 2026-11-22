@@ -778,6 +778,19 @@ except ValueError:
     pass
 else:
     raise AssertionError("completed checkpoint must not be resumed")
+# 最終応答のon_textコールバックが失敗しても、checkpointは完了済みとして残る
+requests.clear()
+replies[:] = [done]
+failing_checkpoint = {}
+def fail_on_text(_text):
+    raise RuntimeError("sink failed")
+try:
+    scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=failing_checkpoint, on_text=fail_on_text)
+except RuntimeError:
+    pass
+else:
+    raise AssertionError("callback error should propagate")
+assert failing_checkpoint["completed"] is True
 `,
     examples()
   );
