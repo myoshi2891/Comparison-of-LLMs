@@ -570,6 +570,8 @@ class TestMoonshot:
             '<p>Kimi K3 input $3.25 output <span data-price="$9.99" data-field="batch">$16.50</span></p>',
             # タグ属性内の別 Kimi モデル名をレコード境界と誤認せず、同一レコードの価格ペアを抽出する。
             '<p>Kimi K3 <span data-next="kimi-k2.6">input $3.25</span> <span data-alias="Kimi K2.7">output $16.50</span></p>',
+            # タグ属性内の自モデル名・価格を可視レコードの開始位置と誤認せず、可視テキストの価格ペアを抽出する。
+            '<p data-model="Kimi K3" data-in="$9.99" data-out="output $88.88">Kimi K3 input $3.25 output $16.50</p>',
         ):
             with patch("scraper.providers.moonshot.get_page_text", return_value=html):
                 model = _find(moonshot.scrape(), "Kimi K3")

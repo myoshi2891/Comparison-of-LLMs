@@ -176,7 +176,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         # 入力・出力は同一レコード内で組にする（別レコードの価格を混成しない）。
         # 完全な組を持つレコードがなければ None のまま既存のフォールバック組を使う。
         in_price = out_price = None
-        key_starts = [m.start() for m in re.finditer(key, html, re.IGNORECASE | re.DOTALL)]
+        # 完結した HTML タグ（属性値を含む）は丸ごと読み飛ばし、可視テキスト上のモデル名だけを開始位置にする。
+        key_finder = re.compile(rf"{_ANY_TAG}|({key})", re.IGNORECASE | re.DOTALL)
+        key_starts = [m.start() for m in key_finder.finditer(html) if m.group(1) is not None]
         for begin in key_starts:
             # 同一モデルの繰り返し記載は同じレコードとして扱い、別の Kimi モデルの見出しで区切る。
             boundary = next(
