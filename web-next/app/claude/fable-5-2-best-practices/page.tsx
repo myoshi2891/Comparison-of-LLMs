@@ -27,7 +27,7 @@ const DIAGRAM_1 =
 const DIAGRAM_2 =
   'flowchart TD\n    A["タスクを分類する"] --> B{"仕様が明確で　短時間で終わる?"}\n    B -- "はい" --> LOW["low から試す"]\n    B -- "いいえ" --> C{"対話的に人が待っている?"}\n    C -- "はい" --> MED["medium から試す"]\n    C -- "いいえ" --> D{"長時間・無人・　難度が高い?"}\n    D -- "はい" --> HIGH["high を起点にする"]\n    D -- "いいえ" --> MED\n    LOW --> E["自社 evals で評価する"]\n    MED --> E\n    HIGH --> E\n    E --> F{"品質は基準を満たすか?"}\n    F -- "満たす" --> G0{"すでに low か?"}\n    G0 -- "はい" --> FIX["その effort で確定"]\n    G0 -- "いいえ" --> G{"1段下げても満たすか?"}\n    G -- "はい" --> DOWN{"1段下げて再評価　基準を満たすか?"}\n    DOWN -- "満たす" --> G0\n    DOWN -- "満たさない" --> FIX\n    G -- "いいえ" --> FIX\n    F -- "満たさない" --> H{"high 未満?"}\n    H -- "はい" --> UP["1段上げて再評価"]\n    UP --> E\n    H -- "いいえ" --> I{"プロンプトや　ハーネスに原因がない?"}\n    I -- "原因あり" --> PROMPT["8章の9パターンを確認"]\n    I -- "原因なし" --> XH["xhigh を試し　効果とコストを測定"]\n\n    class LOW,MED,HIGH,XH hub\n    class FIX done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_3 =
-  'flowchart TD\n    A["リクエストを組み立てる"] --> B{"system・tools・過去メッセージを　前回から変更した?"}\n    B -- "いいえ　追記のみ" --> OK["検査に合格　思考が再利用され　キャッシュも効く"]\n    B -- "はい" --> C{"思考ブロックを　含めて送った?"}\n    C -- "いいえ" --> WEAK["ブロックを除いて送信　モデルが考え直し出力トークン増　類推"]\n    C -- "はい" --> D{"prefix_mismatch_behavior　の設定"}\n    D -- "未設定" --> ERR["400 エラー"]\n    D -- "drop_block" --> DROP["ブロックを破棄して継続　再思考でトークン増の恐れ"]\n\n    class OK done\n    class ERR,DROP,WEAK box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
+  'flowchart TD\n    A["リクエストを組み立てる"] --> B{"各思考ブロックの直前内容(system・tools・先行メッセージ)が　そのブロック生成時のプレフィックスと一致する?"}\n    B -- "はい　全ブロック一致(追記のみ)" --> OK["検査に合格　思考が再利用され　キャッシュも効く"]\n    B -- "いいえ　過去の別system等に紐づくブロックあり(今回未変更でも不一致)" --> C{"不一致の思考ブロックを　含めて送った?"}\n    C -- "いいえ　除いて送信" --> WEAK["ブロックを除いて送信　モデルが考え直し出力トークン増　類推"]\n    C -- "はい" --> D{"prefix_mismatch_behavior　の設定"}\n    D -- "未設定" --> ERR["400 エラー"]\n    D -- "drop_block" --> DROP["ブロックを破棄して継続　再思考でトークン増の恐れ"]\n\n    class OK done\n    class ERR,DROP,WEAK box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_4 =
   'flowchart TD\n    A["1　アプリが1回目のリクエストを送る　system　tools　user"] --> B["2　APIが thinking ブロックと tool_use を返す"]\n    B --> C["3　アプリは返された content をそのまま履歴に追記する"]\n    C --> D["4　アプリがツールを実行して結果を得る"]\n    D --> E["5　アプリが履歴と tool_result で2回目のリクエストを送る"]\n    E --> F["6　APIが prefix を検査して思考を再利用しキャッシュも効かせる"]\n    F --> G["7　APIが text ブロックと end_turn を返す"]\n    class A hub\n    class G done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_5 =
@@ -1497,9 +1497,30 @@ export default function Page() {
                   <tr>
                     <td>{"4"}</td>
                     <td>
+                      {" "}
+                      <strong>{"データ保持の要件"}</strong>
+                      {
+                        "を法務・セキュリティと合意する(技術検証より先に確認する。合意前に疎通確認を行う場合は機密を含まない合成データのみを使う)。30日保持が前提で、ZDR は原則使えない。Enterprise には Enterprise Frontier Safeguards(顧客インフラ上で保存し ZDR と両立する監視、非公開ベータ)がある "
+                      }
+                      <span className={[styles.tag, styles.official].join(" ")}>{"公式"}</span>
+                      {" ("}
+                      <a className={styles["src-link"]} href="#S1">
+                        {"S1"}
+                      </a>
+                      {", "}
+                      <a className={styles["src-link"]} href="#S3">
+                        {"S3"}
+                      </a>
+                      {") "}
+                    </td>
+                    <td>{"契約・社内規程との突き合わせ"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"5"}</td>
+                    <td>
                       {" API を使うなら、モデル ID を "}
                       <code>{"claude-fable-5-2"}</code>
-                      {" にする "}
+                      {" にする(データ保持の合意前は合成データのみで疎通確認する) "}
                       <span className={[styles.tag, styles.official].join(" ")}>{"公式"}</span>
                       {" ("}
                       <a className={styles["src-link"]} href="#S3">
@@ -1522,27 +1543,6 @@ export default function Page() {
                       <code>{"claude-fable-5-2"}</code>
                       {" である "}
                     </td>
-                  </tr>
-                  <tr>
-                    <td>{"5"}</td>
-                    <td>
-                      {" "}
-                      <strong>{"データ保持の要件"}</strong>
-                      {
-                        "を法務・セキュリティと合意する。30日保持が前提で、ZDR は原則使えない。Enterprise には Enterprise Frontier Safeguards(顧客インフラ上で保存し ZDR と両立する監視、非公開ベータ)がある "
-                      }
-                      <span className={[styles.tag, styles.official].join(" ")}>{"公式"}</span>
-                      {" ("}
-                      <a className={styles["src-link"]} href="#S1">
-                        {"S1"}
-                      </a>
-                      {", "}
-                      <a className={styles["src-link"]} href="#S3">
-                        {"S3"}
-                      </a>
-                      {") "}
-                    </td>
-                    <td>{"契約・社内規程との突き合わせ"}</td>
                   </tr>
                   <tr>
                     <td>{"6"}</td>
@@ -3648,6 +3648,27 @@ export default function Page() {
                   <span className={styles.codeLine}></span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"        container = data.get("}
+                    <span className="hljs-string">{'"container"'}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        returned_id = container.get("}
+                    <span className="hljs-string">{'"id"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(container, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"else"}</span>
+                    {" container"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}></span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"        "}
                     <span className="hljs-keyword">{"if"}</span>
                     {" data["}
@@ -3671,8 +3692,27 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"            "}
                     <span className="hljs-comment">
-                      {"# checkpoint は直前に完了したツール結果バッチのまま残る"}
+                      {
+                        "# checkpoint の messages は直前に完了したツール結果バッチのまま残し、返却された container_id だけ反映する"
+                      }
                     </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" checkpoint "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" returned_id:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                checkpoint["}
+                    <span className="hljs-string">{'"container_id"'}</span>
+                    {"] = returned_id"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -3705,25 +3745,6 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}></span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"        container = data.get("}
-                    <span className="hljs-string">{'"container"'}</span>
-                    {")"}
-                  </span>
-                  {"\n"}
-                  <span className={styles.codeLine}>
-                    {"        returned_id = container.get("}
-                    <span className="hljs-string">{'"id"'}</span>
-                    {") "}
-                    <span className="hljs-keyword">{"if"}</span>{" "}
-                    <span className="hljs-built_in">{"isinstance"}</span>
-                    {"(container, "}
-                    <span className="hljs-built_in">{"dict"}</span>
-                    {") "}
-                    <span className="hljs-keyword">{"else"}</span>
-                    {" container"}
-                  </span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"        "}
@@ -4163,17 +4184,116 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"                "}
+                    <span className="hljs-comment">
+                      {
+                        '# run_tool は文字列またはコンテンツブロック(dict のリスト、各要素に str の "type")を返す契約とし、'
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-comment">
+                      {"# それ以外の戻り値はエラー結果として記録して checkpoint の破損を防ぐ。"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                "}
                     <span className="hljs-keyword">{"try"}</span>
                     {":"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
-                    {"                    result["}
-                    <span className="hljs-string">{'"content"'}</span>
-                    {"] = copy.deepcopy(run_tool(tool_key, copy.deepcopy(block["}
+                    {"                    raw = run_tool(tool_key, copy.deepcopy(block["}
                     <span className="hljs-string">{'"input"'}</span>
-                    {"])))"}
+                    {"]))"}
                   </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(raw, "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        result["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"] = raw"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-keyword">{"elif"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(raw, "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"all"}</span>
+                    {"("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" item "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" raw"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                    ):"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        result["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"] = copy.deepcopy(raw)"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-keyword">{"else"}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"raise"}</span>
+                    {" TypeError("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-string">
+                      {'f"run_tool must return str or list of content blocks, got '}
+                      <span className="hljs-subst">
+                        {"{"}
+                        <span className="hljs-built_in">{"type"}</span>
+                        {"(raw).__name__}"}
+                      </span>
+                      {'"'}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                        )"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"                "}
@@ -8290,11 +8410,17 @@ export default function Page() {
               </li>{" "}
               <li>
                 {
-                  " 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は "
+                  " 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API の単一試行 Fable 応答は "
                 }
                 <code>{"estimate_usd(usage, mode, response)"}</code>
                 {
-                  " の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。 "
+                  " の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。サーバー側フォールバック時はトップレベルの "
+                }
+                <code>{"usage"}</code>
+                {" や最終応答への Fable 単価適用に頼らず、課金対象となる "}
+                <code>{"usage.iterations"}</code>
+                {
+                  " の各エントリをその試行を処理したモデルの単価で合算する。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。 "
                 }
               </li>{" "}
               <li>
@@ -8846,7 +8972,14 @@ export default function Page() {
               </li>{" "}
             </ol>{" "}
             <h3 id="s13-2">{"13.2 記録する指標"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original div.table-wrap while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="記録する指標の表"
+            >
               {" "}
               <table>
                 <thead>

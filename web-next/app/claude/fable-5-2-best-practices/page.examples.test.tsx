@@ -645,20 +645,37 @@ import ast, copy, json, sys
 code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
 fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
 
-# 1. model_context_window_exceeded と refusal は messages と checkpoint を変更せずに返す
-for reason in ("max_tokens", "model_context_window_exceeded", "refusal"):
-    checkpoint = {"messages": [{"role": "user", "content": "saved"}]}
-    snapshot = copy.deepcopy(checkpoint)
+# 1. max_tokens / model_context_window_exceeded は messages を変更せず、container が返ったときだけ container_id を反映する
+for reason in ("max_tokens", "model_context_window_exceeded"):
+    checkpoint = {"messages": [{"role": "user", "content": "saved"}], "container_id": "ctr_prev"}
     seen = []
-    def call(body):
+    def call_with_ctr(body):
         seen.append(copy.deepcopy(body))
-        return {"stop_reason": reason, "content": [{"type": "text", "text": "partial"}], "container": {"id": "ctr_bad"}}
-    scope = {"call": call, "copy": copy}
+        return {"stop_reason": reason, "content": [{"type": "text", "text": "partial"}], "container": {"id": "ctr_new"}}
+    scope = {"call": call_with_ctr, "copy": copy}
     exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
     res = scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=checkpoint, max_tokens=64_000)
     assert res["stop_reason"] == reason
     assert seen[0]["max_tokens"] == 64_000
-    assert checkpoint == snapshot, (reason, checkpoint)
+    assert checkpoint["messages"] == [{"role": "user", "content": "saved"}], (reason, checkpoint)
+    assert checkpoint["container_id"] == "ctr_new", (reason, checkpoint)
+
+    # container が無い場合は保存済みの container_id をそのまま保持する
+    checkpoint_no_ctr = {"messages": [{"role": "user", "content": "saved"}], "container_id": "ctr_prev"}
+    def call_without_ctr(body):
+        return {"stop_reason": reason, "content": [{"type": "text", "text": "partial"}]}
+    scope2 = {"call": call_without_ctr, "copy": copy}
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope2)
+    scope2["agent_loop"]("task", [], None, max_turns=2, checkpoint=checkpoint_no_ctr)
+    assert checkpoint_no_ctr == {"messages": [{"role": "user", "content": "saved"}], "container_id": "ctr_prev"}
+
+# refusal は messages も container_id も変更せずに返す
+refusal_cp = {"messages": [{"role": "user", "content": "saved"}], "container_id": "ctr_prev"}
+refusal_snapshot = copy.deepcopy(refusal_cp)
+scope_ref = {"call": lambda _b: {"stop_reason": "refusal", "content": [{"type": "text", "text": "no"}], "container": {"id": "ctr_bad"}}, "copy": copy}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope_ref)
+assert scope_ref["agent_loop"]("task", [], None, max_turns=2, checkpoint=refusal_cp)["stop_reason"] == "refusal"
+assert refusal_cp == refusal_snapshot
 
 # 2. container ID を checkpoint に保存し、pause_turn・API失敗・ターン上限後の再開に含める
 checkpoint, requests = {}, []
@@ -837,6 +854,45 @@ for early_reason in ("refusal", "max_tokens"):
     early_texts = []
     assert scope["agent_loop"]("task", [], None, max_turns=2, on_text=early_texts.append)["stop_reason"] == early_reason
     assert early_texts == []
+`,
+    examples()
+  );
+});
+
+it("agent_loopはrun_toolの非文字列・不正な戻り値を拒否し、is_error=Trueの文字列tool_resultとして記録する", () => {
+  python(
+    `
+import ast, copy, json, sys
+code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
+fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
+def tool(n):
+    return {"type": "tool_use", "id": "t" + str(n), "name": "op", "input": {"n": n}}
+replies = [
+    {"stop_reason": "tool_use", "content": [tool(1), tool(2), tool(3), tool(4), tool(5), tool(6)]},
+    {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]},
+]
+requests = []
+def call(body):
+    requests.append(copy.deepcopy(body))
+    return replies[len(requests) - 1]
+returns = {
+    1: "ok",
+    2: [{"type": "text", "text": "block"}],
+    3: None,
+    4: 42,
+    5: {"type": "text", "text": "dict-not-list"},
+    6: [{"text": "missing-type"}],
+}
+scope = {"call": call, "copy": copy}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
+checkpoint = {}
+assert scope["agent_loop"]("task", [], lambda _k, a: returns[a["n"]], max_turns=2, checkpoint=checkpoint) is replies[1]
+results = checkpoint["messages"][2]["content"]
+assert results[0] == {"type": "tool_result", "tool_use_id": "t1", "content": "ok"}
+assert results[1] == {"type": "tool_result", "tool_use_id": "t2", "content": [{"type": "text", "text": "block"}]}
+for idx in (2, 3, 4, 5):
+    assert results[idx]["is_error"] is True, (idx, results[idx])
+    assert isinstance(results[idx]["content"], str) and "TypeError" in results[idx]["content"], (idx, results[idx])
 `,
     examples()
   );

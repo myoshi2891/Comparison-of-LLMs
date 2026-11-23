@@ -231,8 +231,8 @@ Claude Code の advisor 機能では、メインモデルと advisor モデル�
 | 1 | 利用プランを確認する。Fable 5.2 は Pro / Max / Ultra / Team / Enterprise で利用できる [公式] (S2) | claude.ai のモデルピッカーに Fable 5.2 が出る |
 | 2 | Claude Code を **v2.1.321 以降** に更新する [公式] (S7, S8) | `claude --version` |
 | 3 | モデルを選択する | Claude Code 内で `/model fable` |
-| 4 | API を使うなら、モデル ID を `claude-fable-5-2` にする [公式] (S3) | 最小のリクエストで 200 が返る(認証・通信の確認)。生成の確認として、本文の `stop_reason` が `refusal` ではなく `end_turn` で、`model` が `claude-fable-5-2` である |
-| 5 | **データ保持の要件**を法務・セキュリティと合意する。30日保持が前提で、ZDR は原則使えない。Enterprise には Enterprise Frontier Safeguards(顧客インフラ上で保存し ZDR と両立する監視、非公開ベータ)がある [公式] (S1, S3) | 契約・社内規程との突き合わせ |
+| 4 | **データ保持の要件**を法務・セキュリティと合意する(技術検証より先に確認する。合意前に疎通確認を行う場合は機密を含まない合成データのみを使う)。30日保持が前提で、ZDR は原則使えない。Enterprise には Enterprise Frontier Safeguards(顧客インフラ上で保存し ZDR と両立する監視、非公開ベータ)がある [公式] (S1, S3) | 契約・社内規程との突き合わせ |
+| 5 | API を使うなら、モデル ID を `claude-fable-5-2` にする(データ保持の合意前は合成データのみで疎通確認する) [公式] (S3) | 最小のリクエストで 200 が返る(認証・通信の確認)。生成の確認として、本文の `stop_reason` が `refusal` ではなく `end_turn` で、`model` が `claude-fable-5-2` である |
 | 6 | 利用枠の仕様を把握する(4.2 参照) | プラン画面の使用量表示 |
 
 ```bash
@@ -551,16 +551,19 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
             body["container"] = container_id
         data = call(body)
 
+        container = data.get("container")
+        returned_id = container.get("id") if isinstance(container, dict) else container
+
         if data["stop_reason"] in ("max_tokens", "model_context_window_exceeded"):
             # 途中で切れた応答(未完成の tool_use を含み得る)は履歴へ追加しない。
-            # checkpoint は直前に完了したツール結果バッチのまま残る
+            # checkpoint の messages は直前に完了したツール結果バッチのまま残し、返却された container_id だけ反映する
+            if checkpoint is not None and returned_id:
+                checkpoint["container_id"] = returned_id
             return data
         if data["stop_reason"] == "refusal":
             # 拒否応答は共有 checkpoint の履歴へ追記しない(12章の方針で処理する)
             return data
 
-        container = data.get("container")
-        returned_id = container.get("id") if isinstance(container, dict) else container
         if returned_id:
             container_id = returned_id
 
@@ -617,8 +620,21 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                 # (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。
                 tool_key = (block["toolset_name"], block["name"]) if "toolset_name" in block else block["name"]
                 # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
+                # run_tool は文字列またはコンテンツブロック(dict のリスト、各要素に str の "type")を返す契約とし、
+                # それ以外の戻り値はエラー結果として記録して checkpoint の破損を防ぐ。
                 try:
-                    result["content"] = copy.deepcopy(run_tool(tool_key, copy.deepcopy(block["input"])))
+                    raw = run_tool(tool_key, copy.deepcopy(block["input"]))
+                    if isinstance(raw, str):
+                        result["content"] = raw
+                    elif isinstance(raw, list) and all(
+                        isinstance(item, dict) and isinstance(item.get("type"), str)
+                        for item in raw
+                    ):
+                        result["content"] = copy.deepcopy(raw)
+                    else:
+                        raise TypeError(
+                            f"run_tool must return str or list of content blocks, got {type(raw).__name__}"
+                        )
                 except Exception as error:
                     result["content"] = f"{type(error).__name__}: {error}"
                     result["is_error"] = True
@@ -692,10 +708,10 @@ Fable 5.2 は、過去ターンの思考ブロックを保持して使う **pres
 
 ```mermaid
 flowchart TD
-    A["リクエストを組み立てる"] --> B{"system / tools / 過去メッセージを<br/>前回から変更した?"}
-    B -- "いいえ(追記のみ)" --> OK["検査に合格<br/>思考が再利用され<br/>キャッシュも効く"]
-    B -- "はい" --> C{"思考ブロックを<br/>含めて送った?"}
-    C -- "いいえ" --> WEAK["ブロックを除いて送信<br/>モデルが考え直し出力トークン増(類推)"]
+    A["リクエストを組み立てる"] --> B{"各思考ブロックの直前内容(system / tools / 先行メッセージ)が<br/>そのブロック生成時のプレフィックスと一致する?"}
+    B -- "はい(全ブロック一致・追記のみ)" --> OK["検査に合格<br/>思考が再利用され<br/>キャッシュも効く"]
+    B -- "いいえ(過去の別system等に紐づくブロックあり・今回未変更でも不一致)" --> C{"不一致の思考ブロックを<br/>含めて送った?"}
+    C -- "いいえ(除いて送信)" --> WEAK["ブロックを除いて送信<br/>モデルが考え直し出力トークン増(類推)"]
     C -- "はい" --> D{"prefix_mismatch_behavior<br/>の設定"}
     D -- "未設定" --> ERR["400 エラー"]
     D -- "drop_block" --> DROP["ブロックを破棄して継続<br/>再思考でトークン増の恐れ"]
@@ -1307,7 +1323,7 @@ print(round(estimate_usd(example, "fast"), 2))  # 0.80 + 0.06 + 2.40 = 3.26
 ### 11.4 予算ガードの考え方 [私見]
 
 1. **1タスクあたりの上限金額**と**最大ターン数**を決め、ハーネスで強制する。
-2. 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は `estimate_usd(usage, mode, response)` の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。
+2. 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API の単一試行 Fable 応答は `estimate_usd(usage, mode, response)` の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。サーバー側フォールバック時はトップレベルの `usage` や最終応答への Fable 単価適用に頼らず、課金対象となる `usage.iterations` の各エントリをその試行を処理したモデルの単価で合算する。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。
 3. 週次で**タスク種別ごとの平均コスト**を見て、effort と構成を見直す。
 4. 上限に達したら、**途中経過を保存して人に引き継ぐ**(破棄しない)。
 

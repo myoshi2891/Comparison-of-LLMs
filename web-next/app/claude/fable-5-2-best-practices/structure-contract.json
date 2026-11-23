@@ -3468,9 +3468,57 @@
                                 "td",
                                 {},
                                 [
+                                  ["strong", {}, [["text", "データ保持の要件"]]],
+                                  [
+                                    "text",
+                                    "を法務・セキュリティと合意する(技術検証より先に確認する。合意前に疎通確認を行う場合は機密を含まない合成データのみを使う)。30日保持が前提で、ZDR は原則使えない。Enterprise には Enterprise Frontier Safeguards(顧客インフラ上で保存し ZDR と両立する監視、非公開ベータ)がある"
+                                  ],
+                                  [
+                                    "span",
+                                    {
+                                      "class": "tag official"
+                                    },
+                                    [["text", "公式"]]
+                                  ],
+                                  ["text", "("],
+                                  [
+                                    "a",
+                                    {
+                                      "class": "src-link",
+                                      "href": "#S1"
+                                    },
+                                    [["text", "S1"]]
+                                  ],
+                                  ["text", ","],
+                                  [
+                                    "a",
+                                    {
+                                      "class": "src-link",
+                                      "href": "#S3"
+                                    },
+                                    [["text", "S3"]]
+                                  ],
+                                  ["text", ")"]
+                                ]
+                              ],
+                              ["td", {}, [["text", "契約・社内規程との突き合わせ"]]]
+                            ]
+                          ],
+                          [
+                            "tr",
+                            {},
+                            [
+                              ["td", {}, [["text", "5"]]],
+                              [
+                                "td",
+                                {},
+                                [
                                   ["text", "API を使うなら、モデル ID を"],
                                   ["code", {}, [["text", "claude-fable-5-2"]]],
-                                  ["text", "にする"],
+                                  [
+                                    "text",
+                                    "にする(データ保持の合意前は合成データのみで疎通確認する)"
+                                  ],
                                   [
                                     "span",
                                     {
@@ -3510,51 +3558,6 @@
                                   ["text", "である"]
                                 ]
                               ]
-                            ]
-                          ],
-                          [
-                            "tr",
-                            {},
-                            [
-                              ["td", {}, [["text", "5"]]],
-                              [
-                                "td",
-                                {},
-                                [
-                                  ["strong", {}, [["text", "データ保持の要件"]]],
-                                  [
-                                    "text",
-                                    "を法務・セキュリティと合意する。30日保持が前提で、ZDR は原則使えない。Enterprise には Enterprise Frontier Safeguards(顧客インフラ上で保存し ZDR と両立する監視、非公開ベータ)がある"
-                                  ],
-                                  [
-                                    "span",
-                                    {
-                                      "class": "tag official"
-                                    },
-                                    [["text", "公式"]]
-                                  ],
-                                  ["text", "("],
-                                  [
-                                    "a",
-                                    {
-                                      "class": "src-link",
-                                      "href": "#S1"
-                                    },
-                                    [["text", "S1"]]
-                                  ],
-                                  ["text", ","],
-                                  [
-                                    "a",
-                                    {
-                                      "class": "src-link",
-                                      "href": "#S3"
-                                    },
-                                    [["text", "S3"]]
-                                  ],
-                                  ["text", ")"]
-                                ]
-                              ],
-                              ["td", {}, [["text", "契約・社内規程との突き合わせ"]]]
                             ]
                           ],
                           [
@@ -5476,7 +5479,7 @@
                     [
                       [
                         "code",
-                        "def call(body: dict, betas: list[str] | None = None) -> dict:\n    headers = dict(HEADERS)\n    if betas:\n        headers[\"anthropic-beta\"] = \",\".join(betas)\n    r = httpx.post(API, headers=headers, json=body, timeout=900)\n    r.raise_for_status()\n    return r.json()\n\n\ndef agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = \"high\", max_turns: int = 60, checkpoint: dict | None = None, max_tokens: int = 32_000, on_text=None) -> dict:\n    # system と tools は会話の途中で変更しない(prefix チェックの対象)\n    system = \"あなたはこのリポジトリの保守担当エージェントです。...\"\n    # checkpoint={} を渡すと、上限到達後は同じ辞書で再呼び出しして続行できる\n    messages = [{\"role\": \"user\", \"content\": user_prompt}]\n    container_id = None\n    if checkpoint is not None:\n        if checkpoint.get(\"completed\"):\n            raise ValueError(\"完了済みの checkpoint は再開できません\")\n        if \"messages\" in checkpoint:\n            messages = list(checkpoint[\"messages\"])\n        # 通常の再開では保存済みの container_id を保持する(生存中の一時停止コンテナに必要なファイルが残り得るため黙って消さない)。\n        # コンテナが期限切れになった場合は明示的に新しいコンテナを作成し、必要な成果物を復元してから再開する。\n        container_id = checkpoint.get(\"container_id\")\n\n    for _ in range(max_turns):\n        body = {\n            \"model\": \"claude-fable-5-2\",\n            \"max_tokens\": max_tokens,\n            \"output_config\": {\"effort\": effort},\n            \"system\": system,\n            \"cache_control\": {\"type\": \"ephemeral\"},  # 自動キャッシュを明示的に有効化\n            \"tools\": tools,\n            \"messages\": messages,\n        }\n        if container_id is not None:\n            body[\"container\"] = container_id\n        data = call(body)\n\n        if data[\"stop_reason\"] in (\"max_tokens\", \"model_context_window_exceeded\"):\n            # 途中で切れた応答(未完成の tool_use を含み得る)は履歴へ追加しない。\n            # checkpoint は直前に完了したツール結果バッチのまま残る\n            return data\n        if data[\"stop_reason\"] == \"refusal\":\n            # 拒否応答は共有 checkpoint の履歴へ追記しない(12章の方針で処理する)\n            return data\n\n        container = data.get(\"container\")\n        returned_id = container.get(\"id\") if isinstance(container, dict) else container\n        if returned_id:\n            container_id = returned_id\n\n        # 返ってきた content をそのまま追記する。ブロックの削除・並べ替え・書き換えは禁止\n        messages.append({\"role\": \"assistant\", \"content\": data[\"content\"]})\n\n        if data[\"stop_reason\"] == \"pause_turn\":\n            if checkpoint is not None:\n                checkpoint[\"messages\"] = list(messages)\n                if container_id is not None:\n                    checkpoint[\"container_id\"] = container_id\n            if on_text is not None:\n                for block in data[\"content\"]:\n                    if block.get(\"type\") == \"text\" and block.get(\"text\"):\n                        on_text(block[\"text\"])\n            continue\n        if data[\"stop_reason\"] != \"tool_use\":\n            if checkpoint is not None:\n                checkpoint[\"completed\"] = True\n                checkpoint[\"final_response\"] = data\n                if container_id is not None:\n                    checkpoint[\"container_id\"] = container_id\n            if on_text is not None:\n                for block in data[\"content\"]:\n                    if block.get(\"type\") == \"text\" and block.get(\"text\"):\n                        on_text(block[\"text\"])\n            return data\n\n        if on_text is not None:\n            for block in data[\"content\"]:\n                if block.get(\"type\") == \"text\" and block.get(\"text\"):\n                    on_text(block[\"text\"])\n\n        results = []\n        failed_toolsets = set()  # このターンで操作が失敗したツールセット(computer と browser を別々に追跡)\n        for block in data[\"content\"]:\n            if block[\"type\"] == \"tool_use\":\n                result = {\"type\": \"tool_result\", \"tool_use_id\": block[\"id\"]}\n                # ツールセットのメンバーへの結果には同じ toolset_name を返す(欠落・不一致は拒否される)\n                if \"toolset_name\" in block:\n                    result[\"toolset_name\"] = block[\"toolset_name\"]\n                toolset = block.get(\"toolset_name\")\n                if toolset in failed_toolsets:\n                    # 同じツールセットの後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す\n                    result[\"content\"] = (\n                        \"Not executed: an earlier computer action in this turn failed.\"\n                        if toolset == \"computer\"\n                        else \"Not executed: an earlier action in this turn failed\"\n                    )\n                    result[\"is_error\"] = True\n                    results.append(result)\n                    continue\n                # ツールセットのメンバーは別のツールセットに同名のツールがあり得るため、\n                # (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。\n                tool_key = (block[\"toolset_name\"], block[\"name\"]) if \"toolset_name\" in block else block[\"name\"]\n                # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。\n                try:\n                    result[\"content\"] = copy.deepcopy(run_tool(tool_key, copy.deepcopy(block[\"input\"])))\n                except Exception as error:\n                    result[\"content\"] = f\"{type(error).__name__}: {error}\"\n                    result[\"is_error\"] = True\n                    if toolset in (\"computer\", \"browser\"):\n                        failed_toolsets.add(toolset)\n                results.append(result)\n        messages.append({\"role\": \"user\", \"content\": results})\n        if checkpoint is not None:\n            checkpoint[\"messages\"] = list(messages)  # 次のAPI呼び出し前にスナップショットを保存する\n            if container_id is not None:\n                checkpoint[\"container_id\"] = container_id\n\n    if checkpoint is not None:\n        checkpoint[\"messages\"] = list(messages)  # 最後のtool_resultもスナップショットで保存する\n        if container_id is not None:\n            checkpoint[\"container_id\"] = container_id\n    raise RuntimeError(\"max_turns に到達しました\")"
+                        "def call(body: dict, betas: list[str] | None = None) -> dict:\n    headers = dict(HEADERS)\n    if betas:\n        headers[\"anthropic-beta\"] = \",\".join(betas)\n    r = httpx.post(API, headers=headers, json=body, timeout=900)\n    r.raise_for_status()\n    return r.json()\n\n\ndef agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = \"high\", max_turns: int = 60, checkpoint: dict | None = None, max_tokens: int = 32_000, on_text=None) -> dict:\n    # system と tools は会話の途中で変更しない(prefix チェックの対象)\n    system = \"あなたはこのリポジトリの保守担当エージェントです。...\"\n    # checkpoint={} を渡すと、上限到達後は同じ辞書で再呼び出しして続行できる\n    messages = [{\"role\": \"user\", \"content\": user_prompt}]\n    container_id = None\n    if checkpoint is not None:\n        if checkpoint.get(\"completed\"):\n            raise ValueError(\"完了済みの checkpoint は再開できません\")\n        if \"messages\" in checkpoint:\n            messages = list(checkpoint[\"messages\"])\n        # 通常の再開では保存済みの container_id を保持する(生存中の一時停止コンテナに必要なファイルが残り得るため黙って消さない)。\n        # コンテナが期限切れになった場合は明示的に新しいコンテナを作成し、必要な成果物を復元してから再開する。\n        container_id = checkpoint.get(\"container_id\")\n\n    for _ in range(max_turns):\n        body = {\n            \"model\": \"claude-fable-5-2\",\n            \"max_tokens\": max_tokens,\n            \"output_config\": {\"effort\": effort},\n            \"system\": system,\n            \"cache_control\": {\"type\": \"ephemeral\"},  # 自動キャッシュを明示的に有効化\n            \"tools\": tools,\n            \"messages\": messages,\n        }\n        if container_id is not None:\n            body[\"container\"] = container_id\n        data = call(body)\n\n        container = data.get(\"container\")\n        returned_id = container.get(\"id\") if isinstance(container, dict) else container\n\n        if data[\"stop_reason\"] in (\"max_tokens\", \"model_context_window_exceeded\"):\n            # 途中で切れた応答(未完成の tool_use を含み得る)は履歴へ追加しない。\n            # checkpoint の messages は直前に完了したツール結果バッチのまま残し、返却された container_id だけ反映する\n            if checkpoint is not None and returned_id:\n                checkpoint[\"container_id\"] = returned_id\n            return data\n        if data[\"stop_reason\"] == \"refusal\":\n            # 拒否応答は共有 checkpoint の履歴へ追記しない(12章の方針で処理する)\n            return data\n\n        if returned_id:\n            container_id = returned_id\n\n        # 返ってきた content をそのまま追記する。ブロックの削除・並べ替え・書き換えは禁止\n        messages.append({\"role\": \"assistant\", \"content\": data[\"content\"]})\n\n        if data[\"stop_reason\"] == \"pause_turn\":\n            if checkpoint is not None:\n                checkpoint[\"messages\"] = list(messages)\n                if container_id is not None:\n                    checkpoint[\"container_id\"] = container_id\n            if on_text is not None:\n                for block in data[\"content\"]:\n                    if block.get(\"type\") == \"text\" and block.get(\"text\"):\n                        on_text(block[\"text\"])\n            continue\n        if data[\"stop_reason\"] != \"tool_use\":\n            if checkpoint is not None:\n                checkpoint[\"completed\"] = True\n                checkpoint[\"final_response\"] = data\n                if container_id is not None:\n                    checkpoint[\"container_id\"] = container_id\n            if on_text is not None:\n                for block in data[\"content\"]:\n                    if block.get(\"type\") == \"text\" and block.get(\"text\"):\n                        on_text(block[\"text\"])\n            return data\n\n        if on_text is not None:\n            for block in data[\"content\"]:\n                if block.get(\"type\") == \"text\" and block.get(\"text\"):\n                    on_text(block[\"text\"])\n\n        results = []\n        failed_toolsets = set()  # このターンで操作が失敗したツールセット(computer と browser を別々に追跡)\n        for block in data[\"content\"]:\n            if block[\"type\"] == \"tool_use\":\n                result = {\"type\": \"tool_result\", \"tool_use_id\": block[\"id\"]}\n                # ツールセットのメンバーへの結果には同じ toolset_name を返す(欠落・不一致は拒否される)\n                if \"toolset_name\" in block:\n                    result[\"toolset_name\"] = block[\"toolset_name\"]\n                toolset = block.get(\"toolset_name\")\n                if toolset in failed_toolsets:\n                    # 同じツールセットの後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す\n                    result[\"content\"] = (\n                        \"Not executed: an earlier computer action in this turn failed.\"\n                        if toolset == \"computer\"\n                        else \"Not executed: an earlier action in this turn failed\"\n                    )\n                    result[\"is_error\"] = True\n                    results.append(result)\n                    continue\n                # ツールセットのメンバーは別のツールセットに同名のツールがあり得るため、\n                # (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。\n                tool_key = (block[\"toolset_name\"], block[\"name\"]) if \"toolset_name\" in block else block[\"name\"]\n                # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。\n                # run_tool は文字列またはコンテンツブロック(dict のリスト、各要素に str の \"type\")を返す契約とし、\n                # それ以外の戻り値はエラー結果として記録して checkpoint の破損を防ぐ。\n                try:\n                    raw = run_tool(tool_key, copy.deepcopy(block[\"input\"]))\n                    if isinstance(raw, str):\n                        result[\"content\"] = raw\n                    elif isinstance(raw, list) and all(\n                        isinstance(item, dict) and isinstance(item.get(\"type\"), str)\n                        for item in raw\n                    ):\n                        result[\"content\"] = copy.deepcopy(raw)\n                    else:\n                        raise TypeError(\n                            f\"run_tool must return str or list of content blocks, got {type(raw).__name__}\"\n                        )\n                except Exception as error:\n                    result[\"content\"] = f\"{type(error).__name__}: {error}\"\n                    result[\"is_error\"] = True\n                    if toolset in (\"computer\", \"browser\"):\n                        failed_toolsets.add(toolset)\n                results.append(result)\n        messages.append({\"role\": \"user\", \"content\": results})\n        if checkpoint is not None:\n            checkpoint[\"messages\"] = list(messages)  # 次のAPI呼び出し前にスナップショットを保存する\n            if container_id is not None:\n                checkpoint[\"container_id\"] = container_id\n\n    if checkpoint is not None:\n        checkpoint[\"messages\"] = list(messages)  # 最後のtool_resultもスナップショットで保存する\n        if container_id is not None:\n            checkpoint[\"container_id\"] = container_id\n    raise RuntimeError(\"max_turns に到達しました\")"
                       ]
                     ]
                   ]
@@ -5758,7 +5761,7 @@
                   ],
                   [
                     "diagram",
-                    "flowchart TD\n    A[\"リクエストを組み立てる\"] --> B{\"system・tools・過去メッセージを　前回から変更した?\"}\n    B -- \"いいえ　追記のみ\" --> OK[\"検査に合格　思考が再利用され　キャッシュも効く\"]\n    B -- \"はい\" --> C{\"思考ブロックを　含めて送った?\"}\n    C -- \"いいえ\" --> WEAK[\"ブロックを除いて送信　モデルが考え直し出力トークン増　類推\"]\n    C -- \"はい\" --> D{\"prefix_mismatch_behavior　の設定\"}\n    D -- \"未設定\" --> ERR[\"400 エラー\"]\n    D -- \"drop_block\" --> DROP[\"ブロックを破棄して継続　再思考でトークン増の恐れ\"]\n\n    class OK done\n    class ERR,DROP,WEAK box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
+                    "flowchart TD\n    A[\"リクエストを組み立てる\"] --> B{\"各思考ブロックの直前内容(system・tools・先行メッセージ)が　そのブロック生成時のプレフィックスと一致する?\"}\n    B -- \"はい　全ブロック一致(追記のみ)\" --> OK[\"検査に合格　思考が再利用され　キャッシュも効く\"]\n    B -- \"いいえ　過去の別system等に紐づくブロックあり(今回未変更でも不一致)\" --> C{\"不一致の思考ブロックを　含めて送った?\"}\n    C -- \"いいえ　除いて送信\" --> WEAK[\"ブロックを除いて送信　モデルが考え直し出力トークン増　類推\"]\n    C -- \"はい\" --> D{\"prefix_mismatch_behavior　の設定\"}\n    D -- \"未設定\" --> ERR[\"400 エラー\"]\n    D -- \"drop_block\" --> DROP[\"ブロックを破棄して継続　再思考でトークン増の恐れ\"]\n\n    class OK done\n    class ERR,DROP,WEAK box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;"
                   ]
                 ]
               ],
@@ -12205,12 +12208,19 @@
                     [
                       [
                         "text",
-                        "実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は"
+                        "実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API の単一試行 Fable 応答は"
                       ],
                       ["code", {}, [["text", "estimate_usd(usage, mode, response)"]]],
                       [
                         "text",
-                        "の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。"
+                        "の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。サーバー側フォールバック時はトップレベルの"
+                      ],
+                      ["code", {}, [["text", "usage"]]],
+                      ["text", "や最終応答への Fable 単価適用に頼らず、課金対象となる"],
+                      ["code", {}, [["text", "usage.iterations"]]],
+                      [
+                        "text",
+                        "の各エントリをその試行を処理したモデルの単価で合算する。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。"
                       ]
                     ]
                   ],

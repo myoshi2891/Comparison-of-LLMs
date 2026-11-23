@@ -269,6 +269,10 @@ it("確度ラベル表・ベンチマーク表・費用式表とセットアッ�
   expect(estimatorPre?.getAttribute("tabindex")).toBe("0");
   expect(estimatorPre?.getAttribute("role")).toBe("region");
   expect(estimatorPre?.getAttribute("aria-label")).toBeTruthy();
+  const metricsWrap = container.querySelector("#s13-2")?.nextElementSibling;
+  expect(metricsWrap?.getAttribute("tabindex")).toBe("0");
+  expect(metricsWrap?.getAttribute("role")).toBe("region");
+  expect(metricsWrap?.getAttribute("aria-label")).toBe("記録する指標の表");
 });
 
 it("6.3 CMEK・6.5 進捗例・9.1 fast mode・11.4 予算倍率・図9 コンテキスト超過分岐が最新仕様を反映する", () => {
@@ -313,4 +317,19 @@ it("6.3 CMEK・6.5 進捗例・9.1 fast mode・11.4 予算倍率・図9 コン�
   expect(agentCode).toMatch(/container_id を保持/);
   expect(agentCode).toMatch(/期限切れ/);
   expect(text(budgetItem)).toMatch(/非課金と確認された事前拒否は 0/);
+  expect(text(budgetItem)).toMatch(/単一試行 Fable 応答/);
+  expect(text(budgetItem)).toMatch(/usage\.iterations/);
+  // 図4: 各思考ブロックを生成時のプレフィックスと比較し、今回 system 未変更でも過去別プレフィックスは不一致。
+  const fig4 = diagram("図4");
+  expect(fig4.labels.get("B")).toMatch(/生成時のプレフィックス/);
+  expect(fig4.edges.some((e) => e.from === "B" && /今回未変更でも不一致/.test(e.label))).toBe(true);
+  // 4.1 セットアップ手順: データ保持要件の確認が API 疎通確認より先にあり、合意前は合成データ限定。
+  const setupRows = Array.from(container.querySelectorAll("#s4-1 + div tr")).slice(1);
+  const retentionIdx = setupRows.findIndex((r) => text(r).includes("データ保持の要件"));
+  const smokeIdx = setupRows.findIndex((r) =>
+    text(r).includes("モデル ID を claude-fable-5-2 にする")
+  );
+  expect(retentionIdx).toBeGreaterThanOrEqual(0);
+  expect(smokeIdx).toBeGreaterThan(retentionIdx);
+  expect(text(setupRows[smokeIdx])).toMatch(/合成データのみ/);
 });
