@@ -1991,6 +1991,11 @@ export default function Page() {
                 />
               </div>{" "}
             </div>{" "}
+            <p>
+              {
+                " この段階的な引き下げフローは、低い effort で品質基準を満たすなら1段上の effort でも満たす(単調性がある)場合に限って適用します。effort を上げると品質が下がるなど単調でないケースでは、5.4節のスイープで各 effort を横並び評価し、品質基準を満たす最も低い effort を選んでください。 "
+              }
+            </p>{" "}
             <h3 id="s5-4">{"5.4 effort スイープの手順(最初の1週間でやる)"}</h3>{" "}
             <ol>
               {" "}
@@ -3533,6 +3538,24 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-comment">
+                      {
+                        "# 通常の再開では保存済みの container_id を保持する(生存中の一時停止コンテナに必要なファイルが残り得るため黙って消さない)。"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-comment">
+                      {
+                        "# コンテナが期限切れになった場合は明示的に新しいコンテナを作成し、必要な成果物を復元してから再開する。"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"        container_id = checkpoint.get("}
                     <span className="hljs-string">{'"container_id"'}</span>
                     {")"}
@@ -4056,13 +4079,32 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                    result["}
                     <span className="hljs-string">{'"content"'}</span>
-                    {"] = "}
+                    {"] = ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
                     <span className="hljs-string">
-                      {'f"Not executed: an earlier '}
-                      <span className="hljs-subst">{"{toolset}"}</span>
-                      {' action in this turn failed"'}
+                      {'"Not executed: an earlier computer action in this turn failed."'}
                     </span>
                   </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" toolset == "}
+                    <span className="hljs-string">{'"computer"'}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"else"}</span>{" "}
+                    <span className="hljs-string">
+                      {'"Not executed: an earlier action in this turn failed"'}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                    )"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"                    result["}
@@ -7691,6 +7733,12 @@ export default function Page() {
                       <span className="hljs-built_in">{"str"}</span>
                       {" = "}
                       <span className="hljs-string">{'"standard"'}</span>
+                      {", response: "}
+                      <span className="hljs-built_in">{"dict"}</span>
+                      {" | "}
+                      <span className="hljs-literal">{"None"}</span>
+                      {" = "}
+                      <span className="hljs-literal">{"None"}</span>
                     </span>
                     {") -> "}
                     <span className="hljs-built_in">{"float"}</span>
@@ -7704,6 +7752,101 @@ export default function Page() {
                         '"""usage からトークン費用(USD)のみを見積もる。Web 検索等の従量課金ツール費は別途加算する。"""'
                       }
                     </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-comment">
+                      {
+                        "# 出力トークン 0 の事前拒否(pre-output refusal)は billed 明示時にそれに従い、未指定時は課金対象カテゴリ以外を非課金とする"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"    "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" response "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" response.get("}
+                    <span className="hljs-string">{'"stop_reason"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"refusal"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        details = response.get("}
+                    <span className="hljs-string">{'"stop_details"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" {}"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        billed = details.get("}
+                    <span className="hljs-string">{'"billed"'}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        billable_pre_output = details.get("}
+                    <span className="hljs-string">{'"category"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" ("}
+                    <span className="hljs-string">{'"bio"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"frontier_llm"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"reasoning_extraction"'}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" billed "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-literal">{"False"}</span>{" "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            billed "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" (usage.get("}
+                    <span className="hljs-string">{'"output_tokens"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"or"}</span>{" "}
+                    <span className="hljs-number">{"0"}</span>
+                    {") == "}
+                    <span className="hljs-number">{"0"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>
+                    {" billable_pre_output"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"        ):"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"            "}
+                    <span className="hljs-keyword">{"return"}</span>{" "}
+                    <span className="hljs-number">{"0.0"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>{"    r = RATES[mode]"}</span>
@@ -8149,9 +8292,9 @@ export default function Page() {
                 {
                   " 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は "
                 }
-                <code>{"estimate_usd"}</code>
+                <code>{"estimate_usd(usage, mode, response)"}</code>
                 {
-                  " の値をそのまま使い、リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。 "
+                  " の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。 "
                 }
               </li>{" "}
               <li>

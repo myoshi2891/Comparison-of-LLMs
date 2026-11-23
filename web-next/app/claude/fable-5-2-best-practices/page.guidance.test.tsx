@@ -13,25 +13,57 @@ afterEach(cleanup);
 
 const text = (e: Element | null | undefined) => (e?.textContent ?? "").replace(/\s+/g, " ").trim();
 
+/** Mermaid ソースからノードのラベルと全辺を抽出する（連鎖リンクを含め、未対応リンク構文は失敗させる）。 */
+function parseMermaid(source: string) {
+  const labels = new Map<string, string>();
+  for (const m of source.matchAll(/\b([A-Z][A-Z0-9_]*)(?:\["([^"]*)"\]|\{"([^"]*)"\})/g))
+    labels.set(m[1], m[2] ?? m[3]);
+  const edges: Array<{ from: string; label: string; to: string }> = [];
+  const nodeShape = String.raw`([A-Z][A-Z0-9_]*)(?:\["[^"]*"\]|\{"[^"]*"\}|\("[^"]*"\))?`;
+  const startRe = new RegExp(`^\\s*${nodeShape}`);
+  const linkRe = new RegExp(`^\\s*--(?: "([^"]*)" --)?>\\s*${nodeShape}`);
+  for (const line of source.split("\n")) {
+    const trimmed = line.trim();
+    if (
+      !trimmed ||
+      /^(?:%%|flowchart\b|graph\b|classDef\b|class\b|subgraph\b|end\b|style\b|linkStyle\b|direction\b)/.test(
+        trimmed
+      )
+    ) {
+      continue;
+    }
+    const hasLinkSyntax = /(?:-->|-.->|==>|---|--\s)/.test(trimmed);
+    if (!hasLinkSyntax) continue;
+    const start = startRe.exec(trimmed);
+    if (!start) throw new Error(`Unparseable Mermaid link statement: ${trimmed}`);
+    let from = start[1];
+    let rest = trimmed.slice(start[0].length);
+    let count = 0;
+    while (rest.length > 0) {
+      if (/^\s*;?\s*$/.test(rest)) break;
+      const link = linkRe.exec(rest);
+      if (!link) throw new Error(`Unparseable Mermaid link statement: ${trimmed}`);
+      edges.push({ from, label: link[1] ?? "", to: link[2] });
+      from = link[2];
+      rest = rest.slice(link[0].length);
+      count++;
+    }
+    if (count === 0) throw new Error(`Unparseable Mermaid link statement: ${trimmed}`);
+  }
+  return { source, labels, edges };
+}
+
 /** 図タイトルから Mermaid ソースを引き、ノードのラベルと辺へ分解する。 */
 function diagram(title: string) {
   const { container } = render(<Page />);
   const card = Array.from(container.querySelectorAll("[data-testid='mermaid']")).find((e) =>
     text(e.parentElement?.parentElement?.firstElementChild).startsWith(title)
   );
-  const source = card?.textContent ?? "";
-  const labels = new Map<string, string>();
-  for (const m of source.matchAll(/\b([A-Z][A-Z0-9_]*)(?:\["([^"]*)"\]|\{"([^"]*)"\})/g))
-    labels.set(m[1], m[2] ?? m[3]);
-  const edges = Array.from(
-    source.matchAll(/^\s*([A-Z][A-Z0-9_]*)\b[^\n]*?--(?: "([^"]*)" --)?>\s*([A-Z][A-Z0-9_]*)/gm),
-    (m) => ({ from: m[1], label: m[2] ?? "", to: m[3] })
-  );
-  return { source, labels, edges };
+  return parseMermaid(card?.textContent ?? "");
 }
 
-it("図2: Fable の構成は evals に合格した場合だけ「そのまま運用」へ進み、不合格は見直しへ戻る", () => {
-  const { labels, edges } = diagram("図2");
+function assertEvalGate(source: string) {
+  const { labels, edges } = parseMermaid(source);
   expect(edges.length).toBeGreaterThan(0);
   // DONE へ入る辺は、Opus の evals 合格（Q4 いいえ）か、Fable 構成の evals 判定の合格だけ。
   const intoDone = edges.filter((e) => e.to === "DONE");
@@ -70,8 +102,17 @@ it("図2: Fable の構成は evals に合格した場合だけ「そのまま運
   const failed = edges.find((e) => e.from === gate && e.label === "いいえ");
   expect(failed?.to).toBeTruthy();
   expect(failed?.to).not.toBe("DONE");
-  // 不合格は選定・再試行の経路へ戻る（行き止まりにしない）。
-  expect(edges.some((e) => e.from === failed?.to)).toBe(true);
+  // 不合格は Q1 へ到達できる選定・再試行の経路へ戻る（Q1 自身や RETRY 経由を許容し、行き止まりを禁止）。
+  expect(canReach(failed?.to as string, "Q1")).toBe(true);
+}
+
+it("図2: Fable の構成は evals に合格した場合だけ「そのまま運用」へ進み、不合格は見直しへ戻る", () => {
+  const { source } = diagram("図2");
+  assertEvalGate(source);
+  // 連鎖リンクによるバイパス（FABLE --> BYPASS --> DONE）を抽出・検知できること。
+  expect(() => assertEvalGate(`${source}\n    FABLE --> BYPASS --> DONE`)).toThrow();
+  // 未対応リンク構文を見逃さず失敗させること。
+  expect(() => parseMermaid("flowchart TD\n    FABLE -.-> DONE")).toThrow();
 });
 
 it("図8: 継続したいという希望だけではモデルを切り替えず、明示的な方針がない間は終端にとどまる", () => {
@@ -261,4 +302,15 @@ it("6.3 CMEK・6.5 進捗例・9.1 fast mode・11.4 予算倍率・図9 コン�
   ).toBe(true);
   expect(labels.get("R6C")).toMatch(/compaction/);
   expect(labels.get("R6B")).toMatch(/コンテキストに余裕がある場合/);
+  // 図3 の単調性前提・5.4 節スイープへの案内、agent_loop の期限切れコンテナ復旧、11.4 節の非課金事前拒否。
+  const fig3Note = container.querySelector("#s5-3")?.nextElementSibling?.nextElementSibling;
+  expect(text(fig3Note)).toMatch(/単調性/);
+  expect(text(fig3Note)).toMatch(/5\.4節のスイープ/);
+  const agentCode = Array.from(
+    container.querySelectorAll("pre code"),
+    (e) => e.textContent ?? ""
+  ).find((c) => c.includes("def agent_loop("));
+  expect(agentCode).toMatch(/container_id を保持/);
+  expect(agentCode).toMatch(/期限切れ/);
+  expect(text(budgetItem)).toMatch(/非課金と確認された事前拒否は 0/);
 });

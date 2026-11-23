@@ -323,6 +323,8 @@ flowchart TD
     class FIX ok
 ```
 
+この段階的な引き下げフローは、低い effort で品質基準を満たすなら1段上の effort でも満たす(単調性がある)場合に限って適用します。effort を上げると品質が下がるなど単調でないケースでは、5.4節のスイープで各 effort を横並び評価し、品質基準を満たす最も低い effort を選んでください。
+
 ### 5.4 effort スイープの手順(最初の1週間でやる)
 
 1. 代表的なタスクを **10〜30件**用意し、合否の判定基準(自動テスト、ルーブリックなど)を決める。
@@ -531,6 +533,8 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
             raise ValueError("完了済みの checkpoint は再開できません")
         if "messages" in checkpoint:
             messages = list(checkpoint["messages"])
+        # 通常の再開では保存済みの container_id を保持する(生存中の一時停止コンテナに必要なファイルが残り得るため黙って消さない)。
+        # コンテナが期限切れになった場合は明示的に新しいコンテナを作成し、必要な成果物を復元してから再開する。
         container_id = checkpoint.get("container_id")
 
     for _ in range(max_turns):
@@ -601,7 +605,11 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                 toolset = block.get("toolset_name")
                 if toolset in failed_toolsets:
                     # 同じツールセットの後続の操作は失敗した操作に依存し得るため実行せず、エラー結果として返す
-                    result["content"] = f"Not executed: an earlier {toolset} action in this turn failed"
+                    result["content"] = (
+                        "Not executed: an earlier computer action in this turn failed."
+                        if toolset == "computer"
+                        else "Not executed: an earlier action in this turn failed"
+                    )
                     result["is_error"] = True
                     results.append(result)
                     continue
@@ -1233,8 +1241,19 @@ RATES = {  # USD / 百万トークン(公式価格表の Global API 価格。inf
 }
 
 
-def estimate_usd(usage: dict, mode: str = "standard") -> float:
+def estimate_usd(usage: dict, mode: str = "standard", response: dict | None = None) -> float:
     """usage からトークン費用(USD)のみを見積もる。Web 検索等の従量課金ツール費は別途加算する。"""
+    # 出力トークン 0 の事前拒否(pre-output refusal)は billed 明示時にそれに従い、未指定時は課金対象カテゴリ以外を非課金とする
+    if response is not None and response.get("stop_reason") == "refusal":
+        details = response.get("stop_details") or {}
+        billed = details.get("billed")
+        billable_pre_output = details.get("category") in ("bio", "frontier_llm", "reasoning_extraction")
+        if billed is False or (
+            billed is None
+            and (usage.get("output_tokens") or 0) == 0
+            and not billable_pre_output
+        ):
+            return 0.0
     r = RATES[mode]
     cache = usage.get("cache_creation") or {}
     # キャッシュ件数は null で返ることがあるため、0 として扱う
@@ -1288,7 +1307,7 @@ print(round(estimate_usd(example, "fast"), 2))  # 0.80 + 0.06 + 2.40 = 3.26
 ### 11.4 予算ガードの考え方 [私見]
 
 1. **1タスクあたりの上限金額**と**最大ターン数**を決め、ハーネスで強制する。
-2. 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は `estimate_usd` の値をそのまま使い、リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。
+2. 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API は `estimate_usd(usage, mode, response)` の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。
 3. 週次で**タスク種別ごとの平均コスト**を見て、effort と構成を見直す。
 4. 上限に達したら、**途中経過を保存して人に引き継ぐ**(破棄しない)。
 

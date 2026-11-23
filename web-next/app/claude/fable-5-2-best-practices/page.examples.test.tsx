@@ -81,6 +81,13 @@ for usage, price in (
         "ephemeral_1h_input_tokens": 300000}, "cache_read_input_tokens": 1000000}, 7),
 ):
     assert math.isclose(scope["estimate_usd"](usage), price), (usage, price)
+# 非課金と確認された事前拒否(pre-output refusal)は予算へ 0 として計上し、通常応答・課金対象拒否は通常単価を保つ。
+refusal_usage = {"input_tokens": 100000, "output_tokens": 0}
+assert scope["estimate_usd"](refusal_usage, "standard", {"stop_reason": "refusal", "stop_details": {"category": "cyber"}}) == 0.0
+assert scope["estimate_usd"](refusal_usage, "fast", {"stop_reason": "refusal", "stop_details": {"billed": False}}) == 0.0
+assert math.isclose(scope["estimate_usd"](refusal_usage, "standard", {"stop_reason": "refusal", "stop_details": {"category": "bio"}}), 0.8)
+assert math.isclose(scope["estimate_usd"]({"input_tokens": 100000, "output_tokens": 100}, "standard", {"stop_reason": "refusal", "stop_details": {"category": "cyber"}}), 0.804)
+assert math.isclose(scope["estimate_usd"](refusal_usage, "standard", {"stop_reason": "end_turn"}), 0.8)
 `,
     examples()
   );
@@ -320,7 +327,7 @@ assert "toolset_name" not in first[2]
 assert first[0] == {"type": "tool_result", "tool_use_id": "c1", "toolset_name": "computer", "content": "ok 1"}
 assert first[1]["is_error"] is True and first[2] == {"type": "tool_result", "tool_use_id": "u1", "content": "ok 0"}
 assert first[3] == {"type": "tool_result", "tool_use_id": "c3", "toolset_name": "computer", "is_error": True,
-    "content": "Not executed: an earlier computer action in this turn failed"}
+    "content": "Not executed: an earlier computer action in this turn failed."}
 # 失敗は次のターンへ持ち越さず、成功したバッチはすべて実行して結果を返す
 second = checkpoint["messages"][4]["content"]
 assert [(r["content"], r.get("is_error")) for r in second] == [("ok 4", None), ("ok 5", None)]
@@ -585,8 +592,8 @@ scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint)
 assert [e for e in executed if e != "call"] == [1, 3, 4]
 results = checkpoint["messages"][2]["content"]
 assert [r.get("is_error") for r in results] == [True, True, None, None, True]
-assert results[1]["content"] == "Not executed: an earlier browser action in this turn failed"
-assert results[4]["content"] == "Not executed: an earlier browser action in this turn failed"
+assert results[1]["content"] == "Not executed: an earlier action in this turn failed"
+assert results[4]["content"] == "Not executed: an earlier action in this turn failed"
 assert all(r["toolset_name"] == "browser" for r in (results[0], results[1], results[4]))
 `,
     examples()
