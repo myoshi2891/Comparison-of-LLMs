@@ -1346,7 +1346,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
      * holds for every selected card are transparent. `continue` guards before the position
      * may only test values shared by all iterations or elements proven present in the card.
      */
-    const runsEveryIteration = (position, open, close, indexName, selected) => {
+    const runsEveryIteration = (position, open, close, indexName, selected, ownerAt) => {
       if (!(position > open && position < close)) return false;
       // Same for every card: no index, no per-iteration binding or write, no call or assignment.
       const uniform = condition => {
@@ -1387,12 +1387,15 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       };
       const present = (name, at) => {
         if (!/^[A-Za-z_$][\w$]*$/.test(name)) return false;
-        const value = bindingAt(name, at)?.value;
+        const hostBinding = bindingAt(name, at);
+        const value = hostBinding?.value;
         const element = value && query.exec(value);
-        if (!element || element[1] !== selected[1]) return false;
+        if (!element) return false;
+        const cardBinding = bindingAt(element[1], hostBinding.at);
+        if (!cardBinding || cardBinding.at !== ownerAt) return false;
         if (element[3] === selected[3]) return true;
         if (selectedScript.cardHas?.(element[3], at) !== true) return false;
-        return !hostMayBeRemoved(name, element[3], selected[1], at);
+        return !hostMayBeRemoved(name, element[3], element[1], at);
       };
       const loopPath = pathAt(open);
       const unwrapParens = expr => {
@@ -1470,23 +1473,26 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         }
         return null;
       };
-      const hasTopLevelConditional = condition => {
+      const hasTopLevelConditionalOrComma = condition => {
         let depth = 0;
         for (let k = 0; k < condition.length; k++) {
           const ch = condition[k];
           if ("([{".includes(ch)) depth++;
           else if (")]}".includes(ch)) depth--;
-          else if (depth === 0 && ch === "?") {
-            const isNullish = condition[k + 1] === "?" || condition[k - 1] === "?";
-            const isOptionalChain = condition[k + 1] === "." && !/\d/.test(condition[k + 2] ?? "");
-            if (!isNullish && !isOptionalChain) return true;
+          else if (depth === 0) {
+            if (ch === ",") return true;
+            if (ch === "?") {
+              const isNullish = condition[k + 1] === "?" || condition[k - 1] === "?";
+              const isOptionalChain = condition[k + 1] === "." && !/\d/.test(condition[k + 2] ?? "");
+              if (!isNullish && !isOptionalChain) return true;
+            }
           }
         }
         return false;
       };
       const neverTrue = (condition, at) => {
         const s = unwrapParens(condition);
-        if (hasTopLevelConditional(s)) return false;
+        if (hasTopLevelConditionalOrComma(s)) return false;
         if (provenBool(s, at) === false) return true;
         const orParts = splitTop(s, "||");
         if (orParts.length > 1) return orParts.every(part => neverTrue(part, at));
@@ -1502,7 +1508,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       };
       const alwaysTrue = (condition, at) => {
         const s = unwrapParens(condition);
-        if (hasTopLevelConditional(s)) return false;
+        if (hasTopLevelConditionalOrComma(s)) return false;
         if (provenBool(s, at) === true) return true;
         const orParts = splitTop(s, "||");
         if (orParts.length > 1) {
@@ -1712,7 +1718,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         )) return false;
         // The card binding, the payload read and mermaid.render must run on every selected
         // iteration. A condition such as `i === 0` would certify cards it never renders.
-        if ([ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected))) {
+        if ([ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected, ownerBinding.at))) {
           certifiedLoopOpen = open;
           return true;
         }

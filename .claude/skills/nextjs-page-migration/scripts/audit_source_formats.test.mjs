@@ -2268,3 +2268,38 @@ test("respects ternary precedence in loop guards, allows opposite quotes in rece
 		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], body);
 	}
 });
+
+test("resolves card binding for host guards and rejects top-level comma expressions in loop guards", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div id="c1" class="diagram-card"><div class="host"></div><script type="text/plain">${chart}</script></div>`;
+
+	// 1. Host bound from an outer variable also named `card` does not prove presence on the current loop card.
+	const outerHost = `${card}<div id="other"></div><script>var card = document.querySelector('#other'); var host = card.querySelector('.host'); var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (!host) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const outerRes = audit(outerHost, page);
+	assert.equal(outerRes.status, 1);
+	assert.deepEqual(outerRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	// Host queried on the current loop card remains eligible.
+	const loopHost = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var host = card.querySelector('.host'); if (!host) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(loopHost, page).status, 0);
+
+	// 2. Top-level comma expressions have lower precedence than || and &&, so guards using them stay unresolved.
+	for (const cond of [
+		"true || false, false",
+		"false && x, true",
+	]) {
+		const commaGuard = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (${cond}) { var src = card.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
+		const res = audit(commaGuard, page);
+		assert.equal(res.status, 1, cond);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], cond);
+	}
+	// Nested commas inside subexpressions are not treated as top-level, and `true || false && false` stays eligible.
+	for (const cond of [
+		"true || false && false",
+		"true || fn(a, b)",
+	]) {
+		const okGuard = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (${cond}) { var src = card.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
+		assert.equal(audit(okGuard, page).status, 0, cond);
+	}
+});
