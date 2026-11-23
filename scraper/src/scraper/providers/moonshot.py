@@ -20,24 +20,25 @@ _URL = "https://platform.moonshot.ai/docs/pricing"
 _KIMI_K2_7_CODE_HIGHSPEED = "Kimi K2.7 Code Highspeed"
 _KIMI_K2_7_CODE = "Kimi K2.7 Code"
 
-# レコード終端・次モデルを越えず、outputより前では入力価格の$を許可する。
-# 次モデル名は "<span>Kimi</span> <span>K2.6</span>" のようにインラインタグで区切られても境界とみなす。
-_RECORD_GAP = (
-    r"(?:(?!</(?:p|div|tr|li|dl|section|article|nav|h[1-6])\b|<dt\b"
-    r"|\bkimi(?:[-\s]|<[^<>]*>)*k)[\s\S]){0,80}?"
-)
-_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
 # タグは丸ごと読み飛ばし、属性値（data-field="input" / data-label="output" 等）をラベルとみなさない。
 # 通常文字の分岐は完結したタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
 _ANY_TAG = r"<(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
+# cached と input や次モデル名（Kimi&nbsp;K2.6 等）の間の HTML 空白エンティティを区切りとして扱う。
+_HTML_WS_ENTITY = r"&(?:nbsp|ensp|emsp|thinsp|#0*(?:9|10|12|13|32|160)|#x0*(?:9|a|c|d|20|a0));"
+# レコード終端・次モデルを越えず、outputより前では入力価格の$を許可する。
+# 次モデル名は "<span>Kimi</span> <span>K2.6</span>" や "Kimi&nbsp;K2.6" のようにインラインタグや空白エンティティで区切られても境界とみなす。
+_RECORD_GAP = (
+    r"(?:(?!</(?:p|div|tr|li|dl|section|article|nav|h[1-6])\b|<dt\b"
+    rf"|\bkimi(?:[-\s]|{_HTML_WS_ENTITY}|<[^<>]*>)*k)[\s\S]){{0,80}}?"
+)
+_PRICE_GAP = _RECORD_GAP.replace(r"[\s\S]", r"[^$]")
 # 次の Kimi モデル見出し（レコード境界）。
 # 完結した HTML タグ（属性値を含む）は丸ごと読み飛ばし、可視テキスト上の次モデル名だけを境界にする。
 _NEXT_KIMI_RECORD = re.compile(
-    rf"{_ANY_TAG}|(\bkimi(?:[-\s]|{_ANY_TAG})*k)",
+    rf"{_ANY_TAG}|(\bkimi(?:[-\s]|{_HTML_WS_ENTITY}|{_ANY_TAG})*k)",
     re.IGNORECASE,
 )
 # cached と input の間には空白、HTML 空白エンティティ（&nbsp; 等）、またはレコード境界ではないインラインタグ（span・br 等）を許す。
-_HTML_WS_ENTITY = r"&(?:nbsp|ensp|emsp|thinsp|#0*(?:9|10|12|13|32|160)|#x0*(?:9|a|c|d|20|a0));"
 _INLINE_TAG = r"<(?!/?(?:p|div|tr|li|dl|dt|section|article|nav|h[1-6])\b)(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
 _INLINE_SEP = rf"(?:\s|{_HTML_WS_ENTITY}|{_INLINE_TAG})+"
 _OPT_INLINE_SEP = rf"(?:\s|{_HTML_WS_ENTITY}|{_INLINE_TAG})*"

@@ -597,12 +597,17 @@ class TestMoonshot:
         assert model.provenance is not None
         assert model.provenance.origin == "scraped"
 
-    def test_next_model_split_by_inline_tags_is_a_boundary(self):
-        # インライン HTML で区切られた次モデル名（Kimi K2.6）を越えて、その価格を K3 の output にしない。
-        html = (
+    @pytest.mark.parametrize(
+        "html",
+        [
+            # インライン HTML で区切られた次モデル名（Kimi K2.6）を越えて、その価格を K3 の output にしない。
             "<div>Kimi K3 input $3.25 <span>Kimi</span> <span>K2.6</span> "
-            "input $0.95 output $4.00</div>"
-        )
+            "input $0.95 output $4.00</div>",
+            # HTML 空白エンティティ（&nbsp;）で区切られた次モデル名も境界とみなし、後続価格を K3 に漏らさない。
+            "<div>Kimi K3 input $3.25 Kimi&nbsp;K2.6 input $0.95 output $4.00</div>",
+        ],
+    )
+    def test_next_model_split_by_inline_tags_is_a_boundary(self, html):
         with patch("scraper.providers.moonshot.get_page_text", return_value=html):
             model = _find(moonshot.scrape(), "Kimi K3")
         assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
