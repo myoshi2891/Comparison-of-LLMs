@@ -941,13 +941,13 @@ test("requires src initialization to execute before rendering", () => {
    `function draw() { ${init} ${render} } draw();`,
    `${init} function draw() { ${render} } draw();`,
   ]) assert.equal(audit(`${card}<script>const CLASSDEFS = ''; ${body}</script>`, page).status, 0, body);
-  // A conditional block may skip the render, so reachability is not established for CLASSDEFS.
+  // A conditional block may skip the render, so reachability is not established for CLASSDEFS or suffix-free calls.
   const conditional = audit(`${card}<script>const CLASSDEFS = ''; if (enabled) { ${init} ${render} }</script>`, page);
-  if (suffix) assert.deepEqual(conditional.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
-  else assert.equal(conditional.status, 0);
+  assert.equal(conditional.status, 1, `conditional:${suffix}`);
+  assert.deepEqual(conditional.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
   // Straight-line rendering stays eligible, but an unconditional exit before it does not.
   assert.equal(audit(`${card}<script>const CLASSDEFS = ''; ${init} ${render}</script>`, page).status, 0);
-  if (suffix) assert.deepEqual(audit(`${card}<script>const CLASSDEFS = ''; ${init} return; ${render}</script>`, page).data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
+  assert.deepEqual(audit(`${card}<script>const CLASSDEFS = ''; ${init} return; ${render}</script>`, page).data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
 });
 
@@ -2067,10 +2067,12 @@ test("splits class tokens on ASCII whitespace only", () => {
 	assert.equal(ordinary.data.counts.mermaidSources.source, 1);
 	assert.equal(ordinary.data.counts.mermaidSources.page, 1);
 	assert.deepEqual(ordinary.data.unresolvedMermaidSources, []);
-	const nbsp = audit(`${card("diagram-card\u00a0x")}${script}`, page);
-	assert.notEqual(nbsp.status, 0);
-	assert.equal(nbsp.data.counts.mermaidSources.source, 0);
-	assert.deepEqual(nbsp.data.unresolvedMermaidSources, []);
+	for (const cls of ["diagram-card\u00a0x", "diagram-card&#160;x", "diagram-card&nbsp;x"]) {
+		const nbsp = audit(`${card(cls)}${script}`, page);
+		assert.notEqual(nbsp.status, 0, cls);
+		assert.equal(nbsp.data.counts.mermaidSources.source, 0, cls);
+		assert.deepEqual(nbsp.data.unresolvedMermaidSources, [], cls);
+	}
 });
 
 test("normalizes CRLF script payloads and ignores template text/plain payloads", () => {
@@ -2224,4 +2226,45 @@ test("rejects earlier-script call activating later-script declaration, script se
 	assert.deepEqual(directBeforeId.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
 	const directAfterId = audit(`${card}<script>var card = document.querySelector('#c1'); card.id = 'other'; var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`, basePage);
 	assert.equal(directAfterId.status, 0);
+});
+
+test("respects ternary precedence in loop guards, allows opposite quotes in receiver querySelector, and rejects conditional suffix-free render", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+
+	// 1. Top-level conditional expressions (?:) have lower precedence than || and &&, so guards using them stay unresolved.
+	for (const cond of [
+		"true || false ? false : false",
+		"false && x ? true : true",
+	]) {
+		const ternaryGuard = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (${cond}) { var src = card.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
+		const res = audit(ternaryGuard, page);
+		assert.equal(res.status, 1, cond);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], cond);
+	}
+	// Expressions without top-level ?: still follow JS || / && precedence (true || (false && false) === true).
+	const precGuard = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (true || false && false) { var src = card.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
+	assert.equal(audit(precGuard, page).status, 0);
+
+	// 2. Quoted querySelector receiver may contain the opposite quote character (e.g. script[type="text/plain"]).
+	for (const removal of [
+		`card.querySelector('script[type="text/plain"]').remove();`,
+		`card.querySelector("script[type='text/plain']").remove();`,
+	]) {
+		const removed = `${card}<script>var card = document.querySelector('#c1'); ${removal} var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+		const res = audit(removed, page);
+		assert.equal(res.status, 1, removal);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], removal);
+	}
+
+	// 3. Suffix-free unbraced conditional or short-circuit render calls stay unresolved.
+	for (const body of [
+		`if (enabled) mermaid.render('x', ${JSON.stringify(chart)});`,
+		`enabled && mermaid.render('x', ${JSON.stringify(chart)});`,
+	]) {
+		const res = audit(`${card}<script>${body}</script>`, page);
+		assert.equal(res.status, 1, body);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], body);
+	}
 });

@@ -71,7 +71,7 @@ function matchKey(raw) {
  * @param {string} raw - The string containing HTML character references.
  * @returns {string} The decoded string.
  */
-function decodeEntities(raw) {
+function decodeEntities(raw, { preserveNbsp = false } = {}) {
   return raw
     .replace(/&#(?:x([0-9a-f]+)|(\d+));/gi, (match, hex, decimal) => {
       const point = Number.parseInt(hex ?? decimal, hex === undefined ? 10 : 16);
@@ -82,7 +82,7 @@ function decodeEntities(raw) {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'")
-    .replace(/&nbsp;/g, " ")
+    .replace(/&nbsp;/g, preserveNbsp ? "\u00a0" : " ")
     .replace(/&mdash;/g, "—")
     .replace(/&ndash;/g, "–")
     .replace(/&hellip;/g, "…")
@@ -516,7 +516,7 @@ function decodeQuotedEntryEscapes(raw, strict = false) {
  */
 function decodeAttributeValue(raw) {
   return raw.replace(/&(?:#(\d+)|#[xX]([0-9A-Fa-f]+)|[A-Za-z]+);/g, (match, decimal, hex) => {
-    if (decimal === undefined && hex === undefined) return decodeEntities(match);
+    if (decimal === undefined && hex === undefined) return decodeEntities(match, { preserveNbsp: true });
     const codePoint = decimal === undefined ? Number.parseInt(hex, 16) : Number(decimal);
     return codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : match;
   });
@@ -1470,8 +1470,23 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         }
         return null;
       };
+      const hasTopLevelConditional = condition => {
+        let depth = 0;
+        for (let k = 0; k < condition.length; k++) {
+          const ch = condition[k];
+          if ("([{".includes(ch)) depth++;
+          else if (")]}".includes(ch)) depth--;
+          else if (depth === 0 && ch === "?") {
+            const isNullish = condition[k + 1] === "?" || condition[k - 1] === "?";
+            const isOptionalChain = condition[k + 1] === "." && !/\d/.test(condition[k + 2] ?? "");
+            if (!isNullish && !isOptionalChain) return true;
+          }
+        }
+        return false;
+      };
       const neverTrue = (condition, at) => {
         const s = unwrapParens(condition);
+        if (hasTopLevelConditional(s)) return false;
         if (provenBool(s, at) === false) return true;
         const orParts = splitTop(s, "||");
         if (orParts.length > 1) return orParts.every(part => neverTrue(part, at));
@@ -1487,6 +1502,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       };
       const alwaysTrue = (condition, at) => {
         const s = unwrapParens(condition);
+        if (hasTopLevelConditional(s)) return false;
         if (provenBool(s, at) === true) return true;
         const orParts = splitTop(s, "||");
         if (orParts.length > 1) {
@@ -1572,6 +1588,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     };
     // Bindings whose subtree a script query searches; edits to them can change the selection.
     const cardOwners = new Set();
+    let certifiedLoopOpen;
     const scriptElement = (value, at = before) => {
       const selected = query.exec(value);
       // An unquoted text/plain is an invalid selector (querySelector throws); quotes must match.
@@ -1695,7 +1712,11 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         )) return false;
         // The card binding, the payload read and mermaid.render must run on every selected
         // iteration. A condition such as `i === 0` would certify cards it never renders.
-        return [ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected));
+        if ([ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected))) {
+          certifiedLoopOpen = open;
+          return true;
+        }
+        return false;
       });
     };
     let value = initial;
@@ -1819,7 +1840,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         .some(copy => mayBeCardScript(copy[1].trim(), copy.index, next));
     };
     // The selector stays inside one quoted literal so a match cannot span two queries.
-    const receiver = String.raw`(\w+(?:\.querySelector\(\s*(['"])([^'"\n]*)\2\s*\))?)\s*\.\s*`;
+    const receiver = String.raw`(\w+(?:\.querySelector\(\s*(?:'([^'\r\n]*)'|"([^"\r\n]*)")\s*\))?)\s*\.\s*`;
     const scriptEdits = new RegExp(`${receiver}(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text))\\s*\\(|outerHTML\\s*=(?!=))`, "g");
     const ownerEdits = new RegExp(`${receiver}(?:(?:removeChild|replaceChild|insertBefore|prepend|replaceChildren|insertAdjacent(?:HTML|Element|Text))\\s*\\(|(?:innerHTML|outerHTML|textContent|innerText)\\s*=(?!=))`, "g");
     const wrapperAppendEdits = new RegExp(`${receiver}(?:append|appendChild)\\s*\\(`, "g");
@@ -1880,12 +1901,12 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       Array.from(literalSource.matchAll(wrapperAppendEdits)).some(edit =>
         mayBeCardOwner(edit[1]) ? !isSafeFreshAppend(edit) : mayBeScriptContainer(edit[1], edit.index)
       )) return false;
-    return { base: usesValidatedDedent ? dedentedPayload : payload };
+    return { base: usesValidatedDedent ? dedentedPayload : payload, certifiedLoopOpen };
   };
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
   const renderUses = [];
-  let suffixFree = false;
+  const suffixFreeCalls = [];
   for (const call of executable.matchAll(/\bmermaid\s*\.\s*render\s*\(/g)) {
     const start = call.index + call[0].length;
     const arguments_ = [];
@@ -1926,15 +1947,18 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       // resolving arbitrary assignments/calls needs data-flow analysis.
       const base = expression.trim();
       if (base !== "src" && !/^(?:"[^"\r\n]*"|'[^'\r\n]*'|`[^`]*`)$/.test(base)) return null;
-      if (base === "src" && !srcIsPayload(call.index)) return null;
-      if (base !== "src") {
+      let resolvedSrc;
+      if (base === "src") {
+        resolvedSrc = srcIsPayload(call.index);
+        if (!resolvedSrc) return null;
+      } else {
         const leading = expression.indexOf(base);
         const literalStart = source.start + leading;
         const literal = rawSource.slice(literalStart, literalStart + base.length);
         const value = decodeQuotedEntryEscapes(literal.slice(1, -1), true);
         if (value === undefined || normalizeMermaidSource(value) !== normalizeMermaidSource(payload)) return null;
       }
-      suffixFree = true;
+      suffixFreeCalls.push({ call: call.index, certifiedLoopOpen: resolvedSrc?.certifiedLoopOpen });
       continue;
     }
     const unwrap = value => {
@@ -1964,10 +1988,65 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     if (!resolvedSrc) return null;
     renderUses.push({ index: source.start + names[0].index, call: call.index, base: resolvedSrc.base });
   }
-  if (renderUses.length === 0) return undefined;
+  const loopOrFunctionHead = /(?:\b(?:for|while)\s*\((?:[^{}()]|\([^{}()]*\))*\)|\bfunction\b[^{}]*\)|=>)\s*$/;
+  const exitKeyword = /(?:return|throw|break|continue)(?![\w$])/y;
+  if (renderUses.length === 0) {
+    if (suffixFreeCalls.length === 0) return undefined;
+    const targets = new Set(suffixFreeCalls.map(entry => entry.call));
+    const paths = new Map();
+    const blocks = [];
+    for (let index = 0; index < executable.length; index++) {
+      if (targets.has(index)) paths.set(index, [...blocks]);
+      if (executable[index] === "{") blocks.push(index);
+      else if (executable[index] === "}") {
+        if (blocks.length === 0) return null;
+        blocks.pop();
+      }
+    }
+    if (blocks.length > 0) return null;
+    for (const { call: callIndex, certifiedLoopOpen } of suffixFreeCalls) {
+      const callPath = paths.get(callIndex);
+      const uncertifiedBlocks = certifiedLoopOpen === undefined
+        ? callPath
+        : callPath.filter(block => block <= certifiedLoopOpen);
+      if (uncertifiedBlocks.some(block => !loopOrFunctionHead.test(executable.slice(0, block)))) return null;
+      let depth = 0;
+      for (let i = 0; i < callIndex; i++) {
+        if (executable[i] === "{") depth++;
+        else if (executable[i] === "}") depth--;
+        else if (depth === 0 && !/[\w$]/.test(executable[i - 1] ?? "")) {
+          exitKeyword.lastIndex = i;
+          if (exitKeyword.test(executable)) return null;
+        }
+      }
+      if (certifiedLoopOpen === undefined) {
+        // Unbraced conditionals or short-circuit/ternary guards before the render call leave reachability unproven.
+        const blockStart = callPath.length > 0 ? callPath[callPath.length - 1] + 1 : 0;
+        let stmtStart = blockStart;
+        let paren = 0, bracket = 0, brace = 0;
+        for (let i = blockStart; i < callIndex; i++) {
+          const ch = executable[i];
+          if (ch === "(") paren++;
+          else if (ch === ")") paren--;
+          else if (ch === "[") bracket++;
+          else if (ch === "]") bracket--;
+          else if (ch === "{") brace++;
+          else if (ch === "}") {
+            brace--;
+            if (paren === 0 && bracket === 0 && brace === 0) stmtStart = i + 1;
+          } else if (ch === ";" && paren === 0 && bracket === 0 && brace === 0) {
+            stmtStart = i + 1;
+          }
+        }
+        const stmtPrefix = executable.slice(stmtStart, callIndex);
+        if (/^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(stmtPrefix) || /&&|\|\||\?/.test(stmtPrefix)) return null;
+      }
+    }
+    return undefined;
+  }
   // Selector collection is scope-wide: it cannot associate mixed calls with
   // individual cards. Preserve the ambiguity instead of applying one suffix to all.
-  if (suffixFree || renderUses.some(use => use.base !== renderUses[0].base)) return null;
+  if (suffixFreeCalls.length > 0 || renderUses.some(use => use.base !== renderUses[0].base)) return null;
   // Locate the declaration in code, then read its literal from the offset-aligned view.
   const declaration = /\b(?:var|let|const)\s+CLASSDEFS\s*=/.exec(executable);
   if (!declaration) return null;
@@ -2009,8 +2088,6 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   // established as reachable: no unconditional exit at the declaration's block level before
   // the call, and every block entered beyond the declaration is a loop or function body
   // (if/else/switch/try may skip the call). Anything else stays unresolved.
-  const loopOrFunctionHead = /(?:\b(?:for|while)\s*\((?:[^{}()]|\([^{}()]*\))*\)|\bfunction\b[^{}]*\)|=>)\s*$/;
-  const exitKeyword = /(?:return|throw|break|continue)(?![\w$])/y;
   for (const use of renderUses) {
     const callPath = paths.get(use.call);
     if (callPath.slice(declarationPath.length).some(block => !loopOrFunctionHead.test(executable.slice(0, block)))) return null;
