@@ -205,7 +205,9 @@ web-next/app/page.tsx と web-next/components/HomePage.tsx を読んで現状を
 
 3. [鮮度更新] web-next/lib/page-registry.ts の Home エントリ（slug: "/"）の
    lastReviewed を当日の日付（YYYY-MM-DD）に更新する
-   （addedAt は暗黙に変更せず、更新要否は別途判断する）
+   - addedAt は暗黙に変更せず、この更新で価格データの公開日自体を変更すべきか確認した場合のみ更新する
+   - 両日付を揃える必要がある場合（addedAt を更新する場合）は、web-next/lib/page-registry.test.ts の
+     PRICING_PUBLICATION_DATE も同じ日付に同期する
 
 4. [UI 確認] web-next/components/HomePage.tsx の モデル表示ロジック（ApiTable / SubTable）に
    新規モデル対応漏れがないか確認する

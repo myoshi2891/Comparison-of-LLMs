@@ -349,6 +349,9 @@ flowchart TD
     M -- "非ストリーミング REST" --> NB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
     NB -- "いいえ" --> NR["通常の非ストリーミング REST<br/>generateContent をそのまま呼び出す"]
     NB -- "はい" --> D
+    M -- "非ストリーミング Interactions" --> IB{"65,536 トークンを超えるか<br/>または思考で上限に達しがちか"}
+    IB -- "いいえ" --> NI["通常の非ストリーミング Interactions<br/>interactions.create をそのまま呼び出す"]
+    IB -- "はい" --> D
     B -- "いいえ" --> SAPI{"どのAPIのストリーミングか"}
     SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>generate_content_stream で逐次出力<br/>最終チャンクの finishReason を確認し MAX_TOKENS や異常終了は未完了失敗として扱う(部分出力を完了扱いにしない)"]
     SAPI -- "Interactions" --> SACC
@@ -368,7 +371,7 @@ flowchart TD
     CONT -- "STOP" --> GCOMMIT["未確定バッファのpartsを確定蓄積へ移す"]
     GCOMMIT --> GFC{"現在のモデルターンの蓄積partsに<br/>functionCallがあるか(過去ターンは判定しない)"}
     GFC -- "はい" --> GACT["各functionCallを承認ゲートに通す 12.2節<br/>承認したものだけ実行し functionResponse を返す<br/>拒否は拒否結果を functionResponse として返す"]
-    GACT --> GCALL["現在のモデルターンのpartsを会話履歴に保持して蓄積を空にし<br/>functionResponse を含めて次のリクエストを送る<br/>最終回答が得られるまで繰り返す"]
+    GACT --> GCALL["現在のモデルターンのpartsを会話履歴に保持して蓄積と保存済みcontinuation_tokenを空にし<br/>functionResponse を含めて次のリクエストを送る<br/>(新しいターンで最初のチェックポイント前に切断された場合はチェックポイントなしとして再送)<br/>最終回答が得られるまで繰り返す"]
     GCALL --> GACC
     GFC -- "いいえ" --> GJOIN["蓄積した全セグメントのpartsを会話履歴に保持<br/>表示する回答は思考サマリーでないtextパートだけを結合"]
     GJOIN --> G["累積トークンと課金を監視"]

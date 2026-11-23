@@ -61,7 +61,9 @@ flowchart TD
 5. Step 6 の REST クライアントで使う `httpx` と、Step 13 の契約テストを実行する `pytest`(どちらもこの環境に入れる)
 
 ```bash
-python3.11 -m venv .venv  # 3.11 以降のインタープリタで作る
+PYTHON=python3  # 3.11 以降のインタープリタを指定(例: python3.12)
+"$PYTHON" -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
+"$PYTHON" -m venv .venv
 source .venv/bin/activate
 pip install -U "google-genai>=3.2" httpx pytest
 export GEMINI_API_KEY="あなたのAPIキー"
@@ -413,7 +415,9 @@ sequenceDiagram
 
 ```bash
 # Step 2 とは別の環境を作る(Step 2 の環境には google-adk を入れない)
-python3.11 -m venv .venv-adk  # Step 2 と同じく 3.11 以降で作る
+PYTHON=python3  # Step 2 と同じく 3.11 以降のインタープリタを指定
+"$PYTHON" -c 'import sys; assert sys.version_info >= (3, 11), sys.version'
+"$PYTHON" -m venv .venv-adk
 source .venv-adk/bin/activate
 pip install -U google-adk httpx
 ```
