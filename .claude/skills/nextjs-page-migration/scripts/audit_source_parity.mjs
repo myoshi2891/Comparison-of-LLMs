@@ -381,14 +381,29 @@ function extractTagContents(src, tag) {
  * @param {boolean} includeNested - Also visit descendants of a matching element.
  * @returns {Array<{index: number, end: number, openingTag: string, content: string}>} Elements and their source positions.
  */
-function extractElementContents(src, predicate, includeNested = false) {
+const HTML_VOID_ELEMENTS = new Set([
+  "area", "base", "br", "col", "embed", "hr", "img", "input",
+  "link", "meta", "param", "source", "track", "wbr",
+]);
+
+function extractElementContents(src, predicate, includeNested = false, includeVoid = false) {
   const results = [];
   const openingRe = /<([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
   let opening = openingRe.exec(src);
   while (opening !== null) {
     const openingTag = opening[0];
-    if (!openingTag.endsWith("/>") && predicate(openingTag)) {
-      const tag = opening[1].toLowerCase();
+    const tag = opening[1].toLowerCase();
+    const isVoid = openingTag.endsWith("/>") || HTML_VOID_ELEMENTS.has(tag);
+    if (isVoid) {
+      if (includeVoid && predicate(openingTag)) {
+        results.push({
+          index: opening.index,
+          openingTag,
+          content: "",
+          end: openingRe.lastIndex,
+        });
+      }
+    } else if (predicate(openingTag)) {
       const nestedRe = /<!--[\s\S]*?-->|<(\/?)([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
       nestedRe.lastIndex = openingRe.lastIndex;
       let depth = 1;
@@ -1857,14 +1872,14 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const html = decodeQuotedEntryEscapes(rhs[2], true);
       return html !== undefined && /^\s*<svg\b[\s\S]*<\/svg>\s*$/i.test(html) && !/<script\b/i.test(html);
     };
-    const isSafeFreshAppend = edit => {
+    const extractCallArgs = edit => {
       const start = edit.index + edit[0].length;
       let depth = 1, end = -1;
       for (let k = start; k < executable.length; k++) {
         if (executable[k] === "(") depth++;
         else if (executable[k] === ")" && --depth === 0) { end = k; break; }
       }
-      if (end < 0) return false;
+      if (end < 0) return null;
       const args = [];
       let argStart = start, paren = 0, bracket = 0, brace = 0;
       for (let k = start; k < end; k++) {
@@ -1881,31 +1896,47 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         }
       }
       args.push(literalSource.slice(argStart, end).trim());
-      if (args.length === 0 || args.some(a => a === "")) return false;
-      const isFreshNonScriptNode = (expr, at, seen = new Set()) => {
-        const createEl = /^document\.createElement\(\s*(['"])([A-Za-z][\w-]*)\1\s*\)$/.exec(expr);
-        if (createEl) return createEl[2].toLowerCase() !== "script";
-        if (/^document\.createTextNode\(\s*(['"])(?:[^\\]|\\.)*\1\s*\)$/.test(expr)) return true;
-        if (/^(['"])(?:[^\\]|\\.)*\1$/.test(expr)) return true;
-        if (/^\w+$/.test(expr) && !seen.has(expr)) {
-          const bound = bindingAt(expr, at);
-          if (bound) return isFreshNonScriptNode(bound.value, bound.at, new Set(seen).add(expr));
-        }
-        return false;
-      };
-      return args.every(arg => isFreshNonScriptNode(arg, edit.index));
+      if (args.length === 0 || args.some(a => a === "")) return null;
+      return args;
+    };
+    const allOwnerEdits = Array.from(literalSource.matchAll(ownerEdits));
+    const allWrapperAppendEdits = Array.from(literalSource.matchAll(wrapperAppendEdits));
+    const isFreshNonScriptNode = (expr, at, seen = new Set()) => {
+      const createEl = /^document\.createElement\(\s*(['"])([A-Za-z][\w-]*)\1\s*\)$/.exec(expr);
+      if (createEl) return createEl[2].toLowerCase() !== "script";
+      if (/^document\.createTextNode\(\s*(['"])(?:[^\\]|\\.)*\1\s*\)$/.test(expr)) return true;
+      if (/^(['"])(?:[^\\]|\\.)*\1$/.test(expr)) return true;
+      if (/^\w+$/.test(expr) && !seen.has(expr)) {
+        const bound = bindingAt(expr, at);
+        if (!bound) return false;
+        const nextSeen = new Set(seen).add(expr);
+        if (!isFreshNonScriptNode(bound.value, bound.at, nextSeen)) return false;
+        // A detached wrapper that receives non-fresh children or HTML edits (e.g. a moved
+        // card script or injected markup) is no longer provably an empty fresh node.
+        if (allOwnerEdits.some(e => e[1] === expr && !isSvgOnlyEdit(e))) return false;
+        if (allWrapperAppendEdits.some(e => e[1] === expr && !isSafeFreshAppend(e, nextSeen))) return false;
+        return true;
+      }
+      return false;
+    };
+    const isSafeFreshAppend = (edit, seen = new Set()) => {
+      const args = extractCallArgs(edit);
+      if (!args) return false;
+      return args.every(arg => isFreshNonScriptNode(arg, edit.index, seen));
     };
     // Changing a script's type can move a typed query (script[type="text/plain"]) to another script.
     // Attribute writes with a literal non-type name keep the selection; computed names stay unresolved.
     const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute)\\s*\\(\\s*(?!(['"])(?!type\\4)[^'"\\n]*\\4)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
     if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index) || mayBeScriptContainer(edit[1], edit.index)) ||
       Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeCardScript(edit[1], edit.index)) ||
-      Array.from(literalSource.matchAll(ownerEdits)).some(edit =>
+      allOwnerEdits.some(edit =>
         mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit)) ||
         (writeCanPrecedeRead(edit.index) && mayBeSelectedScript(edit[1], edit.index))
       ) ||
-      Array.from(literalSource.matchAll(wrapperAppendEdits)).some(edit =>
-        mayBeCardOwner(edit[1]) ? !isSafeFreshAppend(edit) : mayBeScriptContainer(edit[1], edit.index)
+      allWrapperAppendEdits.some(edit =>
+        mayBeCardOwner(edit[1])
+          ? !isSafeFreshAppend(edit)
+          : mayBeScriptContainer(edit[1], edit.index) || (extractCallArgs(edit) ?? []).some(arg => mayBeCardScript(arg, edit.index))
       )) return false;
     return { base: usesValidatedDedent ? dedentedPayload : payload, certifiedLoopOpen };
   };
@@ -2140,7 +2171,7 @@ function materializePlainTextCards(src) {
   const unresolvedMermaidSources = [];
   // <template> content is inert until a script instantiates it; its scripts never run in place.
   let templateDepth = 0;
-  const stashed = src.replace(/<!--[\s\S]*?-->|<(style|xmp|iframe|noembed|noframes|noscript|textarea|title)\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)(?:<\/\1\s*>|$)|<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
+  const stashed = src.replace(/<!--[\s\S]*?-->|<(style|xmp|iframe|noembed|noframes|noscript|textarea|title)(?=[\s/>])((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)(?:<\/\1\s*>|$)|<script(?=[\s/>])((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\s*>|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>/gi,
     (full, opaqueTag, opaqueAttrs, opaqueContent, attributes, payload) => {
       if (opaqueTag !== undefined) {
         if (templateDepth === 0) documentElements.push(`<${opaqueTag}${opaqueAttrs}>`);
@@ -2231,6 +2262,8 @@ function materializePlainTextCards(src) {
       Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])(?:textContent|text)\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
         .some(write => isTextContentKey(write, rawSource));
     const editsDomStructure = /\.\s*(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text)|removeChild|replaceChild|insertBefore|prepend|append|appendChild|replaceChildren|setAttribute(?:NS|Node|NodeNS)?|removeAttribute(?:NS|Node)?|toggleAttribute)\s*\(|(?:outerHTML|innerHTML|innerText|type|className)\s*=(?!=)|classList\s*\.\s*(?:remove|replace|toggle)\s*\()/.test(executable);
+    const writesId = /\.\s*id\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
+      /\[\s*(['"])id\1\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable);
     const writesDom = writesTextContent || editsDomStructure;
     // Inline module scripts without async run after the document is parsed.
     const deferredModule = !classic && group.every(script => readHtmlAttribute(script.attributes, "async") === undefined);
@@ -2239,7 +2272,7 @@ function materializePlainTextCards(src) {
     const executableInterpolation = (resolution.interpolations ?? []).some(expr =>
       /\bmermaid\b|(?:[\w$)\]]|\?\.)\s*\(|[\w$)\]]\s*`|\bnew\b/.test(expr)
     );
-    return { literalSource, rawSource, selectors, computedRenderer, classic, deferredModule, segments, writesDom, hasSelection: selectionCalls.length > 0,
+    return { literalSource, rawSource, selectors, computedRenderer, classic, deferredModule, segments, writesDom, writesId, hasSelection: selectionCalls.length > 0,
       hasRenderer: /\bmermaid\s*\.\s*render\s*\(/.test(executable) || executableInterpolation || maskedRenderer || computedRenderer };
   });
   const scopes = allScopes.filter(scope => scope.hasRenderer);
@@ -2316,7 +2349,10 @@ function materializePlainTextCards(src) {
       const firstPlain = queryableScripts
         .find(match => readHtmlAttribute(scripts[Number(match[1])].attributes, "type")?.toLowerCase() === "text/plain");
       // Cross-scope DOM/text writes only invalidate DOM-backed (payload-reading) sources.
-      const foreignWriters = renderer ? allScopes.filter(scope => scope !== renderer && scope.writesDom) : [];
+      // An `.id = ...` mutation only affects another scope when that scope queries by `#id`
+      // (or uses a dynamic selector whose target cannot be ruled out).
+      const usesIdSelector = renderer ? renderer.selectors.some(selector => selector.includes("#")) || (renderer.hasSelection && renderer.selectors.length === 0) : false;
+      const foreignWriters = renderer ? allScopes.filter(scope => scope !== renderer && (scope.writesDom || (usesIdSelector && scope.writesId))) : [];
       // Deferred module writers cannot run before a classic renderer's synchronous read.
       const foreignWrite = foreignWriters.length === 0 ? false
         : renderer.classic && foreignWriters.every(scope => scope.deferredModule) ? "deferred" : true;
@@ -2330,7 +2366,7 @@ function materializePlainTextCards(src) {
           cardAvailableAt: at => renderer.deferredModule || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition >= start),
           priorMatchesComplete: (selector, anyScript) => {
-            const matches = extractElementContents(stashed, tag => matchesCardSelector(tag, selector), true);
+            const matches = extractElementContents(stashed, tag => matchesCardSelector(tag, selector), true, true);
             for (const el of matches) {
               if (el.index >= card.index) continue;
               if (templateRanges.some(range => range.start < el.index && el.index < range.end)) continue;
@@ -2348,7 +2384,7 @@ function materializePlainTextCards(src) {
           // script or precede it (so an edit could insert a matching script before it).
           mayContainScript: (selector, onlyContaining = false) => {
             if (!/^(?:[A-Za-z][\w-]*)?(?:[.#]-?[A-Za-z_][\w-]*)*$/.test(selector) || !selector) return true;
-            const matches = extractElementContents(card.content, tag => matchesCardSelector(tag, selector), true);
+            const matches = extractElementContents(card.content, tag => matchesCardSelector(tag, selector), true, true);
             return matches.some(el =>
               /<script data-audit-payload="\d+"><\/script>/.test(el.content) ||
               (!onlyContaining && el.index < marker.index)
@@ -2406,7 +2442,7 @@ function inventoryHtml(src) {
   // それ以外のタグ・コメントも末尾の分岐で 1 単位として消費する。走査が title="<code>x" のような
   // 引用値の内側へ進むと、そこから一致が始まって表示ブロックの開始タグを本文として食ってしまう。
   const scriptOrCodeRe = new RegExp(
-    String.raw`<script\b${attrs}>([\s\S]*?)<\/script\s*>|<code\b${attrs}>([\s\S]*?)<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`,
+    String.raw`<script(?=[\s/>])${attrs}>([\s\S]*?)<\/script\s*>|<code(?=[\s/>])${attrs}>([\s\S]*?)<\/code\s*>|<!--[\s\S]*?-->|<\/?[A-Za-z](?:[^>"']|"[^"]*"|'[^']*')*>`,
     "gi"
   );
   const detachedCode = new Map();
@@ -2435,16 +2471,16 @@ function inventoryHtml(src) {
   // script/style/link の除去が終わってから <code> として復元する。
   const preservedCode = [];
   const stashed = src.replace(
-    /<script\b[^>]*\bdata-code\b[^>]*>([\s\S]*?)<\/script\s*>/gi,
+    /<script(?=[\s/>])[^>]*\bdata-code\b[^>]*>([\s\S]*?)<\/script\s*>/gi,
     (_match, content) => {
       preservedCode.push(content);
       return `\u0000DATACODE${preservedCode.length - 1}\u0000`;
     }
   );
   const body = stashed
-    .replace(/<head[\s\S]*?<\/head>/gi, "")
-    .replace(/<(script|style)[\s\S]*?<\/\1>/gi, "")
-    .replace(/<link\b[^>]*\/?>/gi, "")
+    .replace(/<head(?=[\s/>])[\s\S]*?<\/head\s*>/gi, "")
+    .replace(/<(script|style)(?=[\s/>])[\s\S]*?<\/\1\s*>/gi, "")
+    .replace(/<link(?=[\s/>])[^>]*\/?>/gi, "")
     .replace(
       /\u0000DATACODE(\d+)\u0000/g,
       // 中身のタグは「表示されるコード」なので < > をエンティティ化して除去から守る。

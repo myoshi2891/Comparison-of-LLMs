@@ -2275,7 +2275,7 @@ test("resolves card binding for host guards and rejects top-level comma expressi
 	const card = `<div id="c1" class="diagram-card"><div class="host"></div><script type="text/plain">${chart}</script></div>`;
 
 	// 1. Host bound from an outer variable also named `card` does not prove presence on the current loop card.
-	const outerHost = `${card}<div id="other"></div><script>var card = document.querySelector('#other'); var host = card.querySelector('.host'); var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (!host) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const outerHost = `${card}<div id="other"></div><script>let card = document.querySelector('#other'); let host = card.querySelector('.host'); let cards = document.querySelectorAll('.diagram-card'); for (let i = 0; i < cards.length; i++) { let card = cards[i]; if (!host) continue; let src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
 	const outerRes = audit(outerHost, page);
 	assert.equal(outerRes.status, 1);
 	assert.deepEqual(outerRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
@@ -2302,4 +2302,52 @@ test("resolves card binding for host guards and rejects top-level comma expressi
 		const okGuard = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (${cond}) { var src = card.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
 		assert.equal(audit(okGuard, page).status, 0, cond);
 	}
+});
+
+test("handles void prior matches, detached script wrappers, custom elements, and cross-scope id mutations", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+
+	// 1. Earlier void element matching the loop selector has no script descendant and blocks certification.
+	const voidBefore = `<input class="diagram-card">${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const voidRes = audit(voidBefore, page);
+	assert.equal(voidRes.status, 1);
+	assert.deepEqual(voidRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	// A void element after the card (or inside a template) does not block certification.
+	const voidAfter = `<template><input class="diagram-card"></template>${card}<input class="diagram-card"><script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(voidAfter, page).status, 0);
+
+	// 2. Appending a card script into a detached wrapper and appending the wrapper to the card stays unresolved,
+	//    while appending an empty fresh wrapper remains certified.
+	const movedViaWrapper = `${card}<script>var card = document.querySelector('#c1'); var wrap = document.createElement('div'); wrap.appendChild(card.querySelector('script')); card.appendChild(wrap); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const wrapRes = audit(movedViaWrapper, page);
+	assert.equal(wrapRes.status, 1);
+	assert.deepEqual(wrapRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	const emptyWrapper = `${card}<script>var card = document.querySelector('#c1'); var wrap = document.createElement('div'); card.appendChild(wrap); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(emptyWrapper, page).status, 0);
+
+	// 3. Custom elements whose names start with real tag names (e.g. <script-box>, <style-card>, <code-block>)
+	//    are not consumed as real opaque/script/code tags.
+	const customElHtml = `<body><script-box><h2>Heading</h2></script-box><style-card><p>Visible paragraph</p></style-card><code-block><p>Another line</p></code-block></body>`;
+	const customElPage = `<h2>Heading</h2><p>Visible paragraph</p><p>Another line</p>`;
+	assert.equal(audit(customElHtml, customElPage).status, 0);
+
+	// 4. Cross-scope id mutation invalidates a module renderer selecting by #id,
+	//    while class-selector renderers, literal sources, and synchronous classic reads before deferred modules remain certified.
+	const crossScopeId = `${card}<script>document.querySelector('#c1').id = 'other';</script><script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const idRes = audit(crossScopeId, page);
+	assert.equal(idRes.status, 1);
+	assert.deepEqual(idRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	const unrelatedClassSelector = `${card}<script>var item = { id: 1 }; item.id = 2;</script><script type="module">const card = document.querySelector('.diagram-card'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(unrelatedClassSelector, page).status, 0);
+
+	const literalWithIdWrite = `${card}<script>document.querySelector('#c1').id = 'other';</script><script type="module">mermaid.render('x', ${JSON.stringify(chart)});</script>`;
+	assert.equal(audit(literalWithIdWrite, page).status, 0);
+
+	const syncBeforeDeferredId = `${card}<script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script><script type="module">document.querySelector('#c1').id = 'other';</script>`;
+	assert.equal(audit(syncBeforeDeferredId, page).status, 0);
 });
