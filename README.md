@@ -158,8 +158,8 @@ make test
 
 # web-next/package.json（Next.js 等）の依存更新後に既存 web-node-modules ボリュームを更新する場合
 # ※ make refresh-web-deps は --frozen-lockfile を使うため、実行前に web-next/bun.lock を更新しておくこと:
-#    - ローカルに Bun がある場合: cd web-next && bun install
-#    - Docker のみで更新する場合: docker compose run --rm --no-deps web bun install
+#    - ローカルに Bun がある場合: (cd web-next && bun install)
+#    - Docker のみで更新する場合（既存の web イメージがある場合のみ利用可。未ビルド時は上のローカル Bun を使用）: docker compose run --rm --no-deps web bun install
 make refresh-web-deps
 # （ボリューム自体を作り直す場合は make clean && make build-web）
 ```

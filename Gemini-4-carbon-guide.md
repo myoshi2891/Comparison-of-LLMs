@@ -353,7 +353,7 @@ flowchart TD
     IB -- "いいえ" --> NI["通常の非ストリーミング Interactions<br/>interactions.create をそのまま呼び出す"]
     IB -- "はい" --> D
     B -- "いいえ" --> SAPI{"どのAPIのストリーミングか"}
-    SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>generate_content_stream で逐次出力<br/>最終チャンクの finishReason を確認し MAX_TOKENS や異常終了は未完了失敗として扱う(部分出力を完了扱いにしない)"]
+    SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>SDK の generate_content_stream または REST の streamGenerateContent で逐次出力<br/>最終チャンクの finishReason を確認し MAX_TOKENS や異常終了は未完了失敗として扱う(部分出力を完了扱いにしない)"]
     SAPI -- "Interactions" --> SACC
     B -- "はい" --> D{"遅延に敏感か"}
     D -- "はい" --> E["タスクを分割して対応"]
