@@ -758,6 +758,19 @@ class TestMoonshot:
         assert m.price_out == price_out
         assert m.scrape_status == "success"
 
+    def test_tag_attribute_model_name_is_not_matched_for_prices(self):
+        html = (
+            "<html><body>"
+            "<p>Kimi K3</p>"
+            '<p><span data-model="Kimi K3">input $99.00 output $199.00</span></p>'
+            "</body></html>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            models = moonshot.scrape()
+        m = _find(models, "Kimi K3")
+        assert m.scrape_status == "fallback"
+        assert (m.price_in, m.price_out) == moonshot._FALLBACKS["Kimi K3"]
+
 
 # --------------------------------------------------------------------------- #
 # Zhipu(GLM)（"GLM-5.2" のみ。key "glm-5\.2" は "GLM-4.6" と衝突しない）

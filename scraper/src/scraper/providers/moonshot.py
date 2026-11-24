@@ -170,9 +170,9 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         fb_in, fb_out = fallback_map[name]
         # K3.1 など未登録の派生版と別レコード・遠距離の価格を拾わない。
         key = model_key_pattern(name, _FALLBACKS) + r"(?![.\d])"
-        in_patterns = [rf"{key}{_INPUT_PRICE_GAP}\$([\d.]+)"]
+        in_patterns = [rf"\A{key}{_INPUT_PRICE_GAP}\$([\d.]+)"]
         out_patterns = [
-            rf"{key}(?:{_PRE_STD_INPUT_GAP}{_STD_INPUT_LABEL}{_POST_STD_INPUT_OUTPUT_GAP}|{_OUTPUT_LABEL_GAP}){_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
+            rf"\A{key}(?:{_PRE_STD_INPUT_GAP}{_STD_INPUT_LABEL}{_POST_STD_INPUT_OUTPUT_GAP}|{_OUTPUT_LABEL_GAP}){_OUTPUT_LABEL}{_OUTPUT_PRICE_GAP}\$([\d.]+)",
         ]
         # 入力・出力は同一レコード内で組にする（別レコードの価格を混成しない）。
         # 完全な組を持つレコードがなければ None のまま既存のフォールバック組を使う。
@@ -190,9 +190,17 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
                 ),
                 None,
             )
-            record = html[begin: boundary.start() if boundary else len(html)]
-            rec_in = extract_price(record, in_patterns)
-            rec_out = extract_price(record, out_patterns)
+            end = boundary.start() if boundary else len(html)
+            # タグ属性内のモデル名にマッチしないよう、レコード内の可視モデル名開始位置だけにアンカーして抽出する。
+            record_starts = [s for s in key_starts if begin <= s < end]
+            rec_in = next(
+                (p for s in record_starts if (p := extract_price(html[s:end], in_patterns)) is not None),
+                None,
+            )
+            rec_out = next(
+                (p for s in record_starts if (p := extract_price(html[s:end], out_patterns)) is not None),
+                None,
+            )
             if rec_in is not None and rec_out is not None:
                 in_price, out_price = rec_in, rec_out
                 break
