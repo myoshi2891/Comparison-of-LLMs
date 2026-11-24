@@ -404,7 +404,7 @@ flowchart TD
     IRES --> ACC
     IINC -- "いいえ" --> ERR["例外として扱い 部分出力を採用しない"]
     IST -- "failed cancelled" --> ERR
-    API -- "Interactions ストリーミング" --> SACC["step.deltaイベントのうちstepがmodel_outputかつ<br/>delta.typeがtextのものだけを回答バッファに順に追記<br/>(thought_summaryのテキストは回答バッファに入れず必要なら別バッファへ保存)<br/>ストリームされたツール呼び出しは回答バッファとは別に<br/>各呼び出しのID・ツール名・引数デルタを蓄積して承認ゲート前に再構築<br/>usageはhop内で累積値なので最新値だけ保持<br/>最後に受信したevent_idを受信位置のカーソルとして保存<br/>continuation_tokenを受け取ったらチェックポイントとして別に保存"]
+    API -- "Interactions ストリーミング" --> SACC["modelの全step(thought stepとその署名を含む)を<br/>欠落・改変せず受信順に保持し、保持したstepから回答バッファとツール呼び出し状態を構築<br/>model_outputのstep.startに初期テキストがあればそのstepのstep.delta処理前に回答バッファへ追記し<br/>続くstep.deltaのうちdelta.typeがtextの差分を重複なく順に追記<br/>(thought_summaryのテキストは回答バッファに入れず必要なら別バッファへ保存)<br/>ストリームされたツール呼び出しは回答バッファとは別に<br/>保持したstepから各呼び出しのID・ツール名・引数デルタを蓄積して承認ゲート前に再構築<br/>usageはhop内で累積値なので最新値だけ保持<br/>最後に受信したevent_idを受信位置のカーソルとして保存<br/>continuation_tokenを受け取ったらチェックポイントとして別に保存"]
     SACC --> SDROP{"ストリームが終了イベントの前に切断されたか"}
     SDROP -- "はい" --> SUSE["中断したhopで最後に受け取ったusageは暫定値として保持<br/>同じバックグラウンドinteractionを再開して最終usageを受け取ったら置き換え<br/>usageは累積値なので両方を合算しない<br/>後続のusageが届かなければ最後に受け取った値をそのinteractionの値とし<br/>受け取っていなければ usage 不明と記録"]
     SUSE --> SCP{"バックグラウンド実行か /<br/>continuation_tokenを保存済みか"}
@@ -419,7 +419,7 @@ flowchart TD
     SDROP -- "いいえ 終了イベントを受信" --> SHOP["このhopの最終usageを確定し<br/>hopごとの最終値を合算する"]
     SHOP --> SST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
     SST -- "requires_action" --> SACT["ツール呼び出しを承認ゲートに通す 12.2節"]
-    SACT -- "承認" --> SRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>最新のmodelのstepsとfunction_result 同じtools宣言を含めて再送する"]
+    SACT -- "承認" --> SRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>受信したままの最新のmodelのsteps(thought stepと署名を含む)とfunction_result 同じtools宣言を含めて再送する"]
     SACT -- "拒否" --> SREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
     SRUN --> SACC
     SREJ --> SACC
