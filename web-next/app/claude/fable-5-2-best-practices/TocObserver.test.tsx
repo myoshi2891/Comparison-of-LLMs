@@ -238,6 +238,7 @@ it("unmountで全リスナー・inert・開状態を解除", () => {
   unmount();
   expect(s.inert).toBe(false);
   expect(r.classList.contains(styles.open)).toBe(false);
+  expect(b.getAttribute("aria-label")).toBe("目次を開く");
   fireEvent.click(b);
   // 解除後のメニュー操作では、切り離されたドロワーが開かない。
   expect(r.classList.contains(styles.open)).toBe(false);

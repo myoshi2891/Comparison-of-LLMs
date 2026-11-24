@@ -54,8 +54,8 @@ function parseMermaid(source: string) {
 }
 
 /** 図タイトルから Mermaid ソースを引き、ノードのラベルと辺へ分解する。 */
-function diagram(title: string) {
-  const { container } = render(<Page />);
+function diagram(title: string, root?: HTMLElement) {
+  const container = root ?? render(<Page />).container;
   const card = Array.from(container.querySelectorAll("[data-testid='mermaid']")).find((e) =>
     text(e.parentElement?.parentElement?.firstElementChild).startsWith(title)
   );
@@ -275,7 +275,7 @@ it("確度ラベル表・ベンチマーク表・費用式表とセットアッ�
   expect(metricsWrap?.getAttribute("aria-label")).toBe("記録する指標の表");
 });
 
-it("6.3 CMEK・6.5 進捗例・9.1 fast mode・11.4 予算倍率・図9 コンテキスト超過分岐が最新仕様を反映する", () => {
+it("6.3 CMEK・6.5 進捗例・9.1 fast mode・4.1 セットアップ手順が最新仕様を反映する", () => {
   const { container } = render(<Page />);
   const cmekRow = Array.from(container.querySelectorAll("tr")).find((r) =>
     text(r).includes("CMEK")
@@ -294,35 +294,6 @@ it("6.3 CMEK・6.5 進捗例・9.1 fast mode・11.4 予算倍率・図9 コン�
   expect(text(fastRow)).toMatch(/Google Cloud Agent Platform/);
   expect(text(fastRow)).toMatch(/v2\.1\.322/);
   expect(text(fastRow)).toMatch(/global.*us.*eu/);
-  const budgetItem = Array.from(container.querySelectorAll("#s11 li")).find((li) =>
-    text(li).includes("estimate_usd")
-  );
-  expect(text(budgetItem)).toMatch(/推論リージョン倍率/);
-  const { labels, edges } = diagram("図9");
-  expect(
-    edges.some(
-      (e) => e.from === "C" && e.label === "model_context_window_exceeded" && e.to === "R6C"
-    )
-  ).toBe(true);
-  expect(labels.get("R6C")).toMatch(/compaction/);
-  expect(labels.get("R6B")).toMatch(/コンテキストに余裕がある場合/);
-  // 図3 の単調性前提・5.4 節スイープへの案内、agent_loop の期限切れコンテナ復旧、11.4 節の非課金事前拒否。
-  const fig3Note = container.querySelector("#s5-3")?.nextElementSibling?.nextElementSibling;
-  expect(text(fig3Note)).toMatch(/単調性/);
-  expect(text(fig3Note)).toMatch(/5\.4節のスイープ/);
-  const agentCode = Array.from(
-    container.querySelectorAll("pre code"),
-    (e) => e.textContent ?? ""
-  ).find((c) => c.includes("def agent_loop("));
-  expect(agentCode).toMatch(/container_id を保持/);
-  expect(agentCode).toMatch(/期限切れ/);
-  expect(text(budgetItem)).toMatch(/非課金と確認された事前拒否は 0/);
-  expect(text(budgetItem)).toMatch(/単一試行 Fable 応答/);
-  expect(text(budgetItem)).toMatch(/usage\.iterations/);
-  // 図4: 各思考ブロックを生成時のプレフィックスと比較し、今回 system 未変更でも過去別プレフィックスは不一致。
-  const fig4 = diagram("図4");
-  expect(fig4.labels.get("B")).toMatch(/生成時のプレフィックス/);
-  expect(fig4.edges.some((e) => e.from === "B" && /今回未変更でも不一致/.test(e.label))).toBe(true);
   // 4.1 セットアップ手順: データ保持要件の確認が API 疎通確認より先にあり、合意前は合成データ限定。
   const setupRows = Array.from(container.querySelectorAll("#s4-1 + div tr")).slice(1);
   const retentionIdx = setupRows.findIndex((r) => text(r).includes("データ保持の要件"));
@@ -332,4 +303,46 @@ it("6.3 CMEK・6.5 進捗例・9.1 fast mode・11.4 予算倍率・図9 コン�
   expect(retentionIdx).toBeGreaterThanOrEqual(0);
   expect(smokeIdx).toBeGreaterThan(retentionIdx);
   expect(text(setupRows[smokeIdx])).toMatch(/合成データのみ/);
+});
+
+it("6.4 標準ループ・予算注記・11.4 予算ガード・図3 注記が最新仕様を反映する", () => {
+  const { container } = render(<Page />);
+  const fig3Note = container.querySelector("#s5-3")?.nextElementSibling?.nextElementSibling;
+  expect(text(fig3Note)).toMatch(/単調性/);
+  expect(text(fig3Note)).toMatch(/5\.4節のスイープ/);
+  const agentCode = Array.from(
+    container.querySelectorAll("pre code"),
+    (e) => e.textContent ?? ""
+  ).find((c) => c.includes("def agent_loop("));
+  expect(agentCode).toMatch(/container_id を保持/);
+  expect(agentCode).toMatch(/期限切れ/);
+  const budgetNote = container.querySelector("#s6-4-budget-note");
+  expect(text(budgetNote)).toMatch(/max_turns.*ターン数のみ/);
+  expect(text(budgetNote)).toMatch(/上限金額.*強制しません/);
+  expect(text(budgetNote)).toMatch(/各 API リクエストの送信前に別途予算チェック/);
+  const budgetItem1 = container.querySelector("#s11-4 + ol > li");
+  expect(budgetItem1?.querySelector('a[href="#s6-4-budget-note"]')).toBeTruthy();
+  const budgetItem = Array.from(container.querySelectorAll("#s11 li")).find((li) =>
+    text(li).includes("estimate_usd")
+  );
+  expect(text(budgetItem)).toMatch(/推論リージョン倍率/);
+  expect(text(budgetItem)).toMatch(/非課金と確認された事前拒否は 0/);
+  expect(text(budgetItem)).toMatch(/単一試行 Fable 応答/);
+  expect(text(budgetItem)).toMatch(/usage\.iterations/);
+});
+
+it("図4 プレフィックス比較と図9 コンテキスト超過分岐が最新仕様を反映する", () => {
+  const { container } = render(<Page />);
+  const { labels, edges } = diagram("図9", container);
+  expect(
+    edges.some(
+      (e) => e.from === "C" && e.label === "model_context_window_exceeded" && e.to === "R6C"
+    )
+  ).toBe(true);
+  expect(labels.get("R6C")).toMatch(/compaction/);
+  expect(labels.get("R6B")).toMatch(/コンテキストに余裕がある場合/);
+  // 図4: 各思考ブロックを生成時のプレフィックスと比較し、今回 system 未変更でも過去別プレフィックスは不一致。
+  const fig4 = diagram("図4", container);
+  expect(fig4.labels.get("B")).toMatch(/生成時のプレフィックス/);
+  expect(fig4.edges.some((e) => e.from === "B" && /今回未変更でも不一致/.test(e.label))).toBe(true);
 });

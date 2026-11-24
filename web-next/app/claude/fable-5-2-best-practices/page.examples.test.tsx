@@ -293,7 +293,8 @@ assert requests[1]["messages"][2]["content"][0]["content"] == [{"type": "text", 
 it("agent_loopはツールセットの結果にtoolset_nameを返し、失敗後の後続のコンピュータ操作を実行しない", () => {
   python(
     `
-import ast, copy, json, sys
+import ast, copy, json, logging, sys
+logging.getLogger().addHandler(logging.NullHandler())
 code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
 fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
 def computer(n):
@@ -369,7 +370,8 @@ assert [(r["content"], r.get("toolset_name")) for r in results] == [("browser", 
 it("agent_loopは次のAPI呼び出しが失敗しても完了済みtool_resultを保存する", () => {
   python(
     `
-import ast, copy, json, sys
+import ast, copy, json, logging, sys
+logging.getLogger().addHandler(logging.NullHandler())
 code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
 fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
 checkpoint, requests, executed = {}, [], []
@@ -410,7 +412,8 @@ assert executed == [("read", {"path": "a.py"})]
 it("agent_loopは成功後のツール例外も対応する結果へ変換し、完全なバッチで再開する", () => {
   python(
     `
-import ast, copy, json, sys
+import ast, copy, json, logging, sys
+logging.getLogger().addHandler(logging.NullHandler())
 code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
 fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
 checkpoint, requests, executed = {}, [], []
@@ -440,7 +443,7 @@ assert len(history) == 5
 assert history[2]["content"] == [{"type": "tool_result", "tool_use_id": "tool-1", "content": "result-1"}]
 assert history[4]["content"] == [
     {"type": "tool_result", "tool_use_id": "tool-2", "content": "result-2"},
-    {"type": "tool_result", "tool_use_id": "tool-3", "content": "OSError: read unavailable", "is_error": True},
+    {"type": "tool_result", "tool_use_id": "tool-3", "content": "Tool execution failed. Check the tool arguments or try an alternative approach.", "is_error": True},
     {"type": "tool_result", "tool_use_id": "tool-4", "content": "result-4"}]
 for assistant, user in zip(history[1::2], history[2::2]):
     assert [b["id"] for b in assistant["content"]] == [b["tool_use_id"] for b in user["content"]]
@@ -566,7 +569,8 @@ assert checkpoint["messages"] == [{"role": "user", "content": "task"}, {"role": 
 it("agent_loopはブラウザ操作の失敗をコンピュータ操作と別に追跡し、後続のブラウザ操作だけを止める", () => {
   python(
     `
-import ast, copy, json, sys
+import ast, copy, json, logging, sys
+logging.getLogger().addHandler(logging.NullHandler())
 code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
 fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
 def use(toolset, n):
@@ -859,16 +863,16 @@ for early_reason in ("refusal", "max_tokens"):
   );
 });
 
-it("agent_loopはrun_toolの非文字列・不正な戻り値を拒否し、is_error=Trueの文字列tool_resultとして記録する", () => {
+it("agent_loopはrun_toolの戻り値をコンテンツブロックスキーマで検証し、例外本文をモデルへ漏らさずマスクしてローカル記録する", () => {
   python(
     `
-import ast, copy, json, sys
+import ast, copy, json, logging, sys
 code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
 fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
 def tool(n):
     return {"type": "tool_use", "id": "t" + str(n), "name": "op", "input": {"n": n}}
 replies = [
-    {"stop_reason": "tool_use", "content": [tool(1), tool(2), tool(3), tool(4), tool(5), tool(6)]},
+    {"stop_reason": "tool_use", "content": [tool(n) for n in range(1, 13)]},
     {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]},
 ]
 requests = []
@@ -878,21 +882,46 @@ def call(body):
 returns = {
     1: "ok",
     2: [{"type": "text", "text": "block"}],
-    3: None,
-    4: 42,
-    5: {"type": "text", "text": "dict-not-list"},
-    6: [{"text": "missing-type"}],
+    3: [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}],
+    4: [{"type": "image", "source": {"type": "url", "url": "https://example.com/a.png"}}],
+    5: None,
+    6: 42,
+    7: {"type": "text", "text": "dict-not-list"},
+    8: [{"text": "missing-type"}],
+    9: [{"type": "text"}],
+    10: [{"type": "image", "source": {"type": "base64"}}],
+    11: [{"type": "unknown_block", "value": "x"}],
 }
+def run_tool(_k, a):
+    if a["n"] == 12:
+        raise RuntimeError("secret api_key=topsecret123 sk-ant-secret999")
+    return returns[a["n"]]
+records = []
+class CaptureHandler(logging.Handler):
+    def emit(self, record):
+        records.append(record.getMessage())
+logger = logging.getLogger()
+handler = CaptureHandler()
+logger.addHandler(handler)
 scope = {"call": call, "copy": copy}
 exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 checkpoint = {}
-assert scope["agent_loop"]("task", [], lambda _k, a: returns[a["n"]], max_turns=2, checkpoint=checkpoint) is replies[1]
+try:
+    assert scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint) is replies[1]
+finally:
+    logger.removeHandler(handler)
 results = checkpoint["messages"][2]["content"]
 assert results[0] == {"type": "tool_result", "tool_use_id": "t1", "content": "ok"}
 assert results[1] == {"type": "tool_result", "tool_use_id": "t2", "content": [{"type": "text", "text": "block"}]}
-for idx in (2, 3, 4, 5):
+assert results[2] == {"type": "tool_result", "tool_use_id": "t3", "content": [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]}
+assert results[3] == {"type": "tool_result", "tool_use_id": "t4", "content": [{"type": "image", "source": {"type": "url", "url": "https://example.com/a.png"}}]}
+fixed_msg = "Tool execution failed. Check the tool arguments or try an alternative approach."
+for idx in range(4, 12):
     assert results[idx]["is_error"] is True, (idx, results[idx])
-    assert isinstance(results[idx]["content"], str) and "TypeError" in results[idx]["content"], (idx, results[idx])
+    assert results[idx]["content"] == fixed_msg, (idx, results[idx])
+    assert "topsecret123" not in results[idx]["content"]
+    assert "sk-ant-secret999" not in results[idx]["content"]
+assert any("[REDACTED]" in msg and "topsecret123" not in msg and "sk-ant-secret999" not in msg for msg in records), records
 `,
     examples()
   );

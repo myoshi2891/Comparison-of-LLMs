@@ -2357,23 +2357,61 @@
                               # (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。
                               tool_key = (block["toolset_name"], block["name"]) if "toolset_name" in block else block["name"]
                               # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
-                              # run_tool は文字列またはコンテンツブロック(dict のリスト、各要素に str の "type")を返す契約とし、
+                              # run_tool は文字列または有効なコンテンツブロック(text / image / document / search_result)のリストを返す契約とし、
                               # それ以外の戻り値はエラー結果として記録して checkpoint の破損を防ぐ。
                               try:
                                   raw = run_tool(tool_key, copy.deepcopy(block["input"]))
                                   if isinstance(raw, str):
                                       result["content"] = raw
                                   elif isinstance(raw, list) and all(
-                                      isinstance(item, dict) and isinstance(item.get("type"), str)
+                                      isinstance(item, dict)
+                                      and (
+                                          (item.get("type") == "text" and isinstance(item.get("text"), str))
+                                          or (
+                                              item.get("type") == "image"
+                                              and isinstance(item.get("source"), dict)
+                                              and (
+                                                  (
+                                                      item["source"].get("type") == "base64"
+                                                      and isinstance(item["source"].get("media_type"), str)
+                                                      and isinstance(item["source"].get("data"), str)
+                                                  )
+                                                  or (
+                                                      item["source"].get("type") == "url"
+                                                      and isinstance(item["source"].get("url"), str)
+                                                  )
+                                              )
+                                          )
+                                          or (
+                                              item.get("type") == "document"
+                                              and isinstance(item.get("source"), dict)
+                                              and isinstance(item["source"].get("type"), str)
+                                          )
+                                          or (
+                                              item.get("type") == "search_result"
+                                              and isinstance(item.get("source"), str)
+                                              and isinstance(item.get("title"), str)
+                                              and isinstance(item.get("content"), list)
+                                          )
+                                      )
                                       for item in raw
                                   ):
                                       result["content"] = copy.deepcopy(raw)
                                   else:
                                       raise TypeError(
-                                          f"run_tool must return str or list of content blocks, got {type(raw).__name__}"
+                                          f"run_tool returned invalid content ({type(raw).__name__})"
                                       )
                               except Exception as error:
-                                  result["content"] = f"{type(error).__name__}: {error}"
+                                  # 例外本文はモデルへ返さず、機微値をマスクしてローカルログのみへ記録する
+                                  import logging, re
+
+                                  redacted = re.sub(
+                                      r"(?i)(sk-[\w-]+|bearer\s+\S+|(?:api[_-]?key|token|secret|password)\s*[=:]\s*\S+)",
+                                      "[REDACTED]",
+                                      str(error),
+                                  )
+                                  logging.getLogger(__name__).warning("tool failed (%s): %s", type(error).__name__, redacted)
+                                  result["content"] = "Tool execution failed. Check the tool arguments or try an alternative approach."
                                   result["is_error"] = True
                                   if toolset in ("computer", "browser"):
                                       failed_toolsets.add(toolset)
@@ -2390,6 +2428,12 @@
                           checkpoint["container_id"] = container_id
                   raise RuntimeError("max_turns に到達しました")
             </script>
+          </div>
+          <div class="callout" id="s6-4-budget-note">
+            <p>
+              <strong>注意(予算上限の強制)</strong>:
+              上記の <code>max_turns</code> はターン数のみを制限し、1タスクあたりの上限金額(ドル上限)は強制しません。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを必ず組み込んでください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。
+            </p>
           </div>
           <h3 id="s6-5">6.5 長い無人実行で「無言」に見える問題を避ける</h3>
           <p>
@@ -4279,7 +4323,7 @@
           <ol>
             <li>
               <strong>1タスクあたりの上限金額</strong
-              >と<strong>最大ターン数</strong>を決め、ハーネスで強制する。
+              >と<strong>最大ターン数</strong>を決め、ハーネスで強制する(6.4節の標準ループの <code>max_turns</code> はターン数のみを制限するため、金額上限の扱いは <a href="#s6-4-budget-note">6.4節の予算注記</a> を参照)。
             </li>
             <li>
               実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global

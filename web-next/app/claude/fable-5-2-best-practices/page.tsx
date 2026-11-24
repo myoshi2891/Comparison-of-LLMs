@@ -4186,7 +4186,7 @@ export default function Page() {
                     {"                "}
                     <span className="hljs-comment">
                       {
-                        '# run_tool は文字列またはコンテンツブロック(dict のリスト、各要素に str の "type")を返す契約とし、'
+                        "# run_tool は文字列または有効なコンテンツブロック(text / image / document / search_result)のリストを返す契約とし、"
                       }
                     </span>
                   </span>
@@ -4242,15 +4242,220 @@ export default function Page() {
                     <span className="hljs-built_in">{"isinstance"}</span>
                     {"(item, "}
                     <span className="hljs-built_in">{"dict"}</span>
-                    {") "}
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            (item.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"text"'}</span>{" "}
                     <span className="hljs-keyword">{"and"}</span>{" "}
                     <span className="hljs-built_in">{"isinstance"}</span>
                     {"(item.get("}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {"))"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                item.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"image"'}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item.get("}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                                    ("}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                        item["}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"].get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"base64"'}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                        "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item["}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"].get("}
+                    <span className="hljs-string">{'"media_type"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                        "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item["}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"].get("}
+                    <span className="hljs-string">{'"data"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                                    )"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                    "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                        item["}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"].get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"url"'}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                        "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item["}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"].get("}
+                    <span className="hljs-string">{'"url"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                                    )"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                                )"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                            )"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                item.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"document"'}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item.get("}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item["}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"].get("}
                     <span className="hljs-string">{'"type"'}</span>
                     {"), "}
                     <span className="hljs-built_in">{"str"}</span>
                     {")"}
                   </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                            )"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" ("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                item.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"search_result"'}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item.get("}
+                    <span className="hljs-string">{'"source"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item.get("}
+                    <span className="hljs-string">{'"title"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item.get("}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                            )"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                        )"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"                        "}
@@ -4283,13 +4488,13 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                            "}
                     <span className="hljs-string">
-                      {'f"run_tool must return str or list of content blocks, got '}
+                      {'f"run_tool returned invalid content ('}
                       <span className="hljs-subst">
                         {"{"}
                         <span className="hljs-built_in">{"type"}</span>
                         {"(raw).__name__}"}
                       </span>
-                      {'"'}
+                      {')"'}
                     </span>
                   </span>
                   {"\n"}
@@ -4304,19 +4509,64 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-comment">
+                      {"# 例外本文はモデルへ返さず、機微値をマスクしてローカルログのみへ記録する"}
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-keyword">{"import"}</span>
+                    {" logging, re"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}></span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    redacted = re.sub("}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-string">
+                      {
+                        'r"(?i)(sk-[\\w-]+|bearer\\s+\\S+|(?:api[_-]?key|token|secret|password)\\s*[=:]\\s*\\S+)"'
+                      }
+                    </span>
+                    {","}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-string">{'"[REDACTED]"'}</span>
+                    {","}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {"(error),"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>{"                    )"}</span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    logging.getLogger(__name__).warning("}
+                    <span className="hljs-string">{'"tool failed (%s): %s"'}</span>
+                    {", "}
+                    <span className="hljs-built_in">{"type"}</span>
+                    {"(error).__name__, redacted)"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"                    result["}
                     <span className="hljs-string">{'"content"'}</span>
                     {"] = "}
                     <span className="hljs-string">
-                      {'f"'}
-                      <span className="hljs-subst">
-                        {"{"}
-                        <span className="hljs-built_in">{"type"}</span>
-                        {"(error).__name__}"}
-                      </span>
-                      {": "}
-                      <span className="hljs-subst">{"{error}"}</span>
-                      {'"'}
+                      {
+                        '"Tool execution failed. Check the tool arguments or try an alternative approach."'
+                      }
                     </span>
                   </span>
                   {"\n"}
@@ -4442,6 +4692,18 @@ export default function Page() {
                   </span>
                 </code>
               </pre>{" "}
+            </div>{" "}
+            <div className={styles.callout} data-variant="info" id="s6-4-budget-note">
+              {" "}
+              <p>
+                {" "}
+                <strong>{"注意(予算上限の強制)"}</strong>
+                {": 上記の "}
+                <code>{"max_turns"}</code>
+                {
+                  " はターン数のみを制限し、1タスクあたりの上限金額(ドル上限)は強制しません。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを必ず組み込んでください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
+                }
+              </p>{" "}
             </div>{" "}
             <h3 id="s6-5">{"6.5 長い無人実行で「無言」に見える問題を避ける"}</h3>{" "}
             <p>
@@ -8406,7 +8668,11 @@ export default function Page() {
                 <strong>{"1タスクあたりの上限金額"}</strong>
                 {"と"}
                 <strong>{"最大ターン数"}</strong>
-                {"を決め、ハーネスで強制する。 "}
+                {"を決め、ハーネスで強制する(6.4節の標準ループの "}
+                <code>{"max_turns"}</code>
+                {" はターン数のみを制限するため、金額上限の扱いは "}
+                <a href="#s6-4-budget-note">{"6.4節の予算注記"}</a>
+                {" を参照)。 "}
               </li>{" "}
               <li>
                 {

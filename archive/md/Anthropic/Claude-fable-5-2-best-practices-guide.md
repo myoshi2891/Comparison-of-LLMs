@@ -620,23 +620,61 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                 # (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。
                 tool_key = (block["toolset_name"], block["name"]) if "toolset_name" in block else block["name"]
                 # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
-                # run_tool は文字列またはコンテンツブロック(dict のリスト、各要素に str の "type")を返す契約とし、
+                # run_tool は文字列または有効なコンテンツブロック(text / image / document / search_result)のリストを返す契約とし、
                 # それ以外の戻り値はエラー結果として記録して checkpoint の破損を防ぐ。
                 try:
                     raw = run_tool(tool_key, copy.deepcopy(block["input"]))
                     if isinstance(raw, str):
                         result["content"] = raw
                     elif isinstance(raw, list) and all(
-                        isinstance(item, dict) and isinstance(item.get("type"), str)
+                        isinstance(item, dict)
+                        and (
+                            (item.get("type") == "text" and isinstance(item.get("text"), str))
+                            or (
+                                item.get("type") == "image"
+                                and isinstance(item.get("source"), dict)
+                                and (
+                                    (
+                                        item["source"].get("type") == "base64"
+                                        and isinstance(item["source"].get("media_type"), str)
+                                        and isinstance(item["source"].get("data"), str)
+                                    )
+                                    or (
+                                        item["source"].get("type") == "url"
+                                        and isinstance(item["source"].get("url"), str)
+                                    )
+                                )
+                            )
+                            or (
+                                item.get("type") == "document"
+                                and isinstance(item.get("source"), dict)
+                                and isinstance(item["source"].get("type"), str)
+                            )
+                            or (
+                                item.get("type") == "search_result"
+                                and isinstance(item.get("source"), str)
+                                and isinstance(item.get("title"), str)
+                                and isinstance(item.get("content"), list)
+                            )
+                        )
                         for item in raw
                     ):
                         result["content"] = copy.deepcopy(raw)
                     else:
                         raise TypeError(
-                            f"run_tool must return str or list of content blocks, got {type(raw).__name__}"
+                            f"run_tool returned invalid content ({type(raw).__name__})"
                         )
                 except Exception as error:
-                    result["content"] = f"{type(error).__name__}: {error}"
+                    # 例外本文はモデルへ返さず、機微値をマスクしてローカルログのみへ記録する
+                    import logging, re
+
+                    redacted = re.sub(
+                        r"(?i)(sk-[\w-]+|bearer\s+\S+|(?:api[_-]?key|token|secret|password)\s*[=:]\s*\S+)",
+                        "[REDACTED]",
+                        str(error),
+                    )
+                    logging.getLogger(__name__).warning("tool failed (%s): %s", type(error).__name__, redacted)
+                    result["content"] = "Tool execution failed. Check the tool arguments or try an alternative approach."
                     result["is_error"] = True
                     if toolset in ("computer", "browser"):
                         failed_toolsets.add(toolset)
@@ -653,6 +691,8 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
             checkpoint["container_id"] = container_id
     raise RuntimeError("max_turns に到達しました")
 ```
+
+> **注意(予算上限の強制)**: 上記の `max_turns` はターン数のみを制限し、1タスクあたりの上限金額(ドル上限)は強制しません。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを必ず組み込んでください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。
 
 ### 6.5 長い無人実行で「無言」に見える問題を避ける
 
@@ -1322,7 +1362,7 @@ print(round(estimate_usd(example, "fast"), 2))  # 0.80 + 0.06 + 2.40 = 3.26
 
 ### 11.4 予算ガードの考え方 [私見]
 
-1. **1タスクあたりの上限金額**と**最大ターン数**を決め、ハーネスで強制する。
+1. **1タスクあたりの上限金額**と**最大ターン数**を決め、ハーネスで強制する(6.4節の標準ループの `max_turns` はターン数のみを制限するため、金額上限の扱いは 6.4節の予算注記を参照)。
 2. 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API の単一試行 Fable 応答は `estimate_usd(usage, mode, response)` の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。サーバー側フォールバック時はトップレベルの `usage` や最終応答への Fable 単価適用に頼らず、課金対象となる `usage.iterations` の各エントリをその試行を処理したモデルの単価で合算する。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。
 3. 週次で**タスク種別ごとの平均コスト**を見て、effort と構成を見直す。
 4. 上限に達したら、**途中経過を保存して人に引き継ぐ**(破棄しない)。
