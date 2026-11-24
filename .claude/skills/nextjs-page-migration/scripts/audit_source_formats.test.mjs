@@ -2275,7 +2275,7 @@ test("resolves card binding for host guards and rejects top-level comma expressi
 	const card = `<div id="c1" class="diagram-card"><div class="host"></div><script type="text/plain">${chart}</script></div>`;
 
 	// 1. Host bound from an outer variable also named `card` does not prove presence on the current loop card.
-	const outerHost = `${card}<div id="other"></div><script>let card = document.querySelector('#other'); let host = card.querySelector('.host'); let cards = document.querySelectorAll('.diagram-card'); for (let i = 0; i < cards.length; i++) { let card = cards[i]; if (!host) continue; let src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const outerHost = `${card}<div id="other"></div><script>let card = document.querySelector('#other'); let host = card.querySelector('.host'); let cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { let card = cards[i]; if (!host) continue; let src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
 	const outerRes = audit(outerHost, page);
 	assert.equal(outerRes.status, 1);
 	assert.deepEqual(outerRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
@@ -2350,4 +2350,45 @@ test("handles void prior matches, detached script wrappers, custom elements, and
 
 	const syncBeforeDeferredId = `${card}<script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script><script type="module">document.querySelector('#c1').id = 'other';</script>`;
 	assert.equal(audit(syncBeforeDeferredId, page).status, 0);
+});
+
+test("ignores string-literal edits, checks loop collection bindings, shadowed undefined, bracket id writes, and dynamic renderer scopes", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D0 = ${JSON.stringify(chart)};<MermaidDiagram chart={D0} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+
+	// 1. Receiver/method text inside string literals does not trigger scriptEdits, while real removals stay unresolved.
+	const stringLiteralEdit = `${card}<script>var card = document.querySelector('#c1'); var note = "card.querySelector('script').remove()"; var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(stringLiteralEdit, page).status, 0);
+	const realRemoval = `${card}<script>var card = document.querySelector('#c1'); card.querySelector('script').remove(); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(realRemoval, page).status, 1);
+	assert.deepEqual(audit(realRemoval, page).data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	// 2. Loop condition collection binding must match the card lookup collection binding.
+	const shadowedCollection = `${card}<div class="other"></div><script>let cards = document.querySelectorAll('.other'); for (var i = 0; i < cards.length; i++) { let cards = document.querySelectorAll('.diagram-card'); let card = cards[i]; let src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const shadowColRes = audit(shadowedCollection, page);
+	assert.equal(shadowColRes.status, 1);
+	assert.deepEqual(shadowColRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	// 3. Unshadowed undefined is false in loop guards, while declared undefined is unknown.
+	const unshadowedUndef = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (undefined) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(unshadowedUndef, page).status, 0);
+	const shadowedUndef = `${card}<script>let undefined = true; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (undefined) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const undefRes = audit(shadowedUndef, page);
+	assert.equal(undefRes.status, 1);
+	assert.deepEqual(undefRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	// 4. Bracket-notation id writes invalidate #id selectors across scopes, while string literals containing ["id"]= do not.
+	const bracketIdWrite = `${card}<script>document.querySelector('#c1')["id"] = 'other';</script><script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const bracketIdRes = audit(bracketIdWrite, page);
+	assert.equal(bracketIdRes.status, 1);
+	assert.deepEqual(bracketIdRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const stringBracketId = `${card}<script>var note = 'el["id"] = "other"';</script><script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(stringBracketId, page).status, 0);
+
+	// 5. A dynamic-selector renderer scope prevents certifying a sole literal match for the card.
+	const dynamicSecondScope = `${card}<script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script><script type="module">const sel = '#' + 'c1'; const card = document.querySelector(sel); const src = card.querySelector('script').textContent; mermaid.render('y', src);</script>`;
+	const dynRes = audit(dynamicSecondScope, page);
+	assert.equal(dynRes.status, 1);
+	assert.deepEqual(dynRes.data.unresolvedMermaidSources, ["renderer:c1"]);
 });

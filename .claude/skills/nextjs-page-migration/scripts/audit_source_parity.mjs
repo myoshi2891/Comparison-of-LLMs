@@ -1369,7 +1369,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if (/[()=.[\]]|\+\+|--/.test(condition.replace(/[!=]==?|[<>]=/g, " "))) return false;
         return Array.from(condition.matchAll(/(?<![\w$.])[A-Za-z_$][\w$]*/g)).every(name => {
           const id = name[0];
-          if (/^(?:true|false|null|undefined|typeof|void|in|instanceof)$/.test(id)) return true;
+          if (/^(?:true|false|null|typeof|void|in|instanceof)$/.test(id)) return true;
           if (id === indexName) return false;
           if (Array.from(executable.matchAll(new RegExp(`\\b(?:var|let|const)\\s+${id.replace(/\$/g, "\\$")}(?![\\w$])`, "g")))
             .some(declaration => declaration.index > open && declaration.index < close)) return false;
@@ -1474,10 +1474,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         }
         return lastProven;
       };
+      const isUndefinedShadowed = () =>
+        /\b(?:var|let|const|function|class)\s+undefined(?![\w$])|\b(?:function\b[^()]*|catch)\s*\([^)]*\bundefined(?![\w$])|\([^)]*\bundefined(?![\w$])[^)]*\)\s*=>|\bundefined\s*=>|\b(?:const|let|var)\s+[^;\n{}]*[,{[]\s*undefined(?![\w$])|\bimport\b[^;\n]*\bundefined(?![\w$])/.test(executable);
       const provenBool = (condition, at) => {
         const s = unwrapParens(condition);
         if (s === "true") return true;
-        if (/^(?:false|null|undefined|0)$/.test(s)) return false;
+        if (/^(?:false|null|0)$/.test(s)) return false;
+        if (s === "undefined") return isUndefinedShadowed() ? null : false;
         if (s.startsWith("!")) {
           const inner = provenBool(s.slice(1), at);
           return inner === null ? null : !inner;
@@ -1692,6 +1695,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       // a matching loop elsewhere in the scope proves nothing about this payload.
       const loopHeader = new RegExp(`for\\s*\\(\\s*var\\s+${indexed[2]}\\s*=\\s*0\\s*;\\s*${indexed[2]}\\s*<\\s*${indexed[1]}\\.length\\s*;\\s*${indexed[2]}\\+\\+\\s*\\)\\s*\\{`, "g");
       return Array.from(executable.matchAll(loopHeader)).some(loop => {
+        const loopCollectionAt = loop.index + loop[0].indexOf(indexed[1], loop[0].indexOf(";"));
+        const loopCollectionBinding = bindingAt(indexed[1], loopCollectionAt);
+        if (!loopCollectionBinding || loopCollectionBinding.at !== collectionBinding.at) return false;
         const open = loop.index + loop[0].length - 1;
         let depth = 0, close = -1;
         for (let k = open; k < executable.length; k++) {
@@ -1899,8 +1905,14 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (args.length === 0 || args.some(a => a === "")) return null;
       return args;
     };
-    const allOwnerEdits = Array.from(literalSource.matchAll(ownerEdits));
-    const allWrapperAppendEdits = Array.from(literalSource.matchAll(wrapperAppendEdits));
+    // Match receivers and methods on `executable` so string literals never trigger edits,
+    // while reading selector arguments from the offset-aligned `literalSource`.
+    const matchExecutableEdits = re =>
+      Array.from(executable.matchAll(re), edit =>
+        Object.assign(edit, { 1: literalSource.slice(edit.index, edit.index + edit[1].length) })
+      );
+    const allOwnerEdits = matchExecutableEdits(ownerEdits);
+    const allWrapperAppendEdits = matchExecutableEdits(wrapperAppendEdits);
     const isFreshNonScriptNode = (expr, at, seen = new Set()) => {
       const createEl = /^document\.createElement\(\s*(['"])([A-Za-z][\w-]*)\1\s*\)$/.exec(expr);
       if (createEl) return createEl[2].toLowerCase() !== "script";
@@ -1926,9 +1938,12 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     };
     // Changing a script's type can move a typed query (script[type="text/plain"]) to another script.
     // Attribute writes with a literal non-type name keep the selection; computed names stay unresolved.
-    const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute)\\s*\\(\\s*(?!(['"])(?!type\\4)[^'"\\n]*\\4)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
-    if (Array.from(literalSource.matchAll(scriptEdits)).some(edit => mayBeSelectedScript(edit[1], edit.index) || mayBeScriptContainer(edit[1], edit.index)) ||
-      Array.from(literalSource.matchAll(typeEdits)).some(edit => mayBeCardScript(edit[1], edit.index)) ||
+    const typeEdits = new RegExp(`${receiver}(?:type\\s*=(?!=)|(?:setAttribute|removeAttribute|toggleAttribute|setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\\s*\\()`, "gi");
+    const isNonTypeLiteralAttrEdit = edit =>
+      /\b(?:setAttribute|removeAttribute|toggleAttribute)\s*\($/i.test(edit[0]) &&
+      /^\s*(['"])(?!type\1)[^'"\n]*\1/i.test(literalSource.slice(edit.index + edit[0].length));
+    if (matchExecutableEdits(scriptEdits).some(edit => mayBeSelectedScript(edit[1], edit.index) || mayBeScriptContainer(edit[1], edit.index)) ||
+      matchExecutableEdits(typeEdits).some(edit => !isNonTypeLiteralAttrEdit(edit) && mayBeCardScript(edit[1], edit.index)) ||
       allOwnerEdits.some(edit =>
         mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit)) ||
         (writeCanPrecedeRead(edit.index) && mayBeSelectedScript(edit[1], edit.index))
@@ -2234,10 +2249,13 @@ function materializePlainTextCards(src) {
     const executable = blankNonCodeText(rawSource, false, resolution);
     const literalSource = group.map(script => blankNonCodeText(script.payload)).join("\n;\n");
     const selectors = [];
+    let hasDynamicSelection = false;
     const selectionCalls = Array.from(executable.matchAll(/\bdocument\.querySelector(?:All)?\s*\(/g));
     for (const call of selectionCalls) {
       const argument = /^\s*(['"])((?:[^\\]|\\.)*?)\1\s*\)/.exec(literalSource.slice(call.index + call[0].length));
-      if (argument) selectors.push(decodeQuotedEntryEscapes(argument[2]));
+      const decoded = argument ? decodeQuotedEntryEscapes(argument[2]) : undefined;
+      if (decoded !== undefined) selectors.push(decoded);
+      else hasDynamicSelection = true;
     }
     // An uncertain slash may have masked a renderer as a string/regex. Keep the
     // scope so rendererSuffix reports it unresolved instead of dropping it.
@@ -2263,7 +2281,8 @@ function materializePlainTextCards(src) {
         .some(write => isTextContentKey(write, rawSource));
     const editsDomStructure = /\.\s*(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text)|removeChild|replaceChild|insertBefore|prepend|append|appendChild|replaceChildren|setAttribute(?:NS|Node|NodeNS)?|removeAttribute(?:NS|Node)?|toggleAttribute)\s*\(|(?:outerHTML|innerHTML|innerText|type|className)\s*=(?!=)|classList\s*\.\s*(?:remove|replace|toggle)\s*\()/.test(executable);
     const writesId = /\.\s*id\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
-      /\[\s*(['"])id\1\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable);
+      Array.from(literalSource.matchAll(/\[\s*(['"])id\1\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/g))
+        .some(write => executable[write.index] === "[");
     const writesDom = writesTextContent || editsDomStructure;
     // Inline module scripts without async run after the document is parsed.
     const deferredModule = !classic && group.every(script => readHtmlAttribute(script.attributes, "async") === undefined);
@@ -2272,7 +2291,7 @@ function materializePlainTextCards(src) {
     const executableInterpolation = (resolution.interpolations ?? []).some(expr =>
       /\bmermaid\b|(?:[\w$)\]]|\?\.)\s*\(|[\w$)\]]\s*`|\bnew\b/.test(expr)
     );
-    return { literalSource, rawSource, selectors, computedRenderer, classic, deferredModule, segments, writesDom, writesId, hasSelection: selectionCalls.length > 0,
+    return { literalSource, rawSource, selectors, hasDynamicSelection, computedRenderer, classic, deferredModule, segments, writesDom, writesId, hasSelection: selectionCalls.length > 0,
       hasRenderer: /\bmermaid\s*\.\s*render\s*\(/.test(executable) || executableInterpolation || maskedRenderer || computedRenderer };
   });
   const scopes = allScopes.filter(scope => scope.hasRenderer);
@@ -2336,8 +2355,10 @@ function materializePlainTextCards(src) {
         edits.push({ index: start + marker.index, length: marker[0].length, value: "" });
       }
     } else {
-      const matching = scopes.filter(scope => scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector)));
-      const renderer = matching.length === 1 ? matching[0]
+      const matching = scopes.filter(scope =>
+        scope.hasDynamicSelection || scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector))
+      );
+      const renderer = matching.length === 1 && !matching[0].hasDynamicSelection ? matching[0]
         : (matching.length === 0 && scopes.length === 1 && !scopes[0].hasSelection ? scopes[0] : undefined);
       const cardId = readHtmlAttribute(card.openingTag, "id") ?? `card-${marker[1]}`;
       if (!renderer && scopes.length > 0) unresolvedMermaidSources.push(`renderer:${cardId}`);
