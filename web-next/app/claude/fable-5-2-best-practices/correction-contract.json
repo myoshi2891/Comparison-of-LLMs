@@ -148,12 +148,12 @@
     "declarations": [["border", "0", false], ["padding", "0", false], ["border-radius", "0", false]]
   },
   {
-    "selector": ".root :global(section), .root :global(h1), .root :global(h2), .root :global(h3), .root :global(h4), .root :global(tr[id])",
+    "selector": ".root :global(section), .root :global(h1), .root :global(h2), .root :global(h3), .root :global(h4), .root :global(tr[id]), .root :global(#s6-4-budget-note)",
     "media": null,
     "declarations": [["scroll-margin-top", "calc(var(--header-height, 60px) + 80px)", false]]
   },
   {
-    "selector": ".root :global(section), .root :global(h1), .root :global(h2), .root :global(h3), .root :global(h4), .root :global(tr[id])",
+    "selector": ".root :global(section), .root :global(h1), .root :global(h2), .root :global(h3), .root :global(h4), .root :global(tr[id]), .root :global(#s6-4-budget-note)",
     "media": null,
     "declarations": [
       [

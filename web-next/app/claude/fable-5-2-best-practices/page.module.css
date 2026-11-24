@@ -738,7 +738,8 @@
 .root :global(h2),
 .root :global(h3),
 .root :global(h4),
-.root :global(tr[id]) {
+.root :global(tr[id]),
+.root :global(#s6-4-budget-note) {
   scroll-margin-top: calc(var(--header-height, 60px) + 80px);
 }
 .root :global(section),
@@ -746,7 +747,8 @@
 .root :global(h2),
 .root :global(h3),
 .root :global(h4),
-.root :global(tr[id]) {
+.root :global(tr[id]),
+.root :global(#s6-4-budget-note) {
   scroll-margin-top: max(
     calc(var(--header-height, 60px) + 80px),
     calc(

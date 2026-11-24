@@ -863,16 +863,24 @@ for early_reason in ("refusal", "max_tokens"):
   );
 });
 
-it("agent_loopはrun_toolの戻り値をコンテンツブロックスキーマで検証し、例外本文をモデルへ漏らさずマスクしてローカル記録する", () => {
+it("agent_loopはrun_toolの戻り値をコンテンツブロックスキーマで検証し、例外本文をモデルにもログにも漏らさず例外型のみを記録する", () => {
   python(
     `
 import ast, copy, json, logging, sys
 code = next(c for c in json.load(sys.stdin) if "def agent_loop(" in c)
 fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and n.name == "agent_loop")
-def tool(n):
-    return {"type": "tool_use", "id": "t" + str(n), "name": "op", "input": {"n": n}}
+def tool(n, name="op", toolset=None):
+    b = {"type": "tool_use", "id": "t" + str(n), "name": name, "input": {"n": n}}
+    if toolset is not None:
+        b["toolset_name"] = toolset
+    return b
 replies = [
-    {"stop_reason": "tool_use", "content": [tool(n) for n in range(1, 13)]},
+    {"stop_reason": "tool_use", "content": [
+        *[tool(n) for n in range(1, 21)],
+        tool(21, name="new_tab", toolset="browser"),
+        tool(22, name="click", toolset="browser"),
+        tool(23, name="switch_tab", toolset="browser"),
+    ]},
     {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]},
 ]
 requests = []
@@ -884,16 +892,27 @@ returns = {
     2: [{"type": "text", "text": "block"}],
     3: [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}],
     4: [{"type": "image", "source": {"type": "url", "url": "https://example.com/a.png"}}],
-    5: None,
-    6: 42,
-    7: {"type": "text", "text": "dict-not-list"},
-    8: [{"text": "missing-type"}],
-    9: [{"type": "text"}],
-    10: [{"type": "image", "source": {"type": "base64"}}],
-    11: [{"type": "unknown_block", "value": "x"}],
+    5: [{"type": "document", "source": {"type": "url", "url": "https://example.com/doc.pdf"}}],
+    6: [{"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": "JVBERi0="}}],
+    7: [{"type": "document", "source": {"type": "text", "media_type": "text/plain", "data": "hello"}}],
+    8: [{"type": "document", "source": {"type": "content", "content": [{"type": "text", "text": "doc"}]}}],
+    9: [{"type": "search_result", "source": "https://example.com", "title": "T", "content": []}],
+    10: None,
+    11: 42,
+    12: {"type": "text", "text": "dict-not-list"},
+    13: [{"text": "missing-type"}],
+    14: [{"type": "text"}],
+    15: [{"type": "image", "source": {"type": "base64"}}],
+    16: [{"type": "unknown_block", "value": "x"}],
+    17: [{"type": "document", "source": {"type": "url"}}],
+    18: [{"type": "search_result", "source": "s", "title": "t", "content": []}, {"type": "text", "text": "mixed"}],
+    19: [{"type": "browser_state", "tabs": []}],
+    21: [{"type": "browser_state", "tabs": [{"id": "tab1"}]}],
+    22: [{"type": "browser_state", "tabs": [{"id": "tab1"}]}, {"type": "text", "text": "clicked"}],
+    23: [{"type": "text", "text": "not-browser-state"}],
 }
 def run_tool(_k, a):
-    if a["n"] == 12:
+    if a["n"] == 20:
         raise RuntimeError("secret api_key=topsecret123 sk-ant-secret999")
     return returns[a["n"]]
 records = []
@@ -915,13 +934,27 @@ assert results[0] == {"type": "tool_result", "tool_use_id": "t1", "content": "ok
 assert results[1] == {"type": "tool_result", "tool_use_id": "t2", "content": [{"type": "text", "text": "block"}]}
 assert results[2] == {"type": "tool_result", "tool_use_id": "t3", "content": [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]}
 assert results[3] == {"type": "tool_result", "tool_use_id": "t4", "content": [{"type": "image", "source": {"type": "url", "url": "https://example.com/a.png"}}]}
+assert results[4] == {"type": "tool_result", "tool_use_id": "t5", "content": returns[5]}
+assert results[5] == {"type": "tool_result", "tool_use_id": "t6", "content": returns[6]}
+assert results[6] == {"type": "tool_result", "tool_use_id": "t7", "content": returns[7]}
+assert results[7] == {"type": "tool_result", "tool_use_id": "t8", "content": returns[8]}
+assert results[8] == {"type": "tool_result", "tool_use_id": "t9", "content": returns[9]}
 fixed_msg = "Tool execution failed. Check the tool arguments or try an alternative approach."
-for idx in range(4, 12):
+for idx in range(9, 20):
     assert results[idx]["is_error"] is True, (idx, results[idx])
     assert results[idx]["content"] == fixed_msg, (idx, results[idx])
     assert "topsecret123" not in results[idx]["content"]
     assert "sk-ant-secret999" not in results[idx]["content"]
-assert any("[REDACTED]" in msg and "topsecret123" not in msg and "sk-ant-secret999" not in msg for msg in records), records
+# browser タブ管理 (new_tab) は単一の browser_state ブロックを正常受理し、他の browser メンバーは text/image 併存も受理する
+assert results[20] == {"type": "tool_result", "tool_use_id": "t21", "toolset_name": "browser", "content": returns[21]}
+assert results[21] == {"type": "tool_result", "tool_use_id": "t22", "toolset_name": "browser", "content": returns[22]}
+# browser タブ管理 (switch_tab) に browser_state 以外が返った場合はエラー結果にする
+assert results[22]["is_error"] is True
+assert results[22]["toolset_name"] == "browser"
+assert results[22]["content"] == fixed_msg
+# 例外型のみの失敗診断が記録され、いずれのレコードにも機微情報が含まれないこと
+assert any("RuntimeError" in msg for msg in records), records
+assert all("topsecret123" not in msg and "sk-ant-secret999" not in msg for msg in records), records
 `,
     examples()
   );
