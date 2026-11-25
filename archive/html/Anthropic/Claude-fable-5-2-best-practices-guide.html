@@ -2314,6 +2314,8 @@
 
                       if data["stop_reason"] == "pause_turn":
                           if checkpoint is not None:
+                              if "messages" not in checkpoint:
+                                  checkpoint["messages"] = [{"role": "user", "content": user_prompt}]
                               checkpoint["pending_messages"] = list(messages)  # 完了済み境界(messages)は上書きせず継続状態を別保存
                               if container_id is not None:
                                   checkpoint["container_id"] = container_id
@@ -2410,7 +2412,7 @@
                                       for tab in tabs:
                                           if not isinstance(tab, dict):
                                               return False
-                                          tid, title, url, active = tab.get("tab_id"), tab.get("title"), tab.get("url"), tab.get("active")
+                                          tid, title, url, active = tab.get("tab_id"), tab.get("title"), tab.get("url"), tab.get("active", False)
                                           if not (isinstance(tid, str) and 0 < len(tid) <= 128 and tid not in seen_ids):
                                               return False
                                           if not (isinstance(title, str) and len(title) <= 500 and isinstance(url, str) and len(url) <= 2048 and isinstance(active, bool)):
@@ -2421,7 +2423,7 @@
                                       if tabs and len(active_ids) != 1:
                                           return False
                                       if tool_name == "new_tab":
-                                          changes = x.get("changes")
+                                          changes = x.get("state_changes")
                                           if not isinstance(changes, list) or len(active_ids) != 1:
                                               return False
                                           opened = [c for c in changes if isinstance(c, dict) and c.get("type") == "tab_opened"]
@@ -2451,7 +2453,7 @@
                                       elif bs_count > 0:
                                           valid = toolset == "browser" and bs_count == 1 and all(_is_browser_state(item, block["name"]) or _is_text(item) or _is_image(item) for item in raw)
                                       else:
-                                          valid = all(_is_text(item) or _is_image(item) or _is_document(item) for item in raw)
+                                          valid = all(_is_text(item) or _is_image(item) or (toolset != "browser" and _is_document(item)) for item in raw)
                                       if valid:
                                           result["content"] = copy.deepcopy(raw)
                                       else:
@@ -2488,7 +2490,7 @@
           <div class="callout" id="s6-4-budget-note">
             <p>
               <strong>注意(予算上限の強制)</strong>:
-              上記の <code>max_turns</code> は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、累計消費額に次のリクエストの上限見積もり(適用単価での最大出力トークン max_tokens 分および従量課金ツール費を含む)を加えた額がハード上限を超える場合は送信を拒否し、応答後は実測の課金額を記録してください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。
+              上記の <code>max_turns</code> は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、次のリクエストの上限見積もり(適用単価での最大出力トークン max_tokens 分および従量課金ツール費を含む)を送信前に予約して累計消費額と予約額の合計がハード上限を超える場合は送信を拒否し、応答後はその予約を実測の課金額で置き換えてください。同じタスク予算を複数のワーカーで共有する場合は、逐次チェックだけでは同時送信の上限を守れないため、予約の確保と確定をワーカー間で排他制御(調停)してください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。
             </p>
           </div>
           <h3 id="s6-5">6.5 長い無人実行で「無言」に見える問題を避ける</h3>
