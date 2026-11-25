@@ -1309,6 +1309,45 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const declarations = Array.from(executable.matchAll(new RegExp(`\\b(?:const|let|var)\\s+${name}(?![\\w$])`, "g")))
         .filter(d => pathAt(d.index).every((block, i) => callPath[i] === block));
       declarations.sort((a, b) => pathAt(b.index).length - pathAt(a.index).length);
+      // A later declarator in a const/let/var list (`var a = 1, src;`) also declares a binding, so a
+      // visible list that may declare `name` can shadow the outer one; leave it unresolved.
+      const declaratorNames = start => {
+        const names = [];
+        let depth = 0, atStart = true, quote = "";
+        for (let i = start; i < executable.length; i++) {
+          const char = executable[i];
+          if (atStart) {
+            const word = /^\s*([\w$]+)/.exec(executable.slice(i));
+            if (/^\s*[{[]/.test(executable.slice(i))) {
+              // Destructuring: every identifier inside the pattern may declare a binding.
+              let end = i + executable.slice(i).search(/[{[]/), nest = 0;
+              for (; end < executable.length; end++) {
+                if ("{[".includes(executable[end])) nest++;
+                else if ("}]".includes(executable[end]) && --nest === 0) break;
+              }
+              for (const m of executable.slice(i, end + 1).matchAll(/[\w$]+/g)) names.push(m[0]);
+              i = end;
+            } else if (word) {
+              names.push(word[1]);
+              i += word[0].length - 1;
+            }
+            atStart = false;
+            continue;
+          }
+          if (quote) { if (char === "\\") i++; else if (char === quote) quote = ""; continue; }
+          if (char === "'" || char === '"' || char === "`") { quote = char; continue; }
+          if ("([{".includes(char)) depth++;
+          else if (")]}".includes(char)) { if (depth === 0) break; depth--; }
+          else if (char === ";" && depth === 0) break;
+          else if (char === "," && depth === 0) atStart = true;
+          else if (char === "\n" && depth === 0 && !/^\s*[,=+\-*/?:|&.]/.test(executable.slice(i + 1)) && !/[,=+\-*/?:|&.]\s*$/.test(executable.slice(start, i))) break;
+        }
+        return names;
+      };
+      const listDeclaresName = Array.from(executable.matchAll(/\b(?:const|let|var)\s+/g)).some(decl =>
+        pathAt(decl.index).every((block, i) => callPath[i] === block) &&
+        declaratorNames(decl.index + decl[0].length).slice(1).includes(name));
+      if (listDeclaresName) return undefined;
       if (!declarations.length) return undefined;
       const d = declarations[0];
       // The visible binding is declared after the read: uninitialized there, never the outer one.
@@ -1731,7 +1770,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         for (const edit of executable.matchAll(reorderRe)) {
           if (!editCanPrecede(edit.index, queryAt)) continue;
           const method = edit[1];
-          if (method === "replaceWith" || method === "replaceChildren" || method === "insertAdjacentHTML" || method === "insertAdjacentText") return false;
+          // Text-only insertion adds no elements, so it cannot change selector matches or their order.
+          if (method === "insertAdjacentText") continue;
+          if (method === "replaceWith" || method === "replaceChildren" || method === "insertAdjacentHTML") return false;
           const openParen = edit.index + edit[0].length;
           let depth = 1, closeParen = -1;
           for (let k = openParen; k < executable.length; k++) {

@@ -2432,7 +2432,6 @@ test("enforces strict module keyword matching, cross-scope classList.add, pre-qu
 		"container.replaceChildren(other, first);",
 		"container.insertAdjacentElement('afterbegin', other);",
 		"container.insertAdjacentHTML('afterbegin', '<div class=\"diagram-card\"></div>');",
-		"container.insertAdjacentText('afterbegin', 'x');",
 	]) {
 		const beforeQuery = `${reorderDom}<script>${setupRefs} ${reorder} var cards = document.querySelectorAll('.diagram-card'); ${loopBody}</script>`;
 		const res = audit(beforeQuery, page);
@@ -2441,6 +2440,11 @@ test("enforces strict module keyword matching, cross-scope classList.add, pre-qu
 		const afterQuery = `${reorderDom}<script>${setupRefs} var cards = document.querySelectorAll('.diagram-card'); ${loopBody} ${reorder}</script>`;
 		assert.equal(audit(afterQuery, page).status, 0, `post-query ${reorder}`);
 	}
+
+	// insertAdjacentText inserts text only, so it keeps the audit successful before and after the query.
+	const textInsert = "container.insertAdjacentText('afterbegin', 'x');";
+	assert.equal(audit(`${reorderDom}<script>${setupRefs} ${textInsert} var cards = document.querySelectorAll('.diagram-card'); ${loopBody}</script>`, page).status, 0, "pre-query insertAdjacentText");
+	assert.equal(audit(`${reorderDom}<script>${setupRefs} var cards = document.querySelectorAll('.diagram-card'); ${loopBody} ${textInsert}</script>`, page).status, 0, "post-query insertAdjacentText");
 
 	// 4. Matching opaque elements (textarea/title) before a card fail priorMatchesComplete; after the card they are skipped and stay opaque.
 	const loopScript = `<script>var cards = document.querySelectorAll('.diagram-card'); ${loopBody}</script>`;
@@ -2500,4 +2504,17 @@ test("handles slash attribute values, suffixed render reachability, split classi
 	assert.deepEqual(replaceBeforeRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
 	const detachAfter = `${card}<script>var card = document.querySelector('#c1'); document.querySelector('#c1').remove(); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
 	assert.equal(audit(detachAfter, page).status, 0);
+});
+
+test("treats names in const/let/var declaration lists as declarations when resolving the renderer src", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const head = "var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent;";
+	// An inner list that declares src (no initializer) shadows the outer payload binding: unresolved.
+	const shadowed = `${card}<script>${head} if (card) { let a = 1, src; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(shadowed, page).status, 1);
+	// Inner lists that only reference src keep the outer binding eligible.
+	const referenced = `${card}<script>${head} if (card) { var a = 1, b = String(a, src); } mermaid.render('x', src);</script>`;
+	assert.equal(audit(referenced, page).status, 0);
 });
