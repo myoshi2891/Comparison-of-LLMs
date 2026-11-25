@@ -449,7 +449,7 @@ def validate(name: str, args: dict | None) -> str | None:
         if not isinstance(high, bool):
             return "high must be a boolean"
         for label, v in (("y", y), ("x", x)):
-            if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or (isinstance(v, float) and not math.isfinite(v)):
                 return f"{label} must be a finite number"
             if not 0 <= v <= 1000:
                 return f"{label}={v} is outside normalized image coordinates 0..1000"
@@ -525,8 +525,8 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
                 # 上限に達しても即座に戻らず、残りの呼び出しを skipped として記録して履歴を揃える。
                 skip_reason, limit_reached = "step limit reached; this action was not executed", True
             if skip_reason is None and fc.name == "move" and moved:
-                # move の座標はこの応答を生成したときの画像に基づく。1 回動いた後のシーンとカメラ姿勢では
-                # 古い座標になり得るため、画像由来の動作は 1 ターン 1 回とし、新しい観測で再計画させる。
+                # move の座標はこの応答を生成したときの画像に基づく。move や setGripperState でシーンが変化した後は
+                # 古い座標になり得るため、新しい観測で再計画させる。
                 skip_reason = "a fresh observation is required before another image-based move; this action was not executed"
             if skip_reason is not None:
                 # 先行する動作が拒否・失敗した場合や上限到達後は、同じ応答の残りを実行しない。
@@ -579,7 +579,8 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
                 # 実行した動作ごとに観測を置き換える。画像がなければ古い観測を消し、
                 # 後続の動作が一部動いて失敗した場合に、前の動作の画像で再計画させない。
                 observation = image
-                moved = moved or fc.name == "move"
+                if payload.get("status") == "ok" and fc.name in ("move", "setGripperState"):
+                    moved = True
             if payload.get("status") != "ok":
                 skip_reason = "an earlier action in this response was rejected or failed"
             results.append(function_response_part(fc, payload))
