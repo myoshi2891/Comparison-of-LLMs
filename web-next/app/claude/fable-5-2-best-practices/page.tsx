@@ -3358,7 +3358,17 @@ export default function Page() {
               <a className={styles["src-link"]} href="#S4">
                 {"S4"}
               </a>
-              {")。 "}
+              {")。以下の例は "}
+              <a href="#s5-4">{"5.4節"}</a>
+              {" の共通セットアップ("}
+              <code>{"copy"}</code>
+              {" / "}
+              <code>{"httpx"}</code>
+              {" / "}
+              <code>{"API"}</code>
+              {" / "}
+              <code>{"HEADERS"}</code>
+              {")を前提とします。 "}
             </p>{" "}
             <div className={styles["code-block"]} data-testid="code-block">
               {" "}
@@ -4555,6 +4565,58 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                    "}
                     <span className="hljs-keyword">{"def"}</span>{" "}
+                    <span className="hljs-title function_">{"_sr_citations"}</span>
+                    {"("}
+                    <span className="hljs-params">{"x"}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-string">{'"citations"'}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" x:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"return"}</span>{" "}
+                    <span className="hljs-literal">{"False"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        c = x["}
+                    <span className="hljs-string">{'"citations"'}</span>
+                    {"]"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"return"}</span>
+                    {" c["}
+                    <span className="hljs-string">{'"enabled"'}</span>
+                    {"] "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(c, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(c.get("}
+                    <span className="hljs-string">{'"enabled"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"bool"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"else"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    "}
+                    <span className="hljs-keyword">{"def"}</span>{" "}
                     <span className="hljs-title function_">{"_is_search_result"}</span>
                     {"("}
                     <span className="hljs-params">{"x"}</span>
@@ -4633,6 +4695,15 @@ export default function Page() {
                     {" x["}
                     <span className="hljs-string">{'"content"'}</span>
                     {"])"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" _sr_citations(x) "}
+                    <span className="hljs-keyword">{"is"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>{"                        )"}</span>
@@ -5167,13 +5238,203 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"                            existing_sr = "}
+                    <span className="hljs-built_in">{"set"}</span>
+                    {"()"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" m "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" messages:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                mc = m.get("}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(m, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"else"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(mc, "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                    "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" b "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" mc:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                        "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(b, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" b.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"search_result"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {
+                      "                                            existing_sr.add(_sr_citations(b))"
+                    }
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                        "}
+                    <span className="hljs-keyword">{"elif"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(b, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" b.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"tool_result"'}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(b.get("}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                            "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" item "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" b["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"]:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                                "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" item.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"search_result"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {
+                      "                                                    existing_sr.add(_sr_citations(item))"
+                    }
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" r "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" results:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(r.get("}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"list"}</span>
+                    {"):"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                    "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" item "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" r["}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {"]:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                                        "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(item, "}
+                    <span className="hljs-built_in">{"dict"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" item.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"search_result"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {
+                      "                                            existing_sr.add(_sr_citations(item))"
+                    }
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            new_sr = {_sr_citations(item) "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" item "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" raw "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" _is_search_result(item)}"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            combined_sr = existing_sr | new_sr"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"                            valid = "}
                     <span className="hljs-built_in">{"all"}</span>
                     {"(_is_search_result(item) "}
                     <span className="hljs-keyword">{"for"}</span>
                     {" item "}
                     <span className="hljs-keyword">{"in"}</span>
-                    {" raw)"}
+                    {" raw) "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-literal">{"None"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" combined_sr "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"len"}</span>
+                    {"(combined_sr) <= "}
+                    <span className="hljs-number">{"1"}</span>
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -5481,7 +5742,7 @@ export default function Page() {
                 {": 上記の "}
                 <code>{"max_turns"}</code>
                 {
-                  " は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、次のリクエストの上限見積もり(適用単価での最大出力トークン max_tokens 分および従量課金ツール費を含む)を送信前に予約して累計消費額と予約額の合計がハード上限を超える場合は送信を拒否し、応答後はその予約を実測の課金額で置き換えてください。同じタスク予算を複数のワーカーで共有する場合は、逐次チェックだけでは同時送信の上限を守れないため、予約の確保と確定をワーカー間で排他制御(調停)してください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
+                  " は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、次のリクエストの上限見積もり(非キャッシュ入力・キャッシュ読み取り・キャッシュ書き込みの各課金区分にそれぞれの適用単価を掛けた最大入力費—キャッシュ書き込み対象トークンを非キャッシュ入力単価で二重計上しないこと—、適用単価での最大出力トークン max_tokens 分、および従量課金ツール費を含む)を送信前に予約して累計消費額と予約額の合計がハード上限を超える場合は送信を拒否し、応答後はその予約を実測の課金額で置き換えてください。同じタスク予算を複数のワーカーで共有する場合は、逐次チェックだけでは同時送信の上限を守れないため、予約の確保と確定をワーカー間で排他制御(調停)してください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
                 }
               </p>{" "}
             </div>{" "}
@@ -5503,7 +5764,14 @@ export default function Page() {
               </a>
               {")。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="thinking.display の設定一覧"
+            >
               {" "}
               <table>
                 <thead>

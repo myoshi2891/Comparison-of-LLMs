@@ -24,13 +24,15 @@ function resolvePython(): string {
     "python3.10",
   ].filter((c): c is string => Boolean(c));
   for (const cmd of candidates) {
-    const probe = spawnSync(cmd, [
-      "-E",
-      "-c",
-      "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)",
-    ], { timeout: 10_000 });
+    const probe = spawnSync(
+      cmd,
+      ["-E", "-c", "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)"],
+      { timeout: 10_000 }
+    );
     if (probe.error && (probe.error as NodeJS.ErrnoException).code === "ETIMEDOUT") {
-      throw new Error(`Python version probe timed out after 10s (phase: version probe, executable: ${cmd})`);
+      throw new Error(
+        `Python version probe timed out after 10s (phase: version probe, executable: ${cmd})`
+      );
     }
     if (!probe.error && probe.status === 0) {
       cachedPython = cmd;
@@ -1093,6 +1095,71 @@ try:
     assert shot_results[1] == {"type": "tool_result", "tool_use_id": "t2", "toolset_name": "browser", "content": "Not executed: an earlier action in this turn failed", "is_error": True}
     assert shot_results[2] == {"type": "tool_result", "tool_use_id": "t3", "content": "custom-ok"}
     assert shot_executed == [("browser", "screenshot"), "custom_tool"]
+
+    # search_result の citations.enabled 一貫性検証(単一結果・同一ターン・checkpoint 履歴)
+    def run_sr_case(replies_seq, tool_fn, cp=None):
+        reqs = []
+        def sr_call(body):
+            reqs.append(copy.deepcopy(body))
+            return replies_seq[len(reqs) - 1]
+        sr_scope = {"call": sr_call, "copy": copy}
+        exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), sr_scope)
+        target_cp = {} if cp is None else cp
+        sr_scope["agent_loop"]("task", [], tool_fn, max_turns=3, checkpoint=target_cp)
+        return target_cp
+
+    sr_enabled = {"type": "search_result", "source": "https://a.example", "title": "A", "content": [{"type": "text", "text": "body"}], "citations": {"enabled": True}}
+    sr_disabled = {"type": "search_result", "source": "https://b.example", "title": "B", "content": [{"type": "text", "text": "body"}], "citations": {"enabled": False}}
+    sr_omitted = {"type": "search_result", "source": "https://c.example", "title": "C", "content": [{"type": "text", "text": "body"}]}
+    sr_bad_cit = {"type": "search_result", "source": "https://d.example", "title": "D", "content": [{"type": "text", "text": "body"}], "citations": {"enabled": "yes"}}
+
+    # 均一に enabled=True / 均一に disabled(False と省略) は受理される
+    cp_en = run_sr_case(
+        [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, _a: [sr_enabled, copy.deepcopy(sr_enabled)],
+    )
+    assert cp_en["messages"][2]["content"][0]["content"] == [sr_enabled, sr_enabled]
+    cp_dis = run_sr_case(
+        [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, _a: [sr_disabled, sr_omitted],
+    )
+    assert cp_dis["messages"][2]["content"][0]["content"] == [sr_disabled, sr_omitted]
+
+    # 同一結果内での enabled 混在・不正な citations 型はツールエラーになり保存されない
+    for bad_batch in ([sr_enabled, sr_disabled], [sr_enabled, sr_omitted], [sr_bad_cit]):
+        cp_bad = run_sr_case(
+            [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+            lambda _k, _a, b=bad_batch: b,
+        )
+        res = cp_bad["messages"][2]["content"][0]
+        assert res["is_error"] is True and res["content"] == fixed_msg, (bad_batch, res)
+
+    # checkpoint 履歴に enabled=True がある状態で後続が disabled を返すとエラー、enabled=True なら受理
+    cp_hist_mismatch = {"messages": [
+        {"role": "user", "content": "task"},
+        {"role": "assistant", "content": [tool(0)]},
+        {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t0", "content": [sr_enabled]}]},
+    ]}
+    run_sr_case(
+        [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, _a: [sr_omitted],
+        cp=cp_hist_mismatch,
+    )
+    res_hm = cp_hist_mismatch["messages"][-1]["content"][0]
+    assert res_hm["is_error"] is True and res_hm["content"] == fixed_msg
+    assert "https://c.example" not in json.dumps(cp_hist_mismatch["messages"])
+
+    cp_hist_ok = {"messages": [
+        {"role": "user", "content": "task"},
+        {"role": "assistant", "content": [tool(0)]},
+        {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t0", "content": [sr_enabled]}]},
+    ]}
+    run_sr_case(
+        [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, _a: [sr_enabled],
+        cp=cp_hist_ok,
+    )
+    assert cp_hist_ok["messages"][-1]["content"][0]["content"] == [sr_enabled]
 finally:
     logger.removeHandler(handler)
 `,

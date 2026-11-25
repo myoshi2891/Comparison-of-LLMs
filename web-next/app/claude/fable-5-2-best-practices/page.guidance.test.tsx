@@ -296,6 +296,10 @@ it("確度ラベル表・ベンチマーク表・費用式表とセットアッ�
   expect(metricsWrap?.getAttribute("tabindex")).toBe("0");
   expect(metricsWrap?.getAttribute("role")).toBe("region");
   expect(metricsWrap?.getAttribute("aria-label")).toBe("記録する指標の表");
+  const s65Wrap = container.querySelector("#s6-5")?.nextElementSibling?.nextElementSibling;
+  expect(s65Wrap?.getAttribute("tabindex")).toBe("0");
+  expect(s65Wrap?.getAttribute("role")).toBe("region");
+  expect(s65Wrap?.getAttribute("aria-label")).toBe("thinking.display の設定一覧");
 });
 
 it("6.3 CMEK・6.5 進捗例・9.1 fast mode・4.1 セットアップ手順が最新仕様を反映する", () => {
@@ -339,10 +343,20 @@ it("6.4 標準ループ・予算注記・11.4 予算ガード・図3 注記が�
   ).find((c) => c.includes("def agent_loop("));
   expect(agentCode).toMatch(/container_id を保持/);
   expect(agentCode).toMatch(/期限切れ/);
+  const s64Intro = container.querySelector("#s6-4")?.nextElementSibling;
+  expect(s64Intro?.querySelector('a[href="#s5-4"]')).toBeTruthy();
+  expect(text(s64Intro)).toMatch(/copy.*httpx.*API.*HEADERS/);
   const budgetNote = container.querySelector("#s6-4-budget-note");
   expect(text(budgetNote)).toMatch(/max_turns.*ターン数のみ/);
   expect(text(budgetNote)).toMatch(/上限金額.*強制しません/);
   expect(text(budgetNote)).toMatch(/各 API リクエストの送信前に別途予算チェック/);
+  expect(text(budgetNote)).toMatch(
+    /非キャッシュ入力・キャッシュ読み取り・キャッシュ書き込み.*最大入力費/
+  );
+  expect(text(budgetNote)).toMatch(
+    /キャッシュ書き込み対象トークンを非キャッシュ入力単価で二重計上しない/
+  );
+  expect(text(budgetNote)).toMatch(/実測の課金額で置き換えてください/);
   const budgetItem1 = container.querySelector("#s11-4 + ol > li");
   expect(budgetItem1?.querySelector('a[href="#s6-4-budget-note"]')).toBeTruthy();
   const budgetItem = Array.from(container.querySelectorAll("#s11 li")).find((li) =>
