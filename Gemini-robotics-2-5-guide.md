@@ -493,6 +493,10 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
     while True:
         if estop_active():  # 非常停止が入っていればモデルに問い合わせずに終了
             return "aborted: emergency stop"
+        # 非常停止から再開するときは、停止前の画像を再利用しない。呼び出し側が停止後に撮った画像を
+        # contents へ追加し、task_state["pending_observation"] を False に戻すまで ER へ問い合わせない。
+        if task_state.get("pending_observation"):
+            return "aborted: fresh observation required after emergency stop"
         response = client.models.generate_content(
             model="gemini-robotics-er-2-preview",
             contents=contents,
@@ -590,6 +594,8 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
         contents.append(types.Content(role="user", parts=results))
         if estopped:
             # 完了した動作の結果・skipped の記録・最新観測を contents に残し、呼び出し元が復旧に使えるようにする。
+            # 停止前の観測は古いため、再開時は新しい画像が追加されるまで次の要求を禁止する。
+            task_state["pending_observation"] = True
             return "aborted: emergency stop"
         if mapping_error is not None:
             # 完了済みの結果・uncertain・skipped の記録を contents に残し、呼び出し元が校正を確認して復旧する。
@@ -701,7 +707,8 @@ class LiveSessionState:
         if not self.usable:
             raise RuntimeError("live session is unusable; recover or reconnect before sending")
 
-    async def send_frame(self, capture: Callable[[], Awaitable[bytes]]) -> None:
+    async def send_frame(self, capture: Callable[[], Awaitable[bytes]], timeout: float | None = None) -> None:
+        # timeout は共有キューの待機を含めず、取得と送信のそれぞれへ別々に適用する。
         loop = asyncio.get_running_loop()
         async with self._frame_lock:  # 全映像送信者で 1 つのタイムスタンプを共有して読み書きする
             self.ensure_usable()
@@ -711,11 +718,14 @@ class LiveSessionState:
             self.ensure_usable()  # 待機中に使用不可になった場合は送らない
             # 送信枠を確保してから最新フレームを取る。先に取得すると、枠を待つ間に
             # 他の送信者が新しいフレームを送り、その後へ古いフレームを送ってしまう。
-            frame = await capture()
+            frame = await asyncio.wait_for(capture(), timeout=timeout)
             self.ensure_usable()  # 取得中に使用不可になった場合も送らない
             try:
-                await self.session.send_realtime_input(
-                    video=types.Blob(data=frame, mime_type="image/jpeg")
+                await asyncio.wait_for(
+                    self.session.send_realtime_input(
+                        video=types.Blob(data=frame, mime_type="image/jpeg")
+                    ),
+                    timeout=timeout,
                 )
             finally:
                 # キャンセル・失敗時も送信が発生した可能性があるため、送信時刻を記録して 1 FPS 上限を守る
@@ -737,10 +747,8 @@ async def heartbeat(state: LiveSessionState, camera, turn_timeout: float):
                 # フレームは send_frame が送信枠を確保した後に取得する(待機中に古くならない)。
                 # 取得・送信が止まってもゲートを握り続けないよう上限を設ける。タイムアウト時は
                 # 送信済みか不明なため、下の例外処理でセッションを使用不可にする。
-                await asyncio.wait_for(
-                    state.send_frame(camera.latest_jpeg),
-                    timeout=turn_timeout + state.min_frame_interval,  # 送信間隔の待機分を上乗せする
-                )
+                # 共有キューや送信間隔の待機は上限に含めず、取得と送信の各処理だけに turn_timeout を適用する。
+                await state.send_frame(camera.latest_jpeg, timeout=turn_timeout)
                 # 送信が取り消し・失敗しても、プロンプトは受理された可能性があり完了を確認できない。
                 # そのため送信も try の中で行い、下の例外処理でセッションを使用不可にする。
                 await asyncio.wait_for(
