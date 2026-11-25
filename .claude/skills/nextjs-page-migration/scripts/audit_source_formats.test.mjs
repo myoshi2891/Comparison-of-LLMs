@@ -1014,14 +1014,16 @@ test("does not certify stale script textContent after observed writes", () => {
   assert.equal(result.status, 1, write);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:chart']);
  }
- const source = `${card}<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); const src = script.textContent; mermaid.render('id', src);</script>`;
+ const reader = `<script>const card = document.querySelector('#chart'); const script = card.querySelector('script'); const src = script.textContent; mermaid.render('id', src);</script>`;
+ const source = `${card}${reader}`;
  assert.equal(audit(source, page).status, 0);
- // 別の script からのテンプレートリテラル経由の書き込みも、payload を読む source を未解決にする。
- // async の module は解析中にも実行され得るため、classic の読み取りより先に書き込める。
- const foreign = audit(`${source}<script type="module" async>document.querySelector('#chart script')[\`textContent\`] = other;</script>`, page);
+ // 読み取りより後にある async module は解析時にまだ到達していないため、同期 classic の読み取りを妨げない。
+ assert.equal(audit(`${source}<script type="module" async>const other = 'flowchart LR\\nX --> Y'; document.querySelector('#chart script')[\`textContent\`] = other;</script>`, page).status, 0);
+ // 読み取りより前にある async module は解析中に実行され得るため、テンプレートリテラル経由の書き込みも未解決にする。
+ const foreign = audit(`${card}<script type="module" async>const other = 'flowchart LR\\nX --> Y'; document.querySelector('#chart script')[\`textContent\`] = other;</script>${reader}`, page);
  assert.equal(foreign.status, 1);
  // 同じ長さの空白だけのテンプレートキーは textContent ではない。
- assert.equal(audit(`${source}<script type="module" async>const x = {}; x[\`           \`] = other;</script>`, page).status, 0);
+ assert.equal(audit(`${card}<script type="module" async>const other = 'flowchart LR\\nX --> Y'; const x = {}; x[\`           \`] = other;</script>${reader}`, page).status, 0);
 });
 
 test("keeps computed mermaid render calls unresolved instead of certifying the base payload", () => {
@@ -2391,4 +2393,61 @@ test("ignores string-literal edits, checks loop collection bindings, shadowed un
 	const dynRes = audit(dynamicSecondScope, page);
 	assert.equal(dynRes.status, 1);
 	assert.deepEqual(dynRes.data.unresolvedMermaidSources, ["renderer:c1"]);
+});
+
+test("enforces strict module keyword matching, cross-scope classList.add, pre-query DOM reorders, and opaque prior matches", () => {
+	const chart = "flowchart LR\nA --> B";
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+
+	// 1. type="MODULE" is executable; type=" module " is inert; ASCII-whitespace-trimmed classic MIME remains executable.
+	const upperModule = `${card}<script type="MODULE">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(upperModule, page).status, 0);
+	const paddedModuleWriter = `${card}<script type=" module ">document.querySelector('#c1 script').textContent = 'flowchart LR\\nX --> Y';</script><script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(paddedModuleWriter, page).status, 0);
+	const paddedClassicMime = `${card}<script type=" text/javascript ">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(paddedClassicMime, page).status, 0);
+
+	// 2. Cross-scope classList.add() invalidates DOM-backed reads while preserving literal sources.
+	const classListAddDom = `${card}<script>document.querySelector('#other').classList.add('diagram-card');</script><script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const addRes = audit(classListAddDom, page);
+	assert.equal(addRes.status, 1);
+	assert.deepEqual(addRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const classListAddLit = `${card}<script>document.querySelector('#other').classList.add('diagram-card');</script><script type="module">mermaid.render('x', ${JSON.stringify(chart)});</script>`;
+	assert.equal(audit(classListAddLit, page).status, 0);
+
+	// 3. Same-scope pre-query DOM reorders invalidate indexed traversal, while post-query reorders remain certified.
+	const loopBody = "for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }";
+	for (const reorder of [
+		"container.prepend(other);",
+		"container.append(other);",
+		"container.appendChild(other);",
+		"container.insertBefore(other, first);",
+		"container.moveBefore(other, first);",
+		"first.before(other);",
+		"first.after(other);",
+		"first.replaceWith(other);",
+		"container.replaceChildren(other);",
+		"container.insertAdjacentElement('afterbegin', other);",
+		"container.insertAdjacentHTML('afterbegin', '<div class=\"diagram-card\"></div>');",
+		"container.insertAdjacentText('afterbegin', 'x');",
+	]) {
+		const beforeQuery = `${card}<script>${reorder} var cards = document.querySelectorAll('.diagram-card'); ${loopBody}</script>`;
+		const res = audit(beforeQuery, page);
+		assert.equal(res.status, 1, `pre-query ${reorder}`);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], `pre-query ${reorder}`);
+		const afterQuery = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); ${loopBody} ${reorder}</script>`;
+		assert.equal(audit(afterQuery, page).status, 0, `post-query ${reorder}`);
+	}
+
+	// 4. Matching opaque elements (textarea/title) before a card fail priorMatchesComplete; after the card they are skipped and stay opaque.
+	const loopScript = `<script>var cards = document.querySelectorAll('.diagram-card'); ${loopBody}</script>`;
+	for (const opaqueTag of ["textarea", "title"]) {
+		const beforeCard = `<${opaqueTag} class="diagram-card"><script type="text/plain">fake</script></${opaqueTag}>${card}${loopScript}`;
+		const res = audit(beforeCard, page);
+		assert.equal(res.status, 1, `opaque before: ${opaqueTag}`);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], `opaque before: ${opaqueTag}`);
+		const afterCard = `${card}<${opaqueTag} class="diagram-card"><script type="text/plain">fake</script></${opaqueTag}>${loopScript}`;
+		assert.equal(audit(afterCard, page).status, 0, `opaque after: ${opaqueTag}`);
+	}
 });

@@ -1267,6 +1267,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     };
     const functions = functionBodies(executable);
     const loops = loopExtents(executable);
+    const hasForeignDomWriteAt = at => {
+      if (foreignDomWrite === true) return true;
+      if (!foreignDomWrite) return false;
+      const isDeferred = functions.some(fn => fn.body < at && at < fn.end);
+      if (typeof foreignDomWrite === "function") return foreignDomWrite(at, isDeferred);
+      return foreignDomWrite === "deferred" && isDeferred;
+    };
     // A `var` declared in a loop is one binding shared by every iteration. A read from a
     // callback created outside its declaring function sees whatever value the loop left
     // there when the callback runs (the final card), so the per-iteration capture is unproven.
@@ -1380,8 +1387,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       };
       // An element binding that the selected card is proven to contain, so `!name` is false.
       const hostMayBeRemoved = (hostName, hostSelector, cardName, at) => {
-        if (foreignDomWrite === true ||
-          (foreignDomWrite === "deferred" && functions.some(fn => fn.body < at && at < fn.end))) return true;
+        if (hasForeignDomWriteAt(at)) return true;
         if (/(?<!\bclassList)\.\s*(?:remove\s*\(\s*\)|(?:replaceWith|removeChild|replaceChild|replaceChildren)\s*\(|outerHTML\s*=(?!=))/.test(executable)) return true;
         const cardEsc = cardName.replace(/\$/g, "\\$");
         if (new RegExp(`(?<![\\w$.])(?:${cardEsc}|document\\s*\\.\\s*(?:body|documentElement))\\s*\\.\\s*(?:innerHTML|textContent|innerText)\\s*=(?!=)`).test(executable)) return true;
@@ -1623,17 +1629,17 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (!selectedScript.availableAt(at)) return false;
       const ownerBinding = bindingAt(selected[1], at);
       const owner = ownerBinding?.value;
+      const editCanPrecede = (editIndex, queryAt) => {
+        if (editIndex <= queryAt) return true;
+        if (functions.some(fn => fn.body < queryAt && queryAt < fn.end)) return true;
+        if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
+        if (loops.some(loop => loop.start < queryAt && queryAt < loop.end)) return true;
+        return false;
+      };
       // Same-scope class/id changes that can run before the query can alter which
       // elements match the card selector; changes provably after the query leave
       // an already-captured element or static NodeList intact.
       const selectorValidAt = (selector, queryAt) => {
-        const editCanPrecede = editIndex => {
-          if (editIndex <= queryAt) return true;
-          if (functions.some(fn => fn.body < queryAt && queryAt < fn.end)) return true;
-          if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
-          if (loops.some(loop => loop.start < queryAt && queryAt < loop.end)) return true;
-          return false;
-        };
         const selectorClasses = Array.from(selector.matchAll(/\.([\w-]+)/g), m => m[1]);
         if (selectorClasses.length > 0) {
           const classChangeRe = /(?:([A-Za-z_$][\w$]*)\s*)?\.\s*(?:className\s*(?:=(?!=)|\+=)|(?:setAttribute|removeAttribute|toggleAttribute)\s*\(\s*(?!(['"])(?!class\2)[^'"\n]*\2)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\s*\(|classList\s*\.\s*(?:add|remove|toggle|replace)\s*\()/gi;
@@ -1665,13 +1671,61 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
             });
           };
           if (Array.from(literalSource.matchAll(classChangeRe))
-            .some(edit => editCanPrecede(edit.index) && changesSelectorClass(edit))) return false;
+            .some(edit => editCanPrecede(edit.index, queryAt) && changesSelectorClass(edit))) return false;
         }
         const selectorIds = Array.from(selector.matchAll(/#([\w-]+)/g), m => m[1]);
         if (selectorIds.length > 0) {
           const idChangeRe = /\.\s*(?:id\s*(?:=(?!=)|\+=)|(?:setAttribute|removeAttribute|toggleAttribute)\s*\(\s*(?!(['"])(?!id\1)[^'"\n]*\1)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\s*\()/gi;
           if (Array.from(literalSource.matchAll(idChangeRe))
-            .some(edit => editCanPrecede(edit.index))) return false;
+            .some(edit => editCanPrecede(edit.index, queryAt))) return false;
+        }
+        return true;
+      };
+      // Same-scope DOM reorder edits before querySelectorAll can move a matching element
+      // (e.g. a broken card) ahead of this card, invalidating document-order traversal.
+      const orderValidAt = (selector, queryAt) => {
+        const reorderRe = /\.\s*(prepend|append|appendChild|insertBefore|moveBefore|before|after|replaceWith|replaceChildren|insertAdjacent(?:Element|HTML|Text))\s*\(/g;
+        const selectorClasses = Array.from(selector.matchAll(/\.([\w-]+)/g), m => m[1]);
+        const selectorIds = Array.from(selector.matchAll(/#([\w-]+)/g), m => m[1]);
+        const selectorTag = /^([A-Za-z][\w-]*)/.exec(selector)?.[1]?.toLowerCase();
+        const isFreshNonMatchingElement = (arg, atIndex) => {
+          if (!/^[A-Za-z_$][\w$]*$/.test(arg)) return false;
+          const bound = bindingAt(arg, atIndex);
+          const created = bound && /^document\.createElement\(\s*(['"])([A-Za-z][\w-]*)\1\s*\)$/.exec(bound.value);
+          if (!created) return false;
+          if (selectorTag && selectorClasses.length === 0 && selectorIds.length === 0 && created[2].toLowerCase() === selectorTag) return false;
+          const argEsc = arg.replace(/\$/g, "\\$");
+          const childMoveRe = new RegExp(`(?<![\\w$.])${argEsc}\\s*\\.\\s*(?:prepend|append|appendChild|insertBefore|moveBefore|replaceChildren|insertAdjacent(?:Element|HTML))\\s*\\(`, "g");
+          if (Array.from(executable.matchAll(childMoveRe)).some(m => editCanPrecede(m.index, atIndex))) return false;
+          const innerHtmlRe = new RegExp(`(?<![\\w$.])${argEsc}\\s*\\.\\s*innerHTML\\s*(?:=(?!=)|\\+=)`, "g");
+          for (const assign of executable.matchAll(innerHtmlRe)) {
+            if (!editCanPrecede(assign.index, atIndex)) continue;
+            const rhs = /^\s*(['"])((?:[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n])/.exec(literalSource.slice(assign.index + assign[0].length));
+            if (!rhs) return false;
+            const html = rhs[2];
+            if (selectorClasses.some(cls => html.includes(cls))) return false;
+            if (selectorIds.some(id => html.includes(id))) return false;
+            if (selectorTag && selectorClasses.length === 0 && selectorIds.length === 0 && new RegExp(`<${selectorTag}(?=[\\s/>])`, "i").test(html)) return false;
+          }
+          return true;
+        };
+        for (const edit of executable.matchAll(reorderRe)) {
+          if (!editCanPrecede(edit.index, queryAt)) continue;
+          const method = edit[1];
+          if (method === "replaceWith" || method === "replaceChildren" || method === "insertAdjacentHTML" || method === "insertAdjacentText") return false;
+          const openParen = edit.index + edit[0].length;
+          let depth = 1, closeParen = -1;
+          for (let k = openParen; k < executable.length; k++) {
+            if (executable[k] === "(") depth++;
+            else if (executable[k] === ")" && --depth === 0) { closeParen = k; break; }
+          }
+          if (closeParen < 0) return false;
+          const args = executable.slice(openParen, closeParen).split(",").map(s => s.trim()).filter(Boolean);
+          if (args.length === 0) return false;
+          const movedArgs = (method === "insertBefore" || method === "moveBefore") ? args.slice(0, 1)
+            : method === "insertAdjacentElement" ? args.slice(1, 2)
+            : args;
+          if (movedArgs.length === 0 || !movedArgs.every(arg => isFreshNonMatchingElement(arg, edit.index))) return false;
         }
         return true;
       };
@@ -1691,6 +1745,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       // A card that a classic initializer may precede is not provably in the traversed list.
       if (!selectedScript.cardAvailableAt(collectionBinding.at)) return false;
       if (!selectorValidAt(all[2], collectionBinding.at)) return false;
+      if (!orderValidAt(all[2], collectionBinding.at)) return false;
       // The card initializer and this read must both run inside the body of the same loop;
       // a matching loop elsewhere in the scope proves nothing about this payload.
       const loopHeader = new RegExp(`for\\s*\\(\\s*var\\s+${indexed[2]}\\s*=\\s*0\\s*;\\s*${indexed[2]}\\s*<\\s*${indexed[1]}\\.length\\s*;\\s*${indexed[2]}\\+\\+\\s*\\)\\s*\\{`, "g");
@@ -1792,8 +1847,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // DOM-backed payload before the read. Literal sources above are unaffected.
     // A deferred module writer runs after parsing, so only a classic read that completes
     // synchronously while parsing (not in a callback or after an await) precedes it.
-    if (foreignDomWrite === true ||
-      (foreignDomWrite === "deferred" && functions.some(fn => fn.body < initialBinding.at && initialBinding.at < fn.end))) return false;
+    if (hasForeignDomWriteAt(initialBinding.at)) return false;
     const element = value.slice(0, -12).trim();
     const isSelectedScript = (reference, at = before, seen = new Set()) => {
       if (scriptElement(reference, at)) return true;
@@ -2190,11 +2244,11 @@ function materializePlainTextCards(src) {
     (full, opaqueTag, opaqueAttrs, opaqueContent, attributes, payload) => {
       if (opaqueTag !== undefined) {
         if (templateDepth === 0) documentElements.push(`<${opaqueTag}${opaqueAttrs}>`);
-        // Hide the whole element during script/card/code discovery. Restore its
-        // text with escaped angles so subsequent inventory scans stay opaque.
+        // Retain the opaque element's tag identity and document position while hiding its
+        // raw-text contents so selector scans see the element without parsing its inner text.
         const content = /^(?:textarea|title)$/i.test(opaqueTag) ? opaqueContent : opaqueContent.replace(/&/g, "&amp;");
-        opaqueElements.push(`<${opaqueTag}${opaqueAttrs}>${content.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</${opaqueTag}>`);
-        return `\u0000AUDITOPAQUE${opaqueElements.length - 1}\u0000`;
+        opaqueElements.push(content.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+        return `<${opaqueTag}${opaqueAttrs}>\u0000AUDITOPAQUE${opaqueElements.length - 1}\u0000</${opaqueTag}>`;
       }
       if (attributes === undefined) {
         // Template content is a separate fragment: keep the <template> element itself but do not
@@ -2211,12 +2265,15 @@ function materializePlainTextCards(src) {
   const executableScripts = scripts.filter(script => {
     // Scripts inside uninstantiated template content are not renderers for document cards.
     if (script.inTemplate) return false;
-    // nomodule scripts are skipped by module-capable browsers; they stay in the DOM inventory.
-    const type = readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase();
+    const rawType = readHtmlAttribute(script.attributes, "type");
+    // HTML spec: "module" is matched ASCII case-insensitively without trimming whitespace.
+    script.isModule = rawType?.toLowerCase() === "module";
     // nomodule only suppresses classic scripts; module scripts run regardless.
-    if (readHtmlAttribute(script.attributes, "nomodule") !== undefined && type !== "module") return false;
-    // The HTML standard's JavaScript MIME type essences (text/plain payloads stay excluded).
-    const isExecutableType = !type || type === "module" || /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(type);
+    if (readHtmlAttribute(script.attributes, "nomodule") !== undefined && !script.isModule) return false;
+    // The HTML standard's JavaScript MIME type essences (ASCII-whitespace-trimmed; text/plain payloads stay excluded).
+    const mimeType = rawType?.replace(/^[ \t\n\r\f]+|[ \t\n\r\f]+$/g, "").toLowerCase();
+    const isExecutableType = rawType === undefined || rawType === "" || script.isModule ||
+      /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(mimeType);
     if (!isExecutableType) return false;
     // A script with src ignores its child text; external renderer code is not inspectable here.
     if (readHtmlAttribute(script.attributes, "src") !== undefined) {
@@ -2230,12 +2287,12 @@ function materializePlainTextCards(src) {
   });
   // Classic scripts share the global scope; each module has its own CLASSDEFS.
   const allScopes = [
-    executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module"),
-    ...executableScripts.filter(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() === "module").map(script => [script]),
+    executableScripts.filter(script => !script.isModule),
+    ...executableScripts.filter(script => script.isModule).map(script => [script]),
   ].map(group => {
     const rawSource = group.map(script => script.payload).join("\n;\n");
     // Classic scripts run while the parser reaches them; module scripts run after parsing.
-    const classic = group.every(script => readHtmlAttribute(script.attributes, "type")?.trim().toLowerCase() !== "module");
+    const classic = group.every(script => !script.isModule);
     // Each classic script's span in the joined source and its document position, so the
     // script that performs a given read can be found from the read's offset.
     let offset = 0;
@@ -2279,7 +2336,7 @@ function materializePlainTextCards(src) {
     const writesTextContent = /\.\s*(?:textContent|text)\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
       Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])(?:textContent|text)\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
         .some(write => isTextContentKey(write, rawSource));
-    const editsDomStructure = /\.\s*(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text)|removeChild|replaceChild|insertBefore|prepend|append|appendChild|replaceChildren|setAttribute(?:NS|Node|NodeNS)?|removeAttribute(?:NS|Node)?|toggleAttribute)\s*\(|(?:outerHTML|innerHTML|innerText|type|className)\s*=(?!=)|classList\s*\.\s*(?:remove|replace|toggle)\s*\()/.test(executable);
+    const editsDomStructure = /\.\s*(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text)|removeChild|replaceChild|insertBefore|prepend|append|appendChild|replaceChildren|setAttribute(?:NS|Node|NodeNS)?|removeAttribute(?:NS|Node)?|toggleAttribute)\s*\(|(?:outerHTML|innerHTML|innerText|type|className)\s*=(?!=)|classList\s*\.\s*(?:add|remove|replace|toggle)\s*\()/.test(executable);
     const writesId = /\.\s*id\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
       Array.from(literalSource.matchAll(/\[\s*(['"])id\1\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/g))
         .some(write => executable[write.index] === "[");
@@ -2374,9 +2431,17 @@ function materializePlainTextCards(src) {
       // (or uses a dynamic selector whose target cannot be ruled out).
       const usesIdSelector = renderer ? renderer.selectors.some(selector => selector.includes("#")) || (renderer.hasSelection && renderer.selectors.length === 0) : false;
       const foreignWriters = renderer ? allScopes.filter(scope => scope !== renderer && (scope.writesDom || (usesIdSelector && scope.writesId))) : [];
-      // Deferred module writers cannot run before a classic renderer's synchronous read.
+      // Deferred module writers run after parsing, and async modules after a classic
+      // capture's script tag have not been parsed yet; only an earlier async module
+      // can race a proven synchronous classic capture.
       const foreignWrite = foreignWriters.length === 0 ? false
-        : renderer.classic && foreignWriters.every(scope => scope.deferredModule) ? "deferred" : true;
+        : renderer.classic ? (at, isDeferredRead) => {
+          if (isDeferredRead) return true;
+          const segment = renderer.segments.find(seg => seg.start <= at && at <= seg.end);
+          if (!segment) return true;
+          return foreignWriters.some(scope => !scope.deferredModule &&
+            scope.segments.some(writerSeg => writerSeg.documentPosition < segment.documentPosition));
+        } : true;
       const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
           segments: renderer.segments,
