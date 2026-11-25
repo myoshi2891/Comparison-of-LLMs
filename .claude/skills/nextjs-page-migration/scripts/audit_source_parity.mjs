@@ -386,6 +386,23 @@ const HTML_VOID_ELEMENTS = new Set([
   "link", "meta", "param", "source", "track", "wbr",
 ]);
 
+function isSelfClosingTag(openingTag) {
+  const match = /^<[A-Za-z][\w.-]*\b([\s\S]*)>$/.exec(openingTag);
+  if (!match) return false;
+  let rest = match[1];
+  while (rest.length > 0) {
+    rest = rest.replace(/^\s+/, "");
+    if (!rest) return false;
+    if (rest === "/") return true;
+    const attr = rest.startsWith("{")
+      ? /^\{[^}]*\}/.exec(rest)
+      : /^[^\s"'=<>`/]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|\{[^}]*\}|[^\s"'=<>`]+))?/.exec(rest);
+    if (!attr) return false;
+    rest = rest.slice(attr[0].length);
+  }
+  return false;
+}
+
 function extractElementContents(src, predicate, includeNested = false, includeVoid = false) {
   const results = [];
   const openingRe = /<([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
@@ -393,7 +410,7 @@ function extractElementContents(src, predicate, includeNested = false, includeVo
   while (opening !== null) {
     const openingTag = opening[0];
     const tag = opening[1].toLowerCase();
-    const isVoid = openingTag.endsWith("/>") || HTML_VOID_ELEMENTS.has(tag);
+    const isVoid = isSelfClosingTag(openingTag) || HTML_VOID_ELEMENTS.has(tag);
     if (isVoid) {
       if (includeVoid && predicate(openingTag)) {
         results.push({
@@ -414,7 +431,7 @@ function extractElementContents(src, predicate, includeNested = false, includeVo
           continue;
         }
         if (nested[1] === "/") depth -= 1;
-        else if (!nested[0].endsWith("/>")) depth += 1;
+        else if (!isSelfClosingTag(nested[0])) depth += 1;
         if (depth === 0) {
           results.push({
             index: opening.index,
@@ -1267,11 +1284,12 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     };
     const functions = functionBodies(executable);
     const loops = loopExtents(executable);
-    const hasForeignDomWriteAt = at => {
+    const hasForeignDomWriteAt = (at, captureAt = at) => {
       if (foreignDomWrite === true) return true;
       if (!foreignDomWrite) return false;
       const isDeferred = functions.some(fn => fn.body < at && at < fn.end);
-      if (typeof foreignDomWrite === "function") return foreignDomWrite(at, isDeferred);
+      const isDeferredCapture = functions.some(fn => fn.body < captureAt && captureAt < fn.end);
+      if (typeof foreignDomWrite === "function") return foreignDomWrite(at, isDeferred, captureAt, isDeferredCapture);
       return foreignDomWrite === "deferred" && isDeferred;
     };
     // A `var` declared in a loop is one binding shared by every iteration. A read from a
@@ -1619,6 +1637,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // Bindings whose subtree a script query searches; edits to them can change the selection.
     const cardOwners = new Set();
     let certifiedLoopOpen;
+    let captureAt = initialBinding.at;
     const scriptElement = (value, at = before) => {
       const selected = query.exec(value);
       // An unquoted text/plain is an invalid selector (querySelector throws); quotes must match.
@@ -1729,9 +1748,19 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         }
         return true;
       };
+      // A removal or replacement before document.querySelector can detach the element
+      // matched by the selector; detachment after lookup leaves the captured card intact.
+      const notDetachedAt = queryAt => {
+        const detachRe = /(?<!\bclassList)\.\s*(?:remove\s*\(\s*\)|(?:replaceWith|removeChild|replaceChild|replaceChildren)\s*\(|outerHTML\s*=(?!=))/g;
+        return !Array.from(executable.matchAll(detachRe)).some(edit => editCanPrecede(edit.index, queryAt));
+      };
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
       // The query runs where its initializer runs; before the card is parsed it returns null.
-      if (direct) return selectedScript.cardAvailableAt(ownerBinding.at) && selectedScript.unique(direct[2]) && selectorValidAt(direct[2], ownerBinding.at);
+      if (direct) {
+        if (!selectedScript.cardAvailableAt(ownerBinding.at) || !selectedScript.unique(direct[2]) || !selectorValidAt(direct[2], ownerBinding.at) || !notDetachedAt(ownerBinding.at)) return false;
+        captureAt = ownerBinding.at;
+        return true;
+      }
       const indexed = owner && /^(\w+)\[(\w+)\]$/.exec(owner);
       const collectionBinding = indexed && bindingAt(indexed[1], ownerBinding.at);
       const collection = collectionBinding?.value;
@@ -1796,6 +1825,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         // iteration. A condition such as `i === 0` would certify cards it never renders.
         if ([ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected, ownerBinding.at))) {
           certifiedLoopOpen = open;
+          captureAt = collectionBinding.at;
           return true;
         }
         return false;
@@ -1843,11 +1873,6 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       usesValidatedDedent = true;
     }
     if (!value.endsWith(".textContent")) return false;
-    // A textContent write in another scope (even one without a renderer) may replace this
-    // DOM-backed payload before the read. Literal sources above are unaffected.
-    // A deferred module writer runs after parsing, so only a classic read that completes
-    // synchronously while parsing (not in a callback or after an await) precedes it.
-    if (hasForeignDomWriteAt(initialBinding.at)) return false;
     const element = value.slice(0, -12).trim();
     const isSelectedScript = (reference, at = before, seen = new Set()) => {
       if (scriptElement(reference, at)) return true;
@@ -1858,6 +1883,11 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     };
     // The src initializer evaluates `element` where it runs, not at the render call.
     if (!isSelectedScript(element, initialBinding.at)) return false;
+    // A textContent write in another scope (even one without a renderer) may replace this
+    // DOM-backed payload before the read, while ID-only writers affect the capture lookup.
+    // A deferred module writer runs after parsing, so only a classic read/capture that completes
+    // synchronously while parsing (not in a callback or after an await) precedes it.
+    if (hasForeignDomWriteAt(initialBinding.at, captureAt)) return false;
     const mayBeSelectedScript = (reference, at, seen = new Set()) => {
       if (isSelectedScript(reference, at)) return true;
       if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
@@ -2092,10 +2122,31 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     if (plus.length !== 1 || unwrap(value.slice(0, plus[0])) !== "src" || unwrap(value.slice(plus[0] + 1)) !== "CLASSDEFS") return null;
     const resolvedSrc = srcIsPayload(call.index);
     if (!resolvedSrc) return null;
-    renderUses.push({ index: source.start + names[0].index, call: call.index, base: resolvedSrc.base });
+    renderUses.push({ index: source.start + names[0].index, call: call.index, base: resolvedSrc.base, certifiedLoopOpen: resolvedSrc.certifiedLoopOpen });
   }
   const loopOrFunctionHead = /(?:\b(?:for|while)\s*\((?:[^{}()]|\([^{}()]*\))*\)|\bfunction\b[^{}]*\)|=>)\s*$/;
   const exitKeyword = /(?:return|throw|break|continue)(?![\w$])/y;
+  const isUnbracedOrShortCircuited = (callIndex, callPath) => {
+    const blockStart = callPath.length > 0 ? callPath[callPath.length - 1] + 1 : 0;
+    let stmtStart = blockStart;
+    let paren = 0, bracket = 0, brace = 0;
+    for (let i = blockStart; i < callIndex; i++) {
+      const ch = executable[i];
+      if (ch === "(") paren++;
+      else if (ch === ")") paren--;
+      else if (ch === "[") bracket++;
+      else if (ch === "]") bracket--;
+      else if (ch === "{") brace++;
+      else if (ch === "}") {
+        brace--;
+        if (paren === 0 && bracket === 0 && brace === 0) stmtStart = i + 1;
+      } else if (ch === ";" && paren === 0 && bracket === 0 && brace === 0) {
+        stmtStart = i + 1;
+      }
+    }
+    const stmtPrefix = executable.slice(stmtStart, callIndex);
+    return /^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(stmtPrefix) || /&&|\|\||\?/.test(stmtPrefix);
+  };
   if (renderUses.length === 0) {
     if (suffixFreeCalls.length === 0) return undefined;
     const targets = new Set(suffixFreeCalls.map(entry => entry.call));
@@ -2125,28 +2176,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (exitKeyword.test(executable)) return null;
         }
       }
-      if (certifiedLoopOpen === undefined) {
-        // Unbraced conditionals or short-circuit/ternary guards before the render call leave reachability unproven.
-        const blockStart = callPath.length > 0 ? callPath[callPath.length - 1] + 1 : 0;
-        let stmtStart = blockStart;
-        let paren = 0, bracket = 0, brace = 0;
-        for (let i = blockStart; i < callIndex; i++) {
-          const ch = executable[i];
-          if (ch === "(") paren++;
-          else if (ch === ")") paren--;
-          else if (ch === "[") bracket++;
-          else if (ch === "]") bracket--;
-          else if (ch === "{") brace++;
-          else if (ch === "}") {
-            brace--;
-            if (paren === 0 && bracket === 0 && brace === 0) stmtStart = i + 1;
-          } else if (ch === ";" && paren === 0 && bracket === 0 && brace === 0) {
-            stmtStart = i + 1;
-          }
-        }
-        const stmtPrefix = executable.slice(stmtStart, callIndex);
-        if (/^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(stmtPrefix) || /&&|\|\||\?/.test(stmtPrefix)) return null;
-      }
+      if (certifiedLoopOpen === undefined && isUnbracedOrShortCircuited(callIndex, callPath)) return null;
     }
     return undefined;
   }
@@ -2196,7 +2226,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   // (if/else/switch/try may skip the call). Anything else stays unresolved.
   for (const use of renderUses) {
     const callPath = paths.get(use.call);
-    if (callPath.slice(declarationPath.length).some(block => !loopOrFunctionHead.test(executable.slice(0, block)))) return null;
+    const uncertifiedBlocks = use.certifiedLoopOpen === undefined
+      ? callPath.slice(declarationPath.length)
+      : callPath.slice(declarationPath.length).filter(block => block <= use.certifiedLoopOpen);
+    if (uncertifiedBlocks.some(block => !loopOrFunctionHead.test(executable.slice(0, block)))) return null;
     let depth = 0;
     for (let i = initializedAt; i < use.call; i++) {
       if (executable[i] === "{") depth++;
@@ -2206,6 +2239,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if (exitKeyword.test(executable)) return null;
       }
     }
+    if (use.certifiedLoopOpen === undefined && isUnbracedOrShortCircuited(use.call, callPath)) return null;
   }
   if (!initializerRunsBefore(executable, declaration.index, initializedAt, declarationPath, renderUses.map(use => use.call), selectedScript.segments)) return null;
   const parts = Array.from(literal.matchAll(/'((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)"/g), m => decodeQuotedEntryEscapes(m[1] ?? m[2], true));
@@ -2435,12 +2469,22 @@ function materializePlainTextCards(src) {
       // capture's script tag have not been parsed yet; only an earlier async module
       // can race a proven synchronous classic capture.
       const foreignWrite = foreignWriters.length === 0 ? false
-        : renderer.classic ? (at, isDeferredRead) => {
+        : renderer.classic ? (at, isDeferredRead, captureAt = at, isDeferredCapture = isDeferredRead) => {
           if (isDeferredRead) return true;
-          const segment = renderer.segments.find(seg => seg.start <= at && at <= seg.end);
-          if (!segment) return true;
-          return foreignWriters.some(scope => !scope.deferredModule &&
-            scope.segments.some(writerSeg => writerSeg.documentPosition < segment.documentPosition));
+          const readSegment = renderer.segments.find(seg => seg.start <= at && at <= seg.end);
+          if (!readSegment) return true;
+          const captureSegment = !isDeferredCapture
+            ? renderer.segments.find(seg => seg.start <= captureAt && captureAt <= seg.end)
+            : undefined;
+          return foreignWriters.some(scope => {
+            if (scope.writesDom) {
+              return !scope.deferredModule &&
+                scope.segments.some(writerSeg => writerSeg.documentPosition < readSegment.documentPosition);
+            }
+            if (isDeferredCapture || !captureSegment) return true;
+            return !scope.deferredModule &&
+              scope.segments.some(writerSeg => writerSeg.documentPosition < captureSegment.documentPosition);
+          });
         } : true;
       const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],

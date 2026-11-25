@@ -2373,9 +2373,9 @@ test("ignores string-literal edits, checks loop collection bindings, shadowed un
 	assert.deepEqual(shadowColRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
 
 	// 3. Unshadowed undefined is false in loop guards, while declared undefined is unknown.
-	const unshadowedUndef = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (undefined) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const unshadowedUndef = `${card}<script type="module">var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (undefined) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
 	assert.equal(audit(unshadowedUndef, page).status, 0);
-	const shadowedUndef = `${card}<script>let undefined = true; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (undefined) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const shadowedUndef = `${card}<script type="module">let undefined = true; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; if (undefined) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
 	const undefRes = audit(shadowedUndef, page);
 	assert.equal(undefRes.status, 1);
 	assert.deepEqual(undefRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
@@ -2417,26 +2417,28 @@ test("enforces strict module keyword matching, cross-scope classList.add, pre-qu
 	assert.equal(audit(classListAddLit, page).status, 0);
 
 	// 3. Same-scope pre-query DOM reorders invalidate indexed traversal, while post-query reorders remain certified.
+	const reorderDom = `<div id="wrap">${card}<div id="bad" class="diagram-card"></div></div>`;
+	const setupRefs = "var container = document.querySelector('#wrap'); var first = document.querySelector('#c1'); var other = document.querySelector('#bad');";
 	const loopBody = "for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }";
 	for (const reorder of [
 		"container.prepend(other);",
-		"container.append(other);",
-		"container.appendChild(other);",
+		"container.append(first);",
+		"container.appendChild(first);",
 		"container.insertBefore(other, first);",
 		"container.moveBefore(other, first);",
 		"first.before(other);",
-		"first.after(other);",
+		"other.after(first);",
 		"first.replaceWith(other);",
-		"container.replaceChildren(other);",
+		"container.replaceChildren(other, first);",
 		"container.insertAdjacentElement('afterbegin', other);",
 		"container.insertAdjacentHTML('afterbegin', '<div class=\"diagram-card\"></div>');",
 		"container.insertAdjacentText('afterbegin', 'x');",
 	]) {
-		const beforeQuery = `${card}<script>${reorder} var cards = document.querySelectorAll('.diagram-card'); ${loopBody}</script>`;
+		const beforeQuery = `${reorderDom}<script>${setupRefs} ${reorder} var cards = document.querySelectorAll('.diagram-card'); ${loopBody}</script>`;
 		const res = audit(beforeQuery, page);
 		assert.equal(res.status, 1, `pre-query ${reorder}`);
 		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], `pre-query ${reorder}`);
-		const afterQuery = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); ${loopBody} ${reorder}</script>`;
+		const afterQuery = `${reorderDom}<script>${setupRefs} var cards = document.querySelectorAll('.diagram-card'); ${loopBody} ${reorder}</script>`;
 		assert.equal(audit(afterQuery, page).status, 0, `post-query ${reorder}`);
 	}
 
@@ -2450,4 +2452,52 @@ test("enforces strict module keyword matching, cross-scope classList.add, pre-qu
 		const afterCard = `${card}<${opaqueTag} class="diagram-card"><script type="text/plain">fake</script></${opaqueTag}>${loopScript}`;
 		assert.equal(audit(afterCard, page).status, 0, `opaque after: ${opaqueTag}`);
 	}
+});
+
+test("handles slash attribute values, suffixed render reachability, split classic ID writers, and direct-lookup detachment", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const emptyPage = "export default function Page() { return <main />; }";
+
+	// 1. Unquoted or quoted slash attribute values do not mark an opening tag as self-closing.
+	for (const attr of ["data-path=/", 'data-path="/"']) {
+		const html = `<div id="c1" class="diagram-card" ${attr}><script type="text/plain">${chart}</script></div><script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+		assert.equal(audit(html, page).status, 0, `accepts payload with ${attr}`);
+		assert.equal(audit(html, emptyPage).status, 1, `rejects omission with ${attr}`);
+	}
+
+	// 2. Short-circuited suffixed render calls are rejected while equivalent unguarded calls pass.
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const suffix = "\nclassDef ok fill:#fff";
+	const suffixedPage = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+	const unguardedSuffix = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS);</script>`;
+	assert.equal(audit(unguardedSuffix, suffixedPage).status, 0);
+	const guardedSuffix = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; window.ready && mermaid.render('x', src + CLASSDEFS);</script>`;
+	const guardedRes = audit(guardedSuffix, suffixedPage);
+	assert.equal(guardedRes.status, 1);
+	assert.deepEqual(guardedRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	// 3. Classic renderer compares ID-only foreign writers against capture position, and DOM-text writers against read position.
+	const idAfterCapture = `${card}<script>var card = document.querySelector('#c1');</script><script type="module" async>document.querySelector('#c1').id = 'other';</script><script>var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(idAfterCapture, page).status, 0);
+	const idBeforeCapture = `${card}<script type="module" async>document.querySelector('#c1').id = 'other';</script><script>var card = document.querySelector('#c1');</script><script>var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const idBeforeRes = audit(idBeforeCapture, page);
+	assert.equal(idBeforeRes.status, 1);
+	assert.deepEqual(idBeforeRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const domBetweenCaptureAndRead = `${card}<script>var card = document.querySelector('#c1');</script><script type="module" async>document.querySelector('#c1 script').textContent = 'flowchart LR\\nX --> Y';</script><script>var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const domBetweenRes = audit(domBetweenCaptureAndRead, page);
+	assert.equal(domBetweenRes.status, 1);
+	assert.deepEqual(domBetweenRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	// 4. Direct lookup rejects removal/replacement before document.querySelector, while detachment after lookup stays eligible.
+	const detachBefore = `${card}<script>document.querySelector('#c1').remove(); var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const detachBeforeRes = audit(detachBefore, page);
+	assert.equal(detachBeforeRes.status, 1);
+	assert.deepEqual(detachBeforeRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const replaceBefore = `${card}<script>document.querySelector('#c1').replaceWith(document.createElement('div')); var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const replaceBeforeRes = audit(replaceBefore, page);
+	assert.equal(replaceBeforeRes.status, 1);
+	assert.deepEqual(replaceBeforeRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const detachAfter = `${card}<script>var card = document.querySelector('#c1'); document.querySelector('#c1').remove(); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(detachAfter, page).status, 0);
 });
