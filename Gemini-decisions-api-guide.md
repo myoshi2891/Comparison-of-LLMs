@@ -488,13 +488,18 @@ async def screen_input(message: types.Content | None) -> types.Content | None:
     try:
         result = await decide(text, GUARD)
     except httpx.HTTPStatusError as err:
-        # 安全フィルタ(error.code が safety / prohibited_content / blocklist / image_safety / content_blocked など)は HTTP 400 で返り、
-        # answers を持たない。安全フィルタの拒否だけを LLM へ渡さず定型文で止める。
+        # 安全フィルタ(error.code が safety / prohibited_content / blocklist / image_safety / content_blocked など)が
+        # HTTP 400 で返る場合、answers は持たない。安全フィルタの拒否だけを LLM へ渡さず定型文で止める。
         if err.response.status_code == 400 and error_code(err.response) in SAFETY_ERROR_CODES:
             return blocked("このリクエストには対応できません。")
         # コンテキスト上限超過などその他の 400、認証・レート制限・サーバー障害は
         # 握りつぶさず呼び出し元へ伝え、原因を区別できるようにする。
         raise
+    # 安全フィルタは HTTP 200 応答の prompt_feedback.block_reason で返る場合もあり、その場合 answers は空になる。
+    # answers を索引する前に block_reason を確認し、HTTP 400 の安全拒否と同じ定型文で止める。
+    prompt_feedback = result.get("prompt_feedback")
+    if isinstance(prompt_feedback, dict) and prompt_feedback.get("block_reason"):
+        return blocked("このリクエストには対応できません。")
     ans = result["answers"]["injection"]
     if ans["noul"] >= 0.8:
         return blocked("このリクエストには対応できません。")  # LLM呼び出しを省略する
@@ -586,7 +591,7 @@ GDE の検証(48件)で、緊急度の正解は **31/48** と比較対象5バッ
 | --- | --- | --- |
 | **入力による分類操作** | ユーザーの文章が自分自身の分類を誘導し得る(Google が警告) | 高リスクの操作(支払い承認など)は **人間のチェック** を残す |
 | **ガードレール自体の突破** | 判定器もモデルである以上、敵対入力で誤判定し得る | 多層防御(Decisions API + ルールベース + 権限分離)にする |
-| **安全フィルタ** | 入力が安全フィルタに引っかかると HTTP 400(`error.code` が `safety` / `prohibited_content` など) | エラーコードを分岐して処理し、`answers` を前提にしない |
+| **安全フィルタ** | 入力が安全フィルタに引っかかると、`prompt_feedback.block_reason` が設定されて `answers` が空で返る場合(HTTP 200)や、HTTP 400(`error.code` が `safety` / `prohibited_content` など)で拒否される場合がある(実運用前にエンドポイントの実際のステータスを確認する) | HTTP 400 のエラーコード分岐と `prompt_feedback.block_reason` の両方を先に確認し、`answers` の存在を前提にしない |
 | **機密データ** | 無料枠の内容は製品改善に使われ得る。有料枠で製品改善に使われない条件でも、Googleは不正利用監視のためプロンプトと応答を保持する場合がある | 送信前に[適用される保持期間](https://ai.google.dev/gemini-api/docs/usage-policies)と組織の要件を確認する |
 | **APIキー** | ヘッダ `x-goog-api-key` で認証 | サーバー側で保持し、クライアントに露出させない |
 
@@ -676,7 +681,7 @@ python -m pytest test_decisions.py -q
 | 4 | 自社の正解データで confidence 帯ごとの正解率を測った | ☐ |
 | 5 | 低信頼ケースの行き先(上位モデル / 人間)が決まっている | ☐ |
 | 6 | 高リスク操作に人間の確認が残っている | ☐ |
-| 7 | HTTP 400(`safety` 等)のエラー処理がある | ☐ |
+| 7 | 安全フィルタ拒否(`prompt_feedback.block_reason` および HTTP 400 の `safety` 等)のエラー処理がある | ☐ |
 | 8 | 契約テスト(出力トークン 0、confidence 範囲など)が CI にある | ☐ |
 | 9 | 機密データは有料枠で処理している | ☐ |
 | 10 | `v1beta` の仕様変更に備え、モデル/SDK バージョンをログに残している | ☐ |

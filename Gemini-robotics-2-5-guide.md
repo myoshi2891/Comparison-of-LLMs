@@ -493,10 +493,10 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
     while True:
         if estop_active():  # 非常停止が入っていればモデルに問い合わせずに終了
             return "aborted: emergency stop"
-        # 非常停止から再開するときは、停止前の画像を再利用しない。呼び出し側が停止後に撮った画像を
+        # 非常停止や実行エラー等から再開するときは、中断前の画像を再利用しない。呼び出し側が復旧後に撮った画像を
         # contents へ追加し、task_state["pending_observation"] を False に戻すまで ER へ問い合わせない。
         if task_state.get("pending_observation"):
-            return "aborted: fresh observation required after emergency stop"
+            return "aborted: fresh observation required before resuming"
         response = client.models.generate_content(
             model="gemini-robotics-er-2-preview",
             contents=contents,
@@ -602,6 +602,8 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
             return f"aborted: coordinate mapping error ({mapping_error})"
         if executor_error is not None:
             # 完了済みの結果・uncertain・skipped の記録を contents に残し、呼び出し元が状態を確認して復旧する。
+            # 動作が途中まで進んだ可能性があり前の観測は古いため、再開時は新しい画像が追加されるまで次の要求を禁止する。
+            task_state["pending_observation"] = True
             return f"aborted: executor error ({executor_error})"
         if limit_reached:
             # 実行済みの結果と skipped の記録を contents に残したまま中断し、呼び出し元へ完全な履歴を渡す。
@@ -707,10 +709,12 @@ class LiveSessionState:
         if not self.usable:
             raise RuntimeError("live session is unusable; recover or reconnect before sending")
 
-    async def send_frame(self, capture: Callable[[], Awaitable[bytes]], timeout: float | None = None) -> None:
-        # timeout は共有キューの待機を含めず、取得と送信のそれぞれへ別々に適用する。
+    async def send_frame(self, capture: Callable[[], Awaitable[bytes]], timeout: float = 10.0) -> None:
+        # 呼び出し側が timeout を省略した場合も無期限待機にならないよう有限値(既定 10.0 秒)を使う。
+        # timeout は取得と送信のそれぞれへ別々に適用し、_frame_lock の取得待ちと 1 FPS の間隔待ちは含めない。
+        # そのため _frame_lock 待ちや間隔待ちを含む全体の所要時間は呼び出し側の turn_timeout を超え得る。
         loop = asyncio.get_running_loop()
-        async with self._frame_lock:  # 全映像送信者で 1 つのタイムスタンプを共有して読み書きする
+        async with self._frame_lock:  # 全映像送信者で 1 つのタイムスタンプを共有して読み書きする(ロック待ちは timeout 対象外)
             self.ensure_usable()
             if self._last_frame_sent is not None:
                 # 間隔は取得開始ではなく、前のフレームを実際に送った時刻から数える
