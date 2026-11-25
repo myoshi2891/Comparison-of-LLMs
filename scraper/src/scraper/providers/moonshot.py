@@ -238,16 +238,26 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             if single_pair is not None:
                 in_price, out_price = single_pair
                 break
-            rec_in = next(
-                (p for s in record_starts if (p := extract_price(html[s:end], in_patterns)) is not None),
-                None,
-            )
-            rec_out = next(
-                (p for s in record_starts if (p := extract_price(html[s:end], out_patterns)) is not None),
-                None,
-            )
-            if rec_in is not None and rec_out is not None:
-                in_price, out_price = rec_in, rec_out
+            # 複数記載をまたぐ組は、間に <dt> のレコード境界がない記載どうしに限る。
+            groups: list[list[int]] = []
+            for s in record_starts:
+                if groups and not re.search(r"<dt\b", html[groups[-1][-1] : s], re.IGNORECASE):
+                    groups[-1].append(s)
+                else:
+                    groups.append([s])
+            for group in groups:
+                rec_in = next(
+                    (p for s in group if (p := extract_price(html[s:end], in_patterns)) is not None),
+                    None,
+                )
+                rec_out = next(
+                    (p for s in group if (p := extract_price(html[s:end], out_patterns)) is not None),
+                    None,
+                )
+                if rec_in is not None and rec_out is not None:
+                    in_price, out_price = rec_in, rec_out
+                    break
+            if in_price is not None and out_price is not None:
                 break
         pi, si = sanity_check(in_price, f"Moonshot/{name}/in", fb_in)
         po, so = sanity_check(out_price, f"Moonshot/{name}/out", fb_out)
