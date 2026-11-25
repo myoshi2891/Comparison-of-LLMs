@@ -608,6 +608,17 @@ class TestMoonshot:
         assert model.provenance is not None
         assert model.provenance.origin == "scraped"
 
+    def test_ignores_models_and_prices_inside_html_comments(self):
+        html = (
+            "<!-- archived: Kimi K3 input $1.11 output $2.22 -->"
+            "<p>Kimi K3 input $3.25 output $16.50</p>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+        assert model.provenance is not None
+        assert model.provenance.origin == "scraped"
+
     def test_prefers_complete_pair_from_single_mention_over_cross_mention(self):
         html = "<p>Kimi K3 promo $9.99</p><p>Kimi K3 input $3.25 output $16.50</p>"
         with patch("scraper.providers.moonshot.get_page_text", return_value=html):

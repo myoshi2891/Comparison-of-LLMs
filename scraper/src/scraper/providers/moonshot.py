@@ -164,8 +164,13 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
         logger.exception("Moonshot(Kimi): ページ取得失敗")
         return _build_fallback(resolver)
 
-    # script/style/template の中身は可視テキストではないため、モデル候補の探索前に取り除く。
-    html = re.sub(r"<(script|style|template)\b[^>]*>.*?</\1\s*>", " ", html, flags=re.IGNORECASE | re.DOTALL)
+    # HTML コメントと script/style/template の中身は可視テキストではないため、モデル候補の探索前に取り除く。
+    html = re.sub(
+        r"<!--.*?-->|<(script|style|template)\b[^>]*>.*?</\1\s*>",
+        " ",
+        html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
 
     models = []
     for name in _FALLBACKS:
