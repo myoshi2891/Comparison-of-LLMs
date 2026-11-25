@@ -26,7 +26,8 @@ function parseMermaid(source: string) {
     const trimmed = line.trim();
     if (
       !trimmed ||
-      /^(?:%%|flowchart\b|graph\b|classDef\b|class\b|subgraph\b|end\b|style\b|linkStyle\b|direction\b)/.test(
+      // 単独のディレクティブだけを読み飛ばす。同じ行に辺などの続きがある場合は下で解析または拒否する。
+      /^(?:%%.*|(?:flowchart|graph)\s+(?:TD|TB|BT|RL|LR)\s*;?|direction\s+(?:TD|TB|BT|RL|LR)\s*;?|end\s*;?|(?:classDef|class|subgraph|style|linkStyle)\b.*)$/.test(
         trimmed
       )
     ) {
@@ -114,6 +115,8 @@ it("図2: Fable の構成は evals に合格した場合だけ「そのまま運
   // 未対応リンク構文を見逃さず失敗させること。
   expect(() => parseMermaid("flowchart TD\n    FABLE -.-> DONE")).toThrow();
   expect(() => parseMermaid("flowchart TD\n    FABLE --o DONE")).toThrow();
+  // ヘッダーと同じ行の辺を読み飛ばさず、未解析の続きとして拒否すること。
+  expect(() => parseMermaid("flowchart TD A --> B")).toThrow();
 });
 
 it("図8: 継続したいという希望だけではモデルを切り替えず、明示的な方針がない間は終端にとどまる", () => {
@@ -123,6 +126,22 @@ it("図8: 継続したいという希望だけではモデルを切り替えず�
   expect(labels.get(fb)).not.toMatch(/継続したい/);
   const yes = edges.find((e) => e.from === fb && e.label === "はい");
   expect(labels.get(yes?.to ?? "")).toMatch(/フォールバック/);
+  const canReach = (start: string, target: string, activeEdges: typeof edges) => {
+    const visited = new Set<string>();
+    const queue = [start];
+    while (queue.length > 0) {
+      const curr = queue.shift() as string;
+      if (curr === target) return true;
+      if (visited.has(curr)) continue;
+      visited.add(curr);
+      for (const e of activeEdges) if (e.from === curr) queue.push(e.to);
+    }
+    return false;
+  };
+  // VERIFY からのどの経路も、肯定の方針辺を通らずにフォールバックへ到達できない。
+  expect(canReach("VERIFY", yes?.to as string, edges)).toBe(true);
+  const withoutPolicyEdge = edges.filter((e) => e !== yes);
+  expect(canReach("VERIFY", yes?.to as string, withoutPolicyEdge)).toBe(false);
   const noEdges = edges.filter((e) => e.from === fb && e.label !== "はい");
   expect(noEdges.length).toBeGreaterThan(0);
   for (const no of noEdges) {

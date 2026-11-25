@@ -28,7 +28,10 @@ function resolvePython(): string {
       "-E",
       "-c",
       "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)",
-    ]);
+    ], { timeout: 10_000 });
+    if (probe.error && (probe.error as NodeJS.ErrnoException).code === "ETIMEDOUT") {
+      throw new Error(`Python version probe timed out after 10s (phase: version probe, executable: ${cmd})`);
+    }
     if (!probe.error && probe.status === 0) {
       cachedPython = cmd;
       return cmd;
@@ -42,7 +45,13 @@ function python(program: string, input: unknown) {
   const result = spawnSync(resolvePython(), ["-E", "-c", program], {
     input: JSON.stringify(input),
     encoding: "utf8",
+    timeout: 60_000,
   });
+  if (result.error) {
+    throw new Error(
+      `Python example execution failed (phase: example execution, executable: ${resolvePython()}): ${result.error.message}`
+    );
+  }
   expect(result.error).toBeUndefined();
   expect(result.stderr).toBe("");
   expect(result.status).toBe(0);
@@ -564,6 +573,10 @@ exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 rows = scope["sweep"]([{"id": "t", "prompt": "p", "check": lambda text: text == "ok"}], levels=("low", "high"))
 assert [(r["effort"], r["passed"]) for r in rows] == [("low", False), ("high", True)]
 assert all((r["sec"], r["usd"]) == (1.5, 0.25) for r in rows)
+# end_turn でも判定関数が False を返せば不合格（時間・費用は記録する）
+rejected = scope["sweep"]([{"id": "t", "prompt": "p", "check": lambda text: False}], levels=("high",))
+assert [r["passed"] for r in rejected] == [False]
+assert (rejected[0]["sec"], rejected[0]["usd"]) == (1.5, 0.25)
 # ワンショットイテラブル(ジェネレータ)を渡しても全タスクで同じ effort 列が適用される
 gen_rows = scope["sweep"](
     [

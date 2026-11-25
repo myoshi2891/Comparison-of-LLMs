@@ -306,6 +306,28 @@ it("9リスト41チェックの全文とリストごとの独立集計・取消�
     ).toBe("0%");
   });
 });
+it("あるチェックリストの操作が別のリストの状態・件数・バーへ影響しない", () => {
+  const { container } = render(<Page />);
+  const groups = Array.from(container.querySelectorAll(`ul.${styles.checklist}`)) as HTMLElement[];
+  const bar = (g: HTMLElement) =>
+    (g.previousElementSibling?.querySelector("[data-check-bar]") as HTMLElement).style.width;
+  const count = (g: HTMLElement) =>
+    g.previousElementSibling?.querySelector('[data-testid="check-progress"]')?.textContent;
+  const [a, b] = groups;
+  const aBoxes = within(a).getAllByRole<HTMLInputElement>("checkbox");
+  const bBoxes = within(b).getAllByRole<HTMLInputElement>("checkbox");
+  fireEvent.click(aBoxes[0]);
+  const aSnapshot = { checked: aBoxes.map((x) => x.checked), count: count(a), bar: bar(a) };
+  expect(aSnapshot.checked[0]).toBe(true);
+  const sameAsSnapshot = () =>
+    expect({ checked: aBoxes.map((x) => x.checked), count: count(a), bar: bar(a) }).toEqual(aSnapshot);
+  fireEvent.click(bBoxes[0]);
+  expect(bBoxes[0].checked).toBe(true);
+  sameAsSnapshot();
+  fireEvent.click(bBoxes[0]);
+  expect(bBoxes[0].checked).toBe(false);
+  sameAsSnapshot();
+});
 it("metadata・registry・ヒーローの日付を保持", () => {
   expect(metadata).toEqual({
     title: expected.title,
