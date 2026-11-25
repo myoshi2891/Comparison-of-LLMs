@@ -31,7 +31,7 @@ const DIAGRAM_3 =
 const DIAGRAM_4 =
   'flowchart TD\n    A["1　アプリが1回目のリクエストを送る　system　tools　user"] --> B["2　APIが thinking ブロックと tool_use を返す"]\n    B --> C["3　アプリは返された content をそのまま履歴に追記する"]\n    C --> D["4　アプリがツールを実行して結果を得る"]\n    D --> E["5　アプリが履歴と tool_result で2回目のリクエストを送る"]\n    E --> F["6　APIが prefix を検査して思考を再利用しキャッシュも効かせる"]\n    F --> G["7　APIが text ブロックと end_turn を返す"]\n    class A hub\n    class G done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_5 =
-  'flowchart TD\n    A["タスクを受け取る"] --> B["plan mode で計画　effort は medium"]\n    B --> C["別のセッションが　計画を厳しくレビュー"]\n    C --> D{"計画は十分?"}\n    D -- "いいえ" --> B\n    D -- "はい" --> E{"作業は長時間・難度が高い?"}\n    E -- "はい" --> F["effort を high に上げ　最後まで走らせる"]\n    E -- "いいえ" --> G["medium のまま実装"]\n    F --> H["自動検証　テスト・型・リンタ"]\n    G --> H\n    H --> I{"検証は合格?"}\n    I -- "いいえ" --> J["失敗ログを渡して修正"]\n    J --> H\n    I -- "はい" --> K["git diff --stat と　差分を人が読む"]\n    K --> L{"頼んでいない変更が　混ざっていない?"}\n    L -- "混ざっている" --> M["差し戻し　または範囲を指定して再依頼"]\n    M --> H\n    L -- "問題なし" --> N["PR を作成"]\n\n    class B,F,G,H hub\n    class N done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
+  'flowchart TD\n    A["タスクを受け取る"] --> B["plan mode で計画　effort は medium"]\n    B --> C["別のセッションが　計画を厳しくレビュー"]\n    C --> D{"計画は十分?"}\n    D -- "いいえ" --> B\n    D -- "はい" --> E{"作業は長時間・難度が高い?"}\n    E -- "はい" --> F["effort を high に上げ　最後まで走らせる"]\n    E -- "いいえ" --> G["medium のまま実装"]\n    F --> H["自動検証　テスト・型・リンタ"]\n    G --> H\n    H --> I{"検証は合格?"}\n    I -- "いいえ" --> J["失敗ログを渡して修正"]\n    J --> H\n    I -- "はい" --> K["マージベースとのコミット済み差分と　git status・git diff HEAD の未コミット差分を人が読む"]\n    K --> L{"頼んでいない変更が　混ざっていない?"}\n    L -- "混ざっている" --> M["差し戻し　または範囲を指定して再依頼"]\n    M --> H\n    L -- "問題なし" --> N["PR を作成"]\n\n    class B,F,G,H hub\n    class N done\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_6 =
   'flowchart LR\n    HUMAN["人　 目標と完了条件を定義　承認ゲートを管理"]\n    ORCH["指揮役 Fable 5.2　計画・分担・統合"]\n    W1["作業者 A　Sonnet 5.5・low"]\n    W2["作業者 B　Haiku 5.5・low"]\n    W3["作業者 C　Opus 5.5・medium"]\n    VER["検証役　テスト・型検査・形式検証"]\n    REV["レビューチーム　独立した別モデル"]\n    STATE["共有状態　タスク台帳・チェックポイント"]\n\n    HUMAN --> ORCH\n    ORCH --> W1\n    ORCH --> W2\n    ORCH --> W3\n    W1 --> VER\n    W2 --> VER\n    W3 --> VER\n    VER --> ORCH\n    ORCH <--> STATE\n    ORCH --> REV\n    REV --> HUMAN\n\n    class ORCH hub\n    class HUMAN,REV box\nclassDef hub fill:#e8ebfa,stroke:#2f3d8f,color:#1d2557;\nclassDef box fill:#f8efd6,stroke:#7d5c14,color:#3f2e08;\nclassDef done fill:#e2f3e9,stroke:#1f6b45,color:#0f3a24;';
 const DIAGRAM_7 =
@@ -481,7 +481,14 @@ export default function Page() {
               <h2 id="s1-heading">{"概要: Fable 5.2 を30秒で把握する"}</h2>{" "}
             </div>{" "}
             <h3 id="s1-1">{"1.1 基本スペック"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 項目・内容・確度 (1)"
+            >
               {" "}
               <table>
                 <thead>
@@ -893,7 +900,14 @@ export default function Page() {
               <h2 id="s2-heading">{"5.1 から 5.2 で何が変わったか"}</h2>{" "}
             </div>{" "}
             <h3 id="s2-1">{"2.1 変更点の一覧"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 観点・Fable 5.1・Fable 5.2・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -1066,7 +1080,14 @@ export default function Page() {
               <strong>{"タスクあたりの総コストが下がるとは限りません"}</strong>
               {"。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 計測・内容・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -1205,7 +1226,14 @@ export default function Page() {
               </div>{" "}
             </div>{" "}
             <h3 id="s3-3">{"3.3 タスク別の使い分け表"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: タスク・推奨・根拠"
+            >
               {" "}
               <table>
                 <thead>
@@ -1368,7 +1396,14 @@ export default function Page() {
               </a>
               {")。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: メインモデル・使える advisor・狙い"
+            >
               {" "}
               <table>
                 <thead>
@@ -1439,7 +1474,14 @@ export default function Page() {
               <h2 id="s4-heading">{"Step 2: アクセスと環境の準備"}</h2>{" "}
             </div>{" "}
             <h3 id="s4-1">{"4.1 手順"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 手順・作業・確認方法"
+            >
               {" "}
               <table>
                 <thead>
@@ -1572,7 +1614,14 @@ export default function Page() {
               </pre>{" "}
             </div>{" "}
             <h3 id="s4-2">{"4.2 サブスクリプションの利用枠"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 項目・内容・確度 (2)"
+            >
               {" "}
               <table>
                 <thead>
@@ -1736,7 +1785,14 @@ export default function Page() {
               {")。 "}
             </p>{" "}
             <h3 id="s5-1">{"5.1 5段階の使い分け"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: effort・向いている用途・特徴・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -1847,7 +1903,14 @@ export default function Page() {
               </table>{" "}
             </div>{" "}
             <h3 id="s5-2">{"5.2 根拠データ: どの effort が割に合うか"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 出典・内容・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -2762,7 +2825,14 @@ export default function Page() {
               </p>{" "}
             </div>{" "}
             <h3 id="s5-5">{"5.5 effort の運用ルール"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: ルール・内容・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -2950,7 +3020,14 @@ export default function Page() {
               {")。 "}
             </p>{" "}
             <h3 id="s6-2">{"6.2 400 エラーになる指定と、その代替"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: やりがちな指定・結果・代替・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -5776,7 +5853,7 @@ export default function Page() {
                 {": 上記の "}
                 <code>{"max_turns"}</code>
                 {
-                  " は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、次のリクエストの上限見積もり(非キャッシュ入力・キャッシュ読み取り・キャッシュ書き込みの各課金区分にそれぞれの適用単価を掛けた最大入力費—キャッシュ書き込み対象トークンを非キャッシュ入力単価で二重計上しないこと—、適用単価での最大出力トークン max_tokens 分、および従量課金ツール費を含む)を送信前に予約して累計消費額と予約額の合計がハード上限を超える場合は送信を拒否し、応答後はその予約を実測の課金額で置き換えてください。同じタスク予算を複数のワーカーで共有する場合は、逐次チェックだけでは同時送信の上限を守れないため、予約の確保と確定をワーカー間で排他制御(調停)してください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
+                  " は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、次のリクエストの上限見積もり(非キャッシュ入力・キャッシュ読み取り・キャッシュ書き込みの各課金区分にそれぞれの適用単価を掛けた最大入力費—キャッシュ書き込み対象トークンを非キャッシュ入力単価で二重計上しないこと—、適用単価での最大出力トークン max_tokens 分、および従量課金ツール費を含む)を送信前に予約して累計消費額と予約額の合計がハード上限を超える場合は送信を拒否し、応答後はその予約を実測の課金額で置き換えてください。同じタスク予算を複数のワーカーで共有する場合は、逐次チェックだけでは同時送信の上限を守れないため、予約の確保と確定をワーカー間で排他制御(調停)してください。サーバー側フォールバックを有効にしたリクエストでは、元のモデルとフォールバック先を含めてそのリクエストが行い得るすべての試行のうち最大の課金額を送信前に予約してください。その上限を算出できない場合はフォールバックを無効のままにしてください。フォールバックなしのリクエストは単一試行分の予約のままで構いません。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
                 }
               </p>{" "}
             </div>{" "}
@@ -6119,7 +6196,14 @@ export default function Page() {
               </div>{" "}
             </div>{" "}
             <h3 id="s7-2">{"7.2 変更したくなったときの代替手段"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: やりたいこと・やってはいけない・代わりにやること・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -6425,7 +6509,14 @@ export default function Page() {
               {"です。 "}
             </p>{" "}
             <h3 id="s7-5">{"7.5 モデルを切り替えると何が起きるか"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 状況・結果・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -6603,7 +6694,14 @@ export default function Page() {
               </p>{" "}
             </div>{" "}
             <h3 id="s8-0">{"8.0 症状から逆引き"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 観察される症状・参照する節"
+            >
               {" "}
               <table>
                 <thead>
@@ -6794,7 +6892,14 @@ export default function Page() {
               </li>{" "}
             </ul>{" "}
             <h3 id="s8-2">{"8.2 承認の出し方と承認ルールの書き方"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 場面・悪い例・良い例(筆者作成)・根拠"
+            >
               {" "}
               <table>
                 <thead>
@@ -6933,7 +7038,14 @@ export default function Page() {
               <strong>{"効果とトレードオフ"}</strong>
               {":"}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 観点・内容・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -7095,7 +7207,14 @@ export default function Page() {
               <strong>{"処方は3段階"}</strong>
               {"です。上から順に、目的に応じて足します。"}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 段階・方法・効果・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -7394,7 +7513,14 @@ export default function Page() {
               <strong>{"処方"}</strong>
               {":"}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 対処・具体策・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -7499,7 +7625,14 @@ export default function Page() {
               {")。 "}
             </p>{" "}
             <h3 id="s8-7">{"8.7 旧モデル向けの指示とハーネスを見直す"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 見直す対象・何が起きるか・対処・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -7737,7 +7870,14 @@ export default function Page() {
               <h2 id="s9-heading">{"Step 7: Claude Code 運用"}</h2>{" "}
             </div>{" "}
             <h3 id="s9-1">{"9.1 コマンド早見表"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 目的・操作・補足"
+            >
               {" "}
               <table>
                 <thead>
@@ -7899,7 +8039,14 @@ export default function Page() {
               </a>
               {")。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 公式ガイドの論点・Claude Code での扱い・あなたがやること"
+            >
               {" "}
               <table>
                 <thead>
@@ -8188,7 +8335,14 @@ export default function Page() {
                 />
               </div>{" "}
             </div>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 手順・やること・根拠"
+            >
               {" "}
               <table>
                 <thead>
@@ -8255,9 +8409,11 @@ export default function Page() {
                     <td>
                       {" "}
                       <strong>{"要約ではなく差分を読む"}</strong>
-                      {"。"}
-                      <code>{"git diff --stat"}</code>
-                      {" から確認する "}
+                      {"。コミット済みの変更はマージベースとの差分、未コミットの変更は "}
+                      <code>{"git status"}</code>
+                      {" と "}
+                      <code>{"git diff HEAD"}</code>
+                      {" で確認する "}
                     </td>
                     <td>
                       {" 公式 ("}
@@ -8551,7 +8707,14 @@ export default function Page() {
               </a>
               {")。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: ヒント・内容"
+            >
               {" "}
               <table>
                 <thead>
@@ -8618,7 +8781,14 @@ export default function Page() {
               {")。この章では、それを安全に・安く回す設計を扱います。 "}
             </p>{" "}
             <h3 id="s10-1">{"10.1 4つの構成パターン"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: パターン・構成・向く場面・根拠"
+            >
               {" "}
               <table>
                 <thead>
@@ -8719,7 +8889,14 @@ export default function Page() {
             </div>{" "}
             <h3 id="s10-2">{"10.2 事例から学べる設計原則"}</h3>{" "}
             <h4>{"事例1: Fermat の最終定理の形式化(Anthropic)"}</h4>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 項目・内容・確度 (3)"
+            >
               {" "}
               <table>
                 <thead>
@@ -9542,7 +9719,14 @@ export default function Page() {
               </pre>{" "}
             </div>{" "}
             <h3 id="s11-2">{"11.2 コスト比較の注意"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 論点・内容・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -9625,7 +9809,14 @@ export default function Page() {
               </table>{" "}
             </div>{" "}
             <h3 id="s11-3">{"11.3 コスト削減のレバー"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: レバー・具体策・期待できる効果・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -9782,7 +9973,7 @@ export default function Page() {
                 {" や最終応答への Fable 単価適用に頼らず、課金対象となる "}
                 <code>{"usage.iterations"}</code>
                 {
-                  " の各エントリをその試行を処理したモデルの単価で合算する。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。 "
+                  " の各エントリをその試行を処理したモデルの単価で合算する。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。サーバー側フォールバックを有効にする場合は、フォールバック先を含めてそのリクエストが行い得るすべての試行のうち最大の課金額を送信前に予約し、その上限を算出できないときはフォールバックを無効のままにする。 "
                 }
               </li>{" "}
               <li>
@@ -9845,7 +10036,14 @@ export default function Page() {
               </a>
               {")。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 意味・対応"
+            >
               {" "}
               <table>
                 <thead>
@@ -9953,7 +10151,14 @@ export default function Page() {
               </div>{" "}
             </div>{" "}
             <h3 id="s12-3">{"12.3 フォールバックの実装"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 方法・内容・確度"
+            >
               {" "}
               <table>
                 <thead>
@@ -10185,7 +10390,14 @@ export default function Page() {
               </p>{" "}
             </div>{" "}
             <h3 id="s12-4">{"12.4 データ保持とプライバシー"}</h3>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 項目・内容・確度 (4)"
+            >
               {" "}
               <table>
                 <thead>
@@ -10486,7 +10698,14 @@ export default function Page() {
               </a>
               {")。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: 人が持つ判断・理由"
+            >
               {" "}
               <table>
                 <thead>
@@ -11169,7 +11388,14 @@ export default function Page() {
               <code>{"S"}</code>
               {" 番号に対応します。 "}
             </p>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: No.・ベストプラクティス・根拠・発信者・種別"
+            >
               {" "}
               <table>
                 <thead>
@@ -11670,7 +11896,14 @@ export default function Page() {
               }
             </p>{" "}
             <h4>{"Anthropic 公式(一次情報)"}</h4>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: ID・内容・取得状況・URL (1)"
+            >
               {" "}
               <table>
                 <thead>
@@ -12014,7 +12247,14 @@ export default function Page() {
               </table>{" "}
             </div>{" "}
             <h4>{"著名な国際的開発者・研究者の投稿"}</h4>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: ID・発信者・内容・取得状況 (1)"
+            >
               {" "}
               <table>
                 <thead>
@@ -12279,7 +12519,14 @@ export default function Page() {
               </table>{" "}
             </div>{" "}
             <h4>{"第三者の独立評価・報道"}</h4>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: ID・発信者・内容・取得状況 (2)"
+            >
               {" "}
               <table>
                 <thead>
@@ -12500,7 +12747,14 @@ export default function Page() {
               </table>{" "}
             </div>{" "}
             <h4>{"コミュニティの集約(参考)"}</h4>{" "}
-            <div className={styles["table-wrap"]}>
+            {/* biome-ignore lint/a11y/useSemanticElements: preserve original table-wrap div while exposing scrollable region */}
+            <div
+              className={styles["table-wrap"]}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: horizontal scroll region must be keyboard focusable
+              tabIndex={0}
+              role="region"
+              aria-label="表: ID・内容・取得状況・URL (2)"
+            >
               {" "}
               <table>
                 <thead>
