@@ -641,6 +641,10 @@
   width: 100%;
   max-width: 100%;
 }
+.root .layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+}
 .root :global(p) {
   color: inherit;
 }
@@ -726,7 +730,10 @@
   top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px));
 }
 .root .main {
-  width: calc(100% - var(--sidebar-w));
+  grid-column: 2;
+  margin-left: 0;
+  min-width: 0;
+  width: 100%;
 }
 .root .backdrop {
   border: 0;
@@ -810,7 +817,11 @@ body:has(.root) :global(nav[aria-label="関連ページ"]) {
   .root .backdrop {
     top: calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height));
   }
+  .root .layout {
+    display: block;
+  }
   .root .main {
+    grid-column: auto;
     width: 100%;
   }
   body:has(.root) :global(nav[aria-label="関連ページ"]) {

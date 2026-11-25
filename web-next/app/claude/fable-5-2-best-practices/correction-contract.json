@@ -14,6 +14,14 @@
     "declarations": [["width", "100%", false], ["max-width", "100%", false]]
   },
   {
+    "selector": ".root .layout",
+    "media": null,
+    "declarations": [
+      ["display", "grid", false],
+      ["grid-template-columns", "var(--sidebar-w) minmax(0, 1fr)", false]
+    ]
+  },
+  {
     "selector": ".root :global(p)",
     "media": null,
     "declarations": [["color", "inherit", false]]
@@ -140,7 +148,12 @@
   {
     "selector": ".root .main",
     "media": null,
-    "declarations": [["width", "calc(100% - var(--sidebar-w))", false]]
+    "declarations": [
+      ["grid-column", "2", false],
+      ["margin-left", "0", false],
+      ["min-width", "0", false],
+      ["width", "100%", false]
+    ]
   },
   {
     "selector": ".root .backdrop",
@@ -251,9 +264,14 @@
     ]
   },
   {
+    "selector": ".root .layout",
+    "media": "(max-width: 900px)",
+    "declarations": [["display", "block", false]]
+  },
+  {
     "selector": ".root .main",
     "media": "(max-width: 900px)",
-    "declarations": [["width", "100%", false]]
+    "declarations": [["grid-column", "auto", false], ["width", "100%", false]]
   },
   {
     "selector": "body:has(.root) :global(nav[aria-label=\"関連ページ\"])",

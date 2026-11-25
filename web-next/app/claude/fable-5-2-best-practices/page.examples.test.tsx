@@ -12,9 +12,34 @@ function examples() {
   const { container } = render(<Page />);
   return Array.from(container.querySelectorAll("pre code"), (e) => e.textContent ?? "");
 }
+let cachedPython: string | undefined;
+function resolvePython(): string {
+  if (cachedPython) return cachedPython;
+  const candidates = [
+    process.env.PYTHON,
+    "python3",
+    "python3.13",
+    "python3.12",
+    "python3.11",
+    "python3.10",
+  ].filter((c): c is string => Boolean(c));
+  for (const cmd of candidates) {
+    const probe = spawnSync(cmd, [
+      "-E",
+      "-c",
+      "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)",
+    ]);
+    if (!probe.error && probe.status === 0) {
+      cachedPython = cmd;
+      return cmd;
+    }
+  }
+  cachedPython = "python3";
+  return cachedPython;
+}
 function python(program: string, input: unknown) {
   // -E: PYTHON* 環境変数（PYTHONOPTIMIZE 等）を無視し、assert を常に有効にする。
-  const result = spawnSync("python3", ["-E", "-c", program], {
+  const result = spawnSync(resolvePython(), ["-E", "-c", program], {
     input: JSON.stringify(input),
     encoding: "utf8",
   });
@@ -131,7 +156,7 @@ def call(body):
     if len(requests) == 1:
         return paused
     if len(requests) == 2:
-        assert checkpoint["messages"] == body["messages"]
+        assert checkpoint["pending_messages"] == body["messages"]
         raise RuntimeError("API failed")
     return done
 scope = {"call": call, "copy": __import__("copy")}
@@ -142,8 +167,9 @@ except RuntimeError as error:
     assert str(error) == "API failed"
 else:
     raise AssertionError("expected API failure")
-assert checkpoint["messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused["content"]}]
-assert checkpoint["messages"][-1]["content"] is paused["content"]
+assert checkpoint["pending_messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused["content"]}]
+assert checkpoint["pending_messages"][-1]["content"] is paused["content"]
+assert "messages" not in checkpoint
 assert scope["agent_loop"]("task", [], None, max_turns=1, checkpoint=checkpoint) is done
 assert requests[1]["messages"] == requests[2]["messages"]
 `,
@@ -352,7 +378,8 @@ seen = []
 def call(body):
     seen.append(len(seen))
     return replies[len(seen) - 1]
-executors = {("browser", "screenshot"): lambda a: "browser", ("computer", "screenshot"): lambda a: "computer",
+browser_img = [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]
+executors = {("browser", "screenshot"): lambda a: browser_img, ("computer", "screenshot"): lambda a: "computer",
     "screenshot": lambda a: "custom"}
 def run_tool(name, args):
     return executors[name](args)
@@ -361,7 +388,7 @@ exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 checkpoint = {}
 scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint)
 results = checkpoint["messages"][2]["content"]
-assert [(r["content"], r.get("toolset_name")) for r in results] == [("browser", "browser"), ("computer", "computer"), ("custom", None)]
+assert [(r["content"], r.get("toolset_name")) for r in results] == [(browser_img, "browser"), ("computer", "computer"), ("custom", None)]
 `,
     examples()
   );
@@ -516,8 +543,8 @@ for name in ("usd", "estimate_usd"):
     assert scope[name](usage) == 8, name
     assert math.isclose(scope[name]({"cache_creation_input_tokens": 1000000,
         "cache_creation": {"ephemeral_5m_input_tokens": None, "ephemeral_1h_input_tokens": 1000000}}), 16), name
-for mode in ("batch", "fast"):
-    assert scope["estimate_usd"](usage, mode) > 0
+for mode, expected in (("batch", 4.0), ("fast", 16.0)):
+    assert math.isclose(scope["estimate_usd"](usage, mode), expected), mode
 `,
     examples()
   );
@@ -537,6 +564,20 @@ exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 rows = scope["sweep"]([{"id": "t", "prompt": "p", "check": lambda text: text == "ok"}], levels=("low", "high"))
 assert [(r["effort"], r["passed"]) for r in rows] == [("low", False), ("high", True)]
 assert all((r["sec"], r["usd"]) == (1.5, 0.25) for r in rows)
+# ワンショットイテラブル(ジェネレータ)を渡しても全タスクで同じ effort 列が適用される
+gen_rows = scope["sweep"](
+    [
+        {"id": "t1", "prompt": "p1", "check": lambda text: text == "ok"},
+        {"id": "t2", "prompt": "p2", "check": lambda text: text == "ok"},
+    ],
+    levels=(lv for lv in ("low", "high")),
+)
+assert [(r["task"], r["effort"], r["passed"]) for r in gen_rows] == [
+    ("t1", "low", False),
+    ("t1", "high", True),
+    ("t2", "low", False),
+    ("t2", "high", True),
+]
 `,
     examples()
   );
@@ -804,8 +845,18 @@ assert result is done
 assert visible == ["step 1. ", "step 2. ", "final."]
 # 完了ターンのassistant応答はcheckpoint["messages"]を汚染せず、checkpointは完了済みとしてマークされる
 assert checkpoint["completed"] is True
-assert len(checkpoint["messages"]) == 3
-assert checkpoint["messages"][-1]["content"] == paused_2["content"]
+assert "pending_messages" not in checkpoint
+assert "messages" not in checkpoint
+# auto_cache=True(既定)ではトップレベル cache_control が付与され、auto_cache=False では省略される
+assert requests[0]["cache_control"] == {"type": "ephemeral"}
+requests_no_cache = []
+def call_no_cache(body):
+    requests_no_cache.append(copy.deepcopy(body))
+    return done
+scope_no_cache = {"call": call_no_cache, "copy": copy}
+exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope_no_cache)
+assert scope_no_cache["agent_loop"]("task", [], None, max_turns=2, auto_cache=False) is done
+assert "cache_control" not in requests_no_cache[0]
 # 完了済みcheckpointを再開しようとするとエラーになる
 try:
     scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=checkpoint)
@@ -827,23 +878,32 @@ else:
     raise AssertionError("callback error should propagate")
 assert failing_checkpoint["completed"] is True
 assert failing_checkpoint["final_response"] is done
-# pause_turnのon_textが失敗しても、messagesとcontainer_idはcheckpointへ保存済みで再開できる
+# pause_turnは完了済みバッチ境界(checkpoint["messages"])を上書きせず、継続状態をpending_messagesへ別保存する
 requests.clear()
+tool_first = {"stop_reason": "tool_use", "content": [{"type": "tool_use", "id": "t1", "name": "read", "input": {}}]}
 paused_with_ctr = {"stop_reason": "pause_turn", "content": [{"type": "text", "text": "p1"}], "container": {"id": "ctr_pause"}}
-replies[:] = [paused_with_ctr, done]
+replies[:] = [tool_first, paused_with_ctr, done]
 pause_cp = {}
 try:
-    scope["agent_loop"]("task", [], None, max_turns=3, checkpoint=pause_cp, on_text=fail_on_text)
+    scope["agent_loop"]("task", [], lambda _n, _a: "ok", max_turns=3, checkpoint=pause_cp, on_text=fail_on_text)
 except RuntimeError:
     pass
 else:
     raise AssertionError("pause_turn callback error should propagate")
-assert pause_cp["messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused_with_ctr["content"]}]
+completed_boundary = [
+    {"role": "user", "content": "task"},
+    {"role": "assistant", "content": tool_first["content"]},
+    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "ok"}]},
+]
+assert pause_cp["messages"] == completed_boundary
+assert pause_cp["pending_messages"] == completed_boundary + [{"role": "assistant", "content": paused_with_ctr["content"]}]
 assert pause_cp["container_id"] == "ctr_pause"
 resumed = []
-assert scope["agent_loop"]("task", [], None, max_turns=2, checkpoint=pause_cp, on_text=resumed.append) is done
-assert requests[1]["messages"] == pause_cp["messages"]
-assert requests[1]["container"] == "ctr_pause"
+assert scope["agent_loop"]("task", [], lambda _n, _a: "ok", max_turns=2, checkpoint=pause_cp, on_text=resumed.append) is done
+assert requests[2]["messages"] == completed_boundary + [{"role": "assistant", "content": paused_with_ctr["content"]}]
+assert requests[2]["container"] == "ctr_pause"
+assert pause_cp["messages"] == completed_boundary
+assert "pending_messages" not in pause_cp
 assert resumed == ["final."]
 # tool_use応答に含まれるtextブロックもon_textへちょうど1回通知される(refusal/max_tokensでは通知しない)
 requests.clear()
@@ -880,6 +940,10 @@ replies = [
         tool(21, name="new_tab", toolset="browser"),
         tool(22, name="click", toolset="browser"),
         tool(23, name="switch_tab", toolset="browser"),
+        tool(24, name="list_tabs", toolset="browser"),
+        tool(25, name="op"),
+        tool(26, name="op"),
+        tool(27, name="list_tabs", toolset="browser"),
     ]},
     {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]},
 ]
@@ -896,7 +960,7 @@ returns = {
     6: [{"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": "JVBERi0="}}],
     7: [{"type": "document", "source": {"type": "text", "media_type": "text/plain", "data": "hello"}}],
     8: [{"type": "document", "source": {"type": "content", "content": [{"type": "text", "text": "doc"}]}}],
-    9: [{"type": "search_result", "source": "https://example.com", "title": "T", "content": []}],
+    9: [{"type": "search_result", "source": "https://example.com", "title": "T", "content": [{"type": "text", "text": "snippet"}]}],
     10: None,
     11: 42,
     12: {"type": "text", "text": "dict-not-list"},
@@ -907,9 +971,13 @@ returns = {
     17: [{"type": "document", "source": {"type": "url"}}],
     18: [{"type": "search_result", "source": "s", "title": "t", "content": []}, {"type": "text", "text": "mixed"}],
     19: [{"type": "browser_state", "tabs": []}],
-    21: [{"type": "browser_state", "tabs": [{"id": "tab1"}]}],
-    22: [{"type": "browser_state", "tabs": [{"id": "tab1"}]}, {"type": "text", "text": "clicked"}],
+    21: [{"type": "browser_state", "tabs": [{"tab_id": "tab1", "title": "New Tab", "url": "https://example.com", "active": True}], "changes": [{"type": "tab_opened", "tab_id": "tab1"}]}],
+    22: [{"type": "browser_state", "tabs": [{"tab_id": "tab1", "title": "Example", "url": "https://example.com", "active": True}]}, {"type": "text", "text": "clicked"}],
     23: [{"type": "text", "text": "not-browser-state"}],
+    24: [{"type": "browser_state", "tabs": [{"tab_id": "", "title": "Bad", "url": "https://example.com", "active": False}]}],
+    25: [{"type": "search_result", "source": "https://example.com", "title": "T", "content": [{"type": "text", "text": ""}]}],
+    26: [{"type": "search_result", "source": "https://example.com", "title": "T", "content": [{"type": "image", "source": {"type": "url", "url": "https://example.com/a.png"}}]}],
+    27: [{"type": "browser_state", "tabs": []}],
 }
 def run_tool(_k, a):
     if a["n"] == 20:
@@ -927,34 +995,88 @@ exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 checkpoint = {}
 try:
     assert scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint) is replies[1]
+    results = checkpoint["messages"][2]["content"]
+    assert results[0] == {"type": "tool_result", "tool_use_id": "t1", "content": "ok"}
+    assert results[1] == {"type": "tool_result", "tool_use_id": "t2", "content": [{"type": "text", "text": "block"}]}
+    assert results[2] == {"type": "tool_result", "tool_use_id": "t3", "content": [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]}
+    assert results[3] == {"type": "tool_result", "tool_use_id": "t4", "content": [{"type": "image", "source": {"type": "url", "url": "https://example.com/a.png"}}]}
+    assert results[4] == {"type": "tool_result", "tool_use_id": "t5", "content": returns[5]}
+    assert results[5] == {"type": "tool_result", "tool_use_id": "t6", "content": returns[6]}
+    assert results[6] == {"type": "tool_result", "tool_use_id": "t7", "content": returns[7]}
+    assert results[7] == {"type": "tool_result", "tool_use_id": "t8", "content": returns[8]}
+    assert results[8] == {"type": "tool_result", "tool_use_id": "t9", "content": returns[9]}
+    fixed_msg = "Tool execution failed. Check the tool arguments or try an alternative approach."
+    for idx in range(9, 20):
+        assert results[idx]["is_error"] is True, (idx, results[idx])
+        assert results[idx]["content"] == fixed_msg, (idx, results[idx])
+        assert "topsecret123" not in results[idx]["content"]
+        assert "sk-ant-secret999" not in results[idx]["content"]
+    # browser タブ管理 (new_tab) は単一の browser_state ブロックを正常受理し、他の browser メンバーは text/image 併存も受理する
+    assert results[20] == {"type": "tool_result", "tool_use_id": "t21", "toolset_name": "browser", "content": returns[21]}
+    assert results[21] == {"type": "tool_result", "tool_use_id": "t22", "toolset_name": "browser", "content": returns[22]}
+    # browser タブ管理 (switch_tab) に browser_state 以外が返った場合はエラー結果にし、後続の browser 操作も抑止する
+    assert results[22]["is_error"] is True
+    assert results[22]["toolset_name"] == "browser"
+    assert results[22]["content"] == fixed_msg
+    assert results[23]["is_error"] is True
+    assert results[23]["toolset_name"] == "browser"
+    assert results[23]["content"] == "Not executed: an earlier action in this turn failed"
+    # 不正な search_result (空テキスト・非テキスト要素) はエラー結果へ変換される
+    for idx in (24, 25):
+        assert results[idx]["is_error"] is True, idx
+        assert results[idx]["content"] == fixed_msg, idx
+    # 例外型のみの失敗診断が記録され、いずれのレコードにも機微情報が含まれないこと
+    assert any("RuntimeError" in msg for msg in records), records
+    assert all("topsecret123" not in msg and "sk-ant-secret999" not in msg for msg in records), records
+
+    # 不正な browser_state 単体ケース: 固定エラーが返り、拒否された状態は messages / checkpoint へ入らない
+    bad_bs_replies = [
+        {"stop_reason": "tool_use", "content": [tool(1, name="list_tabs", toolset="browser")]},
+        {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]},
+    ]
+    bad_bs_reqs = []
+    def bad_bs_call(body):
+        bad_bs_reqs.append(copy.deepcopy(body))
+        return bad_bs_replies[len(bad_bs_reqs) - 1]
+    bad_bs_scope = {"call": bad_bs_call, "copy": copy}
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), bad_bs_scope)
+    bad_bs_cp = {}
+    bad_state = [{"type": "browser_state", "tabs": [{"tab_id": "", "title": "Bad", "url": "https://example.com", "active": False}]}]
+    assert bad_bs_scope["agent_loop"]("task", [], lambda _k, _a: bad_state, max_turns=2, checkpoint=bad_bs_cp) is bad_bs_replies[1]
+    bad_bs_res = bad_bs_cp["messages"][2]["content"][0]
+    assert bad_bs_res == {"type": "tool_result", "tool_use_id": "t1", "toolset_name": "browser", "content": fixed_msg, "is_error": True}
+    assert "Bad" not in json.dumps(bad_bs_cp["messages"])
+
+    # browser.screenshot が文字列("screenshot unavailable")を返した場合はエラー扱いとし、後続 browser 操作を止める
+    shot_replies = [
+        {"stop_reason": "tool_use", "content": [
+            tool(1, name="screenshot", toolset="browser"),
+            tool(2, name="click", toolset="browser"),
+            tool(3, name="custom_tool"),
+        ]},
+        {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]},
+    ]
+    shot_reqs = []
+    shot_executed = []
+    def shot_call(body):
+        shot_reqs.append(copy.deepcopy(body))
+        return shot_replies[len(shot_reqs) - 1]
+    def shot_run_tool(k, _a):
+        shot_executed.append(k)
+        if k == ("browser", "screenshot"):
+            return "screenshot unavailable"
+        return "custom-ok"
+    shot_scope = {"call": shot_call, "copy": copy}
+    exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), shot_scope)
+    shot_cp = {}
+    assert shot_scope["agent_loop"]("task", [], shot_run_tool, max_turns=2, checkpoint=shot_cp) is shot_replies[1]
+    shot_results = shot_cp["messages"][2]["content"]
+    assert shot_results[0] == {"type": "tool_result", "tool_use_id": "t1", "toolset_name": "browser", "content": fixed_msg, "is_error": True}
+    assert shot_results[1] == {"type": "tool_result", "tool_use_id": "t2", "toolset_name": "browser", "content": "Not executed: an earlier action in this turn failed", "is_error": True}
+    assert shot_results[2] == {"type": "tool_result", "tool_use_id": "t3", "content": "custom-ok"}
+    assert shot_executed == [("browser", "screenshot"), "custom_tool"]
 finally:
     logger.removeHandler(handler)
-results = checkpoint["messages"][2]["content"]
-assert results[0] == {"type": "tool_result", "tool_use_id": "t1", "content": "ok"}
-assert results[1] == {"type": "tool_result", "tool_use_id": "t2", "content": [{"type": "text", "text": "block"}]}
-assert results[2] == {"type": "tool_result", "tool_use_id": "t3", "content": [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]}
-assert results[3] == {"type": "tool_result", "tool_use_id": "t4", "content": [{"type": "image", "source": {"type": "url", "url": "https://example.com/a.png"}}]}
-assert results[4] == {"type": "tool_result", "tool_use_id": "t5", "content": returns[5]}
-assert results[5] == {"type": "tool_result", "tool_use_id": "t6", "content": returns[6]}
-assert results[6] == {"type": "tool_result", "tool_use_id": "t7", "content": returns[7]}
-assert results[7] == {"type": "tool_result", "tool_use_id": "t8", "content": returns[8]}
-assert results[8] == {"type": "tool_result", "tool_use_id": "t9", "content": returns[9]}
-fixed_msg = "Tool execution failed. Check the tool arguments or try an alternative approach."
-for idx in range(9, 20):
-    assert results[idx]["is_error"] is True, (idx, results[idx])
-    assert results[idx]["content"] == fixed_msg, (idx, results[idx])
-    assert "topsecret123" not in results[idx]["content"]
-    assert "sk-ant-secret999" not in results[idx]["content"]
-# browser タブ管理 (new_tab) は単一の browser_state ブロックを正常受理し、他の browser メンバーは text/image 併存も受理する
-assert results[20] == {"type": "tool_result", "tool_use_id": "t21", "toolset_name": "browser", "content": returns[21]}
-assert results[21] == {"type": "tool_result", "tool_use_id": "t22", "toolset_name": "browser", "content": returns[22]}
-# browser タブ管理 (switch_tab) に browser_state 以外が返った場合はエラー結果にする
-assert results[22]["is_error"] is True
-assert results[22]["toolset_name"] == "browser"
-assert results[22]["content"] == fixed_msg
-# 例外型のみの失敗診断が記録され、いずれのレコードにも機微情報が含まれないこと
-assert any("RuntimeError" in msg for msg in records), records
-assert all("topsecret123" not in msg and "sk-ant-secret999" not in msg for msg in records), records
 `,
     examples()
   );
