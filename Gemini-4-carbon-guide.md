@@ -327,7 +327,7 @@ Carbon（と Argon）では、入力・思考・出力が **1つの 1M トーク
 | 項目 | 内容 | 出典 |
 |---|---|---|
 | 何をするか | 1回の生成を複数セグメントに分け、1,048,576 トークン枠から入力と思考の分を除いた残りまで出力を継続する | [S6] |
-| 使う手順 | Agent Platform では **`v1beta1` エンドポイント**を使う（`v1` は非対応。Gen AI SDK は `http_options` で `api_version='v1'` を指定しない限り `v1beta1`）。SDK（ストリーミングは 1 セグメント上限 65,536、非ストリーミング `generate_content` は 32,768）では `max_output_tokens` をストリーミングでは 65,536 より大きく、非ストリーミング `generate_content` では 32,768 より大きく設定し、ストリーミングで切断からの再開が必要な場合は SDK の自動継続を無効にし、7.3節のチェックポイント付きループ（未確定 parts を破棄し、保存済み `continuation_token` で再送）で継続する（切断時の再開を要しない非ストリーミング呼び出しに限り SDK の自動継続に任せてよい）。**SDK を使わない非ストリーミング REST の直接呼び出しでは 1 セグメント上限が 32,768 であり、`max_output_tokens` を上げるだけでは足りない**。最初のリクエストは `continuation_token` なしで送り、`finishReason` が `CONTINUATION` の応答で返された `continuation_token` を付けて同じリクエストを再送するクライアント側の継続ループを実装する（7.3節のフロー。引数名は[公式Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode)で確認） | [S6] [S7] |
+| 使う手順 | Agent Platform では **`v1beta1` エンドポイント**を使う（`v1` は非対応。Gen AI SDK は `http_options` で `api_version='v1'` を指定しない限り `v1beta1`）。SDK の既定の出力枠は、ストリーミングと、自動継続が有効な `v1beta1` の非ストリーミング `generate_content` では 65,536、`automatic_continuation=False` の非ストリーミング `generate_content` では 1 セグメント 32,768。1 回の応答がこの枠を超えるときだけ `max_output_tokens` を枠より大きく設定し、ストリーミングで切断からの再開が必要な場合は SDK の自動継続を無効にし、7.3節のチェックポイント付きループ（未確定 parts を破棄し、保存済み `continuation_token` で再送）で継続する（切断時の再開を要しない非ストリーミング呼び出しに限り SDK の自動継続に任せてよい）。**SDK を使わない非ストリーミング REST の直接呼び出しでは 1 セグメント上限が 32,768 であり、`max_output_tokens` を上げるだけでは足りない**。最初のリクエストは `continuation_token` なしで送り、`finishReason` が `CONTINUATION` の応答で返された `continuation_token` を付けて同じリクエストを再送するクライアント側の継続ループを実装する（7.3節のフロー。引数名は[公式Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode)で確認） | [S6] [S7] |
 | 自動継続 | 現行 SDK では**既定で有効**（例: GenerateContent は Python `google-genai` 2.30.1 以上）。`v1` を使っている場合は SDK の更新や継続の有効化だけでは足りず、エンドポイントの変更が必要 | [S6] |
 | 向く用途 | 複数ファイルの差分生成、長大なテストスイート、長い証明、出力上限で打ち切られる評価ハーネス | [S3] [S6] |
 | 向かない用途 | 遅延に敏感なリクエスト（数分かかることがある） | [S6] [S21] |
@@ -343,9 +343,16 @@ Carbon（と Argon）では、入力・思考・出力が **1つの 1M トーク
 flowchart TD
     A["1回の応答で必要な出力量"] --> M{"呼び出し方式"}
     M -- "ストリーミング" --> B{"64K トークンを超えるか<br/>または思考で上限に達しがちか"}
-    M -- "非ストリーミング SDK<br/>5章の generate_content" --> SB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
+    M -- "非ストリーミング SDK<br/>5章の generate_content" --> SV{"api_version と自動継続の設定"}
+    SV -- "v1beta1 で自動継続が有効（SDK 既定）" --> SB{"65,536 トークンを超えるか<br/>または思考で上限に達しがちか"}
+    SV -- "v1beta1 で automatic_continuation=False（手動呼び出し）" --> SM{"1 セグメント上限の 32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
+    SV -- "api_version='v1'（long decode 非対応）" --> SV1{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
     SB -- "いいえ" --> C["通常の generate_content"]
     SB -- "はい" --> D
+    SM -- "いいえ" --> C
+    SM -- "はい" --> D
+    SV1 -- "いいえ" --> C
+    SV1 -- "はい（v1beta1 へ変更する）" --> D
     M -- "非ストリーミング REST" --> NB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
     NB -- "いいえ" --> NR["通常の非ストリーミング REST<br/>generateContent をそのまま呼び出す"]
     NB -- "はい" --> D
@@ -406,12 +413,12 @@ flowchart TD
     IRES --> ACC
     IINC -- "いいえ" --> ERR["例外として扱い 部分出力を採用しない"]
     IST -- "failed cancelled" --> ERR
-    API -- "Interactions ストリーミング" --> SACC["modelの全step(thought stepとその署名を含む)を<br/>欠落・改変せず受信順に保持し、保持したstepから回答バッファとツール呼び出し状態を構築<br/>model_outputのstep.startに初期テキストがあればそのstepのstep.delta処理前に回答バッファへ追記し<br/>続くstep.deltaのうちdelta.typeがtextの差分を重複なく順に追記<br/>(thought_summaryのテキストは回答バッファに入れず必要なら別バッファへ保存)<br/>ストリームされたツール呼び出しは回答バッファとは別に<br/>保持したstepから各呼び出しのID・ツール名・引数デルタを蓄積して承認ゲート前に再構築<br/>usageはhop内で累積値なので最新値だけ保持<br/>最後に受信したevent_idを受信位置のカーソルとして保存<br/>continuation_tokenを受け取ったらチェックポイントとして別に保存"]
+    API -- "Interactions ストリーミング" --> SACC["modelの全step(thought stepとその署名を含む)を<br/>欠落・改変せず受信順に保持し、保持したstepから回答バッファとツール呼び出し状態を構築<br/>model_outputのstep.startに初期テキストがあればそのstepのstep.delta処理前に回答バッファへ追記し<br/>続くstep.deltaのうちdelta.typeがtextの差分を重複なく順に追記<br/>(thought_summaryのテキストは回答バッファに入れず必要なら別バッファへ保存)<br/>ストリームされたツール呼び出しは回答バッファとは別に<br/>保持したstepから各呼び出しのID・ツール名・引数デルタを蓄積して承認ゲート前に再構築<br/>usageはhop内で累積値なので最新値だけ保持<br/>最後に受信したevent_idを受信位置のカーソルとして保存<br/>continuation_tokenを受け取ったら それを発行したinteractionのidと組にして<br/>チェックポイントとして別に保存"]
     SACC --> SDROP{"ストリームが終了イベントの前に切断されたか"}
     SDROP -- "はい" --> SUSE["中断したhopで最後に受け取ったusageは暫定値として保持<br/>同じバックグラウンドinteractionを再開して最終usageを受け取ったら置き換え<br/>usageは累積値なので両方を合算しない<br/>後続のusageが届かなければ最後に受け取った値をそのinteractionの値とし<br/>受け取っていなければ usage 不明と記録"]
     SUSE --> SCP{"バックグラウンド実行か /<br/>continuation_tokenを保存済みか"}
     SCP -- "store=True バックグラウンド<br/>(トークン有無を問わず)" --> SLEI["受信済みの出力を保持し チェックポイントから再生成しない<br/>同じinteraction idへ 最後に受信したevent_idを<br/>last_event_idとして付けて再接続し それ以降のイベントだけを追記"]
-    SCP -- "フォアグラウンド store=True<br/>continuation_token保存済み" --> SRES["チェックポイント以降に受信した出力を破棄<br/>(再生成テキストはevent_idでは重複除去できない)<br/>同じinteraction idと保存済みcontinuation_tokenに加え<br/>元のモデル ツール(設定時) system instruction(設定時) 生成設定を再送して再開し追記"]
+    SCP -- "フォアグラウンド store=True<br/>continuation_token保存済み" --> SRES["最新チェックポイント以降に受信した出力を破棄<br/>(再生成テキストはevent_idでは重複除去できない)<br/>hop 2 にチェックポイントがなければ hop 2 の出力をすべて破棄し hop 1 で保存した組を使う<br/>保存した組の発行元interaction id(previous_interaction_id)とcontinuation_tokenに加え<br/>元のモデル ツール(設定時) system instruction(設定時) 生成設定を再送して再開し追記"]
     SCP -- "フォアグラウンド store=False<br/>continuation_token保存済み" --> SSL["これまでの会話・ツール呼び出しと結果を含む現在ターンの完全な入力と<br/>モデル ツール system instruction(設定時) 生成設定に<br/>保存済みのcontinuation_tokenを付けて再送<br/>チェックポイント以降に受信した出力は破棄して再生成分で置き換える"]
     SCP -- "それ以外<br/>トークン未保存のフォアグラウンド等" --> SRST["完了済みのツール結果(function_result)を保持または<br/>永続的な冪等キー(idempotency key)で安全にリプレイ<br/>未完了分の未チェックポイント出力だけを破棄し<br/>continuation_tokenなしで再送"]
     SRES --> SACC
@@ -438,7 +445,7 @@ flowchart TD
     SST -- "failed cancelled" --> ERR
 ```
 
-ストリーミングでは、`event_id` と `continuation_token` を別々の値として保存します。`event_id` は受信位置を示すカーソル、`continuation_token` は継続hopのチェックポイントです。`store=True` のバックグラウンド実行ではinteractionがサーバー側で進行しているため、チェックポイントの有無にかかわらず最初から再送したりチェックポイントから再生成したりせず、受信済みの出力を保持したまま同じinteraction idへ最後に受信した `event_id` を `last_event_id` として付けて再接続し、それ以降のイベントだけを追記します。フォアグラウンド実行で `continuation_token` を保存済みなら、`store=True` でも `store=False` でもチェックポイント以降の出力は再生成され、`event_id` では再生成テキストの重複を除去できないため、チェックポイント以降に受信した出力を破棄してから再開分を追記します(`store=True` は同じinteraction idに、`store=False` は元の入力・モデル・ツール・system instruction(設定時)・生成設定に保存済みの `continuation_token` を付けて再送)。`continuation_token` 未保存のフォアグラウンド実行などで最初から再送せざるを得ない場合は、完了済みのツール実行の効果を失ったり二重実行したりしないよう、完了済みのツール結果(`function_result`)を保持して引き継ぐか、永続的な冪等キー(idempotency key)で安全にリプレイし、未完了の作業についてのみ未チェックポイントの出力を破棄して再送します。非ストリーミングの自動継続で後続hopの応答到着前に `ContinuationInterruptedError` が送出された場合も、最初から再送せず、例外の `partial_interaction` を保持したまま例外のinteraction IDと `continuation_token` で再開します(`store=False` は元の入力・モデル・ツール・system instruction(設定時)・生成設定も再送。対応する再開APIと属性名は公式SDKで確認してください)。終了イベントを受け取れなかったhopも課金され得るため、そのhopで最後に受け取ったusageを保持して合算に含め、一度も受け取っていなければ「usage不明」と記録して請求額で確認します(公式SDKはチェックポイント後に出力を受け取ってから切断された場合、重複を避けるため `ContinuationInterruptedError` を送出します)。usage はhop内で累積値なので各hopの最新値だけを保持し、hopごとの最終値を合算します。
+ストリーミングでは、`event_id` と `continuation_token` を別々の値として保存します。`event_id` は受信位置を示すカーソル、`continuation_token` は継続hopのチェックポイントです。hopごとにinteraction idが変わるため、`continuation_token` はそれを発行したinteractionのidと組にして保存します。`store=True` のバックグラウンド実行ではinteractionがサーバー側で進行しているため、チェックポイントの有無にかかわらず最初から再送したりチェックポイントから再生成したりせず、受信済みの出力を保持したまま同じinteraction idへ最後に受信した `event_id` を `last_event_id` として付けて再接続し、それ以降のイベントだけを追記します。フォアグラウンド実行で `continuation_token` を保存済みなら、`store=True` でも `store=False` でもチェックポイント以降の出力は再生成され、`event_id` では再生成テキストの重複を除去できないため、チェックポイント以降に受信した出力を破棄してから再開分を追記します(`store=True` は保存した組の発行元interaction idと `continuation_token` を使い、切断した最新hopのidとは組み合わせません。hop 2 でまだチェックポイントを受け取っていなければ、hop 2 の出力をすべて破棄して hop 1 で保存した組から再開します。`store=False` は元の入力・モデル・ツール・system instruction(設定時)・生成設定に保存済みの `continuation_token` を付けて再送)。`continuation_token` 未保存のフォアグラウンド実行などで最初から再送せざるを得ない場合は、完了済みのツール実行の効果を失ったり二重実行したりしないよう、完了済みのツール結果(`function_result`)を保持して引き継ぐか、永続的な冪等キー(idempotency key)で安全にリプレイし、未完了の作業についてのみ未チェックポイントの出力を破棄して再送します。非ストリーミングの自動継続で後続hopの応答到着前に `ContinuationInterruptedError` が送出された場合も、最初から再送せず、例外の `partial_interaction` を保持したまま例外のinteraction IDと `continuation_token` で再開します(`store=False` は元の入力・モデル・ツール・system instruction(設定時)・生成設定も再送。対応する再開APIと属性名は公式SDKで確認してください)。終了イベントを受け取れなかったhopも課金され得るため、そのhopで最後に受け取ったusageを保持して合算に含め、一度も受け取っていなければ「usage不明」と記録して請求額で確認します(公式SDKはチェックポイント後に出力を受け取ってから切断された場合、重複を避けるため `ContinuationInterruptedError` を送出します)。usage はhop内で累積値なので各hopの最新値だけを保持し、hopごとの最終値を合算します。
 
 GenerateContentで `MAX_TOKENS` に達した応答に `continuation_token` が付いている場合は、蓄積済みのpartsを保持したまま `max_output_tokens`(hopをまたいだ累積の上限)を引き上げ、同じトークンで再開します。`STOP` になるまで部分出力は採用せず、トークンがない場合は未完了として扱います。Interactions APIで `incomplete` になった場合も同様に、`continuation_token` が返されていれば完了済みのhopの出力を保持したまま `max_output_tokens` を引き上げて継続し、トークンがなければ未完了として例外にします。`failed` と `cancelled` は従来どおり例外です(再開の可否と引数は[公式Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode)で確認してください)。
 
