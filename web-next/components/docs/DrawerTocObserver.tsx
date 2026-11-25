@@ -33,11 +33,12 @@ export default function DrawerTocObserver({
     const guideContent = root?.querySelector<HTMLElement>(`.${styles.main}`) ?? null;
     let wasOpen = false;
     const siteHamburger = document.querySelector<HTMLElement>("#common-header .ch-hamburger");
+    const isMobile = () => window.matchMedia("(max-width: 900px)").matches;
     const sync = (open: boolean, restoreFocus = true) => {
       root?.classList.toggle(styles.open, open);
       menu?.setAttribute("aria-expanded", String(open));
       menu?.setAttribute("aria-label", open ? "目次を閉じる" : "目次を開く");
-      const mobile = window.innerWidth <= 900;
+      const mobile = isMobile();
       if (sidebar) {
         const hidden = mobile && !open;
         // 背景クリック等でフォーカスが目次外へ移っていても、閉じたら開いた要素へ戻す。
@@ -61,7 +62,7 @@ export default function DrawerTocObserver({
     const toggle = () => sync(!root?.classList.contains(styles.open));
     /** 開いたモバイルドロワーでは、Tab 移動をメニューと目次リンクの間で DOM 順に循環させる。 */
     const containFocus = (event: KeyboardEvent) => {
-      if (!menu || !wasOpen || window.innerWidth > 900) return;
+      if (!menu || !wasOpen || !isMobile()) return;
       const stops = [menu, ...links];
       const first = stops[0];
       const last = stops[stops.length - 1];
@@ -108,12 +109,12 @@ export default function DrawerTocObserver({
     };
     const resize = () => {
       const menuHadFocus = document.activeElement === menu;
-      sync(window.innerWidth <= 900 && Boolean(root?.classList.contains(styles.open)));
+      sync(isMobile() && Boolean(root?.classList.contains(styles.open)));
       update();
       // デスクトップ幅ではメニューボタンが非表示になる。そこに残ったフォーカスを、現在のセクションの
       // 目次リンク（無ければ先頭）へ移す。sync で inert を解除し、update で選択を確定した後に移す。
       // メニュー以外（目次内など）にあるフォーカスは動かさない。
-      if (window.innerWidth > 900 && menuHadFocus)
+      if (!isMobile() && menuHadFocus)
         (links.find((a) => a.getAttribute("aria-current") === "location") ?? links[0])?.focus();
     };
     // 原本と同じUL単位で集計し、進捗DOMもそのリスト直前の表示へ限定する。
