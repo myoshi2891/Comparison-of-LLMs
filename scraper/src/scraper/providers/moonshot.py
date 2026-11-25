@@ -23,6 +23,8 @@ _KIMI_K2_7_CODE = "Kimi K2.7 Code"
 # タグは丸ごと読み飛ばし、属性値（data-field="input" / data-label="output" 等）をラベルとみなさない。
 # 通常文字の分岐は完結したタグの開始を読まない（タグの読み方が分岐すると指数的に後戻りする）。
 _ANY_TAG = r"<(?:[^<>\"']|\"[^\"]*\"|'[^']*')*>"
+_TAG_RE = re.compile(_ANY_TAG)
+_TEMPLATE_TAG_RE = re.compile(r"<(/?)template(?=[\s/>])", re.IGNORECASE)
 # cached と input や次モデル名（Kimi&nbsp;K2.6 等）の間の HTML 空白エンティティを区切りとして扱う。
 _HTML_WS_ENTITY = r"&(?:nbsp|ensp|emsp|thinsp|#0*(?:9|10|12|13|32|160)|#x0*(?:9|a|c|d|20|a0));"
 # レコード終端・次モデルを越えず、outputより前では入力価格の$を許可する。
@@ -142,6 +144,27 @@ _SUB_EN = {
 }
 
 
+def _strip_templates(html: str) -> str:
+    """template 要素を、入れ子を含めて中身ごと空白 1 つへ置き換える（閉じられない場合は末尾まで除く）。"""
+    parts: list[str] = []
+    depth = 0
+    pos = 0
+    for tag in _TAG_RE.finditer(html):
+        template = _TEMPLATE_TAG_RE.match(tag.group())
+        if template is None:
+            continue
+        if not template.group(1):
+            if depth == 0:
+                parts += [html[pos:tag.start()], " "]
+            depth += 1
+        elif depth > 0:
+            depth -= 1
+            pos = tag.end()
+    if depth == 0:
+        parts.append(html[pos:])
+    return "".join(parts)
+
+
 def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
     """
     Builds Moonshot (Kimi) model pricing records from the pricing page.
@@ -166,11 +189,12 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
 
     # HTML コメントと script/style/template の中身は可視テキストではないため、モデル候補の探索前に取り除く。
     html = re.sub(
-        r"<!--.*?-->|<(script|style|template)\b[^>]*>.*?</\1\s*>",
+        r"<!--.*?-->|<(script|style)\b[^>]*>.*?</\1\s*>",
         " ",
         html,
         flags=re.IGNORECASE | re.DOTALL,
     )
+    html = _strip_templates(html)
 
     models = []
     for name in _FALLBACKS:

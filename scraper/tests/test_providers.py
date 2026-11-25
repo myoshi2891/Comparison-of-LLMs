@@ -619,6 +619,24 @@ class TestMoonshot:
         assert model.provenance is not None
         assert model.provenance.origin == "scraped"
 
+    @pytest.mark.parametrize(
+        "template",
+        [
+            "<template><p>a</p></template>",
+            "<template><template><p>a</p></template><p>Kimi K3 input $1.11 output $2.22</p></template>",
+            '<TEMPLATE id="o"><template></template><template>x</template>'
+            "<p>Kimi K3 input $1.11 output $2.22</p></TEMPLATE >",
+            # 属性値の中のタグ様文字列は開始・終了タグとして数えない
+            '<template data-x="</template>"><p>Kimi K3 input $1.11 output $2.22</p></template>',
+            '<div data-x="<template>"></div>',
+        ],
+    )
+    def test_ignores_prices_inside_templates_including_nested(self, template):
+        html = template + "<p>Kimi K3 input $3.25 output $16.50</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
     def test_prefers_complete_pair_from_single_mention_over_cross_mention(self):
         html = "<p>Kimi K3 promo $9.99</p><p>Kimi K3 input $3.25 output $16.50</p>"
         with patch("scraper.providers.moonshot.get_page_text", return_value=html):
