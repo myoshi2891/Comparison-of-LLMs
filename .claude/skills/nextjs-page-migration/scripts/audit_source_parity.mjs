@@ -1670,7 +1670,15 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           const handle = /([A-Za-z_$][\w$]*)\s*=\s*(?:window\s*\.\s*)?$/.exec(head.slice(0, timerCall.index))?.[1];
           const cancelled = handle !== undefined &&
             new RegExp(String.raw`(?<![\w$])(?:clearTimeout|cancelAnimationFrame)\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
-          if (!cancelled) continue;
+          if (!cancelled) {
+            // A return/throw in the callback (at any brace depth, outside nested functions)
+            // before the read or render can end the callback early.
+            const base = block + 1;
+            const earlyExit = Array.from(executable.slice(base, position).matchAll(/(?<![\w$.])(?:return|throw)(?![\w$])/g))
+              .some(exit => !functions.some(fn => fn.body > block && fn.body < base + exit.index && base + exit.index < fn.end));
+            if (earlyExit) return false;
+            continue;
+          }
         }
         if (head.endsWith(")")) {
           const condition = ifCondition(open + 1 + head.length - 1);
@@ -1739,6 +1747,11 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         const selectorClasses = Array.from(selector.matchAll(/\.([\w-]+)/g), m => m[1]);
         if (selectorClasses.length > 0) {
           const classChangeRe = /(?:([A-Za-z_$][\w$]*)\s*)?\.\s*(?:className\s*(?:=(?!=)|\+=)|(?:setAttribute|removeAttribute|toggleAttribute)\s*\(\s*(?!(['"])(?!class\2)[^'"\n]*\2)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\s*\(|classList\s*\.\s*(?:add|remove|toggle|replace)\s*\()/gi;
+          // Class matching follows the document mode: exact in standards mode, ASCII case-insensitive
+          // in quirks mode; a case-only match in unknown mode is blocked as unresolved.
+          const asciiLowerToken = value => value.replace(/[A-Z]/g, c => c.toLowerCase());
+          const hitsSelectorClass = token => selectorClasses.some(wanted =>
+            wanted === token || (selectedScript.docMode !== "standards" && asciiLowerToken(wanted) === asciiLowerToken(token)));
           const changesSelectorClass = match => {
             if (/\bclassName\s*(?:=|\+=)$/.test(match[0])) {
               const targetName = match[1];
@@ -1746,7 +1759,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
               const rhs = soleStringRe.exec(literalSource.slice(match.index + match[0].length));
               if (bound && /^document\.createElement\(\s*(['"])[A-Za-z][\w-]*\1\s*\)$/.test(bound.value) && rhs) {
                 const decoded = decodeQuotedEntryEscapes(rhs[2], true);
-                return decoded === undefined || classTokens(decoded).some(token => selectorClasses.includes(token));
+                return decoded === undefined || classTokens(decoded).some(hitsSelectorClass);
               }
               return true;
             }
@@ -1764,17 +1777,19 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
             return tokenArgs.some(arg => {
               const lit = /^(['"])((?:[^\\]|\\.)*)\1$/.exec(arg);
               const decoded = lit ? decodeQuotedEntryEscapes(lit[2], true) : undefined;
-              return decoded === undefined || selectorClasses.includes(decoded);
+              return decoded === undefined || hitsSelectorClass(decoded);
             });
           };
+          // Only matches that start in executable code count; quoted examples do not block.
           if (Array.from(literalSource.matchAll(classChangeRe))
-            .some(edit => editCanPrecede(edit.index, queryAt) && changesSelectorClass(edit))) return false;
+            .some(edit => executable[edit.index] === literalSource[edit.index] &&
+              editCanPrecede(edit.index, queryAt) && changesSelectorClass(edit))) return false;
         }
         const selectorIds = Array.from(selector.matchAll(/#([\w-]+)/g), m => m[1]);
         if (selectorIds.length > 0) {
           const idChangeRe = /\.\s*(?:id\s*(?:=(?!=)|\+=)|(?:setAttribute|removeAttribute|toggleAttribute)\s*\(\s*(?!(['"])(?!id\1)[^'"\n]*\1)|(?:setAttributeNS|removeAttributeNS|setAttributeNode(?:NS)?|removeAttributeNode)\s*\()/gi;
           if (Array.from(literalSource.matchAll(idChangeRe))
-            .some(edit => editCanPrecede(edit.index, queryAt))) return false;
+            .some(edit => executable[edit.index] === literalSource[edit.index] && editCanPrecede(edit.index, queryAt))) return false;
         }
         return true;
       };
@@ -1785,7 +1800,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         const selectorClasses = Array.from(selector.matchAll(/\.([\w-]+)/g), m => m[1]);
         const selectorIds = Array.from(selector.matchAll(/#([\w-]+)/g), m => m[1]);
         const selectorTag = /^([A-Za-z][\w-]*)/.exec(selector)?.[1]?.toLowerCase();
-        const isFreshNonMatchingElement = (arg, atIndex) => {
+        const isFreshNonMatchingElement = (arg, atIndex, queryIndex) => {
           if (!/^[A-Za-z_$][\w$]*$/.test(arg)) return false;
           const bound = bindingAt(arg, atIndex);
           const created = bound && /^document\.createElement\(\s*(['"])([A-Za-z][\w-]*)\1\s*\)$/.exec(bound.value);
@@ -1796,7 +1811,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (Array.from(executable.matchAll(childMoveRe)).some(m => editCanPrecede(m.index, atIndex))) return false;
           const innerHtmlRe = new RegExp(`(?<![\\w$.])${argEsc}\\s*\\.\\s*innerHTML\\s*(?:=(?!=)|\\+=)`, "g");
           for (const assign of executable.matchAll(innerHtmlRe)) {
-            if (!editCanPrecede(assign.index, atIndex)) continue;
+            // Writes that can run before the collection query matter; later writes cannot change the captured list.
+            if (!editCanPrecede(assign.index, queryIndex)) continue;
             const rhs = soleStringRe.exec(literalSource.slice(assign.index + assign[0].length));
             if (!rhs) return false;
             const html = decodeQuotedEntryEscapes(rhs[2], true);
@@ -1831,7 +1847,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           const movedArgs = (method === "insertBefore" || method === "moveBefore") ? args.slice(0, 1)
             : method === "insertAdjacentElement" ? args.slice(1, 2)
             : args;
-          if (movedArgs.length === 0 || !movedArgs.every(arg => isFreshNonMatchingElement(arg, edit.index))) return false;
+          if (movedArgs.length === 0 || !movedArgs.every(arg => isFreshNonMatchingElement(arg, edit.index, queryAt))) return false;
         }
         return true;
       };
@@ -2639,6 +2655,9 @@ function materializePlainTextCards(src) {
             for (const el of matches) {
               if (el.index >= card.index) continue;
               if (templateRanges.some(range => range.start < el.index && el.index < range.end)) continue;
+              // A prior selected element outside the chart inventory (code-block / diagram-card cards)
+              // may still render a diagram the audit never compares: unresolved.
+              if (!cards.some(inventoried => inventoried.index === el.index)) return false;
               const elScripts = Array.from(el.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
                 .filter(m => !scripts[Number(m[1])].inTemplate);
               const found = anyScript
@@ -3190,7 +3209,9 @@ if (process.exitCode === undefined) {
                   ? "\n判定: ❌ Mermaid 図の件数不一致 — Green コミット禁止。Mermaid 図の過不足・内容を確認してから再実行すること。"
                   : mermaidMismatchOnly
                     ? "\n判定: ❌ Mermaid ソース不一致 — Green コミット禁止。Mermaid 図の順序・内容を確認してから再実行すること。"
-                    : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
+                    : otherMissing && result.unresolvedMermaidSources.length > 0
+                      ? "\n判定: ❌ 移行漏れがあり、描画スクリプトの静的解析も未解決 — Green コミット禁止。漏れを転写し、あわせて描画スクリプトを確認してから再実行すること。"
+                      : "\n判定: ❌ 移行漏れあり — Green コミット禁止。漏れを転写してから再実行すること。"
         );
         process.exitCode = result.blocking ? 1 : 0;
       }
