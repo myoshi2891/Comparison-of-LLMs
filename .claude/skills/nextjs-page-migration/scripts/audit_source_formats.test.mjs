@@ -2511,10 +2511,90 @@ test("treats names in const/let/var declaration lists as declarations when resol
 	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
 	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
 	const head = "var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent;";
-	// An inner list that declares src (no initializer) shadows the outer payload binding: unresolved.
-	const shadowed = `${card}<script>${head} if (card) { let a = 1, src; mermaid.render('x', src); }</script>`;
-	assert.equal(audit(shadowed, page).status, 1);
-	// Inner lists that only reference src keep the outer binding eligible.
-	const referenced = `${card}<script>${head} if (card) { var a = 1, b = String(a, src); } mermaid.render('x', src);</script>`;
+	// A straight-line draw function whose declaration list shadows the outer src: unresolved.
+	const shadowed = `${card}<script>${head} function draw() { let a = 1, src; mermaid.render('x', src); } draw();</script>`;
+	const shadowedRes = audit(shadowed, page);
+	assert.equal(shadowedRes.status, 1);
+	assert.deepEqual(shadowedRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	// Control: referencing the outer src without declaring it in draw() keeps the binding eligible.
+	const referenced = `${card}<script>${head} function draw() { var a = 1, b = String(a, src); mermaid.render('x', src); } draw();</script>`;
 	assert.equal(audit(referenced, page).status, 0);
+});
+
+test("tracks global-object property writes for classic bindings while preserving module-local isolation", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const classicWrite = `${card}<script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; window.src = 'flowchart LR\\nX --> Y'; mermaid.render('x', src);</script>`;
+	const classicRes = audit(classicWrite, page);
+	assert.equal(classicRes.status, 1);
+	assert.deepEqual(classicRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const moduleWrite = `${card}<script type="module">var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; window.src = 'flowchart LR\\nX --> Y'; mermaid.render('x', src);</script>`;
+	assert.equal(audit(moduleWrite, page).status, 0);
+});
+
+test("checks every argument to classList.remove for the queried host class", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const card = `<div id="c1" class="diagram-card"><div class="host"></div><script type="text/plain">${chart}</script></div>`;
+	const removesTarget = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; card.firstElementChild.classList.remove('unrelated', 'host'); var host = card.querySelector('.host'); if (!host) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const removesRes = audit(removesTarget, page);
+	assert.equal(removesRes.status, 1);
+	assert.deepEqual(removesRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const removesOther = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; card.firstElementChild.classList.remove('unrelated', 'other'); var host = card.querySelector('.host'); if (!host) continue; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(removesOther, page).status, 0);
+});
+
+test("applies language attribute fallback when script type is omitted", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const vbScript = `${card}<script language="VBScript">var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src + 'extra');</script>`;
+	assert.equal(audit(vbScript, page).status, 0);
+	const jsLang = `${card}<script language="JavaScript">var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(jsLang, page).status, 0);
+	const explicitType = `${card}<script type="text/javascript" language="VBScript">var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(explicitType, page).status, 0);
+});
+
+test("matches ID and class selectors according to document mode (standards, quirks, or unknown)", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const card = `<div id="c1" class="diagram-card CardBox"><script type="text/plain">${chart}</script></div>`;
+	// Standards mode: exact case only; another element differing only in case does not collide.
+	const standardsExact = `<!DOCTYPE html><div id="C1"></div>${card}<script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(standardsExact, page).status, 0);
+	const standardsMismatch = `<!DOCTYPE html>${card}<script>var card = document.querySelector('#C1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(standardsMismatch, page).status, 1);
+	// Quirks mode: ASCII case-insensitive ID and class matching.
+	const quirksMatch = `<html><body>${card}<script>var card = document.querySelector('.cardbox'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script></body></html>`;
+	assert.equal(audit(quirksMatch, page).status, 0);
+	const quirksCollision = `<html><body><div id="C1"></div>${card}<script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script></body></html>`;
+	assert.equal(audit(quirksCollision, page).status, 1);
+	// Unknown mode (fragment without DOCTYPE): case-folded match stays unresolved.
+	const unknownCaseFold = `${card}<script>var card = document.querySelector('#C1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(unknownCaseFold, page).status, 1);
+});
+
+test("rejects suffix-free and suffixed renders inside unproven loops while keeping proven traversals eligible", () => {
+	const chart = "flowchart LR\nA --> B";
+	const suffix = "\nclassDef box fill:#fff;";
+	const pageBase = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const pageSuffixed = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const head = "var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent;";
+	// Unproven loop (zero iterations): both suffix-free and suffixed renders stay unresolved.
+	const unprovenSuffixFree = `${card}<script>${head} for (var i = 0; i < 0; i++) { mermaid.render('x', src); }</script>`;
+	const resFree = audit(unprovenSuffixFree, pageBase);
+	assert.equal(resFree.status, 1);
+	assert.deepEqual(resFree.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	const unprovenSuffixed = `${card}<script>var CLASSDEFS = ${JSON.stringify(suffix)}; ${head} while (false) { mermaid.render('x', src + CLASSDEFS); }</script>`;
+	const resSuffixed = audit(unprovenSuffixed, pageSuffixed);
+	assert.equal(resSuffixed.status, 1);
+	assert.deepEqual(resSuffixed.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+	// Straight-line and proven indexed traversal remain eligible.
+	const straightLine = `${card}<script>var CLASSDEFS = ${JSON.stringify(suffix)}; ${head} mermaid.render('x', src + CLASSDEFS);</script>`;
+	assert.equal(audit(straightLine, pageSuffixed).status, 0);
+	const provenLoop = `${card}<script>var CLASSDEFS = ${JSON.stringify(suffix)}; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); }</script>`;
+	assert.equal(audit(provenLoop, pageSuffixed).status, 0);
 });

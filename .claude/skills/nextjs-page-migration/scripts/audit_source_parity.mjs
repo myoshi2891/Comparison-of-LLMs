@@ -1244,9 +1244,26 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     for (const m of executable.matchAll(new RegExp(`(?<![\\w$.])${id}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) found.add(m.index);
     for (const m of executable.matchAll(new RegExp(`(?:\\+\\+|--)\\s*${id}(?![\\w$])`, "g"))) found.add(m.index + m[0].length - name.length);
     for (const m of executable.matchAll(new RegExp(`\\bfor\\s*\\(\\s*(?:(?:var|let|const)\\s+)?${id}\\s+(?:of|in)\\b`, "g"))) found.add(m.index + m[0].lastIndexOf(name));
-    for (const m of executable.matchAll(new RegExp(`(?<![\\w$.])${id}(?![\\w$])`, "g"))) {
+    if (selectedScript.classic) {
+      // Classic scripts expose top-level global bindings as properties on the global object;
+      // module-local bindings are not aliased on window/globalThis/self.
+      const globalPrefix = "(?<![\\w$.])(?:window|globalThis|self)\\s*\\.\\s*";
+      for (const m of executable.matchAll(new RegExp(`${globalPrefix}${id}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) found.add(m.index);
+      for (const m of executable.matchAll(new RegExp(`(?:\\+\\+|--)\\s*${globalPrefix}${id}(?![\\w$])`, "g"))) found.add(m.index + m[0].length - name.length);
+      for (const m of executable.matchAll(new RegExp(`\\bfor\\s*\\(\\s*${globalPrefix}${id}\\s+(?:of|in)\\b`, "g"))) found.add(m.index + m[0].lastIndexOf(name));
+      for (const m of literalSource.matchAll(new RegExp(`(?<![\\w$.])(?:window|globalThis|self)\\s*\\[\\s*(['"])${id}\\1\\s*\\]\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) {
+        if (executable[m.index] === literalSource[m.index]) found.add(m.index);
+      }
+      for (const m of literalSource.matchAll(new RegExp(`(?:\\+\\+|--)\\s*(?:window|globalThis|self)\\s*\\[\\s*(['"])${id}\\1\\s*\\]`, "g"))) {
+        if (executable[m.index] === literalSource[m.index]) found.add(m.index);
+      }
+    }
+    const destructuringPattern = selectedScript.classic
+      ? new RegExp(`(?<![\\w$.])(?:(?:window|globalThis|self)\\s*\\.\\s*)?${id}(?![\\w$])`, "g")
+      : new RegExp(`(?<![\\w$.])${id}(?![\\w$])`, "g");
+    for (const m of executable.matchAll(destructuringPattern)) {
       // An object key names a property, not this binding.
-      if (/^\s*:/.test(executable.slice(m.index + name.length))) continue;
+      if (/^\s*:/.test(executable.slice(m.index + m[0].length))) continue;
       let depth = 0;
       for (let i = m.index - 1; i >= 0; i--) {
         const char = executable[i];
@@ -1450,8 +1467,27 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if (new RegExp(`(?<![\\w$.])(?:${cardEsc}|document\\s*\\.\\s*(?:body|documentElement))\\s*\\.\\s*(?:innerHTML|textContent|innerText)\\s*=(?!=)`).test(executable)) return true;
         const wantedClass = hostSelector.startsWith(".") ? hostSelector.slice(1) : "";
         if (wantedClass) {
-          for (const m of literalSource.matchAll(/\.\s*classList\s*\.\s*(?:remove|replace|toggle)\s*\(\s*(?:(['"])([^'"\n]*)\1)?/g)) {
-            if (!m[2] || m[2] === wantedClass) return true;
+          for (const m of literalSource.matchAll(/\.\s*classList\s*\.\s*(remove|replace|toggle)\s*\(/g)) {
+            const start = m.index + m[0].length;
+            let depth = 1, end = -1;
+            for (let k = start; k < executable.length; k++) {
+              if (executable[k] === "(") depth++;
+              else if (executable[k] === ")" && --depth === 0) { end = k; break; }
+            }
+            if (end < 0) return true;
+            const args = literalSource.slice(start, end).split(",").map(s => s.trim()).filter(Boolean);
+            if (args.length === 0) {
+              if (m[1] !== "remove") return true;
+              continue;
+            }
+            const checkedArgs = m[1] === "remove" ? args : args.slice(0, 1);
+            const matchesWanted = checkedArgs.some(arg => {
+              const lit = /^(['"])((?:[^'"\\\n]|\\.)*)\1$/.exec(arg);
+              if (!lit) return true;
+              const decoded = decodeQuotedEntryEscapes(lit[2], true);
+              return decoded === undefined || decoded === wantedClass;
+            });
+            if (matchesWanted) return true;
           }
           const hostEsc = hostName.replace(/\$/g, "\\$");
           const selEsc = hostSelector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -1807,7 +1843,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const collection = collectionBinding?.value;
       const all = collection && /^document\.querySelectorAll\(\s*(['"])(.*?)\1\s*\)$/.exec(collection);
       // The supported indexed traversal visits the selected cards in order.
-      if (!all || !matchesCardSelector(cardTag, all[2])) return false;
+      if (!all || matchesCardSelector(cardTag, all[2], selectedScript.docMode) !== true) return false;
       // Every selector match preceding this card must also be able to complete the loop's
       // script lookup; otherwise a null.textContent TypeError aborts the loop before this card.
       if (selectedScript.priorMatchesComplete && !selectedScript.priorMatchesComplete(all[2], selected[3] === "script")) return false;
@@ -2165,7 +2201,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     if (!resolvedSrc) return null;
     renderUses.push({ index: source.start + names[0].index, call: call.index, base: resolvedSrc.base, certifiedLoopOpen: resolvedSrc.certifiedLoopOpen });
   }
-  const loopOrFunctionHead = /(?:\b(?:for|while)\s*\((?:[^{}()]|\([^{}()]*\))*\)|\bfunction\b[^{}]*\)|=>)\s*$/;
+  // Unproven loops (for/while) may execute zero times; only function bodies and
+  // loops whose entry/iteration is already proven (certifiedLoopOpen) are transparent.
+  const functionHead = /(?:\bfunction\b[^{}]*\)|=>)\s*$/;
   const exitKeyword = /(?:return|throw|break|continue)(?![\w$])/y;
   const isUnbracedOrShortCircuited = (callIndex, callPath) => {
     const blockStart = callPath.length > 0 ? callPath[callPath.length - 1] + 1 : 0;
@@ -2206,8 +2244,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const callPath = paths.get(callIndex);
       const uncertifiedBlocks = certifiedLoopOpen === undefined
         ? callPath
-        : callPath.filter(block => block <= certifiedLoopOpen);
-      if (uncertifiedBlocks.some(block => !loopOrFunctionHead.test(executable.slice(0, block)))) return null;
+        : callPath.filter(block => block < certifiedLoopOpen);
+      if (uncertifiedBlocks.some(block => !functionHead.test(executable.slice(0, block)))) return null;
       let depth = 0;
       for (let i = 0; i < callIndex; i++) {
         if (executable[i] === "{") depth++;
@@ -2248,10 +2286,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   if (renderUses.some(use => declaration.index > use.call || !declarationPath.every((block, index) => paths.get(use.call)?.[index] === block))) return null;
   if (declaration) {
     const initialWrite = declaration.index + declaration[0].indexOf("CLASSDEFS");
-    const writes = executable.matchAll(/\bCLASSDEFS\s*(?:=(?!=|>)|(?:\*\*|&&|\|\||\?\?|[+\-*/%&|^])=|\+\+|--)/g);
-    // Additional writes may run under control flow or in callbacks. Do not
-    // certify an initializer without establishing the value at render time.
-    if (Array.from(writes).some(write => write.index !== initialWrite) || /(?:\+\+|--)\s*CLASSDEFS\b/.test(executable)) return null;
+    // Additional writes (including global object property writes in classic scripts) may run
+    // under control flow or in callbacks. Do not certify an initializer without establishing
+    // the value at render time.
+    if (Array.from(writeIndexes("CLASSDEFS")).some(write => write !== initialWrite)) return null;
   }
   const initializerSource = declaration && literalSource.slice(declaration.index);
   const initializer = initializerSource && /^(?:var|let|const)\s+CLASSDEFS\s*=\s*((?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*")(?:\s*\+\s*(?:'(?:[^'\\\r\n]|\\.)*'|"(?:[^"\\\r\n]|\\.)*"))*)/.exec(initializerSource);
@@ -2263,14 +2301,14 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   const initializedAt = declaration.index + initializer[0].length;
   // Textual order is not reachability. Certify CLASSDEFS only when each render call is
   // established as reachable: no unconditional exit at the declaration's block level before
-  // the call, and every block entered beyond the declaration is a loop or function body
-  // (if/else/switch/try may skip the call). Anything else stays unresolved.
+  // the call, and every uncertified block entered beyond the declaration is a function body
+  // (if/else/switch/try and unproven loops may skip the call). Anything else stays unresolved.
   for (const use of renderUses) {
     const callPath = paths.get(use.call);
     const uncertifiedBlocks = use.certifiedLoopOpen === undefined
       ? callPath.slice(declarationPath.length)
-      : callPath.slice(declarationPath.length).filter(block => block <= use.certifiedLoopOpen);
-    if (uncertifiedBlocks.some(block => !loopOrFunctionHead.test(executable.slice(0, block)))) return null;
+      : callPath.slice(declarationPath.length).filter(block => block < use.certifiedLoopOpen);
+    if (uncertifiedBlocks.some(block => !functionHead.test(executable.slice(0, block)))) return null;
     let depth = 0;
     for (let i = initializedAt; i < use.call; i++) {
       if (executable[i] === "{") depth++;
@@ -2292,14 +2330,55 @@ function classTokens(value) {
   return (value ?? "").split(/[ \t\n\r\f]+/).filter(Boolean);
 }
 
-/** Match static card selectors; complex/dynamic selectors are not guessed. */
-function matchesCardSelector(tag, selector) {
+/**
+ * Determine the HTML document's compatibility mode from its leading DOCTYPE:
+ * - "standards" for standards/almost-standards DOCTYPEs (exact-case ID/class matching)
+ * - "quirks" for full HTML documents without a DOCTYPE or known quirks DOCTYPEs (ASCII case-insensitive)
+ * - "unknown" for fragments or unrecognized DOCTYPEs whose mode cannot be proven
+ */
+function detectDocumentMode(src) {
+  const leading = src.replace(/^\uFEFF/, "").replace(/^(?:[ \t\n\r\f]|<!--[\s\S]*?-->)*/g, "");
+  const doctype = /^<!DOCTYPE\s+([^>]*)>/i.exec(leading);
+  if (!doctype) {
+    return /^<(?:html|head|body)(?=[\s/>])/i.test(leading) ? "quirks" : "unknown";
+  }
+  const body = doctype[1].trim();
+  if (/^html(?:\s+SYSTEM\s+(?:"about:legacy-compat"|'about:legacy-compat'))?$/i.test(body)) {
+    return "standards";
+  }
+  if (/^html\s+PUBLIC\s+["']-\/\/W3C\/\/DTD\s+(?:HTML\s+4\.01(?:\s+Strict)?|XHTML\s+1\.[01])\/\/EN["'](?:\s+["'][^"']+["'])?$/i.test(body)) {
+    return "standards";
+  }
+  if (/^html\s+PUBLIC\s+["']-\/\/W3C\/\/DTD\s+HTML\s+4\.01\s+(?:Transitional|Frameset)\/\/EN["']\s+["'][^"']+["']$/i.test(body)) {
+    return "standards";
+  }
+  if (/^html\s+PUBLIC\s+["']-\/\/(?:W3C|IETF)\/\/DTD\s+HTML\s+(?:4\.0(?:1)?\s+(?:Transitional|Frameset)|3\.2|2\.0)/i.test(body)) {
+    return "quirks";
+  }
+  if (!/^html(?:\s|$)/i.test(body)) return "quirks";
+  return "unknown";
+}
+
+/** Match static card selectors; returns true, false, or "ambiguous" when mode-dependent case folding is unproven. */
+function matchesCardSelector(tag, selector, docMode = "unknown") {
   if (!/^(?:[A-Za-z][\w-]*)?(?:[.#]-?[A-Za-z_][\w-]*)*$/.test(selector) || !selector) return false;
   const element = /^([A-Za-z][\w-]*)/.exec(selector)?.[1];
   if (element && /^<([\w-]+)/.exec(tag)?.[1].toLowerCase() !== element.toLowerCase()) return false;
+  const idAttr = readHtmlAttribute(tag, "id");
   const classes = classTokens(readHtmlAttribute(tag, "class"));
-  return Array.from(selector.matchAll(/([.#])([\w-]+)/g)).every(([, kind, value]) =>
-    kind === "#" ? readHtmlAttribute(tag, "id") === value : classes.includes(value));
+  const asciiLower = s => s.replace(/[A-Z]/g, c => c.toLowerCase());
+  let ambiguous = false;
+  for (const [, kind, value] of selector.matchAll(/([.#])([\w-]+)/g)) {
+    const exact = kind === "#" ? idAttr === value : classes.includes(value);
+    if (exact) continue;
+    if (docMode === "standards") return false;
+    const ci = kind === "#"
+      ? idAttr !== undefined && asciiLower(idAttr) === asciiLower(value)
+      : classes.some(c => asciiLower(c) === asciiLower(value));
+    if (!ci) return false;
+    if (docMode !== "quirks") ambiguous = true;
+  }
+  return ambiguous ? "ambiguous" : true;
 }
 
 /**
@@ -2309,6 +2388,7 @@ function matchesCardSelector(tag, selector) {
  * @returns {{html: string, unresolvedMermaidSources: string[]}} Restored HTML and blocking unresolved contributions.
  */
 function materializePlainTextCards(src) {
+  const docMode = detectDocumentMode(src);
   const scripts = [];
   const opaqueElements = [];
   const documentElements = [];
@@ -2346,9 +2426,15 @@ function materializePlainTextCards(src) {
     // nomodule only suppresses classic scripts; module scripts run regardless.
     if (readHtmlAttribute(script.attributes, "nomodule") !== undefined && !script.isModule) return false;
     // The HTML standard's JavaScript MIME type essences (ASCII-whitespace-trimmed; text/plain payloads stay excluded).
+    const isJsMime = mime => /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(mime);
     const mimeType = rawType?.replace(/^[ \t\n\r\f]+|[ \t\n\r\f]+$/g, "").toLowerCase();
-    const isExecutableType = rawType === undefined || rawType === "" || script.isModule ||
-      /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(mimeType);
+    const rawLang = readHtmlAttribute(script.attributes, "language");
+    const hasNoType = rawType === undefined || rawType === "";
+    // HTML spec: when type is absent or empty, fall back to "text/" + language (non-JS languages like VBScript do not execute).
+    const isExecutableType = script.isModule ||
+      (hasNoType
+        ? (rawLang === undefined || rawLang === "" || isJsMime(`text/${rawLang.toLowerCase()}`))
+        : isJsMime(mimeType));
     if (!isExecutableType) return false;
     // A script with src ignores its child text; external renderer code is not inspectable here.
     if (readHtmlAttribute(script.attributes, "src") !== undefined) {
@@ -2488,7 +2574,7 @@ function materializePlainTextCards(src) {
       }
     } else {
       const matching = scopes.filter(scope =>
-        scope.hasDynamicSelection || scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector))
+        scope.hasDynamicSelection || scope.selectors.some(selector => matchesCardSelector(card.openingTag, selector, docMode) !== false)
       );
       const renderer = matching.length === 1 && !matching[0].hasDynamicSelection ? matching[0]
         : (matching.length === 0 && scopes.length === 1 && !scopes[0].hasSelection ? scopes[0] : undefined);
@@ -2529,6 +2615,8 @@ function materializePlainTextCards(src) {
         } : true;
       const resolvedSource = renderer && (renderer.computedRenderer ? null : rendererSuffix(renderer.literalSource, renderer.rawSource, script.payload, payload, card.openingTag,
         { any: firstScript?.[1] === marker[1], plain: firstPlain?.[1] === marker[1],
+          classic: renderer.classic,
+          docMode,
           segments: renderer.segments,
           // Non-async module scripts run after the document is parsed; classic scripts and
           // async modules must follow this payload in document order to prove availability.
@@ -2537,7 +2625,7 @@ function materializePlainTextCards(src) {
           cardAvailableAt: at => renderer.deferredModule || renderer.segments.some(segment =>
             segment.start <= at && at <= segment.end && segment.documentPosition >= start),
           priorMatchesComplete: (selector, anyScript) => {
-            const matches = extractElementContents(stashed, tag => matchesCardSelector(tag, selector), true, true);
+            const matches = extractElementContents(stashed, tag => matchesCardSelector(tag, selector, docMode) !== false, true, true);
             for (const el of matches) {
               if (el.index >= card.index) continue;
               if (templateRanges.some(range => range.start < el.index && el.index < range.end)) continue;
@@ -2550,12 +2638,12 @@ function materializePlainTextCards(src) {
             }
             return true;
           },
-          unique: selector => matchesCardSelector(card.openingTag, selector) && documentElements.filter(tag => matchesCardSelector(tag, selector)).length === 1,
+          unique: selector => matchesCardSelector(card.openingTag, selector, docMode) === true && documentElements.filter(tag => matchesCardSelector(tag, selector, docMode) !== false).length === 1,
           // Whether an element matched by `selector` inside the card can contain the selected
           // script or precede it (so an edit could insert a matching script before it).
           mayContainScript: (selector, onlyContaining = false) => {
             if (!/^(?:[A-Za-z][\w-]*)?(?:[.#]-?[A-Za-z_][\w-]*)*$/.test(selector) || !selector) return true;
-            const matches = extractElementContents(card.content, tag => matchesCardSelector(tag, selector), true, true);
+            const matches = extractElementContents(card.content, tag => matchesCardSelector(tag, selector, docMode) !== false, true, true);
             return matches.some(el =>
               /<script data-audit-payload="\d+"><\/script>/.test(el.content) ||
               (!onlyContaining && el.index < marker.index)
@@ -2573,7 +2661,7 @@ function materializePlainTextCards(src) {
                 if (isTemplate) depth = Math.max(0, depth - 1);
                 continue;
               }
-              if (depth === 0 && classTokens(readHtmlAttribute(tag[3], "class")).includes(wanted[1])) {
+              if (depth === 0 && matchesCardSelector(tag[0], selector, docMode) === true) {
                 // A classic script only sees hosts parsed before it; a later host leaves `!host` reachable.
                 if (at === undefined || renderer.deferredModule || renderer.segments.some(segment =>
                   segment.start <= at && at <= segment.end && segment.documentPosition > start + tag.index)) return true;
