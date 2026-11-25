@@ -169,7 +169,7 @@ else:
     raise AssertionError("expected API failure")
 assert checkpoint["pending_messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused["content"]}]
 assert checkpoint["pending_messages"][-1]["content"] is paused["content"]
-assert "messages" not in checkpoint
+assert checkpoint["messages"] == [{"role": "user", "content": "task"}]
 assert scope["agent_loop"]("task", [], None, max_turns=1, checkpoint=checkpoint) is done
 assert requests[1]["messages"] == requests[2]["messages"]
 `,
@@ -735,8 +735,11 @@ scope = {"call": call_container, "copy": copy}
 exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 try:
     scope["agent_loop"]("task", [], None, max_turns=3, checkpoint=checkpoint)
-except RuntimeError:
-    pass
+except RuntimeError as err:
+    assert str(err) == "transient"
+else:
+    raise AssertionError("expected transient RuntimeError")
+assert len(requests) == 2
 assert checkpoint["container_id"] == "ctr_123"
 assert "container" not in requests[0]
 assert requests[1]["container"] == "ctr_123"
@@ -816,6 +819,8 @@ assert check_rows[0]["passed"] is None
 assert check_rows[0]["usd"] > 0 and check_rows[0]["sec"] >= 0
 assert "ValueError: grader crashed" in check_rows[0]["error"]
 assert check_rows[1]["status"] == "request_error"
+assert check_rows[2]["passed"] is False
+assert check_rows[3]["passed"] is False
 `,
     examples()
   );
@@ -846,7 +851,7 @@ assert visible == ["step 1. ", "step 2. ", "final."]
 # 完了ターンのassistant応答はcheckpoint["messages"]を汚染せず、checkpointは完了済みとしてマークされる
 assert checkpoint["completed"] is True
 assert "pending_messages" not in checkpoint
-assert "messages" not in checkpoint
+assert checkpoint["messages"] == [{"role": "user", "content": "task"}]
 # auto_cache=True(既定)ではトップレベル cache_control が付与され、auto_cache=False では省略される
 assert requests[0]["cache_control"] == {"type": "ephemeral"}
 requests_no_cache = []
@@ -971,7 +976,7 @@ returns = {
     17: [{"type": "document", "source": {"type": "url"}}],
     18: [{"type": "search_result", "source": "s", "title": "t", "content": []}, {"type": "text", "text": "mixed"}],
     19: [{"type": "browser_state", "tabs": []}],
-    21: [{"type": "browser_state", "tabs": [{"tab_id": "tab1", "title": "New Tab", "url": "https://example.com", "active": True}], "changes": [{"type": "tab_opened", "tab_id": "tab1"}]}],
+    21: [{"type": "browser_state", "tabs": [{"tab_id": "tab1", "title": "New Tab", "url": "https://example.com", "active": True}], "state_changes": [{"type": "tab_opened", "tab_id": "tab1"}]}],
     22: [{"type": "browser_state", "tabs": [{"tab_id": "tab1", "title": "Example", "url": "https://example.com", "active": True}]}, {"type": "text", "text": "clicked"}],
     23: [{"type": "text", "text": "not-browser-state"}],
     24: [{"type": "browser_state", "tabs": [{"tab_id": "", "title": "Bad", "url": "https://example.com", "active": False}]}],
@@ -986,7 +991,7 @@ def run_tool(_k, a):
 records = []
 class CaptureHandler(logging.Handler):
     def emit(self, record):
-        records.append(record.getMessage())
+        records.append(self.format(record))
 logger = logging.getLogger()
 handler = CaptureHandler()
 logger.addHandler(handler)

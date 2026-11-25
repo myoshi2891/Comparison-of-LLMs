@@ -3850,6 +3850,27 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"                "}
+                    <span className="hljs-keyword">{"if"}</span>{" "}
+                    <span className="hljs-string">{'"messages"'}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" checkpoint:"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                    checkpoint["}
+                    <span className="hljs-string">{'"messages"'}</span>
+                    {"] = [{"}
+                    <span className="hljs-string">{'"role"'}</span>
+                    {": "}
+                    <span className="hljs-string">{'"user"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"content"'}</span>
+                    {": user_prompt}]"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"                checkpoint["}
                     <span className="hljs-string">{'"pending_messages"'}</span>
                     {"] = "}
@@ -4716,6 +4737,8 @@ export default function Page() {
                     <span className="hljs-string">{'"url"'}</span>
                     {"), tab.get("}
                     <span className="hljs-string">{'"active"'}</span>
+                    {", "}
+                    <span className="hljs-literal">{"False"}</span>
                     {")"}
                   </span>
                   {"\n"}
@@ -4823,7 +4846,7 @@ export default function Page() {
                   {"\n"}
                   <span className={styles.codeLine}>
                     {"                            changes = x.get("}
-                    <span className="hljs-string">{'"changes"'}</span>
+                    <span className="hljs-string">{'"state_changes"'}</span>
                     {")"}
                   </span>
                   {"\n"}
@@ -5195,7 +5218,10 @@ export default function Page() {
                     <span className="hljs-keyword">{"or"}</span>
                     {" _is_image(item) "}
                     <span className="hljs-keyword">{"or"}</span>
-                    {" _is_document(item) "}
+                    {" (toolset != "}
+                    <span className="hljs-string">{'"browser"'}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" _is_document(item)) "}
                     <span className="hljs-keyword">{"for"}</span>
                     {" item "}
                     <span className="hljs-keyword">{"in"}</span>
@@ -5455,7 +5481,7 @@ export default function Page() {
                 {": 上記の "}
                 <code>{"max_turns"}</code>
                 {
-                  " は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、累計消費額に次のリクエストの上限見積もり(適用単価での最大出力トークン max_tokens 分および従量課金ツール費を含む)を加えた額がハード上限を超える場合は送信を拒否し、応答後は実測の課金額を記録してください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
+                  " は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、次のリクエストの上限見積もり(適用単価での最大出力トークン max_tokens 分および従量課金ツール費を含む)を送信前に予約して累計消費額と予約額の合計がハード上限を超える場合は送信を拒否し、応答後はその予約を実測の課金額で置き換えてください。同じタスク予算を複数のワーカーで共有する場合は、逐次チェックだけでは同時送信の上限を守れないため、予約の確保と確定をワーカー間で排他制御(調停)してください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
                 }
               </p>{" "}
             </div>{" "}

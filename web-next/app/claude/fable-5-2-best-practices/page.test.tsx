@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import fs from "node:fs";
-import { cleanup, fireEvent, render } from "@testing-library/react";
+import { cleanup, fireEvent, render, within } from "@testing-library/react";
 import postcss from "postcss";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { pageRegistry } from "@/lib/page-registry";
@@ -277,18 +277,29 @@ it("9リスト41チェックの全文とリストごとの独立集計・取消�
   const initial = expected.checks.map((a) => `0 / ${a.length} 完了`);
   expect(counts()).toEqual(initial);
   groups.forEach((g, i) => {
-    const boxes = Array.from(g.querySelectorAll("input"));
+    const group = within(g as HTMLElement);
+    const boxes = expected.checks[i].map((labelText) =>
+      group.getByRole<HTMLInputElement>("checkbox", { name: labelText })
+    );
     expect(boxes.map((b) => [b.type, b.checked])).toEqual(
       expected.checks[i].map(() => ["checkbox", false])
     );
-    for (const b of boxes) fireEvent.click(b);
+    const labels = Array.from(g.querySelectorAll("label"));
+    expect(labels.length).toBe(boxes.length);
+    boxes.forEach((b, idx) => {
+      fireEvent.click(labels[idx]);
+      expect(b.checked).toBe(true);
+    });
     expect(counts()).toEqual(
       initial.map((s, j) => (j === i ? `${boxes.length} / ${boxes.length} 完了` : s))
     );
     expect(
       (g.previousElementSibling?.querySelector("[data-check-bar]") as HTMLElement).style.width
     ).toBe("100%");
-    for (const b of boxes) fireEvent.click(b);
+    boxes.forEach((b, idx) => {
+      fireEvent.click(labels[idx]);
+      expect(b.checked).toBe(false);
+    });
     expect(counts()).toEqual(initial);
     expect(
       (g.previousElementSibling?.querySelector("[data-check-bar]") as HTMLElement).style.width
@@ -409,13 +420,24 @@ function scoped(selector: string): string {
     })
     .join(", ");
 }
+/** 規則を包む全 at-rule 祖先を外側から順に [name, params] で記録する。 */
+function atRuleAncestry(r: postcss.Rule): Array<[string, string]> {
+  const ancestors: Array<[string, string]> = [];
+  let p = r.parent;
+  while (p && p.type === "atrule") {
+    const at = p as postcss.AtRule;
+    ancestors.unshift([at.name, normalize(at.params)]);
+    p = p.parent;
+  }
+  return ancestors;
+}
 it("原本110 CSS規則の全宣言・順序・media条件を一致（図寸法は共有部品へ委譲）", () => {
   const actual: unknown[] = [];
   postcss.parse(css().split("/* Tailwind")[0]).walkRules((r) => {
     if (!r.selector.startsWith(".root")) return;
     actual.push({
       selector: normalize(r.selector),
-      media: r.parent?.type === "atrule" ? (r.parent as postcss.AtRule).params : null,
+      atRules: atRuleAncestry(r),
       declarations: r.nodes
         .filter((n) => n.type === "decl")
         .map((n) => {
@@ -434,7 +456,7 @@ it("原本110 CSS規則の全宣言・順序・media条件を一致（図寸法�
       )
       .map((r) => ({
         selector: normalize(scoped(r.selector)),
-        media: r.media,
+        atRules: r.media ? [["media", normalize(r.media)]] : [],
         declarations: r.declarations
           .filter(
             (d) =>
@@ -455,7 +477,7 @@ it("Tailwind補正ブロックの全規則・全宣言・順序・media条件を
   postcss.parse(source.slice(source.indexOf(marker))).walkRules((r) => {
     actual.push({
       selector: normalize(r.selector),
-      media: r.parent?.type === "atrule" ? (r.parent as postcss.AtRule).params : null,
+      atRules: atRuleAncestry(r),
       declarations: r.nodes
         .filter((n) => n.type === "decl")
         .map((n) => {
@@ -464,7 +486,13 @@ it("Tailwind補正ブロックの全規則・全宣言・順序・media条件を
         }),
     });
   });
-  expect(actual).toEqual(correctionContract);
+  expect(actual).toEqual(
+    correctionContract.map((r) => ({
+      selector: r.selector,
+      atRules: r.media ? [["media", normalize(r.media)]] : [],
+      declarations: r.declarations,
+    }))
+  );
 });
 /** 最終的な明示補正値を読む。 */
 function declarations(selector: string): Record<string, string> {

@@ -32,8 +32,8 @@ function parseMermaid(source: string) {
     ) {
       continue;
     }
-    const hasLinkSyntax = /(?:-->|-.->|==>|---|--\s)/.test(trimmed);
-    if (!hasLinkSyntax) continue;
+    const standaloneNode = new RegExp(`^${nodeShape}\\s*;?\\s*$`);
+    if (standaloneNode.test(trimmed)) continue;
     const start = startRe.exec(trimmed);
     if (!start) throw new Error(`Unparseable Mermaid link statement: ${trimmed}`);
     let from = start[1];
@@ -113,6 +113,7 @@ it("図2: Fable の構成は evals に合格した場合だけ「そのまま運
   expect(() => assertEvalGate(`${source}\n    FABLE --> BYPASS --> DONE`)).toThrow();
   // 未対応リンク構文を見逃さず失敗させること。
   expect(() => parseMermaid("flowchart TD\n    FABLE -.-> DONE")).toThrow();
+  expect(() => parseMermaid("flowchart TD\n    FABLE --o DONE")).toThrow();
 });
 
 it("図8: 継続したいという希望だけではモデルを切り替えず、明示的な方針がない間は終端にとどまる", () => {
@@ -122,11 +123,14 @@ it("図8: 継続したいという希望だけではモデルを切り替えず�
   expect(labels.get(fb)).not.toMatch(/継続したい/);
   const yes = edges.find((e) => e.from === fb && e.label === "はい");
   expect(labels.get(yes?.to ?? "")).toMatch(/フォールバック/);
-  const no = edges.find((e) => e.from === fb && e.label !== "はい");
-  expect(no?.label).toMatch(/未決定/);
-  // 方針がない分岐は終端（以降の辺がない）で、フォールバックへ進まない。
-  expect(edges.filter((e) => e.from === no?.to)).toEqual([]);
-  expect(labels.get(no?.to ?? "")).toMatch(/拒否のまま/);
+  const noEdges = edges.filter((e) => e.from === fb && e.label !== "はい");
+  expect(noEdges.length).toBeGreaterThan(0);
+  for (const no of noEdges) {
+    expect(no.label).toMatch(/未決定/);
+    // 方針がない分岐は終端（以降の辺がない）で、フォールバックへ進まない。
+    expect(edges.filter((e) => e.from === no.to)).toEqual([]);
+    expect(labels.get(no.to)).toMatch(/拒否のまま/);
+  }
 });
 
 it("概要: 拒否が自動でモデルを切り替えるとは読めないよう、フォールバックを有効にした場合に限定する", () => {
