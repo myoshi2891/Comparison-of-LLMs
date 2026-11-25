@@ -384,7 +384,7 @@ def run_once(prompt: str, effort: str, max_tokens: int = 32_000) -> dict:
         "output_config": {"effort": effort},
         "messages": [{"role": "user", "content": prompt}],
     }
-    t0 = time.time()
+    t0 = time.perf_counter()
     r = httpx.post(API, headers=HEADERS, json=body, timeout=900)
     r.raise_for_status()
     data = r.json()
@@ -392,7 +392,7 @@ def run_once(prompt: str, effort: str, max_tokens: int = 32_000) -> dict:
     return {
         "status": "ok",
         "effort": effort,
-        "sec": round(time.time() - t0, 1),
+        "sec": round(time.perf_counter() - t0, 1),
         "usd": round(usd(data["usage"], data), 4),
         "out_tokens": data["usage"]["output_tokens"],
         "stop_reason": data["stop_reason"],
@@ -401,9 +401,10 @@ def run_once(prompt: str, effort: str, max_tokens: int = 32_000) -> dict:
 
 
 def sweep(tasks: list[dict], levels=("low", "medium", "high", "xhigh")) -> list[dict]:
+    level_list = tuple(levels)
     rows = []
     for task in tasks:
-        for level in levels:
+        for level in level_list:
             try:
                 res = run_once(task["prompt"], level)
             except Exception as error:
@@ -522,31 +523,35 @@ def call(body: dict, betas: list[str] | None = None) -> dict:
     return r.json()
 
 
-def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "high", max_turns: int = 60, checkpoint: dict | None = None, max_tokens: int = 32_000, on_text=None) -> dict:
+def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "high", max_turns: int = 60, checkpoint: dict | None = None, max_tokens: int = 32_000, on_text=None, auto_cache: bool = True) -> dict:
     # system と tools は会話の途中で変更しない(prefix チェックの対象)
     system = "あなたはこのリポジトリの保守担当エージェントです。..."
-    # checkpoint={} を渡すと、上限到達後は同じ辞書で再呼び出しして続行できる
+    # checkpoint={} を渡すと、max_turns(1回の呼び出しあたりの上限)到達後も同じ辞書で再開できる。タスク全体の累計ターン上限は呼び出し側で強制する
     messages = [{"role": "user", "content": user_prompt}]
     container_id = None
     if checkpoint is not None:
         if checkpoint.get("completed"):
             raise ValueError("完了済みの checkpoint は再開できません")
-        if "messages" in checkpoint:
+        if "pending_messages" in checkpoint:
+            messages = list(checkpoint["pending_messages"])
+        elif "messages" in checkpoint:
             messages = list(checkpoint["messages"])
-        # 通常の再開では保存済みの container_id を保持する(生存中の一時停止コンテナに必要なファイルが残り得るため黙って消さない)。
-        # コンテナが期限切れになった場合は明示的に新しいコンテナを作成し、必要な成果物を復元してから再開する。
+        # 生存中の一時停止呼び出しを継続するときは pending_messages と元の container_id を保持する(必要なファイルが残り得るため黙って消さない)。
+        # コンテナが期限切れになった場合は、新しいコンテナへファイルを復元してもその保留中チェックポイントは再開できない。
+        # pending_messages と container_id を破棄し、保持しておいた直前の完了済み境界(checkpoint["messages"])へ戻して既に実行されたツール処理との整合を取ったうえで新しいコンテナから再実行する。
         container_id = checkpoint.get("container_id")
 
-    for _ in range(max_turns):
+    for _ in range(max_turns):  # 1回の呼び出しあたりのターン上限
         body = {
             "model": "claude-fable-5-2",
             "max_tokens": max_tokens,
             "output_config": {"effort": effort},
             "system": system,
-            "cache_control": {"type": "ephemeral"},  # 自動キャッシュを明示的に有効化
             "tools": tools,
             "messages": messages,
         }
+        if auto_cache:
+            body["cache_control"] = {"type": "ephemeral"}  # 自動キャッシュ(明示的ブレークポイントを4個使う場合は auto_cache=False で省略)
         if container_id is not None:
             body["container"] = container_id
         data = call(body)
@@ -572,7 +577,7 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
 
         if data["stop_reason"] == "pause_turn":
             if checkpoint is not None:
-                checkpoint["messages"] = list(messages)
+                checkpoint["pending_messages"] = list(messages)  # 完了済み境界(messages)は上書きせず継続状態を別保存
                 if container_id is not None:
                     checkpoint["container_id"] = container_id
             if on_text is not None:
@@ -582,6 +587,7 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
             continue
         if data["stop_reason"] != "tool_use":
             if checkpoint is not None:
+                checkpoint.pop("pending_messages", None)
                 checkpoint["completed"] = True
                 checkpoint["final_response"] = data
                 if container_id is not None:
@@ -620,60 +626,108 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                 # (toolset_name, name) で振り分ける。通常のカスタムツールは name のまま。
                 tool_key = (block["toolset_name"], block["name"]) if "toolset_name" in block else block["name"]
                 # 通常のExceptionを結果へ変換する。中断・終了(BaseException)からの復旧は対象外。
-                # run_tool は文字列または有効なコンテンツブロック(text / image / document / search_result)のリストを返す契約とし、
+                # run_tool は文字列または有効なコンテンツブロック(text / image / document / search_result / browser_state)のリストを返す契約とし、
                 # それ以外の戻り値はエラー結果として記録して checkpoint の破損を防ぐ。
                 try:
                     raw = run_tool(tool_key, copy.deepcopy(block["input"]))
-                    if isinstance(raw, str):
-                        result["content"] = raw
-                    elif isinstance(raw, list) and all(
-                        isinstance(item, dict)
-                        and (
-                            (item.get("type") == "text" and isinstance(item.get("text"), str))
-                            or (
-                                item.get("type") == "image"
-                                and isinstance(item.get("source"), dict)
-                                and (
-                                    (
-                                        item["source"].get("type") == "base64"
-                                        and isinstance(item["source"].get("media_type"), str)
-                                        and isinstance(item["source"].get("data"), str)
-                                    )
-                                    or (
-                                        item["source"].get("type") == "url"
-                                        and isinstance(item["source"].get("url"), str)
-                                    )
-                                )
-                            )
-                            or (
-                                item.get("type") == "document"
-                                and isinstance(item.get("source"), dict)
-                                and isinstance(item["source"].get("type"), str)
-                            )
-                            or (
-                                item.get("type") == "search_result"
-                                and isinstance(item.get("source"), str)
-                                and isinstance(item.get("title"), str)
-                                and isinstance(item.get("content"), list)
-                            )
+                    def _is_text(x):
+                        return isinstance(x, dict) and x.get("type") == "text" and isinstance(x.get("text"), str)
+                    def _is_image(x):
+                        if not (isinstance(x, dict) and x.get("type") == "image" and isinstance(x.get("source"), dict)):
+                            return False
+                        s = x["source"]
+                        return (
+                            (s.get("type") == "base64" and isinstance(s.get("media_type"), str) and isinstance(s.get("data"), str))
+                            or (s.get("type") == "url" and isinstance(s.get("url"), str))
                         )
-                        for item in raw
-                    ):
-                        result["content"] = copy.deepcopy(raw)
+                    def _is_document(x):
+                        if not (isinstance(x, dict) and x.get("type") == "document" and isinstance(x.get("source"), dict)):
+                            return False
+                        s = x["source"]
+                        st = s.get("type")
+                        if st == "url":
+                            return isinstance(s.get("url"), str)
+                        if st in ("base64", "text"):
+                            return isinstance(s.get("media_type"), str) and isinstance(s.get("data"), str)
+                        if st == "content":
+                            c = s.get("content")
+                            return isinstance(c, str) or (isinstance(c, list) and all(_is_text(b) or _is_image(b) for b in c))
+                        return False
+                    def _is_search_result(x):
+                        return (
+                            isinstance(x, dict)
+                            and x.get("type") == "search_result"
+                            and isinstance(x.get("source"), str)
+                            and isinstance(x.get("title"), str)
+                            and isinstance(x.get("content"), list)
+                            and all(_is_text(c) and bool(c["text"]) for c in x["content"])
+                        )
+                    def _is_browser_state(x, tool_name=None):
+                        if not (isinstance(x, dict) and x.get("type") == "browser_state"):
+                            return False
+                        tabs = x.get("tabs")
+                        if not isinstance(tabs, list):
+                            return False
+                        seen_ids = set()
+                        active_ids = []
+                        for tab in tabs:
+                            if not isinstance(tab, dict):
+                                return False
+                            tid, title, url, active = tab.get("tab_id"), tab.get("title"), tab.get("url"), tab.get("active")
+                            if not (isinstance(tid, str) and 0 < len(tid) <= 128 and tid not in seen_ids):
+                                return False
+                            if not (isinstance(title, str) and len(title) <= 500 and isinstance(url, str) and len(url) <= 2048 and isinstance(active, bool)):
+                                return False
+                            seen_ids.add(tid)
+                            if active:
+                                active_ids.append(tid)
+                        if tabs and len(active_ids) != 1:
+                            return False
+                        if tool_name == "new_tab":
+                            changes = x.get("changes")
+                            if not isinstance(changes, list) or len(active_ids) != 1:
+                                return False
+                            opened = [c for c in changes if isinstance(c, dict) and c.get("type") == "tab_opened"]
+                            if len(opened) != 1 or opened[0].get("tab_id") != active_ids[0]:
+                                return False
+                        return True
+                    is_tab_tool = toolset == "browser" and block["name"] in ("new_tab", "switch_tab", "close_tab", "list_tabs")
+                    is_screenshot_tool = toolset == "browser" and block["name"] == "screenshot"
+                    if is_tab_tool:
+                        if isinstance(raw, list) and len(raw) == 1 and _is_browser_state(raw[0], block["name"]):
+                            result["content"] = copy.deepcopy(raw)
+                        else:
+                            raise TypeError(f"run_tool returned invalid content ({type(raw).__name__})")
+                    elif is_screenshot_tool:
+                        bs_count = sum(1 for item in raw if isinstance(item, dict) and item.get("type") == "browser_state") if isinstance(raw, list) else 0
+                        if isinstance(raw, list) and any(_is_image(item) for item in raw) and bs_count <= 1 and all(_is_image(item) or _is_text(item) or _is_browser_state(item, block["name"]) for item in raw):
+                            result["content"] = copy.deepcopy(raw)
+                        else:
+                            raise TypeError(f"run_tool returned invalid content ({type(raw).__name__})")
+                    elif isinstance(raw, str):
+                        result["content"] = raw
+                    elif isinstance(raw, list):
+                        has_sr = any(isinstance(item, dict) and item.get("type") == "search_result" for item in raw)
+                        bs_count = sum(1 for item in raw if isinstance(item, dict) and item.get("type") == "browser_state")
+                        if has_sr:
+                            valid = all(_is_search_result(item) for item in raw)
+                        elif bs_count > 0:
+                            valid = toolset == "browser" and bs_count == 1 and all(_is_browser_state(item, block["name"]) or _is_text(item) or _is_image(item) for item in raw)
+                        else:
+                            valid = all(_is_text(item) or _is_image(item) or _is_document(item) for item in raw)
+                        if valid:
+                            result["content"] = copy.deepcopy(raw)
+                        else:
+                            raise TypeError(f"run_tool returned invalid content ({type(raw).__name__})")
                     else:
                         raise TypeError(
                             f"run_tool returned invalid content ({type(raw).__name__})"
                         )
                 except Exception as error:
-                    # 例外本文はモデルへ返さず、機微値をマスクしてローカルログのみへ記録する
-                    import logging, re
+                    # 例外本文や正規表現マスク済み本文はログにもモデルにも出さず、例外型のみを記録する
+                    import logging
 
-                    redacted = re.sub(
-                        r"(?i)(sk-[\w-]+|bearer\s+\S+|(?:api[_-]?key|token|secret|password)\s*[=:]\s*\S+)",
-                        "[REDACTED]",
-                        str(error),
-                    )
-                    logging.getLogger(__name__).warning("tool failed (%s): %s", type(error).__name__, redacted)
+                    logging.getLogger(__name__).warning("tool failed (%s)", type(error).__name__)
                     result["content"] = "Tool execution failed. Check the tool arguments or try an alternative approach."
                     result["is_error"] = True
                     if toolset in ("computer", "browser"):
@@ -681,18 +735,20 @@ def agent_loop(user_prompt: str, tools: list[dict], run_tool, effort: str = "hig
                 results.append(result)
         messages.append({"role": "user", "content": results})
         if checkpoint is not None:
-            checkpoint["messages"] = list(messages)  # 次のAPI呼び出し前にスナップショットを保存する
+            checkpoint["messages"] = list(messages)  # 次のAPI呼び出し前に完了済み境界を保存する
+            checkpoint.pop("pending_messages", None)
             if container_id is not None:
                 checkpoint["container_id"] = container_id
 
     if checkpoint is not None:
-        checkpoint["messages"] = list(messages)  # 最後のtool_resultもスナップショットで保存する
+        if "pending_messages" not in checkpoint:
+            checkpoint["messages"] = list(messages)  # 最後のtool_resultもスナップショットで保存する
         if container_id is not None:
             checkpoint["container_id"] = container_id
     raise RuntimeError("max_turns に到達しました")
 ```
 
-> **注意(予算上限の強制)**: 上記の `max_turns` はターン数のみを制限し、1タスクあたりの上限金額(ドル上限)は強制しません。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを必ず組み込んでください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。
+> **注意(予算上限の強制)**: 上記の `max_turns` は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、累計消費額に次のリクエストの上限見積もり(適用単価での最大出力トークン max_tokens 分および従量課金ツール費を含む)を加えた額がハード上限を超える場合は送信を拒否し、応答後は実測の課金額を記録してください。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。
 
 ### 6.5 長い無人実行で「無言」に見える問題を避ける
 
@@ -1276,7 +1332,7 @@ Claude Managed Agents で advisor を設定している場合、advisor のモ�
 
 ### 11.1 費用の式
 
-1タスクの総額は、次の合計で考えます。
+以下のトークン費用式は Messages API 利用時の見積もりです。1タスクの総額は次の合計で考え、Managed Agents を使う場合はこれとは別にセッション実行時間の料金(session runtime charge)も合算します。
 
 | 項目 | 式 | 備考 |
 | --- | --- | --- |
@@ -1362,7 +1418,7 @@ print(round(estimate_usd(example, "fast"), 2))  # 0.80 + 0.06 + 2.40 = 3.26
 
 ### 11.4 予算ガードの考え方 [私見]
 
-1. **1タスクあたりの上限金額**と**最大ターン数**を決め、ハーネスで強制する(6.4節の標準ループの `max_turns` はターン数のみを制限するため、金額上限の扱いは 6.4節の予算注記を参照)。
+1. **1タスクあたりの上限金額**と**最大ターン数**を決め、ハーネスで強制する(6.4節の標準ループの `max_turns` は1回の呼び出しあたりのターン数のみを制限するため、checkpoint 再開時の累計ターン上限と金額上限の扱いは 6.4節の予算注記を参照)。
 2. 実行ごとに「入力・出力・キャッシュ・推論リージョン倍率・従量課金ツール費・サブエージェント数・所要時間・差分行数」を記録する(Global API の単一試行 Fable 応答は `estimate_usd(usage, mode, response)` の値をそのまま使い、非課金と確認された事前拒否は 0 としてタスク予算へ加算しない。サーバー側フォールバック時はトップレベルの `usage` や最終応答への Fable 単価適用に頼らず、課金対象となる `usage.iterations` の各エントリをその試行を処理したモデルの単価で合算する。リージョン指定時はトークン費用の小計に推論リージョン倍率を掛けてから従量課金ツール費を上限へ合算する)。
 3. 週次で**タスク種別ごとの平均コスト**を見て、effort と構成を見直す。
 4. 上限に達したら、**途中経過を保存して人に引き継ぐ**(破棄しない)。
