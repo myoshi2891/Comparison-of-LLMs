@@ -168,7 +168,7 @@ make refresh-web-deps
 
 #### 前提条件
 
-- [Python 3.12+](https://www.python.org/)
+- [Python 3.12+](https://www.python.org/)（スクレイパーおよびフロントエンドテストの Python コード例検証で使用。`python3` で 3.10 以上が実行できること）
 - [uv](https://docs.astral.sh/uv/)
 - [Bun](https://bun.sh/)
 - [jq](https://jqlang.org/)（フロントエンドテストが、ガイド内の PostToolUse フック例を実行する際に使用）

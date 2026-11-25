@@ -322,7 +322,7 @@ def split_by_confidence(answers: dict, threshold: float = THRESHOLD):
 
 | 入力方法 | 上限(第三者記事の整理) |
 | --- | --- |
-| インライン base64 | PDFは1リクエストあたり最大50 MB。その他のインライン内容は最大100 MB。大きいPDFは[Files API](https://ai.google.dev/gemini-api/docs/files)を利用 |
+| インライン base64 | 1リクエストあたりのインライン内容全体で合計最大100 MB（PDFには別途最大50 MBの上限あり）。大きいPDFは[Files API](https://ai.google.dev/gemini-api/docs/files)を利用 |
 | Files API の URI | 利用可 |
 | HTTPS URL | 各 15 MB まで |
 

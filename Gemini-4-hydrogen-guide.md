@@ -264,7 +264,8 @@ flowchart TD
     G --> H["thought signature を含む履歴を保持しているか確認"]
     H --> PREFILL["prefilled modelターンを検出して削除 履歴末尾のmodelターンも確認"]
     PREFILL --> FORMAT["model応答の接頭辞は使わず system instruction や response_schema で出力形式を指定"]
-    FORMAT --> I["評価セットで 3.8 Flash と比較"]
+    FORMAT --> TOOLJSON["system instruction やプロンプトに生テキストの JSON ツール呼び出し指示がないか確認<br/>tools 未宣言ならネイティブ Function Calling で宣言するか response_schema で構造化出力に制約"]
+    TOOLJSON --> I["評価セットで 3.8 Flash と比較"]
     I --> J{"品質と総コストが基準を満たすか"}
     J -- "はい" --> K["段階的にトラフィックを切替"]
     J -- "いいえ" --> L["thinking_level や指示文を調整して再評価"]
@@ -281,6 +282,7 @@ flowchart TD
 | `frequency_penalty` / `presence_penalty` | モデルによる | **非対応** | リクエストから削除 |
 | `candidate_count > 1` | 複数候補を指定できるモデルあり | **非対応** | パラメータを削除するか `1` に調整 |
 | prefilled `model` ターン | 応答の接頭辞を与える構成あり | **非対応**。履歴をmodelターンで終えない | 事前挿入したmodelターンを削除し、出力形式はsystem instructionや `response_schema` で指定。過去の実応答とthought signatureは保持 |
+| 生テキストの JSON ツール呼び出し | プロンプトや system instruction で JSON 形式のツール呼び出しを要求する構成あり | `tools` 未宣言のまま生テキスト出力させると意図通り機能しない恐れ | system instruction とプロンプトを確認し、ツール利用はネイティブ Function Calling（`tools` 宣言）へ移行するか、JSON 応答が必要なら `response_schema` による構造化出力で制約 |
 | 課金 | 一部トークンのみ課金 | 思考トークン、およびグラウンディング使用時の内部ツール指示・関数宣言を含め**処理した全トークンが課金対象** | コスト試算を作り直す |
 | 明示的キャッシュ | 利用可 | **非対応**(第三者記事が公式を引用) | プロンプト構造を暗黙キャッシュ向けに(Step 8) |
 | 出力上限 | 65,536 | 既定 65,536、Long Decode で拡張 | Step 4 参照 |

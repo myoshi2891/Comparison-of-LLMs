@@ -327,7 +327,7 @@ Carbon（と Argon）では、入力・思考・出力が **1つの 1M トーク
 | 項目 | 内容 | 出典 |
 |---|---|---|
 | 何をするか | 1回の生成を複数セグメントに分け、1,048,576 トークン枠から入力と思考の分を除いた残りまで出力を継続する | [S6] |
-| 使う手順 | Agent Platform では **`v1beta1` エンドポイント**を使う（`v1` は非対応。Gen AI SDK は `http_options` で `api_version='v1'` を指定しない限り `v1beta1`）。SDK（ストリーミング・非ストリーミング `generate_content` とも 65,536）では `max_output_tokens` を 65,536 より大きく設定し、ストリーミングで切断からの再開が必要な場合は SDK の自動継続を無効にし、7.3節のチェックポイント付きループ（未確定 parts を破棄し、保存済み `continuation_token` で再送）で継続する（切断時の再開を要しない非ストリーミング呼び出しに限り SDK の自動継続に任せてよい）。**SDK を使わない非ストリーミング REST の直接呼び出しでは 1 セグメント上限が 32,768 であり、`max_output_tokens` を上げるだけでは足りない**。最初のリクエストは `continuation_token` なしで送り、`finishReason` が `CONTINUATION` の応答で返された `continuation_token` を付けて同じリクエストを再送するクライアント側の継続ループを実装する（7.3節のフロー。引数名は[公式Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode)で確認） | [S6] [S7] |
+| 使う手順 | Agent Platform では **`v1beta1` エンドポイント**を使う（`v1` は非対応。Gen AI SDK は `http_options` で `api_version='v1'` を指定しない限り `v1beta1`）。SDK（ストリーミングは 1 セグメント上限 65,536、非ストリーミング `generate_content` は 32,768）では `max_output_tokens` を 65,536 より大きく設定し、ストリーミングで切断からの再開が必要な場合は SDK の自動継続を無効にし、7.3節のチェックポイント付きループ（未確定 parts を破棄し、保存済み `continuation_token` で再送）で継続する（切断時の再開を要しない非ストリーミング呼び出しに限り SDK の自動継続に任せてよい）。**SDK を使わない非ストリーミング REST の直接呼び出しでは 1 セグメント上限が 32,768 であり、`max_output_tokens` を上げるだけでは足りない**。最初のリクエストは `continuation_token` なしで送り、`finishReason` が `CONTINUATION` の応答で返された `continuation_token` を付けて同じリクエストを再送するクライアント側の継続ループを実装する（7.3節のフロー。引数名は[公式Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode)で確認） | [S6] [S7] |
 | 自動継続 | 現行 SDK では**既定で有効**（例: GenerateContent は Python `google-genai` 2.30.1 以上）。`v1` を使っている場合は SDK の更新や継続の有効化だけでは足りず、エンドポイントの変更が必要 | [S6] |
 | 向く用途 | 複数ファイルの差分生成、長大なテストスイート、長い証明、出力上限で打ち切られる評価ハーネス | [S3] [S6] |
 | 向かない用途 | 遅延に敏感なリクエスト（数分かかることがある） | [S6] [S21] |
@@ -343,14 +343,16 @@ Carbon（と Argon）では、入力・思考・出力が **1つの 1M トーク
 flowchart TD
     A["1回の応答で必要な出力量"] --> M{"呼び出し方式"}
     M -- "ストリーミング" --> B{"64K トークンを超えるか<br/>または思考で上限に達しがちか"}
-    M -- "非ストリーミング SDK<br/>5章の generate_content" --> SB{"64K トークンを超えるか<br/>または思考で上限に達しがちか"}
+    M -- "非ストリーミング SDK<br/>5章の generate_content" --> SB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
     SB -- "いいえ" --> C["通常の generate_content"]
     SB -- "はい" --> D
     M -- "非ストリーミング REST" --> NB{"32,768 トークンを超えるか<br/>または思考で上限に達しがちか"}
     NB -- "いいえ" --> NR["通常の非ストリーミング REST<br/>generateContent をそのまま呼び出す"]
     NB -- "はい" --> D
     M -- "非ストリーミング Interactions" --> IB{"65,536 トークンを超えるか<br/>または思考で上限に達しがちか"}
-    IB -- "いいえ" --> NI["通常の非ストリーミング Interactions<br/>interactions.create をそのまま呼び出す"]
+    IB -- "いいえ" --> IM{"自前フォアグラウンドループで<br/>32,768 トークン超により継続が必要か"}
+    IM -- "いいえ（SDK 既定の自動継続を含む）" --> NI["通常の非ストリーミング Interactions<br/>interactions.create をそのまま呼び出す"]
+    IM -- "はい（32,768 トークンで継続が必要）" --> ACC
     IB -- "はい" --> D
     B -- "いいえ" --> SAPI{"どのAPIのストリーミングか"}
     SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>SDK の generate_content_stream または REST の streamGenerateContent で逐次出力<br/>最終チャンクの finishReason を確認し MAX_TOKENS や異常終了は未完了失敗として扱う(部分出力を完了扱いにしない)"]

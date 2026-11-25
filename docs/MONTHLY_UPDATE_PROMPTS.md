@@ -197,8 +197,8 @@ web-next/app/page.tsx と web-next/components/HomePage.tsx を読んで現状を
 
 以下の作業を行ってください:
 
-1. [スクレイパー実行] scraper/ ディレクトリで `uv run python -m scraper.main --output ../pricing.json` を実行し、
-   pricing.json を最新化する
+1. [スクレイパー実行] scraper/ ディレクトリで `uv run python -m scraper.main --output ../web-next/data/pricing.json` を実行し、
+   web-next/data/pricing.json を最新化する
 
 2. [コピー] bash update.sh --no-scrape で web-next/data/pricing.json と
    web-next/public/pricing.json に最新データをコピーする
