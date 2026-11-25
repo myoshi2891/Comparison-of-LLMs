@@ -5419,6 +5419,33 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-comment">
+                      {
+                        "# サーバー側 web search が有効な次のリクエストでは、citations 無効・省略の search_result は受け付けられない"
+                      }
+                    </span>
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            web_search = "}
+                    <span className="hljs-built_in">{"any"}</span>
+                    {"("}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {"(t.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'""'}</span>
+                    {")).startswith("}
+                    <span className="hljs-string">{'"web_search_"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" t "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" tools)"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"                            valid = "}
                     <span className="hljs-built_in">{"all"}</span>
                     {"(_is_search_result(item) "}
@@ -5434,7 +5461,14 @@ export default function Page() {
                     <span className="hljs-keyword">{"and"}</span>{" "}
                     <span className="hljs-built_in">{"len"}</span>
                     {"(combined_sr) <= "}
-                    <span className="hljs-number">{"1"}</span>
+                    <span className="hljs-number">{"1"}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-keyword">{"not"}</span>
+                    {" (web_search "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-literal">{"False"}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" combined_sr)"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>

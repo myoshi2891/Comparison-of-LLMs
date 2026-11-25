@@ -1097,7 +1097,7 @@ try:
     assert shot_executed == [("browser", "screenshot"), "custom_tool"]
 
     # search_result の citations.enabled 一貫性検証(単一結果・同一ターン・checkpoint 履歴)
-    def run_sr_case(replies_seq, tool_fn, cp=None):
+    def run_sr_case(replies_seq, tool_fn, cp=None, tools=()):
         reqs = []
         def sr_call(body):
             reqs.append(copy.deepcopy(body))
@@ -1105,7 +1105,7 @@ try:
         sr_scope = {"call": sr_call, "copy": copy}
         exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), sr_scope)
         target_cp = {} if cp is None else cp
-        sr_scope["agent_loop"]("task", [], tool_fn, max_turns=3, checkpoint=target_cp)
+        sr_scope["agent_loop"]("task", list(tools), tool_fn, max_turns=3, checkpoint=target_cp)
         return target_cp
 
     sr_enabled = {"type": "search_result", "source": "https://a.example", "title": "A", "content": [{"type": "text", "text": "body"}], "citations": {"enabled": True}}
@@ -1160,6 +1160,30 @@ try:
         cp=cp_hist_ok,
     )
     assert cp_hist_ok["messages"][-1]["content"][0]["content"] == [sr_enabled]
+
+    # サーバー側 web search が有効なら citations 無効・省略の search_result は保存前にエラー、有効なら受理
+    custom_tool = {"name": "web_search_custom", "input_schema": {"type": "object"}}
+    for ws_type in ("web_search_20250305", "web_search_20260318"):
+        ws_tools = [custom_tool, {"type": ws_type, "name": "web_search"}]
+        for batch, ok in (([sr_disabled], False), ([sr_omitted], False), ([sr_enabled], True)):
+            cp_ws = run_sr_case(
+                [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+                lambda _k, _a, b=batch: b,
+                tools=ws_tools,
+            )
+            res_ws = cp_ws["messages"][2]["content"][0]
+            if ok:
+                assert res_ws["content"] == batch and "is_error" not in res_ws, res_ws
+            else:
+                assert res_ws["is_error"] is True and res_ws["content"] == fixed_msg, (ws_type, batch, res_ws)
+    # web search がなければ(名前だけ似たカスタムツールも含め)従来どおり受理する
+    for no_ws_tools in ([], [custom_tool], [{"type": "web_fetch_20260318", "name": "web_fetch"}]):
+        cp_no_ws = run_sr_case(
+            [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+            lambda _k, _a: [sr_omitted],
+            tools=no_ws_tools,
+        )
+        assert cp_no_ws["messages"][2]["content"][0]["content"] == [sr_omitted]
 finally:
     logger.removeHandler(handler)
 `,
