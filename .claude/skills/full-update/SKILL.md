@@ -22,6 +22,7 @@ description: |
 3. **Home の公開日・最終確認日を更新（必須）**
    - 価格データを更新したら、`web-next/lib/page-registry.ts` の `slug: "/"`（Home）エントリの
      `addedAt`（公開日）と `lastReviewed`（最終確認日）を**両方とも更新当日の日付（YYYY-MM-DD）**へ書き換える。
+   - 日付を変更した場合は、`web-next/lib/page-registry.test.ts` の `PRICING_PUBLICATION_DATE` も Home の `addedAt` / `lastReviewed` と同じ日付へ同期する。
    - Home はデータ更新そのものが公開であるため、`addedAt` を据え置く他ページのルールの例外とする（2026-10-03 ユーザー指示）。
 
 4. **フロントエンドの再ビルド（必須）**
