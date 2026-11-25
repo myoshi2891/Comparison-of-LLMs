@@ -193,6 +193,19 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             end = boundary.start() if boundary else len(html)
             # タグ属性内のモデル名にマッチしないよう、レコード内の可視モデル名開始位置だけにアンカーして抽出する。
             record_starts = [s for s in key_starts if begin <= s < end]
+            # まず単一のモデル記載内で input/output の完全な組を探し、見つからない場合だけ複数記載をまたいで組にする。
+            single_pair = None
+            for idx, s in enumerate(record_starts):
+                mention_end = record_starts[idx + 1] if idx + 1 < len(record_starts) else end
+                mention = html[s:mention_end]
+                p_in = extract_price(mention, in_patterns)
+                p_out = extract_price(mention, out_patterns)
+                if p_in is not None and p_out is not None:
+                    single_pair = (p_in, p_out)
+                    break
+            if single_pair is not None:
+                in_price, out_price = single_pair
+                break
             rec_in = next(
                 (p for s in record_starts if (p := extract_price(html[s:end], in_patterns)) is not None),
                 None,
