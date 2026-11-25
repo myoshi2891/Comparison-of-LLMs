@@ -1711,6 +1711,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     };
     // Bindings whose subtree a script query searches; edits to them can change the selection.
     const cardOwners = new Set();
+    // An assigned value that is exactly one string literal; concatenations never match.
+    const soleStringRe = /^\s*(['"])((?:(?!\1)[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n](?!\s*[-+*\/%.,?:&|^=<>([`]))/;
     let certifiedLoopOpen;
     let captureAt = initialBinding.at;
     const scriptElement = (value, at = before) => {
@@ -1741,10 +1743,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
             if (/\bclassName\s*(?:=|\+=)$/.test(match[0])) {
               const targetName = match[1];
               const bound = targetName && bindingAt(targetName, match.index);
-              const rhs = /^\s*(['"])((?:[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n])/.exec(literalSource.slice(match.index + match[0].length));
+              const rhs = soleStringRe.exec(literalSource.slice(match.index + match[0].length));
               if (bound && /^document\.createElement\(\s*(['"])[A-Za-z][\w-]*\1\s*\)$/.test(bound.value) && rhs) {
-                const tokens = classTokens(rhs[2]);
-                return tokens.some(token => selectorClasses.includes(token));
+                const decoded = decodeQuotedEntryEscapes(rhs[2], true);
+                return decoded === undefined || classTokens(decoded).some(token => selectorClasses.includes(token));
               }
               return true;
             }
@@ -1761,7 +1763,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
             const tokenArgs = /\btoggle\s*\($/i.test(match[0]) ? args.slice(0, 1) : args;
             return tokenArgs.some(arg => {
               const lit = /^(['"])((?:[^\\]|\\.)*)\1$/.exec(arg);
-              return !lit || selectorClasses.includes(lit[2]);
+              const decoded = lit ? decodeQuotedEntryEscapes(lit[2], true) : undefined;
+              return decoded === undefined || selectorClasses.includes(decoded);
             });
           };
           if (Array.from(literalSource.matchAll(classChangeRe))
@@ -1794,12 +1797,19 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           const innerHtmlRe = new RegExp(`(?<![\\w$.])${argEsc}\\s*\\.\\s*innerHTML\\s*(?:=(?!=)|\\+=)`, "g");
           for (const assign of executable.matchAll(innerHtmlRe)) {
             if (!editCanPrecede(assign.index, atIndex)) continue;
-            const rhs = /^\s*(['"])((?:[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n])/.exec(literalSource.slice(assign.index + assign[0].length));
+            const rhs = soleStringRe.exec(literalSource.slice(assign.index + assign[0].length));
             if (!rhs) return false;
-            const html = rhs[2];
-            if (selectorClasses.some(cls => html.includes(cls))) return false;
-            if (selectorIds.some(id => html.includes(id))) return false;
-            if (selectorTag && selectorClasses.length === 0 && selectorIds.length === 0 && new RegExp(`<${selectorTag}(?=[\\s/>])`, "i").test(html)) return false;
+            const html = decodeQuotedEntryEscapes(rhs[2], true);
+            if (html === undefined) return false;
+            // Only unambiguous tags are read; any markup left over is not provably safe.
+            const tagRe = /<\/?[A-Za-z][\w-]*(?:\s+[^\s"'<>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*\s*\/?>/g;
+            if (html.replace(tagRe, "").includes("<")) return false;
+            for (const [tag] of html.matchAll(tagRe)) {
+              if (tag.startsWith("</")) continue;
+              // A character reference the decoder leaves in place may still spell a selector token.
+              if ([readHtmlAttribute(tag, "class"), readHtmlAttribute(tag, "id")].some(value => value?.includes("&"))) return false;
+              if (matchesCardSelector(tag, selector, selectedScript.docMode) !== false) return false;
+            }
           }
           return true;
         };
@@ -2429,12 +2439,12 @@ function materializePlainTextCards(src) {
     const isJsMime = mime => /^(?:(?:text|application)\/(?:x-)?(?:java|ecma)script|text\/javascript1\.[0-5]|text\/(?:jscript|livescript))$/.test(mime);
     const mimeType = rawType?.replace(/^[ \t\n\r\f]+|[ \t\n\r\f]+$/g, "").toLowerCase();
     const rawLang = readHtmlAttribute(script.attributes, "language");
-    const hasNoType = rawType === undefined || rawType === "";
-    // HTML spec: when type is absent or empty, fall back to "text/" + language (non-JS languages like VBScript do not execute).
+    // HTML spec: an empty type is classic JavaScript; language ("text/" + language, so VBScript
+    // does not execute) is consulted only when type is absent.
     const isExecutableType = script.isModule ||
-      (hasNoType
+      (rawType === undefined
         ? (rawLang === undefined || rawLang === "" || isJsMime(`text/${rawLang.toLowerCase()}`))
-        : isJsMime(mimeType));
+        : rawType === "" || isJsMime(mimeType));
     if (!isExecutableType) return false;
     // A script with src ignores its child text; external renderer code is not inspectable here.
     if (readHtmlAttribute(script.attributes, "src") !== undefined) {

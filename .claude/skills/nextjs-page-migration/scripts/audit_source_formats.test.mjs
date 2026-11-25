@@ -2400,13 +2400,17 @@ test("enforces strict module keyword matching, cross-scope classList.add, pre-qu
 	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
 	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
 
+	const suffix = "\nclassDef ok fill:#fff";
+	const suffixedPage = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
 	// 1. type="MODULE" is executable; type=" module " is inert; ASCII-whitespace-trimmed classic MIME remains executable.
-	const upperModule = `${card}<script type="MODULE">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
-	assert.equal(audit(upperModule, page).status, 0);
+	const upperModule = `${card}<script type="MODULE">const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS);</script>`;
+	assert.equal(audit(upperModule, suffixedPage).status, 0);
+	assert.equal(audit(upperModule, page).status, 1);
 	const paddedModuleWriter = `${card}<script type=" module ">document.querySelector('#c1 script').textContent = 'flowchart LR\\nX --> Y';</script><script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
 	assert.equal(audit(paddedModuleWriter, page).status, 0);
-	const paddedClassicMime = `${card}<script type=" text/javascript ">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
-	assert.equal(audit(paddedClassicMime, page).status, 0);
+	const paddedClassicMime = `${card}<script type=" text/javascript ">const CLASSDEFS = ${JSON.stringify(suffix)}; const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS);</script>`;
+	assert.equal(audit(paddedClassicMime, suffixedPage).status, 0);
+	assert.equal(audit(paddedClassicMime, page).status, 1);
 
 	// 2. Cross-scope classList.add() invalidates DOM-backed reads while preserving literal sources.
 	const classListAddDom = `${card}<script>document.querySelector('#other').classList.add('diagram-card');</script><script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
@@ -2549,12 +2553,20 @@ test("applies language attribute fallback when script type is omitted", () => {
 	const chart = "flowchart LR\nA --> B";
 	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
 	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const suffix = "\nclassDef ok fill:#fff";
+	const suffixedPage = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
 	const vbScript = `${card}<script language="VBScript">var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src + 'extra');</script>`;
 	assert.equal(audit(vbScript, page).status, 0);
-	const jsLang = `${card}<script language="JavaScript">var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
-	assert.equal(audit(jsLang, page).status, 0);
-	const explicitType = `${card}<script type="text/javascript" language="VBScript">var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
-	assert.equal(audit(explicitType, page).status, 0);
+	const jsLang = `${card}<script language="JavaScript">var CLASSDEFS = ${JSON.stringify(suffix)}; var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS);</script>`;
+	assert.equal(audit(jsLang, suffixedPage).status, 0);
+	assert.equal(audit(jsLang, page).status, 1);
+	const explicitType = `${card}<script type="text/javascript" language="VBScript">var CLASSDEFS = ${JSON.stringify(suffix)}; var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS);</script>`;
+	assert.equal(audit(explicitType, suffixedPage).status, 0);
+	assert.equal(audit(explicitType, page).status, 1);
+	// An explicit empty type is classic JavaScript regardless of language.
+	const emptyType = `${card}<script type="" language="VBScript">var CLASSDEFS = ${JSON.stringify(suffix)}; var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS);</script>`;
+	assert.equal(audit(emptyType, suffixedPage).status, 0);
+	assert.equal(audit(emptyType, page).status, 1);
 });
 
 test("matches ID and class selectors according to document mode (standards, quirks, or unknown)", () => {
@@ -2597,4 +2609,54 @@ test("rejects suffix-free and suffixed renders inside unproven loops while keepi
 	assert.equal(audit(straightLine, pageSuffixed).status, 0);
 	const provenLoop = `${card}<script>var CLASSDEFS = ${JSON.stringify(suffix)}; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); }</script>`;
 	assert.equal(audit(provenLoop, pageSuffixed).status, 0);
+});
+
+test("decodes class-edit arguments before comparing them with the queried selector", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const html = (before, after = "") => `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div><div id="other"></div><script>var other = document.querySelector('#other'); ${before} var card = document.querySelector('.diagram-card'); ${after} var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const fresh = value => `var made = document.createElement('div'); made.className = ${value};`;
+	// Escaped spellings of the selector class, and escapes that cannot be decoded, stay unresolved.
+	for (const edit of [
+		String.raw`other.classList.add('diagram\x2dcard');`,
+		String.raw`other.classList.add('unrelated', 'diagram-card');`,
+		String.raw`other.classList.toggle('diagram\u{2d}card');`,
+		String.raw`other.classList.add('diagram\-card');`,
+		fresh(String.raw`'note diagram\x2dcard'`),
+		fresh(String.raw`'diagram\-card'`),
+		fresh("'a' + suffix + 'b'"),
+	]) {
+		const res = audit(html(edit), page);
+		assert.equal(res.status, 1, edit);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], edit);
+	}
+	// Unrelated tokens stay eligible, as do edits after the capture.
+	for (const edit of [String.raw`other.classList.add('un\x2drelated');`, fresh(String.raw`'un\x2drelated'`)]) {
+		assert.equal(audit(html(edit), page).status, 0, edit);
+	}
+	assert.equal(audit(html("", String.raw`other.classList.add('diagram\x2dcard');`), page).status, 0);
+});
+
+test("parses inserted wrapper markup before exempting it from pre-query reorder checks", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const html = value => `<main id="box"></main><div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div><script>var box = document.querySelector('#box'); var wrap = document.createElement('section'); ${value === undefined ? "" : `wrap.innerHTML = ${value};`} box.append(wrap); var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var src = card.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	for (const value of [
+		`'<p class="diagram-card"></p>'`,
+		`'<p class="diagram&#45;card"></p>'`,
+		`'<p class="diagram&#x2d;card"></p>'`,
+		`'<p class="diagram&hyphen;card"></p>'`,
+		String.raw`'<p class="diagram\x2dcard"></p>'`,
+		String.raw`'<p class="diagram\-card"></p>'`,
+		`'<p title=a"><i class=diagram-card></i>"</p>'`,
+		`'<p ' + attrs + '></p>'`,
+		`'<b></b>'\n+ markup`,
+	]) {
+		const res = audit(html(value), page);
+		assert.equal(res.status, 1, value);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], value);
+	}
+	for (const value of [undefined, "''", `'<p class="note">diagram-card</p>'`, `'<p class="my&#45;note">x</p>'`]) {
+		assert.equal(audit(html(value), page).status, 0, value);
+	}
 });
