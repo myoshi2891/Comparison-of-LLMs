@@ -492,6 +492,7 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
     task_state.setdefault("actions", 0)
     while True:
         if estop_active():  # 非常停止が入っていればモデルに問い合わせずに終了
+            task_state["pending_observation"] = True
             return "aborted: emergency stop"
         # 非常停止や実行エラー等から再開するときは、中断前の画像を再利用しない。呼び出し側が復旧後に撮った画像を
         # contents へ追加し、task_state["pending_observation"] を False に戻すまで ER へ問い合わせない。
@@ -611,6 +612,7 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
         if executed and observation is None:
             # 最後に実行した動作の後の観測がない。contents に残る以前の画像で次の計画をさせず、
             # 呼び出し元が新しい観測を撮影して contents に追加してから再開する。
+            task_state["pending_observation"] = True
             return "aborted: no fresh observation after the last action"
 ```
 
