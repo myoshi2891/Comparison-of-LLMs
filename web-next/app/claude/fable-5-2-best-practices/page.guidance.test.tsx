@@ -16,12 +16,15 @@ const text = (e: Element | null | undefined) => (e?.textContent ?? "").replace(/
 /** Mermaid ソースからノードのラベルと全辺を抽出する（連鎖リンクを含め、未対応リンク構文は失敗させる）。 */
 function parseMermaid(source: string) {
   const labels = new Map<string, string>();
-  for (const m of source.matchAll(/\b([A-Z][A-Z0-9_]*)(?:\["([^"]*)"\]|\{"([^"]*)"\})/g))
-    labels.set(m[1], m[2] ?? m[3]);
+  const recordLabel = (id: string, sq?: string, cur?: string, rd?: string) => {
+    const label = sq ?? cur ?? rd;
+    if (label !== undefined) labels.set(id, label);
+  };
   const edges: Array<{ from: string; label: string; to: string }> = [];
-  const nodeShape = String.raw`([A-Z][A-Z0-9_]*)(?:\["[^"]*"\]|\{"[^"]*"\}|\("[^"]*"\))?`;
+  const nodeShape = String.raw`([A-Z][A-Z0-9_]*)(?:\["([^"]*)"\]|\{"([^"]*)"\}|\("([^"]*)"\))?`;
   const startRe = new RegExp(`^\\s*${nodeShape}`);
   const linkRe = new RegExp(`^\\s*--(?: "([^"]*)" --)?>\\s*${nodeShape}`);
+  const standaloneNode = new RegExp(`^${nodeShape}\\s*;?\\s*$`);
   for (const line of source.split("\n")) {
     const trimmed = line.trim();
     if (
@@ -33,10 +36,14 @@ function parseMermaid(source: string) {
     ) {
       continue;
     }
-    const standaloneNode = new RegExp(`^${nodeShape}\\s*;?\\s*$`);
-    if (standaloneNode.test(trimmed)) continue;
+    const standalone = standaloneNode.exec(trimmed);
+    if (standalone) {
+      recordLabel(standalone[1], standalone[2], standalone[3], standalone[4]);
+      continue;
+    }
     const start = startRe.exec(trimmed);
     if (!start) throw new Error(`Unparseable Mermaid link statement: ${trimmed}`);
+    recordLabel(start[1], start[2], start[3], start[4]);
     let from = start[1];
     let rest = trimmed.slice(start[0].length);
     let count = 0;
@@ -44,6 +51,7 @@ function parseMermaid(source: string) {
       if (/^\s*;?\s*$/.test(rest)) break;
       const link = linkRe.exec(rest);
       if (!link) throw new Error(`Unparseable Mermaid link statement: ${trimmed}`);
+      recordLabel(link[2], link[3], link[4], link[5]);
       edges.push({ from, label: link[1] ?? "", to: link[2] });
       from = link[2];
       rest = rest.slice(link[0].length);
@@ -92,6 +100,8 @@ function assertEvalGate(source: string) {
     }
     return false;
   };
+  expect(canReach("FABLE", "DONE")).toBe(true);
+  expect(canReach("HYBRID", "DONE")).toBe(true);
   const withoutEvalPassAndRestart = edges.filter(
     (e) =>
       !(e.from === gate && e.label === "はい" && e.to === "DONE") &&
@@ -108,8 +118,13 @@ function assertEvalGate(source: string) {
 }
 
 it("図2: Fable の構成は evals に合格した場合だけ「そのまま運用」へ進み、不合格は見直しへ戻る", () => {
-  const { source } = diagram("図2");
+  const { source, edges } = diagram("図2");
   assertEvalGate(source);
+  const gate = edges.find((e) => e.to === "DONE" && e.from !== "Q4")?.from as string;
+  // コメント内のノードラベルはライブのノードラベルを上書きせず、eval ゲート検査はライブ側を参照する。
+  assertEvalGate(`${source}\n    %% ${gate}["commented-unrelated"]`);
+  const withoutLiveEval = source.replace(/evals/g, "manual-check");
+  expect(() => assertEvalGate(`${withoutLiveEval}\n    %% ${gate}["evals 合格?"]`)).toThrow();
   // 連鎖リンクによるバイパス（FABLE --> BYPASS --> DONE）を抽出・検知できること。
   expect(() => assertEvalGate(`${source}\n    FABLE --> BYPASS --> DONE`)).toThrow();
   // 未対応リンク構文を見逃さず失敗させること。
@@ -238,6 +253,7 @@ it("図3: low が品質基準を満たしたときは1段下げ確認を経由�
   const fromF = edges.find((e) => e.from === "F" && e.label === "満たす");
   expect(fromF?.to).toBe("G0");
   expect(labels.get("G0")).toMatch(/low/);
+  expect(edges.filter((e) => e.from === "G0")).toHaveLength(2);
   expect(edges.some((e) => e.from === "G0" && e.label === "はい" && e.to === "FIX")).toBe(true);
   expect(edges.some((e) => e.from === "G0" && e.label === "いいえ" && e.to === "G")).toBe(true);
   expect(edges.some((e) => e.from === "G" && e.label === "いいえ" && e.to === "FIX")).toBe(true);

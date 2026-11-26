@@ -23,6 +23,7 @@ function resolvePython(): string {
     "python3.11",
     "python3.10",
   ].filter((c): c is string => Boolean(c));
+  const timeouts: string[] = [];
   for (const cmd of candidates) {
     const probe = spawnSync(
       cmd,
@@ -30,14 +31,18 @@ function resolvePython(): string {
       { timeout: 10_000 }
     );
     if (probe.error && (probe.error as NodeJS.ErrnoException).code === "ETIMEDOUT") {
-      throw new Error(
+      timeouts.push(
         `Python version probe timed out after 10s (phase: version probe, executable: ${cmd})`
       );
+      continue;
     }
     if (!probe.error && probe.status === 0) {
       cachedPython = cmd;
       return cmd;
     }
+  }
+  if (timeouts.length > 0) {
+    throw new Error(timeouts.join("; "));
   }
   cachedPython = "python3";
   return cachedPython;
@@ -1031,6 +1036,13 @@ try:
         assert results[idx]["content"] == fixed_msg, (idx, results[idx])
         assert "topsecret123" not in results[idx]["content"]
         assert "sk-ant-secret999" not in results[idx]["content"]
+    # 実際の送信リクエスト(requests[1])でも t20 の tool_result が固定エラー文言のみで例外詳細を含まないこと
+    sent_t20 = next(r for r in requests[1]["messages"][2]["content"] if r.get("tool_use_id") == "t20")
+    assert sent_t20["is_error"] is True, sent_t20
+    assert sent_t20["content"] == fixed_msg, sent_t20
+    assert "RuntimeError" not in sent_t20["content"]
+    assert "topsecret123" not in sent_t20["content"]
+    assert "sk-ant-secret999" not in sent_t20["content"]
     # browser タブ管理 (new_tab) は単一の browser_state ブロックを正常受理し、他の browser メンバーは text/image 併存も受理する
     assert results[20] == {"type": "tool_result", "tool_use_id": "t21", "toolset_name": "browser", "content": returns[21]}
     assert results[21] == {"type": "tool_result", "tool_use_id": "t22", "toolset_name": "browser", "content": returns[22]}

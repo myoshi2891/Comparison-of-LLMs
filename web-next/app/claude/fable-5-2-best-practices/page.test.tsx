@@ -289,6 +289,12 @@ it("9リスト41チェックの全文とリストごとの独立集計・取消�
     boxes.forEach((b, idx) => {
       fireEvent.click(labels[idx]);
       expect(b.checked).toBe(true);
+      if (idx === 0 && boxes.length > 1) {
+        expect(counts()).toEqual(initial.map((s, j) => (j === i ? `1 / ${boxes.length} 完了` : s)));
+        expect(
+          (g.previousElementSibling?.querySelector("[data-check-bar]") as HTMLElement).style.width
+        ).toBe(`${(1 / boxes.length) * 100}%`);
+      }
     });
     expect(counts()).toEqual(
       initial.map((s, j) => (j === i ? `${boxes.length} / ${boxes.length} 完了` : s))
@@ -420,8 +426,8 @@ it("原本の全要素ツリー・タグ・本文・リスト階層・図位置�
   const { container } = render(<Page />);
   const root = container.querySelector(`.${styles.root}`) as Element;
   expect(
-    Array.from(root.children)
-      .filter((e) => !e.matches("link"))
+    Array.from(root.childNodes)
+      .filter((n) => !(n instanceof Element && n.matches("link")))
       .map(tree)
       .filter(Boolean)
   ).toEqual(expectedTree);
