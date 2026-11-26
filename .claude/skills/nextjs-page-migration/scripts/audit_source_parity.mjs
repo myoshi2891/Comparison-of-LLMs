@@ -403,7 +403,15 @@ function isSelfClosingTag(openingTag) {
   return false;
 }
 
-function extractElementContents(src, predicate, includeNested = false, includeVoid = false) {
+const HTML_P_AUTO_CLOSE_TAGS = new Set([
+  "address", "article", "aside", "blockquote", "details", "div", "dl", "fieldset",
+  "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5", "h6",
+  "header", "hgroup", "hr", "main", "menu", "nav", "ol", "p", "pre", "search",
+  "section", "table", "ul",
+]);
+const HTML_LIST_CONTAINER_TAGS = new Set(["ul", "ol", "menu"]);
+
+function extractElementContents(src, predicate, includeNested = false, includeVoid = false, unsupportedBoundaries = null) {
   const results = [];
   const openingRe = /<([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
   let opening = openingRe.exec(src);
@@ -424,15 +432,64 @@ function extractElementContents(src, predicate, includeNested = false, includeVo
       const nestedRe = /<!--[\s\S]*?-->|<(\/?)([A-Za-z][\w.-]*)\b(?:[^>"']|"[^"]*"|'[^']*')*>/g;
       nestedRe.lastIndex = openingRe.lastIndex;
       let depth = 1;
+      let listDepth = 0;
+      let closed = false;
+      let boundaryEnd = src.length;
       let nested = nestedRe.exec(src);
       while (nested !== null) {
-        if (nested[2]?.toLowerCase() !== tag) {
+        const nestedTag = nested[2]?.toLowerCase();
+        if (!nestedTag) {
+          nested = nestedRe.exec(src);
+          continue;
+        }
+        if (unsupportedBoundaries) {
+          if (tag === "li") {
+            if (HTML_LIST_CONTAINER_TAGS.has(nestedTag)) {
+              if (nested[1] === "/") {
+                if (listDepth === 0) {
+                  boundaryEnd = nested.index;
+                  break;
+                }
+                listDepth -= 1;
+              } else if (!isSelfClosingTag(nested[0])) {
+                listDepth += 1;
+              }
+              nested = nestedRe.exec(src);
+              continue;
+            }
+            if (nestedTag === "li" && listDepth === 0) {
+              if (nested[1] === "/") {
+                depth = 0;
+                closed = true;
+                results.push({
+                  index: opening.index,
+                  openingTag,
+                  content: src.slice(openingRe.lastIndex, nested.index),
+                  end: nestedRe.lastIndex,
+                });
+                if (!includeNested) openingRe.lastIndex = nestedRe.lastIndex;
+                break;
+              }
+              // An opening <li> at listDepth 0 implicitly closes the current <li> (omitted </li>).
+              boundaryEnd = nested.index;
+              break;
+            }
+            nested = nestedRe.exec(src);
+            continue;
+          }
+          if (tag === "p" && nested[1] !== "/" && HTML_P_AUTO_CLOSE_TAGS.has(nestedTag)) {
+            boundaryEnd = nested.index;
+            break;
+          }
+        }
+        if (nestedTag !== tag) {
           nested = nestedRe.exec(src);
           continue;
         }
         if (nested[1] === "/") depth -= 1;
         else if (!isSelfClosingTag(nested[0])) depth += 1;
         if (depth === 0) {
+          closed = true;
           results.push({
             index: opening.index,
             openingTag,
@@ -443,6 +500,14 @@ function extractElementContents(src, predicate, includeNested = false, includeVo
           break;
         }
         nested = nestedRe.exec(src);
+      }
+      if (!closed && unsupportedBoundaries) {
+        unsupportedBoundaries.push({
+          index: opening.index,
+          openingTag,
+          content: src.slice(openingRe.lastIndex, boundaryEnd),
+          end: boundaryEnd,
+        });
       }
     }
     opening = openingRe.exec(src);
@@ -1664,8 +1729,24 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if (/(?<![\w$.])(?:try|finally)$/.test(head) || /[;{}]$/.test(head) || head === "") continue;
         const callable = /(?:function\s*\([^()]*\)|(?:\([^()]*\)|[A-Za-z_$][\w$]*)\s*=>)$/.exec(head);
         // A timer callback runs once for this iteration; other callbacks may never run.
-        const timerCall = callable && /(?<![\w$.])(?:setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.exec(head.slice(0, callable.index));
-        if (timerCall) {
+        // Only certify when the scheduler binding is proven unshadowed in this scope.
+        const timerCall = callable && /(?<![\w$.])(setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.exec(head.slice(0, callable.index));
+        const isUnshadowedScheduler = name => {
+          const esc = name.replace(/\$/g, "\\$");
+          const shadowRe = new RegExp(
+            String.raw`\b(?:var|let|const|function|class)\s+${esc}(?![\w$])|\b(?:function\b[^()]*|catch)\s*\([^)]*\b${esc}(?![\w$])|\([^)]*\b${esc}(?![\w$])[^)]*\)\s*=>|\b${esc}\s*=>|\b(?:const|let|var)\s+[^;\n{}]*[,{[]\s*${esc}(?![\w$])|\bimport\b[^;\n]*\b${esc}(?![\w$])`
+          );
+          if (shadowRe.test(executable) || writeIndexes(name).size > 0) return false;
+          const globalAssignRe = new RegExp(
+            String.raw`\b(?:window|globalThis|self)\s*(?:\.\s*${esc}(?![\w$])|\[\s*(['"])${esc}\1\s*\])\s*=(?!=)`,
+            "g"
+          );
+          for (const m of literalSource.matchAll(globalAssignRe)) {
+            if (executable[m.index] === literalSource[m.index]) return false;
+          }
+          return true;
+        };
+        if (timerCall && isUnshadowedScheduler(timerCall[1])) {
           // A timer whose handle is cancelled in the scope may never run for this iteration.
           const handle = /([A-Za-z_$][\w$]*)\s*=\s*(?:window\s*\.\s*)?$/.exec(head.slice(0, timerCall.index))?.[1];
           const cancelled = handle !== undefined &&
@@ -1753,7 +1834,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           const hitsSelectorClass = token => selectorClasses.some(wanted =>
             wanted === token || (selectedScript.docMode !== "standards" && asciiLowerToken(wanted) === asciiLowerToken(token)));
           const changesSelectorClass = match => {
-            if (/\bclassName\s*(?:=|\+=)$/.test(match[0])) {
+            // Restrict the fresh-node exemption to plain `className = ...` assignment.
+            // `className += ...` can combine with prior classes to form a selector match.
+            if (/\bclassName\s*=$/.test(match[0])) {
               const targetName = match[1];
               const bound = targetName && bindingAt(targetName, match.index);
               const rhs = soleStringRe.exec(literalSource.slice(match.index + match[0].length));
@@ -2542,9 +2625,21 @@ function materializePlainTextCards(src) {
   const escape = value => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const templateRanges = extractElementContents(stashed, tag => /^<template(?![\w:-])/i.test(tag), true)
     .map(template => ({ start: template.index, end: template.end }));
+  const unsupportedCardBoundaries = [];
   const cards = extractElementContents(stashed, tag => {
     return classTokens(readHtmlAttribute(tag, "class")).some(c => c === "code-block" || c === "diagram-card");
-  }, true);
+  }, true, false, unsupportedCardBoundaries);
+  for (const unclosed of unsupportedCardBoundaries) {
+    if (templateRanges.some(range => range.start < unclosed.index && unclosed.index < range.end)) continue;
+    const payloadMarker = Array.from(unclosed.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g)).find(match => {
+      const script = scripts[Number(match[1])];
+      return !script.inTemplate && readHtmlAttribute(script.attributes, "type")?.toLowerCase() === "text/plain" && readHtmlAttribute(script.attributes, "data-for") === undefined;
+    });
+    if (payloadMarker) {
+      const cardId = readHtmlAttribute(unclosed.openingTag, "id") ?? `card-${payloadMarker[1]}`;
+      unresolvedMermaidSources.push(`boundary:${cardId}`);
+    }
+  }
   const edits = [];
   for (const card of cards.reverse()) {
     const start = card.index + card.openingTag.length;
@@ -2653,17 +2748,29 @@ function materializePlainTextCards(src) {
           priorMatchesComplete: (selector, anyScript) => {
             const matches = extractElementContents(stashed, tag => matchesCardSelector(tag, selector, docMode) !== false, true, true);
             for (const el of matches) {
-              if (el.index >= card.index) continue;
+              if (el.index === card.index) continue;
               if (templateRanges.some(range => range.start < el.index && el.index < range.end)) continue;
-              // A prior selected element outside the chart inventory (code-block / diagram-card cards)
-              // may still render a diagram the audit never compares: unresolved.
+              const elTag = /^<([A-Za-z][\w.-]*)/.exec(el.openingTag)?.[1].toLowerCase() ?? "";
+              const isVoidElement = HTML_VOID_ELEMENTS.has(elTag);
+              // A void element after the captured card cannot contain a script descendant to render.
+              if (el.index > card.index && isVoidElement) continue;
+              // Any selected element outside the chart inventory (prior or trailing)
+              // may render a diagram the audit never compares: unresolved.
               if (!cards.some(inventoried => inventoried.index === el.index)) return false;
               const elScripts = Array.from(el.content.matchAll(/<script data-audit-payload="(\d+)"><\/script>/g))
                 .filter(m => !scripts[Number(m[1])].inTemplate);
               const found = anyScript
                 ? elScripts[0]
                 : elScripts.find(m => readHtmlAttribute(scripts[Number(m[1])].attributes, "type")?.toLowerCase() === "text/plain");
-              if (!found) return false;
+              if (el.index < card.index) {
+                if (!found) return false;
+              } else if (found) {
+                const foundScript = scripts[Number(found[1])];
+                const isInventoriedPayload =
+                  readHtmlAttribute(foundScript.attributes, "type")?.toLowerCase() === "text/plain" &&
+                  readHtmlAttribute(foundScript.attributes, "data-for") === undefined;
+                if (!isInventoriedPayload) return false;
+              }
             }
             return true;
           },

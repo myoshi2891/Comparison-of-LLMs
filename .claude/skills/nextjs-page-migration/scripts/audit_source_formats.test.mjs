@@ -2660,3 +2660,46 @@ test("parses inserted wrapper markup before exempting it from pre-query reorder 
 		assert.equal(audit(html(value), page).status, 0, value);
 	}
 });
+
+test("enforces HTML card boundaries, unshadowed timer bindings, plain className exemptions, and trailing querySelectorAll matches", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+
+	// 1. Omitted </li> on a payload-bearing card blocks certification; explicit </li> stays eligible.
+	const liPage = `const D = ${JSON.stringify(chart)}; <ul><li><MermaidDiagram chart={D} /></li><li>next</li></ul>`;
+	const explicitLi = `<ul><li id="c1" class="diagram-card"><script type="text/plain">${chart}</script></li><li>next</li></ul><script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const explicitRes = audit(explicitLi, liPage);
+	assert.equal(explicitRes.data.mermaidSourcesMatch, true, "explicit </li> card stays eligible");
+	assert.deepEqual(explicitRes.data.unresolvedMermaidSources, [], "explicit </li> card has no unresolved sources");
+	const omittedLi = `<ul><li id="c1" class="diagram-card"><script type="text/plain">${chart}</script><li>next</li></ul><script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const omittedRes = audit(omittedLi, liPage);
+	assert.equal(omittedRes.status, 1, "omitted </li> card is not silently dropped");
+	assert.ok(omittedRes.data.unresolvedMermaidSources.includes("boundary:c1"), `expected boundary:c1, got ${JSON.stringify(omittedRes.data.unresolvedMermaidSources)}`);
+
+	// 2. Shadowed timer bindings fail callback certification, while unshadowed browser timers stay eligible.
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const timerHtml = (prelude, scheduler) =>
+		`${card}<script>${prelude} var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { let c = cards[i]; ${scheduler}(function () { var src = c.querySelector('script').textContent; mermaid.render('x', src); }); }</script>`;
+	for (const scheduler of ["setTimeout", "requestAnimationFrame", "queueMicrotask"]) {
+		assert.equal(audit(timerHtml("", scheduler), page).status, 0, `unshadowed ${scheduler}`);
+		for (const prelude of [`const ${scheduler} = function () {};`, `function ${scheduler}() {}`, `window.${scheduler} = function () {};`]) {
+			const res = audit(timerHtml(prelude, scheduler), page);
+			assert.equal(res.status, 1, `shadowed ${scheduler}: ${prelude}`);
+			assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], `shadowed ${scheduler}: ${prelude}`);
+		}
+	}
+
+	// 3. className += is not exempted on fresh nodes, while plain assignment of an unrelated class stays eligible.
+	const classHtml = edit =>
+		`${card}<script>var n = document.createElement('div'); ${edit} var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(classHtml("n.className = 'unrelated';"), page).status, 0, "fresh node plain unrelated className");
+	const plusEqRes = audit(classHtml("n.className = 'diagram-'; n.className += 'card';"), page);
+	assert.equal(plusEqRes.status, 1, "fresh node className += blocks certification");
+	assert.deepEqual(plusEqRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+
+	// 4. Uninventoried trailing querySelectorAll matches fail traversal certification.
+	const trailingUninventoried = `<div id="c1" class="diagram-card chart"><script type="text/plain">${chart}</script></div><section class="chart"><script type="text/plain">flowchart LR\nX --> Y</script></section><script>var cards = document.querySelectorAll('.chart'); for (var i = 0; i < cards.length; i++) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	const trailingRes = audit(trailingUninventoried, page);
+	assert.equal(trailingRes.status, 1, "uninventoried trailing match fails certification");
+	assert.deepEqual(trailingRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
+});
