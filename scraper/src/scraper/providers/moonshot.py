@@ -238,10 +238,15 @@ def scrape(existing: list[ApiModel] | None = None) -> list[ApiModel]:
             if single_pair is not None:
                 in_price, out_price = single_pair
                 break
-            # 複数記載をまたぐ組は、間に <dt> のレコード境界がない記載どうしに限る。
+            # 複数記載をまたぐ組は、間に <dt> または <tr> の開始タグ境界がない記載どうしに限る。
+            # 完結したタグ単位で走査し、属性値内の "<dt>" / "<tr>" テキストで誤分割しない。
             groups: list[list[int]] = []
             for s in record_starts:
-                if groups and not re.search(r"<dt\b", html[groups[-1][-1] : s], re.IGNORECASE):
+                has_boundary = bool(groups) and any(
+                    re.match(r"^<(?:dt|tr)(?=[\s/>])", tag.group(0), re.IGNORECASE)
+                    for tag in _TAG_RE.finditer(html[groups[-1][-1] : s])
+                )
+                if groups and not has_boundary:
                     groups[-1].append(s)
                 else:
                     groups.append([s])

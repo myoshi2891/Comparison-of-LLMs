@@ -779,6 +779,27 @@ class TestMoonshot:
         assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
         assert model.scrape_status == "fallback"
 
+    def test_attribute_containing_dt_or_tr_does_not_split_grouped_mentions(self):
+        html = (
+            '<p>Kimi K3 input $3.25</p>'
+            '<p data-note="<dt><tr>">Kimi K3 output $16.50</p>'
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    def test_table_row_boundary_splits_repeated_mentions(self):
+        html = (
+            "<table>"
+            "<tr><td>Kimi K3</td><td>input $3.25</td></tr>"
+            "<tr><td>Kimi K3</td><td>output $16.50</td></tr>"
+            "</table>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+        assert model.scrape_status == "fallback"
+
     # "Kimi K2.7 Code" が "Kimi K2.7 Code Highspeed" の価格を拾わないこと。
     _OVERLAP_HTML = (
         "<html><body>"
