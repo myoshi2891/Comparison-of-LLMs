@@ -305,7 +305,7 @@ Hydrogen は入力・思考・出力が**1つの 1,048,576 トークン窓を共
 
 - 同期リクエストの出力は**既定で 65,536 トークン**
 - それを超える出力(複数ファイルのdiff、長大なテストスイート等)は **Long Decode** を使う
-- Interactions API は、`max_output_tokens` を 65,536 超に設定し、バックグラウンド実行またはフォアグラウンドのクライアント側継続を選べる。`background=True` は `store=True` が必要で、サーバーがhopを連結する。`background=False` では対応SDKの自動継続、または `automatic_continuation=False` と `continuation_token` を使う自前ループを利用する。自前ループでは各hopの出力を順に蓄積してから最終hopの状態を確認する(最後のinteractionの `output_text` だけを返すと、それ以前の継続分のテキストが欠落する)。`store=False` のステートレス実行も可能で、その場合は前回IDの代わりに元の入力を再送し、モデル・ツール・system instruction・生成設定を各hopで維持する([公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation))。SDKの自動継続中に接続が切れて `ContinuationInterruptedError` が送出された場合は、リクエストを最初からやり直さない。非ストリーミングでは例外の `partial_interaction`(受信済みの出力とusage)を保持し、`store=True` は例外が持つinteraction IDと `continuation_token` で再開して再開分を後ろへ結合する(`store=False` で例外に `interaction_id` がない場合は、元の入力とモデル・ツール・system instruction・生成設定に `continuation_token` を付けてステートレスに再開する)。一方、ストリーミング中断では `partial_interaction` が `None` になり得るため `partial_interaction` に依存せず、ストリーム受信中に記録した最後の確定チェックポイント(`continuation_token` 取得時点)までの出力だけを保持してそれ以降の未確定出力を破棄したうえで、`store=True` ではその `continuation_token` を発行した対の interaction ID(または例外の `interaction_id`)と `continuation_token` で再開して追記し、`store=False` では `previous_interaction_id` を付けず `continuation_token` と元の入力・モデル・ツール・system instruction・生成設定を再送してステートレスに再開する(最初から再送すると受信済みの出力が重複し、その分も再度課金される。属性名・利用可能なチェックポイント情報は公式SDKで確認する)。
+- Interactions API は、`max_output_tokens` を 65,536 超に設定し、バックグラウンド実行またはフォアグラウンドのクライアント側継続を選べる。`background=True` は `store=True` が必要で、サーバーがhopを連結する。`background=False` では対応SDKの自動継続、または `automatic_continuation=False` と `continuation_token` を使う自前ループを利用する。自前ループでは各hopの出力を順に蓄積してから最終hopの状態を確認する(最後のinteractionの `output_text` だけを返すと、それ以前の継続分のテキストが欠落する)。`store=False` のステートレス実行も可能で、その場合は前回IDの代わりに元の入力を再送し、モデル・ツール・system instruction・生成設定を各hopで維持する([公式Interactions Long Decode](https://ai.google.dev/gemini-api/docs/long-decode#client-side-continuation))。SDKの自動継続中に接続が切れて `ContinuationInterruptedError` が送出された場合は、リクエストを最初からやり直さない。非ストリーミングでは例外の `partial_interaction`(受信済みの出力とusage)を保持し、`store=True` は例外が持つinteraction IDと `continuation_token` で再開して再開分を後ろへ結合する(`store=False` で例外に `interaction_id` がない場合は、元の入力とモデル・ツール・system instruction・生成設定に `continuation_token` を付けてステートレスに再開する)。一方、ストリーミング中断では `partial_interaction` が `None` になり得るため `partial_interaction` に依存せず、ストリーム受信中に記録した最後の確定チェックポイント(`continuation_token` 取得時点)がある場合はそこまでの出力だけを保持してそれ以降の未確定出力を破棄したうえで、`store=True` ではその `continuation_token` を発行した対の interaction ID(または例外の `interaction_id`)と `continuation_token` で再開して追記し、`store=False` では `previous_interaction_id` を付けず `continuation_token` と元の入力・モデル・ツール・system instruction・生成設定を再送してステートレスに再開する(最初から再送すると受信済みの出力が重複し、その分も再度課金される。属性名・利用可能なチェックポイント情報は公式SDKで確認する)。最初のチェックポイント到達前に切断され `continuation_token` が存在しない場合は、受信済みの部分出力を保持しつつも `continuation_token` による再開は前提にせず、未完了として扱う(再実行する場合は最初からやり直す)。
 - GenerateContent APIでも、対応する最新版SDKは `max_output_tokens > 65,536` で自動継続する。RESTや自前ループでは `CONTINUATION` と `continuation_token` を扱い、同じリクエストを継続する([公式GenerateContent Long Decode](https://ai.google.dev/gemini-api/docs/generate-content/long-decode))。必要なSDKバージョンは両APIの公式資料で確認する。
 - Agent Platform(Google Cloud)経由では、Interactions・GenerateContentのどちらの継続も **`v1beta1` エンドポイント**で行う。`v1` はこの継続動作に非対応のため、SDKクライアントは `http_options` で `api_version='v1'` を指定せず、RESTの呼び出し元も `v1beta1` のパスを使う(Carbonガイドの Agent Platform 記載と同じ要件)。
 
@@ -324,14 +324,18 @@ flowchart TD
     FG --> FGM{"継続方式は何か"}
     FGM -- "SDKの自動継続" --> AUTO["interactions.create が返す統合済みの出力とusageをそのまま使う 最終hopをidで再取得しない getは最後のhopの出力しか返さない"]
     AUTO --> AINT{"自動継続の途中で ContinuationInterruptedError が送出されたか"}
-    AINT -- "いいえ" --> AUTOD["返り値の status が completed か確認して採用 失敗や不完全終了は例外"]
-    AINT -- "はい" --> AMODE{"呼び出し方式 /<br/>partial_interaction の有無"}
+    AINT -- "いいえ" --> AACT{"返り値の status は requires_action か"}
+    AINT -- "はい" --> AMODE{"呼び出し方式 /<br/>partial_interaction とチェックポイントの有無"}
     AMODE -- "非ストリーミング<br/>partial_interaction あり" --> ARES["例外の partial_interaction を保持し 最初からやり直さない<br/>store=True は例外の interaction ID と continuation_token で再開<br/>store=False で interaction_id がない場合は 元の入力とモデル ツール system instruction 生成設定に continuation_token を付けてステートレスに再開"]
     ARES --> AJOIN["partial_interaction の出力とusageに 再開分を順に結合する"]
-    AMODE -- "ストリーミング中断<br/>partial_interaction が None になり得る" --> ASRES["partial_interaction に依存せず 最後の確定チェックポイントまでの出力だけを保持し 以降の未確定出力を破棄<br/>store=True はその continuation_token を発行した対の interaction ID(または例外の interaction_id)と continuation_token で再開<br/>store=False は previous_interaction_id を省略し continuation_token と元の入力・モデル・ツール・system instruction・生成設定を再送してステートレスに再開"]
+    AMODE -- "ストリーミング中断<br/>チェックポイント(continuation_token)あり" --> ASRES["partial_interaction に依存せず 最後の確定チェックポイントまでの出力だけを保持し 以降の未確定出力を破棄<br/>store=True はその continuation_token を発行した対の interaction ID(または例外の interaction_id)と continuation_token で再開<br/>store=False は previous_interaction_id を省略し continuation_token と元の入力・モデル・ツール・system instruction・生成設定を再送してステートレスに再開"]
     ASRES --> ASJOIN["確定チェックポイントまでの出力に 再開分を追記し 重複を防ぐ"]
-    AJOIN --> AUTOD
-    ASJOIN --> AUTOD
+    AMODE -- "ストリーミング中断<br/>最初のチェックポイント前(continuation_token なし)" --> ASNOCHK["受信済みの部分出力は保持しつつ continuation_token での継続再開は前提にしない<br/>完了扱いにはせず 再実行が必要なら最初からやり直す"]
+    AJOIN --> AACT
+    ASJOIN --> AACT
+    AACT -- "はい" --> ATOOL["要求されたツールを実行し 結果を interaction に返して処理を継続<br/>store=True は interaction ID とツール結果、store=False は履歴とツール結果・同じtools宣言を再送"]
+    ATOOL --> AUTO
+    AACT -- "いいえ" --> AUTOD["返り値の status が completed か確認して採用 失敗や不完全終了は例外"]
     FGM -- "自前ループ" --> ACC["各hopの出力テキストとusageを順に蓄積 最後のhopのoutput_textだけでは前半の継続分が欠落する"]
     ACC --> FGD["最終hopの status が completed か確認し 蓄積した全hopの出力を結合して採用 失敗や不完全終了は例外"]
     GC --> RESULT["全hopの応答とusageを集計し終了理由を確認"]

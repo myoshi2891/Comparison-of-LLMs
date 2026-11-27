@@ -362,7 +362,13 @@ flowchart TD
     IM -- "はい（32,768 トークンで継続が必要）" --> ACC
     IB -- "はい" --> D
     B -- "いいえ" --> SAPI{"どのAPIのストリーミングか"}
-    SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>SDK の generate_content_stream または REST の streamGenerateContent で逐次出力<br/>最終チャンクの finishReason を確認し MAX_TOKENS や異常終了は未完了失敗として扱う(部分出力を完了扱いにしない)"]
+    SAPI -- "GenerateContent" --> CS["通常のストリーミング<br/>SDK の generate_content_stream または REST の streamGenerateContent で逐次出力し<br/>現在のモデルターンの出力partsを蓄積(新ターン開始時に空にする)"]
+    CS --> CSEND{"最終チャンクの finishReason は何か"}
+    CSEND -- "STOP" --> CSFC{"現在のモデルターンの蓄積partsに<br/>functionCallがあるか(過去ターンは判定しない)"}
+    CSFC -- "はい" --> CSACT["各functionCallを承認ゲートに通す 12.2節<br/>承認したものだけ実行し functionResponse を返す<br/>拒否は拒否結果を functionResponse として返す<br/>現在のモデルターンのpartsを会話履歴に保持し次の通常ストリーミングを送る"]
+    CSACT --> CS
+    CSFC -- "いいえ" --> CSDONE["蓄積した現在ターンのpartsを会話履歴に保持して完了<br/>(表示は思考サマリーでないtextパートだけを結合)"]
+    CSEND -- "MAX_TOKENS や異常終了" --> CSERR["未完了失敗として扱う(部分出力を完了扱いにしない)"]
     SAPI -- "Interactions" --> SACC
     B -- "はい" --> D{"遅延に敏感か"}
     D -- "はい" --> E["タスクを分割して対応"]
