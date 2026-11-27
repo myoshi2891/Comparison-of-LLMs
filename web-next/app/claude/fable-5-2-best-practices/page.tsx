@@ -1583,9 +1583,11 @@ export default function Page() {
                       <code>{"model"}</code>
                       {" が "}
                       <code>{"claude-fable-5-2"}</code>
-                      {" かつ応答本文に期待値("}
+                      {" かつ応答の "}
+                      <code>{"text"}</code>
+                      {" ブロックを抽出して前後空白を除いた本文が期待値("}
                       <code>{"391"}</code>
-                      {")が含まれる "}
+                      {")と完全一致する "}
                     </td>
                   </tr>
                   <tr>
@@ -3767,7 +3769,7 @@ export default function Page() {
                     {"}  "}
                     <span className="hljs-comment">
                       {
-                        "# 自動キャッシュ(明示的ブレークポイントを4個使う場合は auto_cache=False で省略)"
+                        "# 自動キャッシュ(明示的ブレークポイントを4個使う場合や、別TTLの明示的 cache_control が末尾のキャッシュ可能ブロックに当たり得る場合は auto_cache=False で省略)"
                       }
                     </span>
                   </span>
@@ -4646,13 +4648,9 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                        "}
                     <span className="hljs-keyword">{"if"}</span>
-                    {" st "}
-                    <span className="hljs-keyword">{"in"}</span>
-                    {" ("}
+                    {" st == "}
                     <span className="hljs-string">{'"base64"'}</span>
-                    {", "}
-                    <span className="hljs-string">{'"text"'}</span>
-                    {"):"}
+                    {":"}
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -4664,6 +4662,30 @@ export default function Page() {
                     {"), "}
                     <span className="hljs-built_in">{"str"}</span>
                     {") "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(s.get("}
+                    <span className="hljs-string">{'"data"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {")"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"if"}</span>
+                    {" st == "}
+                    <span className="hljs-string">{'"text"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"return"}</span>
+                    {" s.get("}
+                    <span className="hljs-string">{'"media_type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"text/plain"'}</span>{" "}
                     <span className="hljs-keyword">{"and"}</span>{" "}
                     <span className="hljs-built_in">{"isinstance"}</span>
                     {"(s.get("}
