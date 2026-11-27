@@ -1583,7 +1583,9 @@ export default function Page() {
                       <code>{"model"}</code>
                       {" が "}
                       <code>{"claude-fable-5-2"}</code>
-                      {" である "}
+                      {" かつ応答本文に期待値("}
+                      <code>{"391"}</code>
+                      {")が含まれる "}
                     </td>
                   </tr>
                   <tr>
@@ -2977,7 +2979,7 @@ export default function Page() {
                     {"  -d "}
                     <span className="hljs-string">
                       {
-                        '\'{\n    "model": "claude-fable-5-2",\n    "max_tokens": 16000,\n    "output_config": { "effort": "high" },\n    "messages": [\n      { "role": "user", "content": "このリポジトリの設計上のリスクを3つ挙げて" }\n    ]\n  }\''
+                        '\'{\n    "model": "claude-fable-5-2",\n    "max_tokens": 16000,\n    "output_config": { "effort": "high" },\n    "messages": [\n      { "role": "user", "content": "17 * 23 を計算し、答えの数値だけを返して" }\n    ]\n  }\''
                       }
                     </span>
                   </span>
@@ -5590,8 +5592,14 @@ export default function Page() {
                     <span className="hljs-keyword">{"or"}</span>
                     {" _is_image(item) "}
                     <span className="hljs-keyword">{"or"}</span>
-                    {" (toolset != "}
-                    <span className="hljs-string">{'"browser"'}</span>{" "}
+                    {" (toolset "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" ("}
+                    <span className="hljs-string">{'"browser"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"computer"'}</span>
+                    {") "}
                     <span className="hljs-keyword">{"and"}</span>
                     {" _is_document(item)) "}
                     <span className="hljs-keyword">{"for"}</span>

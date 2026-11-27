@@ -30,7 +30,7 @@ function parseMermaid(source: string) {
     if (
       !trimmed ||
       // 単独のディレクティブだけを読み飛ばす。同じ行に辺などの続きがある場合は下で解析または拒否する。
-      /^(?:%%.*|(?:flowchart|graph)\s+(?:TD|TB|BT|RL|LR)\s*;?|direction\s+(?:TD|TB|BT|RL|LR)\s*;?|end\s*;?|(?:classDef|class|subgraph|style|linkStyle)\b.*)$/.test(
+      /^(?:%%.*|(?:flowchart|graph)\s+(?:TD|TB|BT|RL|LR)\s*;?|direction\s+(?:TD|TB|BT|RL|LR)\s*;?|end\s*;?|(?:classDef|class|subgraph|style|linkStyle)\b(?![^;\n]*(?:-->|---|-\.->|==>|--[ox]|--\s*"))[^;\n]*;?\s*)$/.test(
         trimmed
       )
     ) {
@@ -132,6 +132,9 @@ it("図2: Fable の構成は evals に合格した場合だけ「そのまま運
   expect(() => parseMermaid("flowchart TD\n    FABLE --o DONE")).toThrow();
   // ヘッダーと同じ行の辺を読み飛ばさず、未解析の続きとして拒否すること。
   expect(() => parseMermaid("flowchart TD A --> B")).toThrow();
+  // style 等と同じ行に辺が続く場合も読み飛ばさず拒否すること。
+  expect(() => parseMermaid("flowchart TD\n    style A fill:#fff; A --> B")).toThrow();
+  expect(() => parseMermaid("flowchart TD\n    style A fill:#fff A --> B")).toThrow();
 });
 
 it("図8: 継続したいという希望だけではモデルを切り替えず、明示的な方針がない間は終端にとどまる", () => {
@@ -153,10 +156,17 @@ it("図8: 継続したいという希望だけではモデルを切り替えず�
     }
     return false;
   };
-  // VERIFY からのどの経路も、肯定の方針辺を通らずにフォールバックへ到達できない。
-  expect(canReach("VERIFY", yes?.to as string, edges)).toBe(true);
+  // VERIFY からのどの経路も、肯定の方針辺を通らずにどのフォールバック先へも到達できない。
+  expect(edges.filter((e) => e.from === "VERIFY")).toEqual([{ from: "VERIFY", label: "", to: fb }]);
+  const fallbackTargets = Array.from(labels.entries())
+    .filter(([id, label]) => id !== fb && /フォールバック/.test(label))
+    .map(([id]) => id);
+  expect(fallbackTargets).toEqual([yes?.to]);
   const withoutPolicyEdge = edges.filter((e) => e !== yes);
-  expect(canReach("VERIFY", yes?.to as string, withoutPolicyEdge)).toBe(false);
+  for (const target of fallbackTargets) {
+    expect(canReach("VERIFY", target, edges)).toBe(true);
+    expect(canReach("VERIFY", target, withoutPolicyEdge)).toBe(false);
+  }
   const noEdges = edges.filter((e) => e.from === fb && e.label !== "はい");
   expect(noEdges.length).toBeGreaterThan(0);
   for (const no of noEdges) {
@@ -177,11 +187,11 @@ it("概要: 拒否が自動でモデルを切り替えるとは読めないよ�
 });
 
 it("図9・トラブル表: 追記のみは今後の不一致の予防で、既に無効なブロックの復旧は別手段と区別する", () => {
-  const { labels } = diagram("図9");
+  const { container } = render(<Page />);
+  const { labels } = diagram("図9", container);
   expect(labels.get("R7")).toMatch(/防ぐ/);
   expect(labels.get("R7")).toMatch(/プレフィックスに戻す/);
   expect(labels.get("R7")).toMatch(/新しい会話/);
-  const { container } = render(<Page />);
   const row = Array.from(container.querySelectorAll("tr")).find((r) =>
     text(r).startsWith("400: The block is bound to a different conversation")
   );
@@ -203,6 +213,12 @@ it("API の疎通確認は HTTP 200 だけでなく、正常終了と要求し�
   expect(expectation).toMatch(/認証・通信/);
   expect(expectation).toMatch(/stop_reason が refusal ではなく end_turn/);
   expect(expectation).toMatch(/model が claude-fable-5-2/);
+  expect(expectation).toMatch(/期待値\(391\)/);
+  const curl = Array.from(container.querySelectorAll("pre code"), (e) => e.textContent ?? "").find(
+    (c) => c.startsWith("curl https://api.anthropic.com/v1/messages")
+  );
+  expect(curl).toContain("17 * 23");
+  expect(curl).not.toContain("このリポジトリ");
 });
 
 it("drop_block の例は既存リクエストへ統合する thinking フィールドだけを示し、messages は既存の配列を保つと明記する", () => {
@@ -260,11 +276,10 @@ it("図3: low が品質基準を満たしたときは1段下げ確認を経由�
   // 1段下げて基準未達だった場合は、上げる前の元の effort で確定して終了し、DOWN → E → UP → E で循環しない。
   const fromDown = edges.find((e) => e.from === "G" && e.label === "はい")?.to;
   expect(fromDown).toBe("DOWN");
-  expect(edges.some((e) => e.from === "DOWN" && e.to === "E")).toBe(false);
-  expect(edges.some((e) => e.from === "DOWN" && e.label === "満たす" && e.to === "G0")).toBe(true);
-  expect(edges.some((e) => e.from === "DOWN" && e.label === "満たさない" && e.to === "FIX")).toBe(
-    true
-  );
+  expect(edges.filter((e) => e.from === "DOWN")).toEqual([
+    { from: "DOWN", label: "満たす", to: "G0" },
+    { from: "DOWN", label: "満たさない", to: "FIX" },
+  ]);
 });
 
 it("6.5節: omitted を最安と主張せず、ストリーミング表示と応答後確認を区別する", () => {

@@ -397,8 +397,18 @@ function tree(n: Node): unknown {
   if (!(n instanceof Element) || n.matches('[data-progress-panel],[data-testid="hero-dates"]'))
     return null;
   if (n.matches("pre code")) return ["code", n.textContent];
-  if (n.classList.contains(styles["diagram-wrap"]))
-    return ["diagram", n.querySelector('[data-testid="mermaid"]')?.textContent];
+  if (n.classList.contains(styles["diagram-wrap"])) {
+    const children = Array.from(n.childNodes)
+      .map((child) =>
+        child instanceof Element && child.matches('[data-testid="mermaid"]')
+          ? ["diagram", child.textContent]
+          : tree(child)
+      )
+      .filter(Boolean);
+    return children.length === 1 && Array.isArray(children[0]) && children[0][0] === "diagram"
+      ? children[0]
+      : ["div", { class: "diagram-wrap" }, children];
+  }
   const attrs: Record<string, string> = {};
   for (const key of ["class", "href", "colspan", "rowspan", "start", "type", "aria-hidden"]) {
     let v = n.getAttribute(key);

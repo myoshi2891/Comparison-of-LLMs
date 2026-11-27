@@ -170,6 +170,27 @@ it("900pxを跨いでdesktopのinertを解除しmobileへ戻す", () => {
   fireEvent.resize(window);
   state(false);
 });
+it("innerWidthが900でもmatchMediaがfalseを返す場合はsidebarのinertを解除する", () => {
+  const originalMatchMedia = window.matchMedia;
+  try {
+    render(<Harness />);
+    Object.defineProperty(window, "innerWidth", { value: 900, configurable: true });
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(max-width: 900px)" ? false : originalMatchMedia(query).matches,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: () => false,
+    }));
+    fireEvent.resize(window);
+    expect(sidebar().inert).toBe(false);
+  } finally {
+    window.matchMedia = originalMatchMedia;
+  }
+});
 it("スクロールとresizeでセクションを選択", () => {
   render(<Harness />);
   position = 1000;
@@ -321,6 +342,33 @@ it("サイトメニューを開くとドロワーを閉じ、フォーカスは�
   expect(guideContent().inert).toBe(false);
   expect(document.activeElement).toBe(hamburger);
   header.remove();
+});
+it("769-900px幅でヘッダードロップダウンを開くとドロワーを閉じ、ヘッダー内のTabを奪わない", () => {
+  Object.defineProperty(window, "innerWidth", { value: 850, configurable: true });
+  const header = document.createElement("div");
+  header.id = "common-header";
+  const toggle = document.createElement("button");
+  toggle.className = "ch-dropdown-toggle";
+  toggle.addEventListener("click", (e) => e.stopPropagation());
+  const headerLink = document.createElement("a");
+  headerLink.href = "/pricing";
+  headerLink.textContent = "料金";
+  header.append(toggle, headerLink);
+  document.body.appendChild(header);
+  try {
+    render(<Harness />);
+    fireEvent.click(menu());
+    expect(menu().getAttribute("aria-expanded")).toBe("true");
+    headerLink.focus();
+    expect(fireEvent.keyDown(document, { key: "Tab", cancelable: true })).toBe(true);
+    expect(document.activeElement).toBe(headerLink);
+    fireEvent.click(toggle);
+    expect(menu().getAttribute("aria-expanded")).toBe("false");
+    expect(guideContent().inert).toBe(false);
+    expect(document.activeElement).toBe(toggle);
+  } finally {
+    header.remove();
+  }
 });
 it("閉じた状態のEscapeでは本文のフォーカスを奪わない", () => {
   render(<Harness />);

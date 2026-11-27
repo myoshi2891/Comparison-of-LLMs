@@ -44,8 +44,9 @@ function resolvePython(): string {
   if (timeouts.length > 0) {
     throw new Error(timeouts.join("; "));
   }
-  cachedPython = "python3";
-  return cachedPython;
+  throw new Error(
+    `Python 3.10 or later is required, and no candidate passed the version probe (candidates: ${candidates.join(", ")})`
+  );
 }
 function python(program: string, input: unknown) {
   // -E: PYTHON* 環境変数（PYTHONOPTIMIZE 等）を無視し、assert を常に有効にする。
@@ -1018,6 +1019,7 @@ logger.addHandler(handler)
 scope = {"call": call, "copy": copy}
 exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 checkpoint = {}
+expected_returns = copy.deepcopy(returns)
 try:
     assert scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint) is replies[1]
     results = checkpoint["messages"][2]["content"]
@@ -1025,11 +1027,11 @@ try:
     assert results[1] == {"type": "tool_result", "tool_use_id": "t2", "content": [{"type": "text", "text": "block"}]}
     assert results[2] == {"type": "tool_result", "tool_use_id": "t3", "content": [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]}
     assert results[3] == {"type": "tool_result", "tool_use_id": "t4", "content": [{"type": "image", "source": {"type": "url", "url": "https://example.com/a.png"}}]}
-    assert results[4] == {"type": "tool_result", "tool_use_id": "t5", "content": returns[5]}
-    assert results[5] == {"type": "tool_result", "tool_use_id": "t6", "content": returns[6]}
-    assert results[6] == {"type": "tool_result", "tool_use_id": "t7", "content": returns[7]}
-    assert results[7] == {"type": "tool_result", "tool_use_id": "t8", "content": returns[8]}
-    assert results[8] == {"type": "tool_result", "tool_use_id": "t9", "content": returns[9]}
+    assert results[4] == {"type": "tool_result", "tool_use_id": "t5", "content": expected_returns[5]}
+    assert results[5] == {"type": "tool_result", "tool_use_id": "t6", "content": expected_returns[6]}
+    assert results[6] == {"type": "tool_result", "tool_use_id": "t7", "content": expected_returns[7]}
+    assert results[7] == {"type": "tool_result", "tool_use_id": "t8", "content": expected_returns[8]}
+    assert results[8] == {"type": "tool_result", "tool_use_id": "t9", "content": expected_returns[9]}
     fixed_msg = "Tool execution failed. Check the tool arguments or try an alternative approach."
     for idx in range(9, 20):
         assert results[idx]["is_error"] is True, (idx, results[idx])
@@ -1044,8 +1046,8 @@ try:
     assert "topsecret123" not in sent_t20["content"]
     assert "sk-ant-secret999" not in sent_t20["content"]
     # browser タブ管理 (new_tab) は単一の browser_state ブロックを正常受理し、他の browser メンバーは text/image 併存も受理する
-    assert results[20] == {"type": "tool_result", "tool_use_id": "t21", "toolset_name": "browser", "content": returns[21]}
-    assert results[21] == {"type": "tool_result", "tool_use_id": "t22", "toolset_name": "browser", "content": returns[22]}
+    assert results[20] == {"type": "tool_result", "tool_use_id": "t21", "toolset_name": "browser", "content": expected_returns[21]}
+    assert results[21] == {"type": "tool_result", "tool_use_id": "t22", "toolset_name": "browser", "content": expected_returns[22]}
     # browser タブ管理 (switch_tab) に browser_state 以外が返った場合はエラー結果にし、後続の browser 操作も抑止する
     assert results[22]["is_error"] is True
     assert results[22]["toolset_name"] == "browser"
@@ -1145,6 +1147,36 @@ try:
         )
         res = cp_bad["messages"][2]["content"][0]
         assert res["is_error"] is True and res["content"] == fixed_msg, (bad_batch, res)
+
+    # 同一ターン内の複数 tool_use でも citations.enabled の不一致を検出し、一致するケースは受理する
+    for second_sr, forbidden_url in ((sr_disabled, "https://b.example"), (sr_omitted, "https://c.example")):
+        cp_same_bad = run_sr_case(
+            [{"stop_reason": "tool_use", "content": [tool(1), tool(2)]}, {"stop_reason": "end_turn", "content": []}],
+            lambda _k, a, s2=second_sr: [sr_enabled] if a["n"] == 1 else [s2],
+        )
+        r1, r2 = cp_same_bad["messages"][2]["content"]
+        assert r1 == {"type": "tool_result", "tool_use_id": "t1", "content": [sr_enabled]}
+        assert r2["is_error"] is True and r2["content"] == fixed_msg
+        assert forbidden_url not in json.dumps(cp_same_bad["messages"])
+
+    cp_same_ok = run_sr_case(
+        [{"stop_reason": "tool_use", "content": [tool(1), tool(2)]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, _a: [copy.deepcopy(sr_enabled)],
+    )
+    assert cp_same_ok["messages"][2]["content"] == [
+        {"type": "tool_result", "tool_use_id": "t1", "content": [sr_enabled]},
+        {"type": "tool_result", "tool_use_id": "t2", "content": [sr_enabled]},
+    ]
+
+    # computer ツールメンバーの document ブロックは拒否し、カスタムツールの document ブロックは受理する
+    doc_block = {"type": "document", "source": {"type": "text", "media_type": "text/plain", "data": "secret-doc"}}
+    cp_comp_doc = run_sr_case(
+        [{"stop_reason": "tool_use", "content": [tool(1, name="screenshot", toolset="computer"), tool(2, name="custom_doc")]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, _a: [copy.deepcopy(doc_block)],
+    )
+    comp_res, custom_res = cp_comp_doc["messages"][2]["content"]
+    assert comp_res == {"type": "tool_result", "tool_use_id": "t1", "toolset_name": "computer", "content": fixed_msg, "is_error": True}
+    assert custom_res == {"type": "tool_result", "tool_use_id": "t2", "content": [doc_block]}
 
     # checkpoint 履歴に enabled=True がある状態で後続が disabled を返すとエラー、enabled=True なら受理
     cp_hist_mismatch = {"messages": [
