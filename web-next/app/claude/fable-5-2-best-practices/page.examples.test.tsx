@@ -203,14 +203,23 @@ fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and 
 requests = []
 def call(body):
     requests.append(copy.deepcopy(body))
+    if len(requests) == 1:
+        return {"stop_reason": "pause_turn", "content": []}
     return {"stop_reason": "end_turn", "content": []}
 scope = {"call": call, "copy": copy}
 exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 scope["agent_loop"]("task", [], None)
-assert len(requests) == 1
+assert len(requests) == 2
 assert requests[0]["cache_control"] == {"type": "ephemeral"}
+assert requests[1]["cache_control"] == {"type": "ephemeral"}
 assert requests[0]["max_tokens"] == 32_000
 assert "container" not in requests[0]
+
+requests.clear()
+scope["agent_loop"]("task", [], None, auto_cache=False)
+assert len(requests) == 2
+assert "cache_control" not in requests[0]
+assert "cache_control" not in requests[1]
 `,
     examples()
   );
@@ -396,7 +405,8 @@ def call(body):
     seen.append(len(seen))
     return replies[len(seen) - 1]
 browser_img = [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "AAAA"}}]
-executors = {("browser", "screenshot"): lambda a: browser_img, ("computer", "screenshot"): lambda a: "computer",
+computer_img = [{"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": "BBBB"}}]
+executors = {("browser", "screenshot"): lambda a: browser_img, ("computer", "screenshot"): lambda a: computer_img,
     "screenshot": lambda a: "custom"}
 def run_tool(name, args):
     return executors[name](args)
@@ -405,7 +415,7 @@ exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
 checkpoint = {}
 scope["agent_loop"]("task", [], run_tool, max_turns=2, checkpoint=checkpoint)
 results = checkpoint["messages"][2]["content"]
-assert [(r["content"], r.get("toolset_name")) for r in results] == [(browser_img, "browser"), ("computer", "computer"), ("custom", None)]
+assert [(r["content"], r.get("toolset_name")) for r in results] == [(browser_img, "browser"), (computer_img, "computer"), ("custom", None)]
 `,
     examples()
   );
@@ -816,7 +826,8 @@ for category in ("bio", "frontier_llm", "reasoning_extraction"):
     # 明示的に billed=False の場合は非課金を優先する
     assert scope["usd"](one_million_pre_output, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": category, "billed": False}}) == 0.0, category
 # 出力トークンが発生した拒否や billed=True の拒否、通常応答は従来どおり課金する
-assert scope["usd"](usage, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": "cyber"}}) > 0
+import math
+assert math.isclose(scope["usd"](usage, {"stop_reason": "refusal", "stop_details": {"type": "refusal", "category": "cyber"}}), 1.20)
 assert scope["usd"](pre_output_usage, {"stop_reason": "refusal", "stop_details": {"billed": True}}) > 0
 assert scope["usd"](usage, {"stop_reason": "end_turn", "stop_details": {"billed": False}}) > 0
 

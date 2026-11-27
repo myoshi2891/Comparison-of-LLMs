@@ -333,15 +333,18 @@ it("サイトメニューを開くとドロワーを閉じ、フォーカスは�
   hamburger.className = "ch-hamburger";
   header.appendChild(hamburger);
   document.body.appendChild(header);
-  render(<Harness />);
-  fireEvent.click(menu());
-  expect(guideContent().inert).toBe(true);
-  expect(document.activeElement).toBe(links()[0]);
-  fireEvent.click(hamburger);
-  expect(menu().getAttribute("aria-expanded")).toBe("false");
-  expect(guideContent().inert).toBe(false);
-  expect(document.activeElement).toBe(hamburger);
-  header.remove();
+  try {
+    render(<Harness />);
+    fireEvent.click(menu());
+    expect(guideContent().inert).toBe(true);
+    expect(document.activeElement).toBe(links()[0]);
+    fireEvent.click(hamburger);
+    expect(menu().getAttribute("aria-expanded")).toBe("false");
+    expect(guideContent().inert).toBe(false);
+    expect(document.activeElement).toBe(hamburger);
+  } finally {
+    header.remove();
+  }
 });
 it("769-900px幅でヘッダードロップダウンを開くとドロワーを閉じ、ヘッダー内のTabを奪わない", () => {
   Object.defineProperty(window, "innerWidth", { value: 850, configurable: true });

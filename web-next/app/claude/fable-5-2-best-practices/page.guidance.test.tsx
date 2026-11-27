@@ -110,7 +110,9 @@ function assertEvalGate(source: string) {
   expect(canReach("FABLE", "DONE", withoutEvalPassAndRestart)).toBe(false);
   expect(canReach("HYBRID", "DONE", withoutEvalPassAndRestart)).toBe(false);
   expect(canReach("START", "DONE", withoutEvalPassAndRestart)).toBe(true);
-  const failed = edges.find((e) => e.from === gate && e.label === "いいえ");
+  const failedEdges = edges.filter((e) => e.from === gate && e.label === "いいえ");
+  expect(failedEdges).toHaveLength(1);
+  const failed = failedEdges[0];
   expect(failed?.to).toBeTruthy();
   expect(failed?.to).not.toBe("DONE");
   // 不合格は Q1 へ到達できる選定・再試行の経路へ戻る（Q1 自身や RETRY 経由を許容し、行き止まりを禁止）。
@@ -272,10 +274,11 @@ it("図3: low が品質基準を満たしたときは1段下げ確認を経由�
   expect(edges.filter((e) => e.from === "G0")).toHaveLength(2);
   expect(edges.some((e) => e.from === "G0" && e.label === "はい" && e.to === "FIX")).toBe(true);
   expect(edges.some((e) => e.from === "G0" && e.label === "いいえ" && e.to === "G")).toBe(true);
-  expect(edges.some((e) => e.from === "G" && e.label === "いいえ" && e.to === "FIX")).toBe(true);
+  expect(edges.filter((e) => e.from === "G")).toEqual([
+    { from: "G", label: "はい", to: "DOWN" },
+    { from: "G", label: "いいえ", to: "FIX" },
+  ]);
   // 1段下げて基準未達だった場合は、上げる前の元の effort で確定して終了し、DOWN → E → UP → E で循環しない。
-  const fromDown = edges.find((e) => e.from === "G" && e.label === "はい")?.to;
-  expect(fromDown).toBe("DOWN");
   expect(edges.filter((e) => e.from === "DOWN")).toEqual([
     { from: "DOWN", label: "満たす", to: "G0" },
     { from: "DOWN", label: "満たさない", to: "FIX" },

@@ -625,6 +625,21 @@ it("S5256: 全表がヘッダーセルを持ち、概要のキー値表は行見
   const { container } = render(<Page />);
   for (const table of Array.from(container.querySelectorAll("table")))
     expect(table.querySelectorAll("th").length).toBeGreaterThan(0);
+  const fiveColRefTables = Array.from(container.querySelectorAll("table")).filter((table) => {
+    const headers = Array.from(table.querySelectorAll("thead tr th")).map(text);
+    return headers.length === 5 && headers[0] === "ID";
+  });
+  expect(fiveColRefTables.length).toBeGreaterThan(0);
+  for (const table of fiveColRefTables) {
+    const headers = Array.from(table.querySelectorAll("thead tr th")).map(text);
+    expect(headers).toEqual(["ID", "発信者", "内容", "取得状況", "URL"]);
+    const urlColIdx = headers.indexOf("URL");
+    for (const row of Array.from(table.querySelectorAll("tbody tr"))) {
+      const cells = Array.from(row.querySelectorAll("td"));
+      expect(cells).toHaveLength(5);
+      expect(cells[urlColIdx].classList.contains(styles["url-cell"])).toBe(true);
+    }
+  }
   expect(
     Array.from(container.querySelectorAll(`.${styles["kv-wrap"]} th[scope="row"]`)).map(text)
   ).toEqual(["対象モデル", "調査時点", "想定読者", "情報源", "図解のルール"]);
