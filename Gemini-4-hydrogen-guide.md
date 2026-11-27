@@ -377,7 +377,7 @@ def model_text(interaction) -> str:
 
 
 class IncompleteInteractionError(RuntimeError):
-    """未完了で再開できない interaction のエラー。蓄積済みの部分出力を失わず呼び出し側へ渡す。"""
+    """未完了で再開できない interaction や、継続中に failed / cancelled で終了した interaction のエラー。蓄積済みの部分出力を失わず呼び出し側へ渡す。"""
 
     def __init__(self, message: str, *, interaction_id: str, parts: list[str]) -> None:
         super().__init__(message)
@@ -408,9 +408,17 @@ while True:
         interaction = client.interactions.get(id=interaction_id)
 
     if interaction.status == "failed":
-        raise RuntimeError(f"Interaction failed: {interaction.id}")
+        raise IncompleteInteractionError(
+            f"Interaction failed: {interaction.id}",
+            interaction_id=interaction.id,
+            parts=parts,
+        )
     if interaction.status == "cancelled":
-        raise RuntimeError(f"Interaction cancelled: {interaction.id}")
+        raise IncompleteInteractionError(
+            f"Interaction cancelled: {interaction.id}",
+            interaction_id=interaction.id,
+            parts=parts,
+        )
     if interaction.status == "incomplete":
         # 途中までの出力は捨てずに保持する。継続したinteractionの steps に前hopの出力も
         # 含まれるかは公式資料で確認し、含まれる場合は重複して結合しないよう調整する。

@@ -429,8 +429,8 @@ flowchart TD
     SDROP -- "いいえ 終了イベントを受信" --> SHOP["このhopの最終usageを確定し<br/>hopごとの最終値を合算する"]
     SHOP --> SST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
     SST -- "requires_action" --> SACT["ツール呼び出しを承認ゲートに通す 12.2節"]
-    SACT -- "承認" --> SRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>受信したままの最新のmodelのsteps(thought stepと署名を含む)とfunction_result 同じtools宣言を含めて再送する"]
-    SACT -- "拒否" --> SREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
+    SACT -- "承認" --> SRUN["保存済みのcontinuation_tokenと発行元interaction idをクリアしてから<br/>クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>受信したままの最新のmodelのsteps(thought stepと署名を含む)とfunction_result 同じtools宣言を含めて再送する"]
+    SACT -- "拒否" --> SREJ["保存済みのcontinuation_tokenと発行元interaction idをクリアしてから<br/>拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
     SRUN --> SACC
     SREJ --> SACC
     SST -- "requires_continuation" --> SAUTO{"SDKの自動継続を無効にしたか<br/>automatic_continuation=False"}

@@ -608,6 +608,8 @@ def run_task(contents: list, task_state: dict, execute_on_robot, estop_active, i
             return f"aborted: executor error ({executor_error})"
         if limit_reached:
             # 実行済みの結果と skipped の記録を contents に残したまま中断し、呼び出し元へ完全な履歴を渡す。
+            if executed and observation is None:
+                task_state["pending_observation"] = True
             return "aborted: step limit reached"
         if executed and observation is None:
             # 最後に実行した動作の後の観測がない。contents に残る以前の画像で次の計画をさせず、
