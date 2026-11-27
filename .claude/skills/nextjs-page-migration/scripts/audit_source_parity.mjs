@@ -776,7 +776,7 @@ function normalizeUrl(url) {
  * @param {boolean} stopAtClosingBrace - Stop at the end of a recursive interpolation scan.
  * @return {string} The source with non-code contents replaced by spaces, preserving offsets.
  */
-function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, stopAtClosingBrace = false, initialAsync = null) {
+function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, stopAtClosingBrace = false, initialAsync = null, initialGenerator = false) {
   const blank = (text) => text.replace(/[^\n]/g, " ");
   let out = "";
   let index = 0;
@@ -791,6 +791,11 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
   let pendingFnAsync = null;
   const parenAsyncStack = [];
   let lastParenAsync = null;
+  // Track whether `yield` is inside an established generator function (`function*`).
+  const generatorStack = [initialGenerator === true];
+  let pendingFnGenerator = null;
+  const parenGeneratorStack = [];
+  let lastParenGenerator = null;
   // Consume whole Unicode identifiers (incl. \u escapes) so `πreturn` is never split into `return`.
   const wordRe = /(?:[\p{ID_Start}$_]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})(?:[\p{ID_Continue}$\u200C\u200D]|\\u[\da-fA-F]{4}|\\u\{[\da-fA-F]+\})*/uy;
   while (index < src.length) {
@@ -849,7 +854,7 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
           // Interpolations execute code. Keep it offset-aligned for discovery,
           // including nested templates, while declining to evaluate its effects.
           resolution.interpolation = true;
-          const expression = blankNonCodeText(src.slice(cursor + 2), preserveQuotedStrings, resolution, true, asyncStack.at(-1) ?? null);
+          const expression = blankNonCodeText(src.slice(cursor + 2), preserveQuotedStrings, resolution, true, asyncStack.at(-1) ?? null, generatorStack.at(-1) ?? false);
           (resolution.interpolations ??= []).push(expression);
           maskedBody += "${" + expression;
           cursor += 2 + expression.length;
@@ -880,6 +885,7 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
       } else if (lastToken !== "." && word === "function") {
         pendingFnAsync = pendingAsync;
         pendingAsync = false;
+        pendingFnGenerator = false;
       } else if (lastToken !== "function") {
         // Keep pendingAsync only across `async` followed by `function`, `*`, `(`, or a single-param arrow identifier.
         if (lastToken !== "async") pendingAsync = false;
@@ -892,8 +898,13 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
         const declHead = /^(?:var|let|const|function|class)$/.test(lastToken);
         const asyncCtx = asyncStack.at(-1) ?? null;
         canStartRegex = declHead ? false : asyncCtx === true ? true : asyncCtx === false ? false : null;
+      } else if (word === "yield") {
+        // `yield` is only a unary operator keyword when generator context is established;
+        // otherwise it may be an identifier, so leave `/` unresolved rather than masking code.
+        const declHead = /^(?:var|let|const|function|class)$/.test(lastToken);
+        canStartRegex = declHead ? false : generatorStack.at(-1) === true ? true : null;
       } else {
-        canStartRegex = /^(?:return|throw|case|delete|void|typeof|instanceof|in|yield|else|do)$/.test(word)
+        canStartRegex = /^(?:return|throw|case|delete|void|typeof|instanceof|in|else|do)$/.test(word)
           // `of` is an ordinary identifier outside a for head; leave its slash unresolved.
           || (word === "of" ? null : false);
       }
@@ -915,16 +926,23 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
       pendingFnAsync = lastParenAsync !== null ? lastParenAsync : pendingAsync;
       pendingAsync = false;
       lastParenAsync = null;
+      pendingFnGenerator = false;
+      lastParenGenerator = null;
       lastToken = "=>";
       continue;
     }
     if (!/\s/.test(char)) {
+      if (char === "*" && lastToken === "function") {
+        pendingFnGenerator = true;
+      }
       if (char === "(") {
         const isControl = /^(?:if|while|for|with|switch|catch)$/.test(lastToken);
         controlParens.push(isControl);
         parenAsyncStack.push(pendingFnAsync !== null ? pendingFnAsync : pendingAsync ? true : null);
         pendingAsync = false;
         pendingFnAsync = null;
+        parenGeneratorStack.push(pendingFnGenerator);
+        pendingFnGenerator = null;
       }
       if (char === "{") {
         // Object expressions end an operand; statement blocks permit a new regex.
@@ -942,20 +960,35 @@ function blankNonCodeText(src, preserveQuotedStrings = true, resolution = {}, st
         }
         lastParenAsync = null;
         pendingAsync = false;
+        if (pendingFnGenerator !== null) {
+          generatorStack.push(pendingFnGenerator);
+          pendingFnGenerator = null;
+        } else if (lastToken === ")" && lastParenGenerator !== null) {
+          generatorStack.push(lastParenGenerator);
+        } else {
+          generatorStack.push(generatorStack.at(-1) ?? false);
+        }
+        lastParenGenerator = null;
       }
       if (char === "}") {
         if (asyncStack.length > 1) asyncStack.pop();
         lastParenAsync = null;
         pendingAsync = false;
         pendingFnAsync = null;
+        if (generatorStack.length > 1) generatorStack.pop();
+        lastParenGenerator = null;
+        pendingFnGenerator = null;
       }
       const controlEnd = char === ")" && (controlParens.pop() ?? false);
       if (char === ")") {
         lastParenAsync = parenAsyncStack.pop() ?? null;
+        lastParenGenerator = parenGeneratorStack.pop() ?? null;
       } else if (char === ";") {
         pendingAsync = false;
         pendingFnAsync = null;
         lastParenAsync = null;
+        pendingFnGenerator = null;
+        lastParenGenerator = null;
       }
       canStartRegex = char === "}" ? (braces.pop() ?? null)
         : char === ")" ? controlEnd : /[=(:,\[!&|?{;+\-*/%~^<>]/.test(char);
@@ -1319,7 +1352,7 @@ const htmlAttributesPattern = String.raw`((?:[^>"']|"[^"]*"|'[^']*')*)`;
 /** Prove ordinary initialization and all enclosing callable activations precede rendering. */
 /** Braced function bodies in source order: { start, body (open brace), end (after close), name, nameIndex }. */
 function functionBodies(executable) {
-  return Array.from(executable.matchAll(/\bfunction(?:\s+([A-Za-z_$][\w$]*))?\s*\([^(){}]*\)\s*\{|(?:\([^(){}]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g), head => {
+  return Array.from(executable.matchAll(/\bfunction(?:\s*\*)?(?:\s+([A-Za-z_$][\w$]*))?\s*\([^(){}]*\)\s*\{|(?:\([^(){}]*\)|[A-Za-z_$][\w$]*)\s*=>\s*\{/g), head => {
     const body = head.index + head[0].length - 1;
     let depth = 1;
     let end = body + 1;
@@ -2146,10 +2179,19 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         const detachRe = /(?<!\bclassList)\.\s*(?:remove\s*\(\s*\)|(?:replaceWith|removeChild|replaceChild|replaceChildren)\s*\(|outerHTML\s*=(?!=))/g;
         return !Array.from(executable.matchAll(detachRe)).some(edit => editCanPrecede(edit.index, queryAt));
       };
+      const isUnshadowedDocument = () => {
+        const shadowRe = /\b(?:var|let|const|function|class)\s+document(?![\w$])|\b(?:function\b[^()]*|catch)\s*\([^)]*\bdocument(?![\w$])|\([^)]*\bdocument(?![\w$])[^)]*\)\s*=>|\bdocument\s*=>|\b(?:const|let|var)\s+[^;\n{}]*[,{[]\s*document(?![\w$])|\bimport\b[^;\n]*\bdocument(?![\w$])/;
+        if (shadowRe.test(executable) || writeIndexes("document").size > 0) return false;
+        const globalAssignRe = /\b(?:window|globalThis|self)\s*(?:\.\s*document(?![\w$])|\[\s*(['"])document\1\s*\])\s*=(?!=)/g;
+        for (const m of literalSource.matchAll(globalAssignRe)) {
+          if (executable[m.index] === literalSource[m.index]) return false;
+        }
+        return true;
+      };
       const direct = owner && /^document\.querySelector\(\s*(['"])(.*?)\1\s*\)$/.exec(owner);
       // The query runs where its initializer runs; before the card is parsed it returns null.
       if (direct) {
-        if (!selectedScript.cardAvailableAt(ownerBinding.at) || !selectedScript.unique(direct[2]) || !selectorValidAt(direct[2], ownerBinding.at) || !notDetachedAt(ownerBinding.at)) return false;
+        if (!isUnshadowedDocument() || !selectedScript.cardAvailableAt(ownerBinding.at) || !selectedScript.unique(direct[2]) || !selectorValidAt(direct[2], ownerBinding.at) || !notDetachedAt(ownerBinding.at)) return false;
         captureAt = ownerBinding.at;
         return true;
       }
@@ -2158,7 +2200,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const collection = collectionBinding?.value;
       const all = collection && /^document\.querySelectorAll\(\s*(['"])(.*?)\1\s*\)$/.exec(collection);
       // The supported indexed traversal visits the selected cards in order.
-      if (!all || matchesCardSelector(cardTag, all[2], selectedScript.docMode) !== true) return false;
+      if (!all || !isUnshadowedDocument() || matchesCardSelector(cardTag, all[2], selectedScript.docMode) !== true) return false;
       // Every selector match preceding this card must also be able to complete the loop's
       // script lookup; otherwise a null.textContent TypeError aborts the loop before this card.
       if (selectedScript.priorMatchesComplete && !selectedScript.priorMatchesComplete(all[2], selected[3] === "script")) return false;
@@ -2213,6 +2255,17 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
               fn.body > indexScopeStart && fn.end <= indexScopeEnd &&
               !(fn.body < open && close < fn.end)))
         )) return false;
+        // The loop statement itself must be guaranteed to execute (not nested under a
+        // conditional/branch/short-circuit such as `if (cond) for (...)` or `if (cond) { for (...) }`).
+        const loopPath = pathAt(loop.index);
+        const loopFloor = loopPath.at(-1) ?? -1;
+        const loopStmt = statementBefore(loop.index, loopFloor);
+        if (loopStmt === null || /^\s*(?:if|else|while|for|do|switch|with|catch)(?![\w$])/.test(loopStmt) || /&&|\|\||\?/.test(loopStmt)) return false;
+        if (loopPath.some(block => {
+          const head = executable.slice(0, block).replace(/\s+$/, "");
+          if (head === "" || /[;{}]$/.test(head) || /(?<![\w$.])(?:try|finally)$/.test(head)) return false;
+          return !/(?:\bfunction\b[^{}]*\)|=>)$/.test(head);
+        })) return false;
         // The card binding, the payload read and mermaid.render must run on every selected
         // iteration. A condition such as `i === 0` would certify cards it never renders.
         if ([ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected, ownerBinding.at))) {
@@ -3097,7 +3150,7 @@ function materializePlainTextCards(src) {
       if (resolvedSource === null) unresolvedMermaidSources.push(`CLASSDEFS:${cardId}`);
       // Serialize the entity-decoded chart: inventory decodes the HTML escape layer once, so the
       // result equals normalizeMermaidSource's decoding of the raw chart, as for TSX charts.
-      edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid">${escape(decodeEntities(resolvedSource ?? script.payload))}</div>` });
+      edits.push({ index: start + marker.index, length: marker[0].length, value: `<div class="mermaid" data-audit-materialized="1">${escape(decodeEntities(resolvedSource ?? script.payload))}</div>` });
     }
   }
   let result = stashed;
@@ -3183,7 +3236,9 @@ function inventoryHtml(src) {
   const liRe = /<li\b[^>]*>([\s\S]*?)<\/li>/gi;
   let li = liRe.exec(body);
   while (li !== null) {
-    listTexts.push(normalize(stripMarkup(li[1], false)));
+    const liContent = li[1].replace(/<div class="mermaid" data-audit-materialized="1">[\s\S]*?<\/div>/gi, "");
+    const text = normalize(stripMarkup(liContent, false));
+    if (text) listTexts.push(text);
     li = liRe.exec(body);
   }
 

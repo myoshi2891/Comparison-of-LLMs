@@ -2441,7 +2441,7 @@ test("enforces strict module keyword matching, cross-scope classList.add, pre-qu
 		const res = audit(beforeQuery, page);
 		assert.equal(res.status, 1, `pre-query ${reorder}`);
 		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], `pre-query ${reorder}`);
-		const afterQuery = `${reorderDom}<script>${setupRefs} var cards = document.querySelectorAll('.diagram-card'); ${loopBody} ${reorder}</script>`;
+		const afterQuery = `${reorderDom}<script>${setupRefs} var cards = document.querySelectorAll('.diagram-card'); ${reorder} ${loopBody}</script>`;
 		assert.equal(audit(afterQuery, page).status, 0, `post-query ${reorder}`);
 	}
 
@@ -2669,6 +2669,7 @@ test("enforces HTML card boundaries, unshadowed timer bindings, plain className 
 	const liPage = `const D = ${JSON.stringify(chart)}; <ul><li><MermaidDiagram chart={D} /></li><li>next</li></ul>`;
 	const explicitLi = `<ul><li id="c1" class="diagram-card"><script type="text/plain">${chart}</script></li><li>next</li></ul><script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
 	const explicitRes = audit(explicitLi, liPage);
+	assert.equal(explicitRes.status, 0, "explicit </li> card passes overall audit");
 	assert.equal(explicitRes.data.mermaidSourcesMatch, true, "explicit </li> card stays eligible");
 	assert.deepEqual(explicitRes.data.unresolvedMermaidSources, [], "explicit </li> card has no unresolved sources");
 	const omittedLi = `<ul><li id="c1" class="diagram-card"><script type="text/plain">${chart}</script><li>next</li></ul><script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
@@ -2797,4 +2798,29 @@ test("checks suffix-free activation, wrapper aliases, HTML non-void slashes, awa
 	assert.equal(audit(stringBracketWrite, page).status, 0);
 	const execBracketWrite = `${card}<script type="module">const other = document.querySelector('#c1 script'); other['textContent'] = 'flowchart LR\\nX --> Y';</script><script type="module">const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
 	assert.equal(audit(execBracketWrite, page).status, 1);
+
+	// 6. `yield` outside a generator leaves `/` unresolved and does not mask a following write to `src`; inside `function*` it permits a regex literal.
+	const yieldDivAssign = `${card}<script>var yield = 10; var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; var x = yield / 2; src = 'mutated' / 1; mermaid.render('x', src);</script>`;
+	assert.equal(audit(yieldDivAssign, page).status, 1);
+	const yieldInGen = `${card}<script>function* gen() { yield /abc/; } var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(yieldInGen, page).status, 0);
+
+	// 7. Shadowed `document` blocks both direct and indexed lookups; unshadowed global `document` stays eligible.
+	const shadowedDirect = `${card}<script>const document = { querySelector: () => fake }; const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(shadowedDirect, page).status, 1);
+	const shadowedAll = `${card}<script>function run(document) { var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); } } run(fakeDoc);</script>`;
+	assert.equal(audit(shadowedAll, page).status, 1);
+
+	// 8. Indexed loop nested under a condition (unbraced or braced) cannot be certified; unconditional loop stays eligible.
+	const unbracedCondLoop = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); if (window.flag) for (var i = 0; i < cards.length; i++) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(unbracedCondLoop, page).status, 1);
+	const bracedCondLoop = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); if (window.flag) { for (var i = 0; i < cards.length; i++) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
+	assert.equal(audit(bracedCondLoop, page).status, 1);
+
+	// 9. Materialized Mermaid chart inside <li> does not pollute list-item text matching, while real list prose stays checked.
+	const proseLiHtml = `<ul><li id="c1" class="diagram-card">diagram note<script type="text/plain">${chart}</script></li><li>next</li></ul><script>var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const proseLiPage = `const D = ${JSON.stringify(chart)}; <ul><li>diagram note<MermaidDiagram chart={D} /></li><li>next</li></ul>`;
+	assert.equal(audit(proseLiHtml, proseLiPage).status, 0);
+	const missingProseLiPage = `const D = ${JSON.stringify(chart)}; <ul><li><MermaidDiagram chart={D} /></li><li>next</li></ul>`;
+	assert.equal(audit(proseLiHtml, missingProseLiPage).status, 1);
 });
