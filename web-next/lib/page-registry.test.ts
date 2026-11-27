@@ -68,15 +68,18 @@ describe("pageRegistry", () => {
     // 為替のみの更新などで generated_at が動いても落ちないよう、価格公開日は明示的に固定する。
     // 価格を再公開するときは、この定数と page-registry.ts のHome日付を同時に更新する。
     const PRICING_PUBLICATION_DATE = "2026-11-13";
-    expect(pricingSnapshot.generated_at).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    const expectValidUtcDate = (value: string | undefined) => {
+      expect(value).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      // Date.parse は 2026-02-31 のような存在しない日付を繰り上げるため、往復して厳密に検証する。
+      const parsed = new Date(`${value}T00:00:00Z`);
+      expect(Number.isNaN(parsed.getTime())).toBe(false);
+      expect(parsed.toISOString().slice(0, 10)).toBe(value);
+    };
+    expectValidUtcDate(pricingSnapshot.generated_at);
     const home = findBySlug("/");
     expect(home?.addedAt).toBe(PRICING_PUBLICATION_DATE);
     // 為替のみの更新などで確認日だけ進む場合があるため、公開日以降の有効な日付であればよい。
-    expect(home?.lastReviewed).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    // Date.parse は 2026-02-31 のような存在しない日付を繰り上げるため、往復して厳密に検証する。
-    const parsedReview = new Date(`${home?.lastReviewed}T00:00:00Z`);
-    expect(Number.isNaN(parsedReview.getTime())).toBe(false);
-    expect(parsedReview.toISOString().slice(0, 10)).toBe(home?.lastReviewed);
+    expectValidUtcDate(home?.lastReviewed);
     expect(home?.lastReviewed && home.lastReviewed >= PRICING_PUBLICATION_DATE).toBe(true);
   });
 
