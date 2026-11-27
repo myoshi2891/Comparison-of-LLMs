@@ -285,11 +285,19 @@ async def decide(input_text: str, questions: dict) -> dict:
     return r.json()
 
 
-def split_by_confidence(answers: dict, threshold: float = THRESHOLD):
+def split_by_confidence(
+    answers: dict,
+    threshold: float = THRESHOLD,
+    high_risk_keys: set[str] | None = None,
+):
     """自動処理してよい回答と、人間/上位モデルに回す回答に分ける。"""
+    high_risk = high_risk_keys or set()
     auto, review = {}, {}
     for key, ans in answers.items():
-        (auto if ans["confidence"] >= threshold else review)[key] = ans
+        if key in high_risk or ans["confidence"] < threshold:
+            review[key] = ans
+        else:
+            auto[key] = ans
     return auto, review
 ```
 

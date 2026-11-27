@@ -827,7 +827,7 @@ flowchart TD
 |---|---|---|---|
 | S10 | Philipp Schmid（Google AI Studio） | 開発者ガイドの紹介。Argon からはID変更のみ、ほぼ `medium`、`/swarm` で Carbon を設計・レビューに配置 | https://x.com/_philschmid/status/2120209233019019723 |
 | S11 | Simon Willison | `llm-gemini` 0.36 のリリース。3段階の thinking の比較、価格が12月1日に倍増する点、Antigravity での検証 | https://simonwillison.net/2026/Nov/10/llm-gemini/ |
-| S12 | Simon Willison | Gemini 4 の価格体系が分かりにくいという指摘（Hydrogen 公開日の記事） | https://simonwillison.net/ |
+| S12 | Simon Willison | Gemini 4 の価格体系が分かりにくいという指摘（Hydrogen 公開日の記事） | https://simonwillison.net/2026/Nov/12/llm-gemini/ |
 | S13 | Simon Willison | Carbon の SVG 生成と Three.js 検証の投稿 | https://x.com/simonw/status/2120258951594037732 |
 | S29 | Zapier（二次情報経由） | AutomationBench レポート | https://zapier.com/es/benchmarks/gemini-carbon-4-report |
 
