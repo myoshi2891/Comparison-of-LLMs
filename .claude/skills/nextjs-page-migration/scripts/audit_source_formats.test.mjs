@@ -2729,7 +2729,9 @@ test("handles parenthesized src writes, conditional timers, post-capture script 
 	// 3. Removing a script after top-level synchronous capture stays eligible; deferred/loop removals stay blocking.
 	const removeAfterCapture = `${card}<script>var c = document.querySelector('#c1'); var s = c.querySelector('script'); var src = s.textContent; s.remove(); mermaid.render('x', src);</script>`;
 	assert.equal(audit(removeAfterCapture, page).status, 0);
-	const removeInLoop = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var s = cards[i].querySelector('script'); var src = s.textContent; s.remove(); mermaid.render('x', src); }</script>`;
+	const keepInLoop = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var s = card.querySelector('script'); var src = s.textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(keepInLoop, page).status, 0);
+	const removeInLoop = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var card = cards[i]; var s = card.querySelector('script'); var src = s.textContent; s.remove(); mermaid.render('x', src); }</script>`;
 	assert.equal(audit(removeInLoop, page).status, 1);
 
 	// 4. Shadowed/local/foreign mermaid bindings stay unresolved; global mermaid and window.mermaid stay eligible.
@@ -2760,4 +2762,39 @@ test("handles parenthesized src writes, conditional timers, post-capture script 
 	} finally {
 		rmSync(dir, { recursive: true, force: true });
 	}
+});
+
+test("checks suffix-free activation, wrapper aliases, HTML non-void slashes, await context, and string bracket writes", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+
+	// 1. Uncalled suffix-free named renderer function stays unresolved; reachable call stays eligible.
+	const uncalledDraw = `${card}<script>function draw() { var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(uncalledDraw, page).status, 1);
+	const calledDraw = `${card}<script>function draw() { var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; mermaid.render('x', src); } draw();</script>`;
+	assert.equal(audit(calledDraw, page).status, 0);
+
+	// 2. Fresh-wrapper audit catches edits through aliases while still allowing empty wrappers.
+	const emptyWrapper = `${card}<script>const wrap = document.createElement('div'); document.body.prepend(wrap); var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(emptyWrapper, page).status, 0);
+	const aliasedWrapper = `${card}<script>const wrap = document.createElement('div'); const alias = wrap; alias.innerHTML = '<div class="diagram-card"></div>'; document.body.prepend(wrap); var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); }</script>`;
+	assert.equal(audit(aliasedWrapper, page).status, 1);
+
+	// 3. In HTML mode, trailing slash does not self-close non-void elements; foreign SVG elements stay self-closing.
+	const slashedDiv = `<div id="c1" class="diagram-card" /><script type="text/plain">${chart}</script><script>var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(slashedDiv, page).status, 1);
+	const svgPage = `<svg><path d="M0 0" /></svg>${page}`;
+	const svgSelfClose = `<div id="c1" class="diagram-card"><svg><path d="M0 0" /></svg><script type="text/plain">${chart}</script></div><script>var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(svgSelfClose, svgPage).status, 0);
+
+	// 4. `await` as an identifier in a classic script treats `/` as division rather than masking following code.
+	const awaitIdentifier = `${card}<script>var await = 10; var ratio = await / 2; var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; mermaid.render('x', src); var after = 1 / 2;</script>`;
+	assert.equal(audit(awaitIdentifier, page).status, 0);
+
+	// 5. Computed textContent write example inside a string literal does not block; executable computed write blocks.
+	const stringBracketWrite = `${card}<script type="module">const example = "el['textContent'] = 'x'";</script><script type="module">const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(stringBracketWrite, page).status, 0);
+	const execBracketWrite = `${card}<script type="module">const other = document.querySelector('#c1 script'); other['textContent'] = 'flowchart LR\\nX --> Y';</script><script type="module">const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(execBracketWrite, page).status, 1);
 });
