@@ -1,0 +1,301 @@
+[
+  {
+    "selector": ".root",
+    "media": null,
+    "declarations": [
+      ["color-scheme", "light", false],
+      ["min-width", "0", false],
+      ["--mobile-bar-height", "0px", false]
+    ]
+  },
+  {
+    "selector": ".layout",
+    "media": null,
+    "declarations": [["width", "100%", false], ["max-width", "100%", false]]
+  },
+  {
+    "selector": ".root .layout",
+    "media": null,
+    "declarations": [
+      ["display", "grid", false],
+      ["grid-template-columns", "var(--sidebar-w) minmax(0, 1fr)", false]
+    ]
+  },
+  {
+    "selector": ".root :global(p)",
+    "media": null,
+    "declarations": [["color", "inherit", false]]
+  },
+  {
+    "selector": ".root :global(h1), .root :global(h2), .root :global(h3), .root :global(h4)",
+    "media": null,
+    "declarations": [["font-weight", "700", false]]
+  },
+  {
+    "selector": ".root :global(ul)",
+    "media": null,
+    "declarations": [["list-style-type", "disc", false]]
+  },
+  {
+    "selector": ".root :global(ol)",
+    "media": null,
+    "declarations": [["list-style-type", "decimal", false]]
+  },
+  {
+    "selector": ".root :global(ul) :global(ul)",
+    "media": null,
+    "declarations": [["list-style-type", "circle", false]]
+  },
+  {
+    "selector": ".root :global(ul) :global(ul) :global(ul)",
+    "media": null,
+    "declarations": [["list-style-type", "square", false]]
+  },
+  {
+    "selector": ".root :global(ul).nav, .root :global(ul).chips, .root :global(ul).checklist",
+    "media": null,
+    "declarations": [["list-style", "none", false]]
+  },
+  {
+    "selector": ".root :global(b)",
+    "media": null,
+    "declarations": [["font-weight", "700", false]]
+  },
+  {
+    "selector": ".root :global(th), .root :global(td)",
+    "media": null,
+    "declarations": [["text-align", "left", true]]
+  },
+  {
+    "selector": ".root :global(pre code)",
+    "media": null,
+    "declarations": [
+      ["background", "none", false],
+      ["border", "none", false],
+      ["border-radius", "0", false]
+    ]
+  },
+  {
+    "selector": ".codeLine",
+    "media": null,
+    "declarations": [["white-space", "pre", false]]
+  },
+  {
+    "selector": ".root .table-wrap :global(thead)",
+    "media": null,
+    "declarations": [["position", "static", false]]
+  },
+  {
+    "selector": ".root .table-wrap :global(th)",
+    "media": null,
+    "declarations": [
+      ["font-family", "inherit", false],
+      ["font-size", "inherit", false],
+      ["text-transform", "none", false],
+      ["letter-spacing", "normal", false],
+      ["white-space", "normal", false],
+      ["min-width", "0", false],
+      ["border-bottom", "none", false]
+    ]
+  },
+  {
+    "selector": ".root .table-wrap :global(td)",
+    "media": null,
+    "declarations": [["font-family", "inherit", false], ["font-size", "inherit", false]]
+  },
+  {
+    "selector": ".root .table-wrap :global(tbody tr)",
+    "media": null,
+    "declarations": [["border-bottom", "none", false]]
+  },
+  {
+    "selector": ".root .table-wrap :global(tbody tr:hover)",
+    "media": null,
+    "declarations": [["background", "var(--paper-alt)", false]]
+  },
+  {
+    "selector": ".root .kv-wrap :global(th[scope=\"row\"])",
+    "media": null,
+    "declarations": [
+      ["background", "transparent", false],
+      ["color", "var(--indigo)", false],
+      ["font-weight", "700", false],
+      ["white-space", "nowrap", false],
+      ["padding", "12px 16px", false],
+      ["border-bottom", "1px solid var(--border)", false],
+      ["vertical-align", "top", false],
+      ["line-height", "1.7", false],
+      ["overflow-wrap", "break-word", false]
+    ]
+  },
+  {
+    "selector": ".root .kv-wrap :global(tbody tr:last-child th[scope=\"row\"])",
+    "media": null,
+    "declarations": [["border-bottom", "none", false]]
+  },
+  {
+    "selector": ".root .checklist :global(input:checked + span)",
+    "media": null,
+    "declarations": [["text-decoration", "line-through", false]]
+  },
+  {
+    "selector": ".root .sidebar",
+    "media": null,
+    "declarations": [
+      ["top", "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px))", false]
+    ]
+  },
+  {
+    "selector": ".root .main",
+    "media": null,
+    "declarations": [
+      ["grid-column", "2", false],
+      ["margin-left", "0", false],
+      ["min-width", "0", false],
+      ["width", "100%", false]
+    ]
+  },
+  {
+    "selector": ".root .backdrop",
+    "media": null,
+    "declarations": [["border", "0", false], ["padding", "0", false], ["border-radius", "0", false]]
+  },
+  {
+    "selector": ".root :global(section), .root :global(h1), .root :global(h2), .root :global(h3), .root :global(h4), .root :global(tr[id]), .root :global(#s6-4-budget-note)",
+    "media": null,
+    "declarations": [["scroll-margin-top", "calc(var(--header-height, 60px) + 80px)", false]]
+  },
+  {
+    "selector": ".root :global(section), .root :global(h1), .root :global(h2), .root :global(h3), .root :global(h4), .root :global(tr[id]), .root :global(#s6-4-budget-note)",
+    "media": null,
+    "declarations": [
+      [
+        "scroll-margin-top",
+        "max( calc(var(--header-height, 60px) + 80px), calc( var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height, 0px) + 16px ) )",
+        false
+      ]
+    ]
+  },
+  {
+    "selector": ".heroDates",
+    "media": null,
+    "declarations": [
+      ["display", "flex", false],
+      ["justify-content", "flex-end", false],
+      ["flex-wrap", "wrap", false],
+      ["gap", "0.3em", false],
+      ["margin-top", "20px", false],
+      ["color", "#fff", false]
+    ]
+  },
+  {
+    "selector": "body:has(.root):global(.has-common-header)",
+    "media": null,
+    "declarations": [
+      ["margin-top", "0", false],
+      ["padding-top", "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px))", false],
+      ["background", "#f7f3ea", false],
+      ["color-scheme", "light", false]
+    ]
+  },
+  {
+    "selector": "body:has(.root) :global(#site-freshness-bar)",
+    "media": null,
+    "declarations": [["display", "none", true]]
+  },
+  {
+    "selector": "body:has(.root) :global(#common-header), body:has(.root) :global(.ch-disclaimer)",
+    "media": null,
+    "declarations": [["background", "#161d42", false], ["backdrop-filter", "none", false]]
+  },
+  {
+    "selector": "body:has(.root) :global(nav[aria-label=\"関連ページ\"])",
+    "media": null,
+    "declarations": [
+      ["margin-left", "288px", false],
+      ["width", "calc(100% - 288px)", false],
+      ["background", "#f7f3ea", false],
+      ["--line", "#ddd4c2", false],
+      ["--card", "#fff", false],
+      ["--fg", "#1f1b16", false],
+      ["--muted", "#463f34", false],
+      ["--accent", "#2f3d8f", false]
+    ]
+  },
+  {
+    "selector": ".root",
+    "media": "(max-width: 900px)",
+    "declarations": [["--mobile-bar-height", "56px", false]]
+  },
+  {
+    "selector": ".root .sidebar",
+    "media": "(max-width: 900px)",
+    "declarations": [
+      ["visibility", "hidden", false],
+      ["pointer-events", "none", false],
+      [
+        "top",
+        "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height))",
+        false
+      ]
+    ]
+  },
+  {
+    "selector": ".root.open .sidebar",
+    "media": "(max-width: 900px)",
+    "declarations": [["visibility", "visible", false], ["pointer-events", "auto", false]]
+  },
+  {
+    "selector": ".root .mobile-bar",
+    "media": "(max-width: 900px)",
+    "declarations": [
+      ["top", "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px))", false]
+    ]
+  },
+  {
+    "selector": ".root .backdrop",
+    "media": "(max-width: 900px)",
+    "declarations": [
+      [
+        "top",
+        "calc(var(--ch-height, 60px) + var(--ch-disclaimer-height, 0px) + var(--mobile-bar-height))",
+        false
+      ]
+    ]
+  },
+  {
+    "selector": ".root .layout",
+    "media": "(max-width: 900px)",
+    "declarations": [["display", "block", false]]
+  },
+  {
+    "selector": ".root .main",
+    "media": "(max-width: 900px)",
+    "declarations": [["grid-column", "auto", false], ["width", "100%", false]]
+  },
+  {
+    "selector": "body:has(.root) :global(nav[aria-label=\"関連ページ\"])",
+    "media": "(max-width: 900px)",
+    "declarations": [["margin-left", "0", false], ["width", "100%", false]]
+  },
+  {
+    "selector": ".root :global(table)",
+    "media": null,
+    "declarations": [["font-size", "inherit", false]]
+  },
+  {
+    "selector": ".root .checklist .done :global(span)",
+    "media": null,
+    "declarations": [["text-decoration", "line-through", false]]
+  },
+  {
+    "selector": ".root .mobile-bar :global(button) :global(i.ti-menu-2)::before",
+    "media": null,
+    "declarations": [
+      ["content", "\"\\2630\"", false],
+      ["font-family", "system-ui, -apple-system, \"Segoe UI\", sans-serif", false],
+      ["font-style", "normal", false],
+      ["font-weight", "400", false]
+    ]
+  }
+]

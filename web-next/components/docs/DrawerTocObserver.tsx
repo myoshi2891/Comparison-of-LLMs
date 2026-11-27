@@ -32,15 +32,23 @@ export default function DrawerTocObserver({
     const links = Array.from(sidebar?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
     const guideContent = root?.querySelector<HTMLElement>(`.${styles.main}`) ?? null;
     let wasOpen = false;
-    const sync = (open: boolean) => {
+    const siteHeader = document.getElementById("common-header");
+    const siteHeaderControls = Array.from(
+      siteHeader?.querySelectorAll<HTMLElement>(
+        ".ch-hamburger, .ch-dropdown-toggle, .ch-subdropdown-toggle"
+      ) ?? []
+    );
+    const isMobile = () => window.matchMedia("(max-width: 900px)").matches;
+    const sync = (open: boolean, restoreFocus = true) => {
       root?.classList.toggle(styles.open, open);
       menu?.setAttribute("aria-expanded", String(open));
       menu?.setAttribute("aria-label", open ? "目次を閉じる" : "目次を開く");
-      const mobile = window.innerWidth <= 900;
+      const mobile = isMobile();
       if (sidebar) {
         const hidden = mobile && !open;
         // 背景クリック等でフォーカスが目次外へ移っていても、閉じたら開いた要素へ戻す。
-        if (hidden && (wasOpen || sidebar.contains(document.activeElement))) menu?.focus();
+        if (restoreFocus && hidden && (wasOpen || sidebar.contains(document.activeElement)))
+          menu?.focus();
         sidebar.inert = hidden;
       }
       // モバイルのドロワー表示中は、チェックリストを含む本文をキーボード操作の対象から外す。
@@ -50,15 +58,23 @@ export default function DrawerTocObserver({
       wasOpen = open;
     };
     const close = () => sync(false);
+    // サイトメニューやヘッダードロップダウンを開くときはドロワーを閉じる。フォーカスは押下した要素に残す。
+    const closeForSiteHeader = (event: Event) => {
+      if (!wasOpen) return;
+      sync(false, false);
+      (event.currentTarget as HTMLElement | null)?.focus();
+    };
     const toggle = () => sync(!root?.classList.contains(styles.open));
     /** 開いたモバイルドロワーでは、Tab 移動をメニューと目次リンクの間で DOM 順に循環させる。 */
     const containFocus = (event: KeyboardEvent) => {
-      if (!menu || !wasOpen || window.innerWidth > 900) return;
+      if (!menu || !wasOpen || !isMobile()) return;
       const stops = [menu, ...links];
       const first = stops[0];
       const last = stops[stops.length - 1];
       const edge = event.shiftKey ? first : last;
       const active = document.activeElement;
+      // 769-900px では共通ヘッダーのナビが可視のため、ヘッダー内のフォーカスはドロワーへ引き戻さない。
+      if (active && siteHeader?.contains(active)) return;
       // 範囲内かつ端以外ならブラウザ既定の移動に任せる。
       if (active !== edge && stops.some((stop) => stop === active)) return;
       event.preventDefault();
@@ -99,8 +115,14 @@ export default function DrawerTocObserver({
       }
     };
     const resize = () => {
-      sync(window.innerWidth <= 900 && Boolean(root?.classList.contains(styles.open)));
+      const menuHadFocus = document.activeElement === menu;
+      sync(isMobile() && Boolean(root?.classList.contains(styles.open)));
       update();
+      // デスクトップ幅ではメニューボタンが非表示になる。そこに残ったフォーカスを、現在のセクションの
+      // 目次リンク（無ければ先頭）へ移す。sync で inert を解除し、update で選択を確定した後に移す。
+      // メニュー以外（目次内など）にあるフォーカスは動かさない。
+      if (!isMobile() && menuHadFocus)
+        (links.find((a) => a.getAttribute("aria-current") === "location") ?? links[0])?.focus();
     };
     // 原本と同じUL単位で集計し、進捗DOMもそのリスト直前の表示へ限定する。
     const disposeChecklists = Array.from(
@@ -131,6 +153,9 @@ export default function DrawerTocObserver({
       };
     });
     menu?.addEventListener("click", toggle);
+    siteHeaderControls.forEach((control) => {
+      control.addEventListener("click", closeForSiteHeader);
+    });
     backdrop?.addEventListener("click", close);
     document.addEventListener("keydown", key);
     window.addEventListener("scroll", update, { passive: true });
@@ -142,6 +167,9 @@ export default function DrawerTocObserver({
     update();
     return () => {
       menu?.removeEventListener("click", toggle);
+      siteHeaderControls.forEach((control) => {
+        control.removeEventListener("click", closeForSiteHeader);
+      });
       backdrop?.removeEventListener("click", close);
       document.removeEventListener("keydown", key);
       window.removeEventListener("scroll", update);
@@ -153,6 +181,9 @@ export default function DrawerTocObserver({
         dispose();
       });
       root?.classList.remove(styles.open);
+      // 開状態のまま解除されても、メニューの aria 状態を閉に戻す。
+      menu?.setAttribute("aria-expanded", "false");
+      menu?.setAttribute("aria-label", "目次を開く");
       if (sidebar) sidebar.inert = false;
       if (guideContent) guideContent.inert = false;
     };

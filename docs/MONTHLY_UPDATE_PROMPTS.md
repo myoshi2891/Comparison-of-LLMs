@@ -1,7 +1,7 @@
 # 月次更新プロンプト集
 
 > **用途**: 毎月最低 1 回、各画面の情報を最新状態に保つためのプロンプトテンプレート集。  
-> **最終更新**: 2026-10-24  
+> **最終更新**: 2026-11-14<br>
 > **次回予定**: 2026-11-01 以降
 
 ---
@@ -14,6 +14,7 @@
 4. 更新後は `## 検証チェックリスト` を確認してコミットする
 
 **共通制約（全画面共通）**:
+
 - ファイル全体の書き直し禁止。外科的パッチのみ
 - `bun run build && bun run typecheck && bun run test && bun run lint` が全て通ること
 - **日付・バージョン表記は `metadata` だけでなく本文中の全箇所を更新する**（下記「頻出レビュー指摘」参照）
@@ -116,7 +117,7 @@ bun run test app/<path> >/tmp/t.log 2>&1; echo "exit=$?"   # tail はexit code �
 
 | # | URL | ページタイトル（概要） | 区分 | 確認日（registry `lastReviewed`） |
 |---|-----|----------------------|------|--------|
-| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | Home | 2026-10-24 |
+| 1 | `/` | AIモデル 時間別コスト 計算機（ホーム） | Home | 2026-11-13 |
 | 2 | `/claude/skill` | Claude Code AI仕様駆動開発 — マークダウンファイル完全ガイド | Providers / Claude | 2026-10-22 |
 | 3 | `/claude/skill-guide` | SKILL.md 完全解説ガイド — Claude Code | Providers / Claude | 2026-10-22 |
 | 4 | `/claude/skill-guide-intermediate` | SKILL.md 中級者完全攻略ガイド — Claude Code | Providers / Claude | 2026-10-22 |
@@ -196,18 +197,24 @@ web-next/app/page.tsx と web-next/components/HomePage.tsx を読んで現状を
 
 以下の作業を行ってください:
 
-1. [スクレイパー実行] scraper/ ディレクトリで `uv run python -m scraper.main --output ../pricing.json` を実行し、
-   pricing.json を最新化する
+1. [スクレイパー実行] scraper/ ディレクトリで `uv run python -m scraper.main --output ../web-next/data/pricing.json` を実行し、
+   web-next/data/pricing.json を最新化する
 
 2. [コピー] bash update.sh --no-scrape で web-next/data/pricing.json と
    web-next/public/pricing.json に最新データをコピーする
 
-3. [UI 確認] web-next/components/HomePage.tsx の モデル表示ロジック（ApiTable / SubTable）に
+3. [鮮度更新] web-next/lib/page-registry.ts の Home エントリ（slug: "/"）の
+   lastReviewed を当日の日付（YYYY-MM-DD）に更新する
+   - addedAt は暗黙に変更せず、この更新で価格データの公開日自体を変更すべきか確認した場合のみ更新する
+   - 両日付を揃える必要がある場合（addedAt を更新する場合）は、web-next/lib/page-registry.test.ts の
+     PRICING_PUBLICATION_DATE も同じ日付に同期する
+
+4. [UI 確認] web-next/components/HomePage.tsx の モデル表示ロジック（ApiTable / SubTable）に
    新規モデル対応漏れがないか確認する
    - 表示名・通貨表記・カラーインデックスが正しいか
    - Zod スキーマ（web-next/lib/pricing.ts）が新フィールドを受け入れるか
 
-4. 型エラーがあれば web-next/types/pricing.ts と web-next/lib/pricing.ts の
+5. 型エラーがあれば web-next/types/pricing.ts と web-next/lib/pricing.ts の
    _AssertParity を確認して修正する（Pydantic モデルが SSoT）
 
 変更は最小 diff で。

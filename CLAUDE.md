@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Updated 2026-11-12
+Updated 2026-11-19
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -9,6 +9,73 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 AIモデルの時間別コスト計算機 + AI ツール導入ガイド群。Python スクレイパーが各社料金ページから価格を自動取得し `pricing.json` を生成、**Next.js 16 App Router（SSG / `output: 'export'`）** がそれを読み込んで Netlify CDN へ配信する。Phase 1–14 でコスト計算機ページが Next.js 化済み。18 枚のガイドページ（旧 `legacy/` 配下）は Phase A–F で **全移行完了**（計画書は [`docs/archive/NEXTJS_PHASE_A_F_PLAN.md`](docs/archive/NEXTJS_PHASE_A_F_PLAN.md) に保存）。さらに追加移行ページとして `/claude/managed-agents` や `/code-review/coderabbit-guide` 等を設置。
 
 ## アーキテクチャ
+
+2026-11-19追加レビュー22件: 原本監査はカード走査で読取・描画が全反復で実行される場合だけ認定し（添字条件・反復固有のcontinue・メンバー参照や関数内で書き換わるガードは未解決、全カード共通の条件と実在要素のnullガードは維持）、同期classicの読取は非asyncモジュールの書き込みより先と扱う。型付きセレクターの引用符一致、直接問い合わせのカード解析後、`obj.if(`の非制御頭、script種別の書き込みを追加。終了コード1の2原因を文書化。Moonshotの標準input先読みはタグ全体を読み飛ばす。共有目次はresize時に現在の目次リンクへフォーカスを移す。Fable 5.2は図2・8・9、疎通確認、drop_block、batch／fastのキャッシュ単価（Global API）、目次アイコンを修正（原本・JSX・契約を同期）。Robotics・Carbon・Hydrogenを訂正。監査151件・Fable以外の61原本の監査結果不変・全体241 files／3098 tests・pytest159件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-19レビュー27件: 原本監査はquerySelectorAllの初期化より後に解析されるカードを添字走査で認定せず、JavaScript MIME typeを全て扱い、選択scriptを変え得る編集・render引数のスプレッドを未解決とし、CLIで未解決解析を欠落と区別。Moonshotはcached探索の指数的後戻りを解消。Fable 5.2はmax_tokensで履歴へ追加せず、browser失敗を別追跡、拒否を既定、sweepはend_turnのみ合格、キャッシュnullを0（原本・JSX・契約・トークンを同期）。共有目次はデスクトップ化時にメニューのフォーカスを目次へ移す。Next.jsの差し戻しは依存変更のため確認待ち。監査144件・原本62件の監査結果不変・全体240 files／3088 tests・pytest156件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-18再追加レビュー15件: 原本監査はpayloadを読むscript自体の位置で読取時点を判定し、エスケープ識別子を未解決とし、template内の要素を文書セレクターに数えない。Moonshotはcache-hit inputを後戻りで分割しない。Fable 5.2のagent_loopは(toolset_name, name)で振り分ける（原本・JSX・契約・トークンを同期）。Carbon・Hydrogen・Decisions・Roboticsの手順とコード例を訂正。bun auditは確認待ち。監査135件・原本66件の監査結果不変・全体240 files／3082 tests・pytest152件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-18追加レビュー16件: 原本監査はtemplate内のscriptをrenderer対象から除外し、classic scriptがpayloadより前で読む場合は未解決とする。Moonshotは価格なしのcachedが標準inputを飲み込まない。Fable 5.2のagent_loopはtoolset_nameを返し、失敗後の後続computer操作を実行しない（原本・JSX・契約・トークンを同期）。Carbon・Hydrogen・Decisions・Roboticsのコード例と手順を訂正。bun auditのpicomatchは依存変更のため確認待ち。監査132件・原本66件の監査結果不変・全体240 files／3081 tests・pytest150件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-18レビュー15件: 原本監査はラベル等の`:`直後の`{`を不確実なスラッシュ文脈とし、正規dedentはhelper外のisFinite／Infinity出現で未解決、祖先preは実タグのみで数える。Fable 5.2はツール結果をdeepcopyして保存（原本・JSX・契約を同期）。Carbonはrequires_action・store=Falseのストリーム復旧・hop別usage、Hydrogenは自動継続の統合結果と誠実性94%、Decisionsはメッセージのスナップショット、Roboticsは座標系・上限時の履歴・ターンゲートを訂正。S26契約は原本固定の設計のためスキップ。bun auditのpicomatchは依存変更のため確認待ち。監査130件・62原本の監査結果不変・全体240 files／3080 tests・pytest150件＋39 subtestsが成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-17レビュー14件: 原本監査はカードループ本体での添字書き込みを未解決とし、dedent比較でASIに影響する改行（return等の直後、++／--の直前）を保持する。Moonshotはbatch／cached outputを区切り幅・インラインタグによらず読み飛ばす。Robotics 2.5は関数呼び出し単位の上限・拒否／失敗後の停止・画像パートでの観測返却、Carbonは非ストリーミング32,768分岐とCONTINUATION継続、HydrogenはSTOP限定、Decisionsはtypes.Contentでのブロックへ訂正。READMEにjqを追加。監査119件・62原本の監査結果不変・pytest150件＋39 subtestsが成功。web-nextは無変更。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-16レビュー14件: 原本監査はスラッシュ分類が不確実でrendererが隠れうるスコープを未解決として保持し、別名は初期化子が実行される位置で解決する。入れ子のlet／constはシャドーイング扱い。Moonshotはcached入力ラベル内のインラインHTMLを読み飛ばし、標準outputをbatch等の別フィールドから拾わない。Robotics 2.5・Decisions・Carbonのコード例と手順を訂正し、Carbonのprefix_mismatch_behaviorは公式記載ありとしてスキップ。監査113件・62原本の監査結果不変・pytest145件＋39 subtestsが成功。web-nextは無変更。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-16レビュー7件: 原本監査はsrcの分割代入・for-of/in先頭・入れ子ブロックの再宣言を書き込みとして扱い、遅延実行のrenderに備えてsrc・別名・script textContentへの書き込みをスコープ全体で検出する。dedentは唯一の正規helperへ束縛される場合だけ認定。Moonshotのcached input探索もoutputを越えない。Carbonはツール呼び出しごとに承認ゲートを通す。Fable 5.2はunmount後のchangeを明示的に送り、目次をroleで取得。監査111件・62原本の監査結果不変・pytest143件＋39 subtests・全体240 files／3077 tests・型・Biome657 filesが成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15追加レビュー3件: 原本監査はdocument.querySelectorの一意性を文書全体の要素で確認し、先行する非カードの一致を見逃さない。scriptのtextContentへの代入・複合代入・別名／クエリー経由の書き込みは、古いpayloadを認定せず未解決とする。Carbon料金表はCyber Permissiveの11月単価$4／$20を通常の導入単価から分離。監査109件・HTML原本監査exit 0・Markdown lintと既存料金の維持を確認。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15初期化順序等の追加レビュー5件: 原本監査はsrcとCLASSDEFSで初期化実行順序の証明を共有し、条件付き初期化・初期化前の呼び出しを未解決とする。実行時のscript選択は子カードを含む子孫順で照合し、payload所有は最寄りカードへ限定。Carbonのhigh採用前に品質を検証し、Moonshotのcached input金額を途中まで読み飛ばすバックトラックを防止。現在地と再開プロンプトの実装checkpointを4a02de85へ同期。監査107件・pytest141件＋39 subtests・HTML原本監査exit 0・24図解析が成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15追加レビュー5件: 原本監査はsrcの引数遮蔽・未定義・未知の初期化を拒否し、可視の宣言とカードpayloadの対応を確認する。接尾辞なしでも検証済みtextContent初期化を認定。Moonshotはcached inputを除外して標準入力単価を選び、Fableのpause_turnは次のAPI呼び出し前にcheckpointへ履歴を保存。PDFのインライン上限50 MBとFiles APIへの案内を訂正。全体240 files／3077 tests・監査105件・Fable77件・pytest140件＋39 subtests・型・Biome・HTML原本監査が成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15レビュー4件: コメントのみのcodeは現行監査で既に拒否されるためロジック変更をスキップし、回帰1テストを追加。監査104件・HTML監査exit 0。ビルド要約を最後の成功11月14日／11月15日の失敗と再試行失敗へ同期。Decisionsはrefundを常に人間レビューへ送り、非返金の閾値を保持。有料枠の規約・共有設定による改善利用の条件差を追記。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15追加レビュー7件: 原本監査はrenderのリテラル図ソースをカード本文と照合し、接尾辞あり／なしの呼び出しをカードへ対応付けられない場合は未解決とする。テンプレート補間の実行コードを発見対象に残し、未解決スコープを除外しない。Carbonの移行パラメータ、HydrogenのSTOP限定履歴保存と全model_output本文集約、Decisionsの質問込み262,144トークン上限を訂正。監査103件・HTML原本監査exit 0・ガイド例モック・24図解析が成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15レビュー12件: 原本監査はobject式後の除算と文ブロック後の正規表現を区別し、分類不明のslashとrender前のsrc再代入を未解決とする。Carbon／Decisionsは承認・リスク判定を実行前へ移動。Hydrogenはコード入力とMAX_TOKENS時の履歴不変を追加。Moonshotは兄弟ddの価格を取得し、Fableはpause_turnで応答履歴をそのまま再送する。全体240 files／3076 tests・監査100件・Fable76件・pytest139件＋39 subtests・型・Biome・HTML監査が成功。ビルドはTurbopackのローカルポート制限で失敗。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15追加レビュー4件: 原本監査はCLASSDEFSの初期化とrendererへ至る呼び出し順を確認し、別名経由の図ソースは確定できなければ未解決とする。textarea等のraw-text／RCDATA内のscript・カード様文字列は不透明に保ち、実payloadを保持。Hydrogenは一時履歴で生成を要求し、成功時だけ署名付き応答と入力を保存する。監査100件・FableのHTML原本監査exit 0・失敗／再試行モックが成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15レビュー4件: 原本監査は図ソースのテンプレート補間を未解決として停止し、空codeの閉じタグ区切り前の空白も認識する。Hydrogenの履歴例はツールなしのテキスト専用と明記。Fableの費用例は集計キャッシュ書込のTTL未帰属分を非負に丸めて5分単価で加算し、原本・JSX・契約を同期。全体240 files／3075 tests・監査97件・Fable対象75件・型・lint657 files・HTML原本監査exit 0が成功。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-15レビュー11件: 原本監査は独立scriptの文境界・render第2引数・括弧付きCLASSDEFS・HTMLタグの大小文字を扱う。Carbonは承認制御を試験運用の前へ移し、参照ラベルを保持した区切り修正でMarkdown lintを解消。Hydrogenはツール宣言をconfig経由へ訂正。Fableはstrictの入力検証とJSON応答を区別し、autoで未呼び出しの場合の扱いを原本・JSX・契約へ同期。当該レビュー時点では2026-11-14の115静的ページ成功後は未ビルドだった。後続の11月15日レビュー12件で失敗と再試行失敗を記録。全体240 files／3075 tests・監査95件・型・lint657 files・HTML原本監査exit 0が成功。検証結果はdocs/PROGRESS.mdを参照。
+
+2026-11-15レビュー8件: 原本監査の境界走査は他タグの引用属性とコメントを丸ごと消費し、同名タグの深さだけを更新。CLASSDEFSは宣言がrenderを囲む範囲にあるか確認し、引数・catch・その他の曖昧な参照は未解決として停止。Carbonは認証コードを入力へ追加し、署名／履歴・暗黙キャッシュの移行項目とツール入力トークン課金を訂正。Hydrogenはxhighの品質判定とMAX_TOKENSの拒否を追加。監査91件・HTML原本監査exit 0・コード例のモック・19図解析・Hydrogen等のMarkdown lintが成功。Carbonの既存参照ラベルlint47件は不変。アプリと依存・設定は無変更。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14追加レビュー7件: 原本監査は一致ラッパー内の子カードを走査し、最も近い所有カードへpayloadを対応付ける。CLASSDEFSの16進・Unicodeエスケープを復号し、不正・未対応は未解決として停止。Hydrogenは提供条件・検索課金単位・prefix変更時のDROPを訂正。最新ユーザー指示によりHomeの両日付を価格更新日2026-11-13へ同期し、月次一覧も同日に合わせる。全体240 files／3075 tests・監査89件・型・lint657 files・Markdown lint・HTML原本監査exit 0が成功。バックエンド最新実測は138件＋39 subtests。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14レビュー11コメント: 監査は未確定renderer対応とCLASSDEFS再代入を未解決として停止し、引用属性内の偽codeを除外。Hydrogenは非対応パラメータ・prefill除去・思考込みの出力見積り・会話別履歴へ訂正。月次Home確認日をregistryへ同期。Moonshotは定義リストの境界を保持。Fableは通常のツール例外を対応するエラー結果へ変換し、全結果バッチを保存して再開する。検証結果はdocs/PROGRESS.mdを参照。
+
+2026-11-14レビュー4件: 原本監査は未解決のCLASSDEFSを空文字と区別し、unresolvedMermaidSourcesとして完了判定を停止。コードのマスクは正規表現を認識して後続宣言の位置を保持。HydrogenはContributor Tierの改善利用と有料サービスの監視用保持を明記。Fableのagent_loopはツール結果バッチを次のAPI呼び出し前にcheckpointへ保存し、API失敗後も再開できる。ターン上限時の保存は維持。全体240 files／3074 tests・Fable対象74件・監査84件・型・lint657 files・HTML原本監査exit 0・管理文書等のMarkdown lintが成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14追加レビュー5件: 原本監査はカード開始タグの引用属性を保持し、moduleごとのCLASSDEFSを静的カードセレクターで対応付ける。Hydrogenは必須機能を先に判定し、Long Decodeのフォアグラウンド／ステートレス／GenerateContent継続も案内。Fableのagent_loopは上限例外前に呼び出し元のcheckpointへツール結果込みの履歴を保存し、同じ辞書で再開できる。原本・JSX・対象コード契約を同期。全体240 files／3073 tests・対象73件・監査82件・型・lint657 files・HTML原本監査exit 0が成功。保存Markdownの既存lint34件は不変。ビルド・実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14レビュー8件: 原本監査はrender呼び出しの括弧内だけでCLASSDEFSを判定し、通常タグの引用属性内のscript様文字列を除外。Moonshotはoutputラベル以降の価格を入力単価に流用しない。Homeの公開日を2026-10-24へ復元し、確認日のみ2026-11-14へ更新。Hydrogen原稿は完了状態の確認・output_text・共有コンテキスト・継続入力課金を訂正。全体240 files／3072 tests・監査80件・pytest137件＋39 subtests・型・lint657 files・Markdown lint・HTML原本監査exit 0が成功。ビルドと実API呼び出しは未実行。詳細はdocs/PROGRESS.mdを参照。
+
+2026-11-14追加レビュー: 原本監査は文字列とコメントを隠したコードでrender呼び出しとCLASSDEFS宣言を検出し、リテラル抽出用の表現を分離。カードで表示済みのscriptを消費してdata-codeの二重処理を防止。Fable 5.2の著者・独立評価22行は空の内容セルを取得状況の前へ移動し、原文・URL・リンク属性を保持。webのDocker devステージだけにテスト用python3を追加。全体240 files／3071 tests・監査76件・対象72件・HTML原本監査exit 0・typecheck・lint657 filesが成功。Dockerデーモン停止中のためイメージのビルド検証は未実施。
+
+2026-11-14追加レビュー: 原本監査の図挿入でドル記号を保持し、Moonshotの単一レコード内の入出力価格を取得するよう修正。Fable 5.2の費用例をTTL別課金・未定義キャッシュ単価の拒否へ修正し、agent_loopのキャッシュ明示設定と安全なPostToolUse引数渡しをHTML／Markdown・JSX・契約へ同期。全体240 files／3070 tests・対象71件・監査74件・pytest136件＋39 subtests・型・lint657 files・HTML原本監査exit 0・ビルド115静的ページ生成が成功。保存Markdownの既存lint指摘34件は対象外として保持。
+
+2026-11-14: 原本監査のCLASSDEFS判定をコメント除去済みの実行用scriptへ限定し、カード内ではdata-for属性のない最初のtext/plain payloadを選択するよう修正。追加2件のRed確認後、監査73テストとFable 5.2のHTML原本監査exit 0が成功。アプリ・依存・設定は無変更。
+
+Claude Fable 5.2 `/claude/fable-5-2-best-practices` を追加（2026-11-13）。
+指定HTMLの100見出し・98段落・111リスト項目・45表363行・19コード例・10図・21 callout・49外部リンクをPure JSXへ転写。
+原本固定の全文・全要素ツリー・110 CSS規則・highlight.js11.12.0全トークンを66契約（ページ31／操作35）で照合。
+全体239 files／3065 tests、関連93件、型・lint656 files・HTML監査exit 0・10図解析・pytest135件が成功。
+288px固定目次・900pxモバイル開閉・点と番号・入れ子・全列左寄せ・コード空白を保持。
+41チェックは原本の9リスト（5・5・8・3・3・6・4・4・3）で独立集計。操作の行／関数100%、分岐89.87%。
+registryのClaudeカテゴリから導線を導出し、追加・確認日は2026-11-13、本文の情報基準日は2026-11-12を維持。
+カード内text/plainと実行時CLASSDEFSを読む監査を4つのRedから追加し、監査71テスト成功。
+HTML／Markdownは内容無変更保存。配信HTMLの3477個の意味的要素が原本と一致し、174 IDに重複なし。
+npm・ビルド未実行、依存・設定・ロックは無変更。目視はユーザー担当（localhost:3000）。分離履歴はdocs/PROGRESS.mdを参照。
+
+価格データ更新（2026-11-13）: 公式料金表に基づきFable 5.2・利用制限付きMythos 5.2・Gemini 4 Carbon／Hydrogen・Omni 1.2 Flashを追加。
+API 98件／ツール34件。Carbonは11月末まで$2/$10、12月から$4/$20へ生成時に切替。Homeの公開日・確認日を更新。
+Moonshotの派生版・遠距離価格の誤抽出を防止。追加9契約のRedを確認。複数行の価格取得とレコード境界の回帰4件を追加し、pytest 135件＋39 subtestsが成功。詳細はdocs/PROGRESS.md。
 
 Google Antigravity `/google/antigravity-best-practices` を指定HTMLで完全更新（2026-11-11）。
 108見出し・92段落・48リスト項目・61表404行・18コード例・11図・26引用・8表形式チェック・4外部リンクをPure JSXへ転写。
@@ -618,7 +685,7 @@ Build:     cd web-next && bun run build
 以下を全て確認してからコミットすること：
 
 1. `cd web-next && bun run build` が成功（※Antigravityサンドボックス環境では実行禁止。他環境やCIでは必須）
-2. `cd web-next && bun run test` が完全に成功（237 files / 2999 tests pass、2026-11-12実測（追加レビュー対応後）。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
+2. `cd web-next && bun run test` が完全に成功（241 files / 3098 tests pass、2026-11-19追加レビュー22件修正後の実測。`NODE_OPTIONS=--no-experimental-webstorage` と `--maxWorkers=1 --testTimeout=30000` を使用。収集失敗もブロッキング失敗として原因を調査する）
 3. `cd web-next && bun run typecheck` が成功
 4. `cd web-next && bun run lint` が成功
 5. `cd scraper && uv run pytest` が成功

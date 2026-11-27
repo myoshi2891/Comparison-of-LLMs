@@ -91,7 +91,7 @@ Mermaid 契約 C-6 とデザイン契約 D-1〜D-4 は原本依存の追加契�
   bun .claude/skills/nextjs-page-migration/scripts/audit_source_parity.mjs \
     archive/{html|md}/<ベンダー>/<原本>.{html|md|markdown} \
     web-next/app/<provider>/<slug>/page.tsx
-  echo "exit=$?"   # 0 以外なら移行漏れあり → Green コミット禁止
+  echo "exit=$?"   # 1 は内容の欠落・Mermaid 図ソース不一致（本文・順序・回数）・レンダラー解析の未解決、2 は引数・ファイル読み込みエラー（page.tsx 等の読み込み失敗を含む）→ いずれも Green コミット禁止
   ```
 
   漏れのうち「正当な差分」（原本の `目次` 見出しがサイドバー TOC に置き換わる等）と判断した項目は、

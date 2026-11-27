@@ -14,6 +14,7 @@ fallback パスしか通らない**。本ファイルは get_page_text / httpx.g
 from __future__ import annotations
 
 import logging
+import re
 from datetime import date, datetime
 from unittest.mock import MagicMock, patch
 
@@ -518,6 +519,287 @@ class TestMoonshot:
             models = moonshot.scrape()
         _assert_all_fallback(models, moonshot._FALLBACKS, "Moonshot(Kimi)")
 
+    @pytest.mark.parametrize(
+        "html",
+        [
+            "<p>Kimi K3 input unavailable</p><p>Kimi K3 output $16.50</p>",
+            # cached input の価格読み飛ばしが output を越えると、後続の batch 価格を入力単価として拾う。
+            "<p>Kimi K3 input N/A cached input N/A output $16.50 (batch $8.25)</p>",
+            "<p>Kimi K3 cached input N/A output $16.50 (batch $8.25)</p>",
+            # cache-hit 入力だけのレコードで、ラベル末尾の input を手放して cache-hit 価格を標準入力にしない。
+            "<p>Kimi K3 cache hit input $0.25 output $16.50</p>",
+            "<p>Kimi K3 <span>cache</span> <span>hit</span> input $0.25 output $16.50</p>",
+            # 標準 output が欠ける場合、別フィールドの batch 価格を output として公開しない。
+            "<p>Kimi K3 input $3.25 output N/A batch $8.25</p>",
+            "<p>Kimi K3 input $3.25 output <span>N/A</span> batch output $8.25</p>",
+        ],
+    )
+    def test_output_only_price_preserves_fallback_pair(self, html):
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+        assert model.scrape_status == "fallback"
+
+    def test_standard_input_skips_cached_price(self):
+        for html in (
+            '<p>Kimi K3 cached input $0.25 input $3.25 output $16.50</p>',
+            # cached が価格なし（N/A）でも、後続の標準 input ラベルと価格を cached 扱いで飲み込まない。
+            '<p>Kimi K3 cached input N/A input $3.25 output $16.50</p>',
+            '<dl><dt>Kimi K3</dt><dd>cached input $0.25</dd><dd>input $3.25</dd><dd>output $16.50</dd></dl>',
+            # cached と input の間のインライン HTML も cached ラベルとして読み飛ばす。
+            '<p>Kimi K3 <span>cached</span> input $0.25 input $3.25 output $16.50</p>',
+            '<td>Kimi K3</td><td>cached<br>input $0.25</td><td>input $3.25</td><td>output $16.50</td>',
+            # batch input の価格も標準入力として拾わない。
+            '<p>Kimi K3 batch input $1.60 input $3.25 output $16.50</p>',
+            '<dl><dt>Kimi K3</dt><dd>batch input $1.60</dd><dd>input $3.25</dd><dd>output $16.50</dd></dl>',
+            # cache-hit の入力価格が cache-miss より前にあっても、標準入力は cache-miss を選ぶ。
+            '<p>Kimi K3 input (cache hit) $0.25 input (cache miss) $3.25 output $16.50</p>',
+            '<td>Kimi K3</td><td>Cache Hit $0.25</td><td>Cache Miss $3.25</td><td>Output $16.50</td>',
+            '<p>Kimi K3 cache-hit input $0.25 cache-miss input $3.25 output $16.50</p>',
+            '<p>Kimi K3 <span>cache</span> <span>hit</span> input $0.25 input $3.25 output $16.50</p>',
+            # cache-hit・cached・batch が同じレコードに並んでも標準入力だけを選ぶ。
+            '<p>Kimi K3 cache hit $0.25 cached input $0.2 batch input $1.6 input $3.25 output $16.50</p>',
+            # cached 価格を囲むタグの属性値（input-price 等）で cached の価格探索を打ち切らない。
+            '<p>Kimi K3 cached input <span class="input-price">$0.25</span> input $3.25 output $16.50</p>',
+            # 標準 input が cached input より先にあるレコードでも標準 input と output を正しく抽出する。
+            '<p>Kimi K3 input $3.25 cached input $0.25 output $16.50</p>',
+            # タグ属性内の output（data-label="output" 等）を標準 output ラベルと誤認しない。
+            '<p>Kimi K3 <span data-label="output">input</span> $3.25 output $16.50</p>',
+            '<p>Kimi K3 input $3.25 <span class="output-col">$9.99</span> output $16.50</p>',
+            # output 価格を囲むタグ属性内の $ や batch/cached/input を誤認せず、可視の出力単価を選ぶ。
+            '<p>Kimi K3 input $3.25 output <span data-price="$9.99" data-field="batch">$16.50</span></p>',
+            # タグ属性内の別 Kimi モデル名をレコード境界と誤認せず、同一レコードの価格ペアを抽出する。
+            '<p>Kimi K3 <span data-next="kimi-k2.6">input $3.25</span> <span data-alias="Kimi K2.7">output $16.50</span></p>',
+            # タグ属性内の自モデル名・価格を可視レコードの開始位置と誤認せず、可視テキストの価格ペアを抽出する。
+            '<p data-model="Kimi K3" data-in="$9.99" data-out="output $88.88">Kimi K3 input $3.25 output $16.50</p>',
+        ):
+            with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+                model = _find(moonshot.scrape(), "Kimi K3")
+            assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+            assert model.provenance is not None
+            assert model.provenance.origin == "scraped"
+
+    @pytest.mark.parametrize(
+        "html",
+        [
+            # 複数空白・インラインタグで区切られた batch output を標準 output として拾わない。
+            "<p>Kimi K3 input $3.25 batch  output $8.25 output $16.50</p>",
+            "<p>Kimi K3 input $3.25 batch\n\toutput $8.25 output $16.50</p>",
+            "<p>Kimi K3 input $3.25 <span>batch</span> output $8.25 output $16.50</p>",
+            "<p>Kimi K3 input $3.25 batch<br> output $8.25 output $16.50</p>",
+            "<p>Kimi K3 input $3.25 cached  output $0.50 output $16.50</p>",
+        ],
+    )
+    def test_standard_output_skips_spaced_batch_output(self, html):
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+        assert model.provenance is not None
+        assert model.provenance.origin == "scraped"
+
+    def test_ignores_models_and_prices_inside_script_blocks(self):
+        html = (
+            "<script>var d = 'Kimi K3 input $1.11 output $2.22';</script>"
+            "<p>Kimi K3 input $3.25 output $16.50</p>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+        assert model.provenance is not None
+        assert model.provenance.origin == "scraped"
+
+    def test_ignores_models_and_prices_inside_html_comments(self):
+        html = (
+            "<!-- archived: Kimi K3 input $1.11 output $2.22 -->"
+            "<p>Kimi K3 input $3.25 output $16.50</p>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+        assert model.provenance is not None
+        assert model.provenance.origin == "scraped"
+
+    @pytest.mark.parametrize(
+        "template",
+        [
+            "<template><p>a</p></template>",
+            "<template><template><p>a</p></template><p>Kimi K3 input $1.11 output $2.22</p></template>",
+            '<TEMPLATE id="o"><template></template><template>x</template>'
+            "<p>Kimi K3 input $1.11 output $2.22</p></TEMPLATE >",
+            # 属性値の中のタグ様文字列は開始・終了タグとして数えない
+            '<template data-x="</template>"><p>Kimi K3 input $1.11 output $2.22</p></template>',
+            '<div data-x="<template>"></div>',
+        ],
+    )
+    def test_ignores_prices_inside_templates_including_nested(self, template):
+        html = template + "<p>Kimi K3 input $3.25 output $16.50</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    def test_prefers_complete_pair_from_single_mention_over_cross_mention(self):
+        html = "<p>Kimi K3 promo $9.99</p><p>Kimi K3 input $3.25 output $16.50</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    @pytest.mark.parametrize(
+        "html",
+        [
+            # インライン HTML で区切られた次モデル名（Kimi K2.6）を越えて、その価格を K3 の output にしない。
+            "<div>Kimi K3 input $3.25 <span>Kimi</span> <span>K2.6</span> "
+            "input $0.95 output $4.00</div>",
+            # HTML 空白エンティティ（&nbsp;）で区切られた次モデル名も境界とみなし、後続価格を K3 に漏らさない。
+            "<div>Kimi K3 input $3.25 Kimi&nbsp;K2.6 input $0.95 output $4.00</div>",
+        ],
+    )
+    def test_next_model_split_by_inline_tags_is_a_boundary(self, html):
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+        assert model.scrape_status == "fallback"
+
+    def test_batch_input_row_output_is_not_standard_output(self):
+        # batch input 行の output は batch 単価。標準 output は標準 input の行から選ぶ。
+        html = (
+            "<p>Kimi K3 batch input $1.60 output $8.25</p>"
+            "<p>Kimi K3 input $3.25 output $16.50</p>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert model.price_out != 8.25
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    def test_batch_input_after_standard_input_does_not_leak_output(self):
+        # 標準 input の後に batch input が来る単一レコードでは、後続 output は batch 単価。
+        html = "<p>Kimi K3 input $3.25 batch input $1.60 output $8.25</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert model.price_out != 8.25
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+
+    @pytest.mark.parametrize(
+        "batch_row",
+        [
+            # batch 行の後ろのタグ属性に input があっても、標準 input のラベルとはみなさない。
+            '<p>Kimi K3 batch input $1.60 <span data-field="input">output</span> $8.25</p>',
+            '<p>Kimi K3 batch input $1.60 <div class="input-col">output $8.25</div></p>',
+        ],
+    )
+    def test_batch_row_tag_attribute_input_is_not_standard_input(self, batch_row):
+        html = batch_row + "<p>Kimi K3 input $3.25 output $16.50</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    @pytest.mark.parametrize(
+        "cache_hit_row",
+        [
+            # cache-hit 注記にインライン HTML が含まれる行は標準 input として扱わない。
+            "<p>Kimi K3 batch input $1.60 input <span>(cache hit)</span> $0.25 output $8.25</p>",
+            "<p>Kimi K3 batch input $1.60 input (<span>cache hit</span>) $0.25 output $8.25</p>",
+            "<p>Kimi K3 batch input $1.60 input (<span>cache</span>-<span>hit</span>) $0.25 output $8.25</p>",
+        ],
+    )
+    def test_cache_hit_row_with_inline_html_is_not_standard_input(self, cache_hit_row):
+        html = cache_hit_row + "<p>Kimi K3 input $3.25 output $16.50</p>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    def test_std_input_ahead_fails_promptly_with_repeated_inline_tags(self):
+        # 標準 input の先読みでインラインタグが連続しても、指数的に後戻りしない。
+        import time
+
+        pattern = (
+            rf"Kimi K3{moonshot._OUTPUT_LABEL_GAP}{moonshot._OUTPUT_LABEL}"
+            rf"{moonshot._OUTPUT_PRICE_GAP}\$([\d.]+)"
+        )
+        text = "<p>Kimi K3 batch input " + "<b>" * 24 + "N/A</p>"
+        started = time.perf_counter()
+        assert re.search(pattern, text, re.IGNORECASE | re.DOTALL) is None
+        assert time.perf_counter() - started < 0.5
+
+    def test_cached_input_gap_cannot_stop_inside_a_price(self):
+        text = "Kimi K3 cached input $0.25 input $3.25 output $16.50"
+        gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}"
+        assert re.match(gap + r"(?=5 input)", text) is None
+        matched = re.match(gap + r"(?= input)", text)
+        assert matched is not None
+        assert matched.group() == "Kimi K3 cached input $0.25"
+
+    def test_cached_input_gap_skips_label_words_in_inline_tag_attributes(self):
+        gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}\$([\d.]+)"
+        for text in (
+            '<p>Kimi K3 cached input <span data-field="output">$0.25</span> input $3.25</p>',
+            '<p>Kimi K3 cached input <span class="input-price">$0.25</span> input $3.25</p>',
+        ):
+            matched = re.search(gap, text, re.IGNORECASE | re.DOTALL)
+            assert matched is not None and matched.group(1) == "3.25", text
+
+    def test_cached_input_separated_by_html_whitespace_entity_is_skipped(self):
+        for html in (
+            "<p>Kimi K3 Cached&nbsp;Input $0.25 / Input $3.25 / Output $16.50</p>",
+            "<p>Kimi K3 Cached&#160;Input $0.25 / Input $3.25 / Output $16.50</p>",
+            "<p>Kimi K3 Cache&nbsp;Hit&nbsp;Input $0.25 / Cache&nbsp;Miss $3.25 / Output $16.50</p>",
+        ):
+            with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+                model = _find(moonshot.scrape(), "Kimi K3")
+            assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success"), html
+
+    def test_cached_input_gap_fails_promptly_with_repeated_inline_tags(self):
+        # cached 価格が N/A でインラインタグが連続しても、タグの読み方が分岐して指数的に後戻りしない。
+        import time
+
+        gap = rf"Kimi K3{moonshot._INPUT_PRICE_GAP}\$([\d.]+)"
+        text = "<p>Kimi K3 cached input " + "<b>" * 24 + "N/A</p>"
+        started = time.perf_counter()
+        assert re.search(gap, text, re.IGNORECASE | re.DOTALL) is None
+        assert time.perf_counter() - started < 0.5
+
+    def test_definition_list_extracts_sibling_definitions(self):
+        html = "<dl><dt>Kimi K3</dt><dd>input $3.25</dd><dd>output $16.50</dd></dl>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    def test_quoted_attribute_with_greater_than_is_not_price_text(self):
+        html = (
+            '<dl><dt>Kimi K3</dt><dd data-note="a > $9.99">input $3.25</dd>'
+            '<dd title="x > $8.88">output $16.50</dd></dl>'
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    def test_definition_list_cannot_pair_prices_from_different_records(self):
+        html = "<dl><dt>Kimi K3</dt><dd>input $3.25</dd><dt>Other</dt><dd>output $16.50</dd></dl>"
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+        assert model.scrape_status == "fallback"
+
+    def test_attribute_containing_dt_or_tr_does_not_split_grouped_mentions(self):
+        html = (
+            '<p>Kimi K3 input $3.25</p>'
+            '<p data-note="<dt><tr>">Kimi K3 output $16.50</p>'
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out, model.scrape_status) == (3.25, 16.50, "success")
+
+    def test_table_row_boundary_splits_repeated_mentions(self):
+        html = (
+            "<table>"
+            "<tr><td>Kimi K3</td><td>input $3.25</td></tr>"
+            "<tr><td>Kimi K3</td><td>output $16.50</td></tr>"
+            "</table>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            model = _find(moonshot.scrape(), "Kimi K3")
+        assert (model.price_in, model.price_out) == moonshot._FALLBACKS["Kimi K3"]
+        assert model.scrape_status == "fallback"
+
     # "Kimi K2.7 Code" が "Kimi K2.7 Code Highspeed" の価格を拾わないこと。
     _OVERLAP_HTML = (
         "<html><body>"
@@ -542,6 +824,19 @@ class TestMoonshot:
         assert m.price_in == price_in
         assert m.price_out == price_out
         assert m.scrape_status == "success"
+
+    def test_tag_attribute_model_name_is_not_matched_for_prices(self):
+        html = (
+            "<html><body>"
+            "<p>Kimi K3</p>"
+            '<p><span data-model="Kimi K3">input $99.00 output $199.00</span></p>'
+            "</body></html>"
+        )
+        with patch("scraper.providers.moonshot.get_page_text", return_value=html):
+            models = moonshot.scrape()
+        m = _find(models, "Kimi K3")
+        assert m.scrape_status == "fallback"
+        assert (m.price_in, m.price_out) == moonshot._FALLBACKS["Kimi K3"]
 
 
 # --------------------------------------------------------------------------- #
