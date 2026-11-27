@@ -326,7 +326,9 @@ it("あるチェックリストの操作が別のリストの状態・件数・�
   const aSnapshot = { checked: aBoxes.map((x) => x.checked), count: count(a), bar: bar(a) };
   expect(aSnapshot.checked[0]).toBe(true);
   const sameAsSnapshot = () =>
-    expect({ checked: aBoxes.map((x) => x.checked), count: count(a), bar: bar(a) }).toEqual(aSnapshot);
+    expect({ checked: aBoxes.map((x) => x.checked), count: count(a), bar: bar(a) }).toEqual(
+      aSnapshot
+    );
   fireEvent.click(bBoxes[0]);
   expect(bBoxes[0].checked).toBe(true);
   sameAsSnapshot();
@@ -363,6 +365,9 @@ it("metadata・registry・ヒーローの日付を保持", () => {
   const { getByTestId } = render(<Page />);
   const dates = getByTestId("hero-dates");
   expect(dates.closest("header")?.classList.contains(styles.hero)).toBe(true);
+  expect(dates.textContent?.replace(/\s+/g, " ").trim()).toBe(
+    `最終確認日: ${entry?.lastReviewed} / 公開日: ${entry?.addedAt}`
+  );
   expect(
     Array.from(dates.querySelectorAll("time")).map((e) => [e.dateTime, e.textContent])
   ).toEqual([

@@ -117,6 +117,13 @@ function assertEvalGate(source: string) {
   expect(failed?.to).not.toBe("DONE");
   // 不合格は Q1 へ到達できる選定・再試行の経路へ戻る（Q1 自身や RETRY 経由を許容し、行き止まりを禁止）。
   expect(canReach(failed?.to as string, "Q1")).toBe(true);
+  const withoutEvalPassAndQ1 = edges.filter(
+    (e) =>
+      !(e.from === gate && e.label === "はい" && e.to === "DONE") &&
+      e.from !== "Q1" &&
+      e.to !== "Q1"
+  );
+  expect(canReach(failed?.to as string, "DONE", withoutEvalPassAndQ1)).toBe(false);
 }
 
 it("図2: Fable の構成は evals に合格した場合だけ「そのまま運用」へ進み、不合格は見直しへ戻る", () => {
@@ -268,8 +275,9 @@ it("モバイルの目次ボタンは Tabler のスタイルシートがなく�
 
 it("図3: low が品質基準を満たしたときは1段下げ確認を経由せず直接 FIX へ進み、再訪した effort で循環しない", () => {
   const { labels, edges } = diagram("図3");
-  const fromF = edges.find((e) => e.from === "F" && e.label === "満たす");
-  expect(fromF?.to).toBe("G0");
+  expect(edges.filter((e) => e.from === "F" && e.label === "満たす")).toEqual([
+    { from: "F", label: "満たす", to: "G0" },
+  ]);
   expect(labels.get("G0")).toMatch(/low/);
   expect(edges.filter((e) => e.from === "G0")).toHaveLength(2);
   expect(edges.some((e) => e.from === "G0" && e.label === "はい" && e.to === "FIX")).toBe(true);
@@ -391,6 +399,9 @@ it("6.4 標準ループ・予算注記・11.4 予算ガード・図3 注記が�
     /キャッシュ書き込み対象トークンを非キャッシュ入力単価で二重計上しない/
   );
   expect(text(budgetNote)).toMatch(/実測の課金額で置き換えてください/);
+  expect(text(budgetNote)).toMatch(
+    /キャッシュが失効し得る場合は.*キャッシュ有効性が保証されていない限り失効済みと仮定し.*キャッシュ読み取り単価ではなく適用されるキャッシュ書き込み単価.*TTL 不明時は保守的な書き込み単価/
+  );
   const budgetItem1 = container.querySelector("#s11-4 + ol > li");
   expect(budgetItem1?.querySelector('a[href="#s6-4-budget-note"]')).toBeTruthy();
   const budgetItem = Array.from(container.querySelectorAll("#s11 li")).find((li) =>

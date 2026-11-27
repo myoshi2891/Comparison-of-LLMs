@@ -144,6 +144,7 @@ fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and 
 for reason in ("end_turn", "refusal", "max_tokens"):
     requests = []
     paused = {"stop_reason": "pause_turn", "content": [{"type": "server_tool_use", "id": "s1", "name": "search", "input": {}}, {"type": "thinking", "signature": "kept"}]}
+    expected_history = [{"role": "user", "content": "task"}, {"role": "assistant", "content": copy.deepcopy(paused["content"])}]
     done = {"stop_reason": reason, "content": [{"type": "text", "text": "done"}]}
     def call(body):
         requests.append(copy.deepcopy(body))
@@ -153,7 +154,7 @@ for reason in ("end_turn", "refusal", "max_tokens"):
     scope = {"call": call, "copy": __import__("copy")}
     exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), scope)
     assert scope["agent_loop"]("task", [], run_tool, max_turns=2) is done
-    assert requests[1]["messages"] == [{"role": "user", "content": "task"}, {"role": "assistant", "content": paused["content"]}]
+    assert requests[1]["messages"] == expected_history
 `,
     examples()
   );
@@ -1239,6 +1240,64 @@ try:
             tools=no_ws_tools,
         )
         assert cp_no_ws["messages"][2]["content"][0]["content"] == [sr_omitted]
+
+    # base64 画像は JPEG/PNG/GIF/WebP のみ受理し、非対応 media_type は保存前にエラーへ変換する
+    for media_type, ok in (("image/jpeg", True), ("image/png", True), ("image/gif", True), ("image/webp", True), ("image/svg+xml", False), ("image/bmp", False)):
+        img_block = {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": "AAAA"}}
+        cp_img = run_sr_case(
+            [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+            lambda _k, _a, b=img_block: [copy.deepcopy(b)],
+        )
+        res_img = cp_img["messages"][2]["content"][0]
+        if ok:
+            assert res_img["content"] == [img_block] and "is_error" not in res_img, (media_type, res_img)
+        else:
+            assert res_img["is_error"] is True and res_img["content"] == fixed_msg, (media_type, res_img)
+            assert media_type not in json.dumps(cp_img["messages"])
+
+    # Files API ベータ有効時はカスタムツールの file ソース(image / document)を受理し、ベータなし・browser/computer では拒否する
+    file_img = {"type": "image", "source": {"type": "file", "file_id": "file_01img"}}
+    file_doc = {"type": "document", "source": {"type": "file", "file_id": "file_01doc"}}
+    def run_betas_case(replies_seq, tool_fn, betas=None):
+        reqs = []
+        def b_call(body, betas=None):
+            reqs.append((copy.deepcopy(body), betas))
+            return replies_seq[len(reqs) - 1]
+        b_scope = {"call": b_call, "copy": copy}
+        exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), b_scope)
+        cp = {}
+        b_scope["agent_loop"]("task", [], tool_fn, max_turns=2, checkpoint=cp, betas=betas)
+        return cp
+    cp_file_ok = run_betas_case(
+        [{"stop_reason": "tool_use", "content": [tool(1), tool(2)]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, a: [copy.deepcopy(file_img)] if a["n"] == 1 else [copy.deepcopy(file_doc)],
+        betas=["files-api-2025-04-14"],
+    )
+    assert cp_file_ok["messages"][2]["content"][0]["content"] == [file_img]
+    assert cp_file_ok["messages"][2]["content"][1]["content"] == [file_doc]
+    cp_file_no_beta = run_betas_case(
+        [{"stop_reason": "tool_use", "content": [tool(1), tool(2)]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, a: [copy.deepcopy(file_img)] if a["n"] == 1 else [copy.deepcopy(file_doc)],
+    )
+    for res_nb in cp_file_no_beta["messages"][2]["content"]:
+        assert res_nb["is_error"] is True and res_nb["content"] == fixed_msg
+    cp_file_toolsets = run_betas_case(
+        [{"stop_reason": "tool_use", "content": [tool(1, name="click", toolset="browser"), tool(2, name="click", toolset="computer")]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, _a: [copy.deepcopy(file_img)],
+        betas=["files-api-2025-04-14"],
+    )
+    for res_ts in cp_file_toolsets["messages"][2]["content"]:
+        assert res_ts["is_error"] is True and res_ts["content"] == fixed_msg
+
+    # browser_state の tab_opened.tab_id は new_tab 以外の browser 結果でも tabs に存在しなければ拒否する
+    bad_opened_state = [{"type": "browser_state", "tabs": [{"tab_id": "tab1", "title": "Example", "url": "https://example.com", "active": True}], "state_changes": [{"type": "tab_opened", "tab_id": "tab_missing"}]}]
+    cp_bad_opened = run_sr_case(
+        [{"stop_reason": "tool_use", "content": [tool(1, name="click", toolset="browser")]}, {"stop_reason": "end_turn", "content": []}],
+        lambda _k, _a: copy.deepcopy(bad_opened_state),
+    )
+    res_bo = cp_bad_opened["messages"][2]["content"][0]
+    assert res_bo == {"type": "tool_result", "tool_use_id": "t1", "toolset_name": "browser", "content": fixed_msg, "is_error": True}
+    assert "tab_missing" not in json.dumps(cp_bad_opened["messages"])
 finally:
     logger.removeHandler(handler)
 `,

@@ -4428,7 +4428,10 @@ export default function Page() {
                     <span className="hljs-keyword">{"def"}</span>{" "}
                     <span className="hljs-title function_">{"_is_image"}</span>
                     {"("}
-                    <span className="hljs-params">{"x"}</span>
+                    <span className="hljs-params">
+                      {"x, allow_file="}
+                      <span className="hljs-literal">{"False"}</span>
+                    </span>
                     {"):"}
                   </span>
                   {"\n"}
@@ -4478,12 +4481,19 @@ export default function Page() {
                     <span className="hljs-string">{'"type"'}</span>
                     {") == "}
                     <span className="hljs-string">{'"base64"'}</span>{" "}
-                    <span className="hljs-keyword">{"and"}</span>{" "}
-                    <span className="hljs-built_in">{"isinstance"}</span>
-                    {"(s.get("}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" s.get("}
                     <span className="hljs-string">{'"media_type"'}</span>
-                    {"), "}
-                    <span className="hljs-built_in">{"str"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" ("}
+                    <span className="hljs-string">{'"image/jpeg"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"image/png"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"image/gif"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"image/webp"'}</span>
                     {") "}
                     <span className="hljs-keyword">{"and"}</span>{" "}
                     <span className="hljs-built_in">{"isinstance"}</span>
@@ -4510,6 +4520,29 @@ export default function Page() {
                     {"))"}
                   </span>
                   {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" (allow_file "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" s.get("}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {") == "}
+                    <span className="hljs-string">{'"file"'}</span>{" "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(s.get("}
+                    <span className="hljs-string">{'"file_id"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"bool"}</span>
+                    {"(s["}
+                    <span className="hljs-string">{'"file_id"'}</span>
+                    {"]))"}
+                  </span>
+                  {"\n"}
                   <span className={styles.codeLine}>{"                        )"}</span>
                   {"\n"}
                   <span className={styles.codeLine}>
@@ -4517,7 +4550,10 @@ export default function Page() {
                     <span className="hljs-keyword">{"def"}</span>{" "}
                     <span className="hljs-title function_">{"_is_document"}</span>
                     {"("}
-                    <span className="hljs-params">{"x"}</span>
+                    <span className="hljs-params">
+                      {"x, allow_file="}
+                      <span className="hljs-literal">{"False"}</span>
+                    </span>
                     {"):"}
                   </span>
                   {"\n"}
@@ -4584,6 +4620,32 @@ export default function Page() {
                   <span className={styles.codeLine}>
                     {"                        "}
                     <span className="hljs-keyword">{"if"}</span>
+                    {" st == "}
+                    <span className="hljs-string">{'"file"'}</span>
+                    {":"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                            "}
+                    <span className="hljs-keyword">{"return"}</span>
+                    {" allow_file "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"isinstance"}</span>
+                    {"(s.get("}
+                    <span className="hljs-string">{'"file_id"'}</span>
+                    {"), "}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"bool"}</span>
+                    {"(s["}
+                    <span className="hljs-string">{'"file_id"'}</span>
+                    {"])"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
+                    {"                        "}
+                    <span className="hljs-keyword">{"if"}</span>
                     {" st "}
                     <span className="hljs-keyword">{"in"}</span>
                     {" ("}
@@ -4642,7 +4704,7 @@ export default function Page() {
                     <span className="hljs-built_in">{"all"}</span>
                     {"(_is_text(b) "}
                     <span className="hljs-keyword">{"or"}</span>
-                    {" _is_image(b) "}
+                    {" _is_image(b, allow_file) "}
                     <span className="hljs-keyword">{"for"}</span>
                     {" b "}
                     <span className="hljs-keyword">{"in"}</span>
@@ -5045,6 +5107,17 @@ export default function Page() {
                     {"(c["}
                     <span className="hljs-string">{'"type"'}</span>
                     {"]) "}
+                    <span className="hljs-keyword">{"and"}</span>
+                    {" (c["}
+                    <span className="hljs-string">{'"type"'}</span>
+                    {"] != "}
+                    <span className="hljs-string">{'"tab_opened"'}</span>{" "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" c.get("}
+                    <span className="hljs-string">{'"tab_id"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" seen_ids) "}
                     <span className="hljs-keyword">{"for"}</span>
                     {" c "}
                     <span className="hljs-keyword">{"in"}</span>
@@ -5728,11 +5801,35 @@ export default function Page() {
                   </span>
                   {"\n"}
                   <span className={styles.codeLine}>
+                    {"                            allow_file = toolset "}
+                    <span className="hljs-keyword">{"not"}</span>{" "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" ("}
+                    <span className="hljs-string">{'"browser"'}</span>
+                    {", "}
+                    <span className="hljs-string">{'"computer"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"and"}</span>{" "}
+                    <span className="hljs-built_in">{"any"}</span>
+                    {"("}
+                    <span className="hljs-built_in">{"str"}</span>
+                    {"(b).startswith("}
+                    <span className="hljs-string">{'"files-api-"'}</span>
+                    {") "}
+                    <span className="hljs-keyword">{"for"}</span>
+                    {" b "}
+                    <span className="hljs-keyword">{"in"}</span>
+                    {" (betas "}
+                    <span className="hljs-keyword">{"or"}</span>
+                    {" ()))"}
+                  </span>
+                  {"\n"}
+                  <span className={styles.codeLine}>
                     {"                            valid = "}
                     <span className="hljs-built_in">{"all"}</span>
                     {"(_is_text(item) "}
                     <span className="hljs-keyword">{"or"}</span>
-                    {" _is_image(item) "}
+                    {" _is_image(item, allow_file) "}
                     <span className="hljs-keyword">{"or"}</span>
                     {" (toolset "}
                     <span className="hljs-keyword">{"not"}</span>{" "}
@@ -5743,7 +5840,7 @@ export default function Page() {
                     <span className="hljs-string">{'"computer"'}</span>
                     {") "}
                     <span className="hljs-keyword">{"and"}</span>
-                    {" _is_document(item)) "}
+                    {" _is_document(item, allow_file)) "}
                     <span className="hljs-keyword">{"for"}</span>
                     {" item "}
                     <span className="hljs-keyword">{"in"}</span>
@@ -6003,7 +6100,7 @@ export default function Page() {
                 {": 上記の "}
                 <code>{"max_turns"}</code>
                 {
-                  " は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、次のリクエストの上限見積もり(非キャッシュ入力・キャッシュ読み取り・キャッシュ書き込みの各課金区分にそれぞれの適用単価を掛けた最大入力費—キャッシュ書き込み対象トークンを非キャッシュ入力単価で二重計上しないこと—、適用単価での最大出力トークン max_tokens 分、および従量課金ツール費を含む)を送信前に予約して累計消費額と予約額の合計がハード上限を超える場合は送信を拒否し、応答後はその予約を実測の課金額で置き換えてください。同じタスク予算を複数のワーカーで共有する場合は、逐次チェックだけでは同時送信の上限を守れないため、予約の確保と確定をワーカー間で排他制御(調停)してください。advisor ツールを有効にしたリクエストでは advisor 推論が別課金となり、リクエスト本体の max_tokens は advisor の出力トークン上限を制限しないため、advisor の呼び出し回数とトークン課金に対する明示的な上限を設けて送信前予約へ合算し、ハーネスがその上限を確立できない場合は advisor を無効にしてください。サーバー側フォールバックを有効にしたリクエストでは、元のモデルと同一パス上で課金が生じ得るすべてのフォールバック先を含め、取り得るサーバー側フォールバック試行列における課金総額の最大値を送信前に予約してください。その上限を算出できない場合はフォールバックを無効のままにしてください。フォールバックなしのリクエストは単一試行分の予約のままで構いません。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
+                  " は1回の呼び出しあたりのターン数のみを制限し、1タスクあたりの上限金額(ドル上限)や checkpoint 再開をまたぐ累計ターン数は強制しません。checkpoint で再開する場合はタスク全体の累計ターン上限も呼び出し側で強制してください。課金上限を守るハーネスとして使う場合は、各 API リクエストの送信前に別途予算チェックを組み込み、次のリクエストの上限見積もり(非キャッシュ入力・キャッシュ読み取り・キャッシュ書き込みの各課金区分にそれぞれの適用単価を掛けた最大入力費—キャッシュ書き込み対象トークンを非キャッシュ入力単価で二重計上しないこと—、適用単価での最大出力トークン max_tokens 分、および従量課金ツール費を含む)を送信前に予約して累計消費額と予約額の合計がハード上限を超える場合は送信を拒否し、応答後はその予約を実測の課金額で置き換えてください。API リクエスト開始前にキャッシュが失効し得る場合は、キャッシュ有効性が保証されていない限り失効済みと仮定し、該当プレフィックスをキャッシュ読み取り単価ではなく適用されるキャッシュ書き込み単価(TTL 不明時は保守的な書き込み単価)で予約して上限見積もりを過小評価しないようにしてください。同じタスク予算を複数のワーカーで共有する場合は、逐次チェックだけでは同時送信の上限を守れないため、予約の確保と確定をワーカー間で排他制御(調停)してください。advisor ツールを有効にしたリクエストでは advisor 推論が別課金となり、リクエスト本体の max_tokens は advisor の出力トークン上限を制限しないため、advisor の呼び出し回数とトークン課金に対する明示的な上限を設けて送信前予約へ合算し、ハーネスがその上限を確立できない場合は advisor を無効にしてください。サーバー側フォールバックを有効にしたリクエストでは、元のモデルと同一パス上で課金が生じ得るすべてのフォールバック先を含め、取り得るサーバー側フォールバック試行列における課金総額の最大値を送信前に予約してください。その上限を算出できない場合はフォールバックを無効のままにしてください。フォールバックなしのリクエストは単一試行分の予約のままで構いません。予算チェックなしのまま、このループを金額上限を強制するハーネスとして使用しないでください。 "
                 }
               </p>{" "}
             </div>{" "}
@@ -10971,6 +11068,179 @@ export default function Page() {
                   </tr>
                   <tr>
                     <td>
+                      {"400: "}
+                      <code>{"tool_choice"}</code>
+                      {" が不正"}
+                    </td>
+                    <td>
+                      <code>{"any"}</code>
+                      {" / 特定ツールの強制"}
+                    </td>
+                    <td>
+                      <code>{"auto"}</code>
+                      {" + "}
+                      <code>{"strict: true"}</code>
+                    </td>
+                    <td>{"6.3"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"400: コンピュータ操作ツールのエラー"}</td>
+                    <td>
+                      <code>{"computer_20251124"}</code>
+                      {" を使っている(Bedrock以外)"}
+                    </td>
+                    <td>
+                      <code>{"computer_toolset_20260801"}</code>
+                    </td>
+                    <td>{"6.2"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"400: advisor のエラー"}</td>
+                    <td>{"executor が 5.2 なのに advisor が 5.1 など"}</td>
+                    <td>
+                      {" advisor を "}
+                      <code>{"claude-fable-5-2"}</code>
+                      {" か "}
+                      <code>{"claude-mythos-5-2"}</code>
+                      {" に "}
+                    </td>
+                    <td>{"3.4"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"簡単な依頼の返事が遅い・高い"}</td>
+                    <td>{"high 以上は挨拶にも思考する。「考えるな」は無効"}</td>
+                    <td>{"その種のターンは low / medium に"}</td>
+                    <td>{"5.5"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"ターンが途中で終わる"}</td>
+                    <td>{"low / medium で起きやすい"}</td>
+                    <td>{"完遂の指示(8.1)。effort を上げる"}</td>
+                    <td>{"8.1"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"不要な承認を求める"}</td>
+                    <td>{"承認ルールが広い、古い注意書きの積み上がり"}</td>
+                    <td>{"対象を具体的に。古い指示を削除"}</td>
+                    <td>{"8.2・8.6"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"長い処理の間、画面が無言"}</td>
+                    <td>
+                      <code>{"thinking.display"}</code>
+                      {" が "}
+                      <code>{"omitted"}</code>
+                    </td>
+                    <td>
+                      <code>{"updates"}</code>
+                      {" / "}
+                      <code>{"summarized"}</code>
+                      {"。ハーネスで差し込み"}
+                    </td>
+                    <td>{"6.5・8.4"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"サブエージェントが多すぎて高い"}</td>
+                    <td>{"委譲を促す指示、サブエージェントの既定モデル"}</td>
+                    <td>{"常設指示を削る。ツール説明に費用を書く。小型モデル + low"}</td>
+                    <td>{"8.5"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"既存コードに継ぎ足すだけ"}</td>
+                    <td>{"所有の言及がない"}</td>
+                    <td>
+                      {"プロジェクトの "}
+                      <code>{"CLAUDE.md"}</code>
+                      {" に所有を明記(副作用に注意)"}
+                    </td>
+                    <td>{"8.3"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"頼んでいない変更が増えた"}</td>
+                    <td>{"所有の指示の副作用"}</td>
+                    <td>{"範囲を指定する。差分を読む。必要な場所にだけ入れる"}</td>
+                    <td>{"8.3"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"文章がぶつ切り"}</td>
+                    <td>{"文体の厳格な上限が残っている"}</td>
+                    <td>{"上限を外し、趣旨ベースの指示に"}</td>
+                    <td>{"8.7・8.8"}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>{'stop_reason: "refusal"'}</code>
+                    </td>
+                    <td>{"分類器が発動"}</td>
+                    <td>{"カテゴリ別に対応。必要なら検証プログラムへ"}</td>
+                    <td>{"12章"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"最終報告が読みにくい"}</td>
+                    <td>{"低文脈の読み手を想定していない"}</td>
+                    <td>{"8.8 の指示を足す"}</td>
+                    <td>{"8.8"}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <code>{"max"}</code>
+                      {" で期待ほど伸びない・遅い"}
+                    </td>
+                    <td>{"max は high より劣る評価が複数ある"}</td>
+                    <td>{"high に戻して比較"}</td>
+                    <td>{"5.2"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"ZDR で使えない"}</td>
+                    <td>{"30日保持が前提のモデル"}</td>
+                    <td>{"契約・保持ポリシーを確認。EFS(Enterprise)の検討"}</td>
+                    <td>{"12.4"}</td>
+                  </tr>
+                  <tr>
+                    <td>{"モデルを切り替えたら精度が落ちた"}</td>
+                    <td>{"Fable 5.2 の思考が引き継がれない"}</td>
+                    <td>{"会話ごとにモデルを固定する"}</td>
+                    <td>{"7.5"}</td>
+                  </tr>
+                </tbody>
+              </table>{" "}
+            </div>{" "}
+            <h3 id="s14-2">{"14.2 切り分けフロー"}</h3>{" "}
+            <div className={styles["diagram-card"]}>
+              {" "}
+              <div className={styles["diagram-title"]}>{"図9 問題の切り分けフロー"}</div>{" "}
+              <div className={styles["diagram-wrap"]}>
+                <MermaidDiagram
+                  id="fable52-diagram-8"
+                  chart={DIAGRAM_8}
+                  theme="base"
+                  themeVariables={LIGHT_THEME}
+                />
+              </div>{" "}
+            </div>{" "}
+          </section>{" "}
+          <section className={styles.section} id="s15">
+            {" "}
+            <div className={styles["sec-head"]}>
+              {" "}
+              <span className={styles["chapter-badge"]}>{"15"}</span>{" "}
+              <h2 id="s15-heading">{"導入チェックリストと30日ロードマップ"}</h2>{" "}
+            </div>{" "}
+            <h3 id="s15-1">{"15.1 チェックリスト"}</h3>{" "}
+            <p>
+              <strong>{"環境"}</strong>
+            </p>{" "}
+            <div className={styles["check-progress"]} data-progress-panel="">
+              <span className={styles.count} data-testid="check-progress">
+                <span data-check-count>0</span>
+                {" / "}
+                <span data-check-total>3</span>
+                {" 完了"}
+              </span>
+              <div className={styles.bar}>
+                <i data-check-bar style={{ width: "0%" }} />
+              </div>
+            </div>
             <ul className={styles.checklist}>
               {" "}
               <li>
