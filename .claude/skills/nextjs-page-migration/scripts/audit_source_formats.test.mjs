@@ -1732,8 +1732,9 @@ test("does not treat continue guards on members or function-written flags as uni
   assert.equal(result.status, 1, body);
   assert.deepEqual(result.data.unresolvedMermaidSources, ['CLASSDEFS:card-0', 'CLASSDEFS:card-1'], body);
  }
- // 最上位で一度だけ書き込まれる共有フラグ（Fable原本の mermaidReady）は認定を維持する。
- assert.equal(audit(`${source}<script>var ready = false; try { ready = true; } catch (e) {} ${loop} if (!ready) continue; ${render} }</script>`, page).status, 0);
+ // 最上位の直線経路で一度だけ書き込まれる共有フラグは認定を維持し、try ブロック内の代入は保証扱いにしない。
+ assert.equal(audit(`${source}<script>var ready = false; ready = true; ${loop} if (!ready) continue; ${render} }</script>`, page).status, 0);
+ assert.equal(audit(`${source}<script>var ready = false; try { ready = true; } catch (e) {} ${loop} if (!ready) continue; ${render} }</script>`, page).status, 1);
 });
 
 test("builds executable view from raw source so regex masking does not hide later assignments", () => {
@@ -2413,11 +2414,12 @@ test("enforces strict module keyword matching, cross-scope classList.add, pre-qu
 	assert.equal(audit(paddedClassicMime, page).status, 1);
 
 	// 2. Cross-scope classList.add() invalidates DOM-backed reads while preserving literal sources.
-	const classListAddDom = `${card}<script>document.querySelector('#other').classList.add('diagram-card');</script><script type="module">const card = document.querySelector('#c1'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const decoy = `<div id="other"><script type="text/plain">flowchart LR\nX --> Y</script></div>`;
+	const classListAddDom = `${decoy}${card}<script>document.querySelector('#other').classList.add('diagram-card');</script><script type="module">const card = document.querySelector('.diagram-card'); const src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
 	const addRes = audit(classListAddDom, page);
 	assert.equal(addRes.status, 1);
 	assert.deepEqual(addRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
-	const classListAddLit = `${card}<script>document.querySelector('#other').classList.add('diagram-card');</script><script type="module">mermaid.render('x', ${JSON.stringify(chart)});</script>`;
+	const classListAddLit = `${decoy}${card}<script>document.querySelector('#other').classList.add('diagram-card');</script><script type="module">mermaid.render('x', ${JSON.stringify(chart)});</script>`;
 	assert.equal(audit(classListAddLit, page).status, 0);
 
 	// 3. Same-scope pre-query DOM reorders invalidate indexed traversal, while post-query reorders remain certified.
@@ -2823,4 +2825,57 @@ test("checks suffix-free activation, wrapper aliases, HTML non-void slashes, awa
 	assert.equal(audit(proseLiHtml, proseLiPage).status, 0);
 	const missingProseLiPage = `const D = ${JSON.stringify(chart)}; <ul><li><MermaidDiagram chart={D} /></li><li>next</li></ul>`;
 	assert.equal(audit(proseLiHtml, missingProseLiPage).status, 1);
+});
+
+test("checks anonymous activation, materialized paragraphs, escaped property keys, and typed-query type edits", () => {
+	const chart = "flowchart LR\nA --> B";
+	const suffix = "\nclassDef ok fill:#fff";
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const suffixedPage = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+
+	// 1. Uninvoked anonymous functions stay unresolved (both suffix-free and suffixed), while IIFEs and timers pass.
+	const uninvokedAnon = `${card}<script>const draw = () => { const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src); };</script>`;
+	assert.equal(audit(uninvokedAnon, page).status, 1);
+	const uninvokedAnonSuffixed = `${card}<script>const CLASSDEFS = ${JSON.stringify(suffix)}; const draw = () => { const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); };</script>`;
+	assert.equal(audit(uninvokedAnonSuffixed, suffixedPage).status, 1);
+	const clickAnon = `${card}<script>document.addEventListener('click', () => { const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src); });</script>`;
+	assert.equal(audit(clickAnon, page).status, 1);
+	const iifeAnon = `${card}<script>(() => { const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src); })();</script>`;
+	assert.equal(audit(iifeAnon, page).status, 0);
+	const iifeSuffixed = `${card}<script>(function () { const CLASSDEFS = ${JSON.stringify(suffix)}; const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS); })();</script>`;
+	assert.equal(audit(iifeSuffixed, suffixedPage).status, 0);
+	const timerAnon = `${card}<script>setTimeout(() => { const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src); }, 0);</script>`;
+	assert.equal(audit(timerAnon, page).status, 0);
+
+	// 2. Materialized Mermaid inside <p> is excluded from paragraph text scan while kept in Mermaid inventory.
+	const prosePHtml = `<p id="c1" class="diagram-card">diagram paragraph<script type="text/plain">${chart}</script></p><script>var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const prosePPage = `const D = ${JSON.stringify(chart)}; <p>diagram paragraph</p><MermaidDiagram chart={D} />`;
+	assert.equal(audit(prosePHtml, prosePPage).status, 0);
+	const missingChartPPage = `<p>diagram paragraph</p>`;
+	assert.equal(audit(prosePHtml, missingChartPPage).status, 1);
+
+	// 3. Escaped quoted property keys are decoded in local and foreign-scope payload-write checks.
+	const localEscapedWrite = `${card}<script>const c = document.querySelector('#c1'); const s = c.querySelector('script'); s["text\\u0043ontent"] = 'flowchart LR\\nX --> Y'; const src = s.textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(localEscapedWrite, page).status, 1);
+	const localUnrelatedKey = `${card}<script>const c = document.querySelector('#c1'); const s = c.querySelector('script'); s["data\\u0043ustom"] = 'ok'; const src = s.textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(localUnrelatedKey, page).status, 0);
+	const localPostReadEscapedWrite = `${card}<script>const c = document.querySelector('#c1'); const s = c.querySelector('script'); const src = s.textContent; s["text\\u0043ontent"] = 'x'; mermaid.render('x', src);</script>`;
+	assert.equal(audit(localPostReadEscapedWrite, page).status, 0);
+	const foreignEscapedWrite = `${card}<script type="module">document.querySelector('#c1 script')["\\x74ext"] = 'flowchart LR\\nX --> Y';</script><script type="module">const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(foreignEscapedWrite, page).status, 1);
+
+	// 4. Type edits reject pre-query typed selections, but allow post-query type edits and untyped querySelector('script').
+	const preTypedEdit = `${card}<script>const c = document.querySelector('#c1'); c.querySelector('script').type = 'text/other'; const src = c.querySelector('script[type="text/plain"]').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(preTypedEdit, page).status, 1);
+	const postTypedEdit = `${card}<script>const c = document.querySelector('#c1'); const s = c.querySelector('script[type="text/plain"]'); s.type = 'text/other'; const src = s.textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(postTypedEdit, page).status, 0);
+	const untypedTypeEdit = `${card}<script>const c = document.querySelector('#c1'); c.querySelector('script').type = 'text/other'; const src = c.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	assert.equal(audit(untypedTypeEdit, page).status, 0);
+
+	// 5. Loop-guard assignments inside a `try` block are not guaranteed (an earlier throw may skip them); straight-line assignments stay eligible.
+	const tryGuard = `${card}<script>var ready = false; try { mayThrow(); ready = true; } catch (e) {} var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { if (ready) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
+	assert.equal(audit(tryGuard, page).status, 1);
+	const straightLineGuard = `${card}<script>var ready = false; ready = true; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { if (ready) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
+	assert.equal(audit(straightLineGuard, page).status, 0);
 });

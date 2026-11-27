@@ -227,13 +227,20 @@ const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60 *\x60`;
  * @return {boolean} False only for a blanked template key that is not `textContent` or `text`.
  */
 function isTextContentKey(write, rawSource) {
-  if (!write[0].includes("\x60")) return true;
-  const key = /\[\s*\x60((?:[^\x60\\$]|\\[\s\S]|\$(?!\{))*)\x60\s*\]/.exec(rawSource.slice(write.index, write.index + write[0].length));
+  const raw = rawSource.slice(write.index, write.index + write[0].length);
+  if (/(?:^|[^\]])\.\s*(?:textContent|text)\b\s*(?:(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=|\+\+|--)?$/.test(raw)) {
+    return true;
+  }
+  const key = /\[\s*(?:(['"])((?:[^\\\r\n]|\\[\s\S])*?)\1|\x60((?:[^\x60\\$]|\\[\s\S]|\$(?!\{))*)\x60)\s*\]\s*(?:(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=|\+\+|--)?$/.exec(raw);
   if (!key) return false;
-  const decoded = key[1].replace(/\\(?:u\{([0-9a-fA-F]+)\}|u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2})|([\s\S]))/g, (_all, braced, unicode, hex, simple) => {
-    if (simple !== undefined) return ({ n: "\n", r: "\r", t: "\t", b: "\b", f: "\f", v: "\v", 0: "\0" })[simple] ?? simple;
-    const code = Number.parseInt(braced ?? unicode ?? hex, 16);
-    return code <= 0x10ffff ? String.fromCodePoint(code) : "";
+  const rawKey = key[2] ?? key[3] ?? "";
+  const decoded = rawKey.replace(/\\(?:u\{([0-9a-fA-F]+)\}|u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2})|(?:\r\n?|\n)|([\s\S]))/g, (_all, braced, unicode, hex, simple) => {
+    if (braced !== undefined || unicode !== undefined || hex !== undefined) {
+      const code = Number.parseInt(braced ?? unicode ?? hex, 16);
+      return code <= 0x10ffff ? String.fromCodePoint(code) : "";
+    }
+    if (simple === undefined) return "";
+    return ({ n: "\n", r: "\r", t: "\t", b: "\b", f: "\f", v: "\v", 0: "\0" })[simple] ?? simple;
   });
   return decoded === "textContent" || decoded === "text";
 }
@@ -1780,7 +1787,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (writes.some(w => w > namePos)) continue;
           const assignPath = pathAt(namePos);
           // Every block enclosing the assignment that does not also enclose the loop must be
-          // a plain block or a `try` block (so the assignment runs on the normal execution path).
+          // a plain block (not `try`, where an earlier throw can skip the assignment before reaching the loop).
           const extraBlocks = assignPath.filter(b => !loopPath.includes(b));
           // A block-scoped `let`/`const` declaration in a nested block is not visible at the guard.
           if ((match[1] === "let" || match[1] === "const") && extraBlocks.length > 0) continue;
@@ -1798,7 +1805,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (shadowedAtGuard) continue;
           const inNormalPath = extraBlocks.every(b => {
             const head = executable.slice(0, b).replace(/\s+$/, "");
-            return head === "" || /[;{}]$/.test(head) || /(?<![\w$.])try$/.test(head);
+            return head === "" || /[;{}]$/.test(head);
           });
           if (!inNormalPath) continue;
           const enclosingStart = assignPath.at(-1) ?? -1;
@@ -1977,7 +1984,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const soleStringRe = /^\s*(['"])((?:(?!\1)[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n](?!\s*[-+*\/%.,?:&|^=<>([`]))/;
     let certifiedLoopOpen;
     let captureAt = initialBinding.at;
-    const scriptElement = (value, at = before) => {
+    let usesTypedScriptQuery = false;
+    let scriptQueryAt = initialBinding.at;
+    const scriptElement = (value, at = before, recordSelection = false) => {
       const selected = query.exec(value);
       // An unquoted text/plain is an invalid selector (querySelector throws); quotes must match.
       if (!selected || !/^script(?:\[type=(['"])text\/plain\1\])?$/.test(selected[3])) return false;
@@ -2193,6 +2202,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (direct) {
         if (!isUnshadowedDocument() || !selectedScript.cardAvailableAt(ownerBinding.at) || !selectedScript.unique(direct[2]) || !selectorValidAt(direct[2], ownerBinding.at) || !notDetachedAt(ownerBinding.at)) return false;
         captureAt = ownerBinding.at;
+        if (recordSelection) {
+          usesTypedScriptQuery = selected[3] !== "script";
+          scriptQueryAt = at;
+        }
         return true;
       }
       const indexed = owner && /^(\w+)\[(\w+)\]$/.exec(owner);
@@ -2271,6 +2284,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if ([ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected, ownerBinding.at))) {
           certifiedLoopOpen = open;
           captureAt = collectionBinding.at;
+          if (recordSelection) {
+            usesTypedScriptQuery = selected[3] !== "script";
+            scriptQueryAt = at;
+          }
           return true;
         }
         return false;
@@ -2319,15 +2336,15 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     }
     if (!value.endsWith(".textContent")) return false;
     const element = value.slice(0, -12).trim();
-    const isSelectedScript = (reference, at = before, seen = new Set()) => {
-      if (scriptElement(reference, at)) return true;
+    const isSelectedScript = (reference, at = before, seen = new Set(), recordSelection = false) => {
+      if (scriptElement(reference, at, recordSelection)) return true;
       if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
       seen.add(reference);
       const alias = bindingAt(reference, at);
-      return isSelectedScript(alias?.value ?? "", alias?.at ?? at, seen);
+      return isSelectedScript(alias?.value ?? "", alias?.at ?? at, seen, recordSelection);
     };
     // The src initializer evaluates `element` where it runs, not at the render call.
-    if (!isSelectedScript(element, initialBinding.at)) return false;
+    if (!isSelectedScript(element, initialBinding.at, new Set(), true)) return false;
     // A textContent write in another scope (even one without a renderer) may replace this
     // DOM-backed payload before the read, while ID-only writers affect the capture lookup.
     // A deferred module writer runs after parsing, so only a classic read/capture that completes
@@ -2349,14 +2366,15 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // top-level synchronous capture do not alter the already-captured string).
     // Static computed access (script["textContent"]) writes the same property as dot access.
     // Template keys are blanked in literalSource; match their length and confirm them in rawSource.
-    const writeCanPrecedeRead = writeIndex => {
-      if (writeIndex <= initialBinding.at) return true;
-      if (functions.some(fn => fn.body < initialBinding.at && initialBinding.at < fn.end)) return true;
-      if (functions.some(fn => fn.body < writeIndex && writeIndex < fn.end)) return true;
-      if (loops.some(loop => loop.start < initialBinding.at && initialBinding.at < loop.end)) return true;
+    const editCanPrecedeTarget = (editIndex, targetAt) => {
+      if (editIndex <= targetAt) return true;
+      if (functions.some(fn => fn.body < targetAt && targetAt < fn.end)) return true;
+      if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
+      if (loops.some(loop => loop.start < targetAt && targetAt < loop.end)) return true;
       return false;
     };
-    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\s*\.\s*(?:textContent|text)\b|\s*\[\s*(?:(['"])(?:textContent|text)\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
+    const writeCanPrecedeRead = writeIndex => editCanPrecedeTarget(writeIndex, initialBinding.at);
+    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\s*\.\s*(?:textContent|text)\b|\s*\[\s*(?:(['"])(?:[^\\\r\n]|\\[\s\S])*?\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
     if ([...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
@@ -2475,7 +2493,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       mayBeScriptContainer(edit[1], edit.index) ||
       (writeCanPrecedeRead(edit.index) && mayBeSelectedScript(edit[1], edit.index))
     ) ||
-      matchExecutableEdits(typeEdits).some(edit => !isNonTypeLiteralAttrEdit(edit) && mayBeCardScript(edit[1], edit.index)) ||
+      (usesTypedScriptQuery && matchExecutableEdits(typeEdits).some(edit => editCanPrecedeTarget(edit.index, scriptQueryAt) && !isNonTypeLiteralAttrEdit(edit) && mayBeCardScript(edit[1], edit.index))) ||
       allOwnerEdits.some(edit =>
         mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit)) ||
         (writeCanPrecedeRead(edit.index) && mayBeSelectedScript(edit[1], edit.index))
@@ -2622,6 +2640,112 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const stmtPrefix = executable.slice(stmtStart, callIndex);
     return /^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(stmtPrefix) || /&&|\|\||\?/.test(stmtPrefix);
   };
+  const functions = functionBodies(executable);
+  const segmentOf = idx => selectedScript.segments.findIndex(seg => seg.start <= idx && idx <= seg.end);
+  // Verify enclosing functions (named or anonymous) are actually activated via a reachable call,
+  // IIFE, timer callback, or DOMContentLoaded/load listener.
+  const hasReachableActivation = (pos, certifiedLoopOpen, active = new Set(), seen = new Set()) => {
+    const isReachableSite = siteIndex => {
+      const sitePath = [];
+      for (let k = 0; k < siteIndex; k++) {
+        if (executable[k] === "{") sitePath.push(k);
+        else if (executable[k] === "}") sitePath.pop();
+      }
+      if (sitePath.some(block => !functionHead.test(executable.slice(0, block)))) return false;
+      if (isUnbracedOrShortCircuited(siteIndex, sitePath)) return false;
+      let siteDepth = 0;
+      const enclosingStart = sitePath.length > 0 ? sitePath[sitePath.length - 1] + 1 : 0;
+      for (let k = enclosingStart; k < siteIndex; k++) {
+        if (executable[k] === "{") siteDepth++;
+        else if (executable[k] === "}") siteDepth--;
+        else if (siteDepth === 0 && !/[\w$]/.test(executable[k - 1] ?? "")) {
+          exitKeyword.lastIndex = k;
+          if (exitKeyword.test(executable)) return false;
+        }
+      }
+      return hasReachableActivation(siteIndex, certifiedLoopOpen, active, seen);
+    };
+    const isDirectOrCallbackActivation = fn => {
+      const rawBefore = executable.slice(0, fn.start);
+      const beforeFn = rawBefore.replace(/\basync\s*$/, "");
+      const beforeFnLit = literalSource.slice(0, fn.start).replace(/\basync\s*$/, "");
+      const afterFn = executable.slice(fn.end);
+      // Immediately invoked function expression: (fn)(), (fn()), !fn(), void fn(), etc.
+      let left = beforeFn.length;
+      while (left > 0 && /\s/.test(beforeFn[left - 1])) left--;
+      let openParens = 0;
+      let iifeStart = fn.start;
+      let scan = left;
+      while (scan > 0 && beforeFn[scan - 1] === "(") {
+        openParens++;
+        iifeStart = scan - 1;
+        scan--;
+        while (scan > 0 && /\s/.test(beforeFn[scan - 1])) scan--;
+      }
+      let right = 0;
+      let closeParens = 0;
+      while (closeParens < openParens) {
+        const ws = /^\s*\)/.exec(afterFn.slice(right));
+        if (!ws) break;
+        right += ws[0].length;
+        closeParens++;
+      }
+      const isGroupedIife = openParens > 0 && /^\s*\(/.test(afterFn.slice(right));
+      const unaryIife = /(?:[!~+-]|\bvoid)\s*$/.exec(beforeFn);
+      const isUnaryIife = unaryIife !== null && !/=>/.test(executable.slice(fn.start, fn.body)) && /^\s*\(/.test(afterFn);
+      if (isGroupedIife && isReachableSite(iifeStart)) return true;
+      if (isUnaryIife && isReachableSite(unaryIife.index)) return true;
+      // Timer callback: setTimeout/requestAnimationFrame/queueMicrotask with unshadowed scheduler.
+      const timerMatch = /(?<![\w$.])(setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.exec(beforeFn);
+      if (timerMatch && isUnshadowedGlobalBinding(timerMatch[1])) {
+        const handle = /([A-Za-z_$][\w$]*)\s*=\s*(?:window\s*\.\s*)?$/.exec(beforeFn.slice(0, timerMatch.index))?.[1];
+        const cancelled = handle !== undefined &&
+          new RegExp(String.raw`(?<![\w$])(?:clearTimeout|cancelAnimationFrame)\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
+        if (!cancelled && isReachableSite(timerMatch.index)) return true;
+      }
+      // Document load lifecycle callback.
+      const eventMatch = /\baddEventListener\s*\(\s*(['"])(?:DOMContentLoaded|load)\1\s*,\s*$/.exec(beforeFnLit);
+      if (eventMatch && executable[eventMatch.index] === literalSource[eventMatch.index] && isReachableSite(eventMatch.index)) {
+        return true;
+      }
+      return false;
+    };
+    for (const fn of functions.filter(fn => fn.body < pos && pos < fn.end)) {
+      if (certifiedLoopOpen !== undefined && fn.body > certifiedLoopOpen) continue;
+      if (seen.has(fn)) continue;
+      if (active.has(fn)) return false;
+      active.add(fn);
+      let invoked = isDirectOrCallbackActivation(fn);
+      const rawBeforeFn = executable.slice(0, fn.start).replace(/\basync\s*$/, "");
+      const boundDecl = !fn.name ? /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*$/.exec(rawBeforeFn) : null;
+      const boundName = boundDecl?.[1];
+      const boundNameIndex = boundDecl ? boundDecl.index + boundDecl[0].indexOf(boundName) : -1;
+      const callableName = fn.name ?? (boundName && Array.from(writeIndexes(boundName)).every(w => w === boundNameIndex) ? boundName : undefined);
+      const callableNameIndex = fn.name ? fn.nameIndex : boundNameIndex;
+      if (!invoked && callableName) {
+        const fnSegment = segmentOf(fn.start);
+        const refs = executable.matchAll(new RegExp(`(?<![\\w$.])${callableName.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
+        for (const ref of refs) {
+          if (ref.index === callableNameIndex) continue;
+          if (!fn.name && ref.index < fn.end) continue;
+          const refSegment = segmentOf(ref.index);
+          if (fnSegment >= 0 && refSegment >= 0 && refSegment < fnSegment) continue;
+          const afterRef = executable.slice(ref.index + ref[0].length);
+          const isCall = /^\s*\(/.test(afterRef);
+          const isEventCallback = /\baddEventListener\s*\(\s*(['"])(?:DOMContentLoaded|load)\1\s*,\s*$/.test(literalSource.slice(0, ref.index));
+          if (!isCall && !isEventCallback) continue;
+          if (isReachableSite(ref.index)) {
+            invoked = true;
+            break;
+          }
+        }
+      }
+      active.delete(fn);
+      if (!invoked) return false;
+      seen.add(fn);
+    }
+    return true;
+  };
   if (renderUses.length === 0) {
     if (suffixFreeCalls.length === 0) return undefined;
     const targets = new Set(suffixFreeCalls.map(entry => entry.call));
@@ -2636,65 +2760,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       }
     }
     if (blocks.length > 0) return null;
-    const functions = functionBodies(executable);
-    const segmentOf = idx => selectedScript.segments.findIndex(seg => seg.start <= idx && idx <= seg.end);
     for (const { call: callIndex, certifiedLoopOpen } of suffixFreeCalls) {
       const callPath = paths.get(callIndex);
       const uncertifiedBlocks = certifiedLoopOpen === undefined
         ? callPath
         : callPath.filter(block => block < certifiedLoopOpen);
       if (uncertifiedBlocks.some(block => !functionHead.test(executable.slice(0, block)))) return null;
-      // Verify enclosing named functions are actually activated via a reachable call
-      // (separately from initializer order, which only checks declarations relative to uses).
-      const hasReachableActivation = (pos, active = new Set(), seen = new Set()) => {
-        for (const fn of functions.filter(fn => fn.body < pos && pos < fn.end)) {
-          if (certifiedLoopOpen !== undefined && fn.body > certifiedLoopOpen) continue;
-          if (seen.has(fn)) continue;
-          if (active.has(fn)) return false;
-          if (!fn.name) continue;
-          active.add(fn);
-          const fnSegment = segmentOf(fn.start);
-          const refs = executable.matchAll(new RegExp(`(?<![\\w$.])${fn.name.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
-          let invoked = false;
-          for (const ref of refs) {
-            if (ref.index === fn.nameIndex) continue;
-            const refSegment = segmentOf(ref.index);
-            if (fnSegment >= 0 && refSegment >= 0 && refSegment < fnSegment) continue;
-            const afterRef = executable.slice(ref.index + ref[0].length);
-            const isCall = /^\s*\(/.test(afterRef);
-            const isEventCallback = /\baddEventListener\s*\(\s*(['"])(?:DOMContentLoaded|load)\1\s*,\s*$/.test(literalSource.slice(0, ref.index));
-            if (!isCall && !isEventCallback) continue;
-            const refPath = [];
-            for (let k = 0; k < ref.index; k++) {
-              if (executable[k] === "{") refPath.push(k);
-              else if (executable[k] === "}") refPath.pop();
-            }
-            if (refPath.some(block => !functionHead.test(executable.slice(0, block)))) continue;
-            if (isUnbracedOrShortCircuited(ref.index, refPath)) continue;
-            let refDepth = 0;
-            let exited = false;
-            const enclosingStart = refPath.length > 0 ? refPath[refPath.length - 1] + 1 : 0;
-            for (let k = enclosingStart; k < ref.index; k++) {
-              if (executable[k] === "{") refDepth++;
-              else if (executable[k] === "}") refDepth--;
-              else if (refDepth === 0 && !/[\w$]/.test(executable[k - 1] ?? "")) {
-                exitKeyword.lastIndex = k;
-                if (exitKeyword.test(executable)) { exited = true; break; }
-              }
-            }
-            if (exited) continue;
-            if (hasReachableActivation(ref.index, active, seen)) {
-              invoked = true;
-              break;
-            }
-          }
-          active.delete(fn);
-          if (!invoked) return false;
-          seen.add(fn);
-        }
-        return true;
-      };
-      if (!hasReachableActivation(callIndex)) return null;
+      if (!hasReachableActivation(callIndex, certifiedLoopOpen)) return null;
       let depth = 0;
       for (let i = 0; i < callIndex; i++) {
         if (executable[i] === "{") depth++;
@@ -2758,6 +2830,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       ? callPath.slice(declarationPath.length)
       : callPath.slice(declarationPath.length).filter(block => block < use.certifiedLoopOpen);
     if (uncertifiedBlocks.some(block => !functionHead.test(executable.slice(0, block)))) return null;
+    if (!hasReachableActivation(use.call, use.certifiedLoopOpen)) return null;
     let depth = 0;
     for (let i = initializedAt; i < use.call; i++) {
       if (executable[i] === "{") depth++;
@@ -2944,7 +3017,7 @@ function materializePlainTextCards(src) {
     // Writes to any element's textContent/text (static or computed key) or structural/attribute
     // edits that can alter script selection or remove a queried host across scopes.
     const writesTextContent = /\.\s*(?:textContent|text)\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
-      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])(?:textContent|text)\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
+      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])(?:[^\\\r\n]|\\[\s\S])*?\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
         .some(write => executable[write.index] === "[" && isTextContentKey(write, rawSource));
     const editsDomStructure = /\.\s*(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text)|removeChild|replaceChild|insertBefore|prepend|append|appendChild|replaceChildren|setAttribute(?:NS|Node|NodeNS)?|removeAttribute(?:NS|Node)?|toggleAttribute)\s*\(|(?:outerHTML|innerHTML|innerText|type|className)\s*=(?!=)|classList\s*\.\s*(?:add|remove|replace|toggle)\s*\()/.test(executable);
     const writesId = /\.\s*id\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
@@ -3252,9 +3325,14 @@ function inventoryHtml(src) {
   const tableRowTexts = extractTagContents(body, "tr").map(({ content }) =>
     normalizeElementContent(content, false)
   );
-  const paragraphTexts = extractTagContents(body, "p").map(({ content }) =>
-    normalizeElementContent(content, false)
-  );
+  const paragraphTexts = extractTagContents(body, "p")
+    .map(({ content }) =>
+      normalizeElementContent(
+        content.replace(/<div class="mermaid" data-audit-materialized="1">[\s\S]*?<\/div>/gi, ""),
+        false
+      )
+    )
+    .filter(Boolean);
 
   return {
     headings,
