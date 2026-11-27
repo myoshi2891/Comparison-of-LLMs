@@ -32,7 +32,12 @@ export default function DrawerTocObserver({
     const links = Array.from(sidebar?.querySelectorAll<HTMLAnchorElement>("a") ?? []);
     const guideContent = root?.querySelector<HTMLElement>(`.${styles.main}`) ?? null;
     let wasOpen = false;
-    const siteHamburger = document.querySelector<HTMLElement>("#common-header .ch-hamburger");
+    const siteHeader = document.getElementById("common-header");
+    const siteHeaderControls = Array.from(
+      siteHeader?.querySelectorAll<HTMLElement>(
+        ".ch-hamburger, .ch-dropdown-toggle, .ch-subdropdown-toggle"
+      ) ?? []
+    );
     const isMobile = () => window.matchMedia("(max-width: 900px)").matches;
     const sync = (open: boolean, restoreFocus = true) => {
       root?.classList.toggle(styles.open, open);
@@ -53,11 +58,11 @@ export default function DrawerTocObserver({
       wasOpen = open;
     };
     const close = () => sync(false);
-    // サイトメニューを開くときはドロワーを閉じる。フォーカスはサイトのハンバーガーに残す。
-    const closeForSiteMenu = () => {
+    // サイトメニューやヘッダードロップダウンを開くときはドロワーを閉じる。フォーカスは押下した要素に残す。
+    const closeForSiteHeader = (event: Event) => {
       if (!wasOpen) return;
       sync(false, false);
-      siteHamburger?.focus();
+      (event.currentTarget as HTMLElement | null)?.focus();
     };
     const toggle = () => sync(!root?.classList.contains(styles.open));
     /** 開いたモバイルドロワーでは、Tab 移動をメニューと目次リンクの間で DOM 順に循環させる。 */
@@ -68,6 +73,8 @@ export default function DrawerTocObserver({
       const last = stops[stops.length - 1];
       const edge = event.shiftKey ? first : last;
       const active = document.activeElement;
+      // 769-900px では共通ヘッダーのナビが可視のため、ヘッダー内のフォーカスはドロワーへ引き戻さない。
+      if (active && siteHeader?.contains(active)) return;
       // 範囲内かつ端以外ならブラウザ既定の移動に任せる。
       if (active !== edge && stops.some((stop) => stop === active)) return;
       event.preventDefault();
@@ -146,7 +153,9 @@ export default function DrawerTocObserver({
       };
     });
     menu?.addEventListener("click", toggle);
-    siteHamburger?.addEventListener("click", closeForSiteMenu);
+    siteHeaderControls.forEach((control) => {
+      control.addEventListener("click", closeForSiteHeader);
+    });
     backdrop?.addEventListener("click", close);
     document.addEventListener("keydown", key);
     window.addEventListener("scroll", update, { passive: true });
@@ -158,7 +167,9 @@ export default function DrawerTocObserver({
     update();
     return () => {
       menu?.removeEventListener("click", toggle);
-      siteHamburger?.removeEventListener("click", closeForSiteMenu);
+      siteHeaderControls.forEach((control) => {
+        control.removeEventListener("click", closeForSiteHeader);
+      });
       backdrop?.removeEventListener("click", close);
       document.removeEventListener("keydown", key);
       window.removeEventListener("scroll", update);
