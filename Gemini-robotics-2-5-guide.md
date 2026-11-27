@@ -970,7 +970,7 @@ flowchart TB
 
 1. Hugging Face にログインした状態でデータセットページを開き、利用条件(アクセス条件)が表示された場合は内容を確認して同意する。
 2. 事前に `pip install huggingface_hub datasets` でパッケージと CLI を導入する。
-3. 同じアカウントのアクセストークンで認証する。`huggingface_hub` のログインコマンド(`hf auth login`、旧 CLI では `huggingface-cli login`)を使うか、環境変数 `HF_TOKEN` にトークンを設定する。トークンはコードに直書きしない。
+3. 同じアカウントのアクセストークンで認証する。`huggingface_hub` のログインコマンド(`hf auth login`、旧 CLI では `huggingface-cli login`)を使うか、環境変数 `HF_TOKEN` にトークンを設定し、`hf auth whoami` で有効なアカウントが手順1で条件に同意したアカウントと一致していることを確認する(別アカウントなら認証情報を切り替える)。なお、`HF_TOKEN` は保存済みログインより優先されるため、認証トラブル時は `HF_TOKEN` の設定も確認・更新する。トークンはコードに直書きしない。
 
 ```bash
 # 例: データセットを取得して、自社の指示パイプライン(入力審査→ER→検証層)に流す
