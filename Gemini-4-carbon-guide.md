@@ -404,8 +404,8 @@ flowchart TD
     IPOLL --> ICOLL["終端状態になった interaction の<br/>結合済み出力と usage を1回だけ蓄積"]
     ICOLL --> IST
     IST -- "requires_action" --> IACT["ツール呼び出しを承認ゲートに通す 12.2節"]
-    IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>(ツールBなど別ツールへのアクセスを後続ターンで維持)<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>最新のmodelのstepsとfunction_result 同じtools宣言を含めて再送する"]
-    IACT -- "拒否" --> IREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
+    IACT -- "承認" --> IRUN["クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言とsystem_instruction(設定時)・generation_configを再送する<br/>(ツールBなど別ツールへのアクセスとシステム指示・生成設定を後続ターンで維持)<br/>store=True はこのinteractionのidと同じtools宣言・system_instruction(設定時)・generation_configで結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>最新のmodelのstepsとfunction_result 同じtools宣言・system_instruction(設定時)・generation_configを含めて再送する"]
+    IACT -- "拒否" --> IREJ["拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言・system_instruction(設定時)・generation_configを含めstoreで分ける"]
     IRUN --> ACC
     IREJ --> ACC
     IST -- "requires_continuation store=True<br/>automatic_continuation=False の自前ループ" --> ISS["previous_interaction_id と continuation_token に加え<br/>元のモデル 元のtools宣言(設定時) system instruction(設定時)<br/>max_output_tokens を含む生成設定を毎hop再送して継続を送る"]
@@ -435,8 +435,8 @@ flowchart TD
     SDROP -- "いいえ 終了イベントを受信" --> SHOP["このhopの最終usageを確定し<br/>hopごとの最終値を合算する"]
     SHOP --> SST{"status は何か<br/>requires_continuation と requires_action を完了扱いにしない"}
     SST -- "requires_action" --> SACT["ツール呼び出しを承認ゲートに通す 12.2節"]
-    SACT -- "承認" --> SRUN["保存済みのcontinuation_tokenと発行元interaction idをクリアしてから<br/>クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言を再送する<br/>store=True はこのinteractionのidと同じtools宣言で結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>受信したままの最新のmodelのsteps(thought stepと署名を含む)とfunction_result 同じtools宣言を含めて再送する"]
-    SACT -- "拒否" --> SREJ["保存済みのcontinuation_tokenと発行元interaction idをクリアしてから<br/>拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言を含めstoreで分ける"]
+    SACT -- "承認" --> SRUN["保存済みのcontinuation_tokenと発行元interaction idをクリアしてから<br/>クライアント側でツールを実行し<br/>毎回の結果送信リクエストでも同じtools宣言とsystem_instruction(設定時)・generation_configを再送する<br/>store=True はこのinteractionのidと同じtools宣言・system_instruction(設定時)・generation_configで結果を送る<br/>store=False は元の入力とこれまでの全ツール呼び出し・結果の会話履歴を累積し<br/>受信したままの最新のmodelのsteps(thought stepと署名を含む)とfunction_result 同じtools宣言・system_instruction(設定時)・generation_configを含めて再送する"]
+    SACT -- "拒否" --> SREJ["保存済みのcontinuation_tokenと発行元interaction idをクリアしてから<br/>拒否をツール結果として送る 実行はしない<br/>送り方は承認時と同じくtools宣言・system_instruction(設定時)・generation_configを含めstoreで分ける"]
     SRUN --> SACC
     SREJ --> SACC
     SST -- "requires_continuation" --> SAUTO{"SDKの自動継続を無効にしたか<br/>automatic_continuation=False"}
@@ -474,7 +474,7 @@ GenerateContentで `MAX_TOKENS` に達した応答に `continuation_token` が�
 | `frequency_penalty` / `presence_penalty` / `candidate_count` | 既存設定に残る場合あり | 両penaltyと `candidate_count > 1` は非対応 | penaltyを削除し、`candidate_count` は省略または1へ調整してから移行 [S7] |
 | 明示的コンテキストキャッシュ | 対応するモデルあり | **Agent Platformでは非対応** | `cached_content` 参照を削除し、4,096トークン以上の共有・静的コンテンツをプロンプト先頭へ置いて暗黙的キャッシュを利用 [S7] |
 | `thought_signature` と会話履歴 | モデルごとの要件に従う | 過去のfunctionCall・最終textを含む署名付きPartを保持。並列呼び出しの署名は最初のfunctionCallだけ | 応答のContentとPartをそのまま再送し、署名を兄弟呼び出しへコピーしない。必要な署名の欠落・重複はHTTP 400の原因 [S7] |
-| 履歴の編集・prefill | 構成による | 署名は会話prefixに結び付く。prefilled modelターンは非対応 | prefillを削除してmodelターン末尾のまま送信しない。履歴圧縮では `ThinkingConfig` の `prefix_mismatch_behavior="DROP"` または対応する履歴リセットを使う [S7] |
+| 履歴の編集・prefill | 構成による | 署名は会話prefixに結び付く。prefilled modelターンは非対応 | prefillを削除してmodelターン末尾のまま送信しない。履歴圧縮などで会話prefixが変わる場合は、公式ドキュメントに沿った履歴リセット（新しい会話・セッションの開始など）を使う [S7] |
 | トークン課金 | 一部のみ課金 | **全トークン課金**（思考、内部ツール指示を含む） | 予算とアラートを再設計 [S7] |
 | 長い出力 | 上限内 | long decode が必要な場合あり | `v1beta1` を使い、`max_output_tokens` をセグメント上限より大きく設定 [S6] |
 
@@ -639,8 +639,11 @@ def estimate_cost(usage, rates):
     """
     if usage is None:
         raise ValueError("usage_metadata is None; cannot estimate token cost")
+    prompt_total = getattr(usage, "prompt_token_count", None)
+    if prompt_total is None:
+        raise ValueError("prompt_token_count is unavailable; cannot estimate token cost")
     cached = getattr(usage, "cached_content_token_count", 0) or 0
-    prompt = (getattr(usage, "prompt_token_count", 0) or 0) - cached
+    prompt = prompt_total - cached
     tool_prompt = getattr(usage, "tool_use_prompt_token_count", 0) or 0
     thoughts = getattr(usage, "thoughts_token_count", 0) or 0
     candidates = getattr(usage, "candidates_token_count", 0) or 0

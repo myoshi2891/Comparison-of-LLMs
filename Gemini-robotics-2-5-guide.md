@@ -969,11 +969,12 @@ flowchart TB
 ダウンロードの前に、次の準備をします。
 
 1. Hugging Face にログインした状態でデータセットページを開き、利用条件(アクセス条件)が表示された場合は内容を確認して同意する。
-2. 同じアカウントのアクセストークンで認証する。`huggingface_hub` のログインコマンド(`hf auth login`、旧 CLI では `huggingface-cli login`)を使うか、環境変数 `HF_TOKEN` にトークンを設定する。トークンはコードに直書きしない。
+2. 事前に `pip install huggingface_hub datasets` でパッケージと CLI を導入する。
+3. 同じアカウントのアクセストークンで認証する。`huggingface_hub` のログインコマンド(`hf auth login`、旧 CLI では `huggingface-cli login`)を使うか、環境変数 `HF_TOKEN` にトークンを設定する。トークンはコードに直書きしない。
 
 ```bash
 # 例: データセットを取得して、自社の指示パイプライン(入力審査→ER→検証層)に流す
-pip install datasets
+# 前提: 手順2・3で huggingface_hub / datasets の導入と認証を済ませていること
 python - <<'PY'
 from datasets import load_dataset
 from huggingface_hub import list_repo_files
