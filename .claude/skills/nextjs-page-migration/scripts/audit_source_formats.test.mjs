@@ -2703,3 +2703,61 @@ test("enforces HTML card boundaries, unshadowed timer bindings, plain className 
 	assert.equal(trailingRes.status, 1, "uninventoried trailing match fails certification");
 	assert.deepEqual(trailingRes.data.unresolvedMermaidSources, ["CLASSDEFS:c1"]);
 });
+
+test("handles parenthesized src writes, conditional timers, post-capture script removal, shadowed mermaid bindings, and boundary CLI reporting", () => {
+	const chart = "flowchart LR\nA --> B";
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+
+	// 1. Parenthesized assignment target is detected as a write; parenthesized read without write stays eligible.
+	const parenWrite = `${card}<script>var c = document.querySelector('#c1'); let src = c.querySelector('script').textContent; (src) = 'flowchart LR\\nX --> Y'; mermaid.render('x', src);</script>`;
+	assert.equal(audit(parenWrite, page).status, 1);
+	const parenRead = `${card}<script>var c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; const ok = (src) === 'nope'; mermaid.render('x', src);</script>`;
+	assert.equal(audit(parenRead, page).status, 0);
+
+	// 2. Conditional timer registrations do not certify cards; unconditional timer registrations stay eligible.
+	for (const body of [
+		"if (flag) setTimeout(() => { var src = c.querySelector('script').textContent; mermaid.render('x', src); }, 0);",
+		"flag && requestAnimationFrame(() => { var src = c.querySelector('script').textContent; mermaid.render('x', src); });",
+		"flag ? queueMicrotask(() => { var src = c.querySelector('script').textContent; mermaid.render('x', src); }) : null;",
+	]) {
+		const res = audit(`${card}<script>var flag = Math.random() > 0.5; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { let c = cards[i]; ${body} }</script>`, page);
+		assert.equal(res.status, 1, body);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], body);
+	}
+
+	// 3. Removing a script after top-level synchronous capture stays eligible; deferred/loop removals stay blocking.
+	const removeAfterCapture = `${card}<script>var c = document.querySelector('#c1'); var s = c.querySelector('script'); var src = s.textContent; s.remove(); mermaid.render('x', src);</script>`;
+	assert.equal(audit(removeAfterCapture, page).status, 0);
+	const removeInLoop = `${card}<script>var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { var s = cards[i].querySelector('script'); var src = s.textContent; s.remove(); mermaid.render('x', src); }</script>`;
+	assert.equal(audit(removeInLoop, page).status, 1);
+
+	// 4. Shadowed/local/foreign mermaid bindings stay unresolved; global mermaid and window.mermaid stay eligible.
+	for (const bad of [
+		"const mermaid = { render: () => {} }; mermaid.render('x', src);",
+		"window.mermaid = custom; mermaid.render('x', src);",
+		"other.mermaid.render('x', src);",
+	]) {
+		const res = audit(`${card}<script>var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; ${bad}</script>`, page);
+		assert.equal(res.status, 1, bad);
+		assert.deepEqual(res.data.unresolvedMermaidSources, ["CLASSDEFS:c1"], bad);
+	}
+	assert.equal(audit(`${card}<script>var c = document.querySelector('#c1'); var src = c.querySelector('script').textContent; window.mermaid.render('x', src);</script>`, page).status, 0);
+
+	// 5. CLI text output distinguishes boundary: markers from renderer markers.
+	const liPage = `const D = ${JSON.stringify(chart)}; <ul><li><MermaidDiagram chart={D} /></li><li>next</li></ul>`;
+	const omittedLi = `<ul><li id="c1" class="diagram-card"><script type="text/plain">${chart}</script><li>next</li></ul><script>var card = document.querySelector('#c1'); var src = card.querySelector('script').textContent; mermaid.render('x', src);</script>`;
+	const dir = mkdtempSync(join(tmpdir(), "audit-boundary-cli-"));
+	try {
+		const srcPath = join(dir, "src.html");
+		const pagePath = join(dir, "page.tsx");
+		writeFileSync(srcPath, omittedLi);
+		writeFileSync(pagePath, liPage);
+		const cli = spawnSync(process.execPath, [script, srcPath, pagePath], { encoding: "utf8" });
+		assert.equal(cli.status, 1);
+		assert.match(cli.stdout, /マークアップ境界が未解決: boundary:c1/);
+		assert.match(cli.stdout, /対象カードのマークアップ/);
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
+});

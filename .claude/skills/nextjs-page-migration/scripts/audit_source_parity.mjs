@@ -1306,16 +1306,40 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
   const writeIndexes = name => {
     const id = name.replace(/\$/g, "\\$");
     const found = new Set();
-    for (const m of executable.matchAll(new RegExp(`(?<![\\w$.])${id}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) found.add(m.index);
-    for (const m of executable.matchAll(new RegExp(`(?:\\+\\+|--)\\s*${id}(?![\\w$])`, "g"))) found.add(m.index + m[0].length - name.length);
-    for (const m of executable.matchAll(new RegExp(`\\bfor\\s*\\(\\s*(?:(?:var|let|const)\\s+)?${id}\\s+(?:of|in)\\b`, "g"))) found.add(m.index + m[0].lastIndexOf(name));
+    const hasEnclosingOpenParens = (index, closeCount) => {
+      if (closeCount === 0) return true;
+      let i = index - 1, opens = 0;
+      while (i >= 0 && opens < closeCount) {
+        if (/\s/.test(executable[i])) { i--; continue; }
+        if (executable[i] === "(") { opens++; i--; continue; }
+        return false;
+      }
+      return opens === closeCount;
+    };
+    const countClosingParens = text => (text.match(/\)/g) ?? []).length;
+    const countOpeningParens = text => (text.match(/\(/g) ?? []).length;
+    for (const m of executable.matchAll(new RegExp(`(?<![\\w$.])${id}((?:\\s*\\))*)\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) {
+      if (hasEnclosingOpenParens(m.index, countClosingParens(m[1]))) found.add(m.index);
+    }
+    for (const m of executable.matchAll(new RegExp(`(?:\\+\\+|--)\\s*((?:\\(\\s*)*)${id}((?:\\s*\\))*)(?![\\w$])`, "g"))) {
+      if (countOpeningParens(m[1]) === countClosingParens(m[2])) found.add(m.index + m[0].length - m[2].length - name.length);
+    }
+    for (const m of executable.matchAll(new RegExp(`\\bfor\\s*\\(\\s*(?:(?:var|let|const)\\s+)?((?:\\(\\s*)*)${id}((?:\\s*\\))*)\\s+(?:of|in)\\b`, "g"))) {
+      if (countOpeningParens(m[1]) === countClosingParens(m[2])) found.add(m.index + m[0].lastIndexOf(name));
+    }
     if (selectedScript.classic) {
       // Classic scripts expose top-level global bindings as properties on the global object;
       // module-local bindings are not aliased on window/globalThis/self.
       const globalPrefix = "(?<![\\w$.])(?:window|globalThis|self)\\s*\\.\\s*";
-      for (const m of executable.matchAll(new RegExp(`${globalPrefix}${id}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) found.add(m.index);
-      for (const m of executable.matchAll(new RegExp(`(?:\\+\\+|--)\\s*${globalPrefix}${id}(?![\\w$])`, "g"))) found.add(m.index + m[0].length - name.length);
-      for (const m of executable.matchAll(new RegExp(`\\bfor\\s*\\(\\s*${globalPrefix}${id}\\s+(?:of|in)\\b`, "g"))) found.add(m.index + m[0].lastIndexOf(name));
+      for (const m of executable.matchAll(new RegExp(`${globalPrefix}${id}((?:\\s*\\))*)\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) {
+        if (hasEnclosingOpenParens(m.index, countClosingParens(m[1]))) found.add(m.index);
+      }
+      for (const m of executable.matchAll(new RegExp(`(?:\\+\\+|--)\\s*((?:\\(\\s*)*)${globalPrefix}${id}((?:\\s*\\))*)(?![\\w$])`, "g"))) {
+        if (countOpeningParens(m[1]) === countClosingParens(m[2])) found.add(m.index + m[0].length - m[2].length - name.length);
+      }
+      for (const m of executable.matchAll(new RegExp(`\\bfor\\s*\\(\\s*((?:\\(\\s*)*)${globalPrefix}${id}((?:\\s*\\))*)\\s+(?:of|in)\\b`, "g"))) {
+        if (countOpeningParens(m[1]) === countClosingParens(m[2])) found.add(m.index + m[0].lastIndexOf(name));
+      }
       for (const m of literalSource.matchAll(new RegExp(`(?<![\\w$.])(?:window|globalThis|self)\\s*\\[\\s*(['"])${id}\\1\\s*\\]\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|<<|>>>?|[+\\-*/%&|^])=|\\+\\+|--)`, "g"))) {
         if (executable[m.index] === literalSource[m.index]) found.add(m.index);
       }
@@ -1335,8 +1359,14 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if (")]}".includes(char)) { depth++; continue; }
         if (!"([{".includes(char)) continue;
         if (depth) { depth--; continue; }
-        // Calls/grouping end the pattern; obj[key] = value writes a member.
-        if (char === "(" || (char === "[" && /[\w$)\]]\s*$/.test(executable.slice(0, i)))) break;
+        // Grouping parens around a bare target (e.g. `[(src)] = x`) do not end the pattern;
+        // call parens or expressions inside parens do.
+        if (char === "(") {
+          if (/^\s*$/.test(executable.slice(i + 1, m.index)) && !/[\w$)\]]\s*$/.test(executable.slice(0, i))) continue;
+          break;
+        }
+        // obj[key] = value writes a member.
+        if (char === "[" && /[\w$)\]]\s*$/.test(executable.slice(0, i))) break;
         let close = i + 1;
         for (let level = 1; close < executable.length; close++) {
           if ("([{".includes(executable[close])) level++;
@@ -1747,6 +1777,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           return true;
         };
         if (timerCall && isUnshadowedScheduler(timerCall[1])) {
+          // The statement registering the timer callback must itself run on every iteration.
+          const regStatement = statementBefore(open + 1 + timerCall.index, open);
+          if (regStatement === null || /^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(regStatement) || /&&|\|\||\?|=>/.test(regStatement)) return false;
           // A timer whose handle is cancelled in the scope may never run for this iteration.
           const handle = /([A-Za-z_$][\w$]*)\s*=\s*(?:window\s*\.\s*)?$/.exec(head.slice(0, timerCall.index))?.[1];
           const cancelled = handle !== undefined &&
@@ -2212,7 +2245,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const isNonTypeLiteralAttrEdit = edit =>
       /\b(?:setAttribute|removeAttribute|toggleAttribute)\s*\($/i.test(edit[0]) &&
       /^\s*(['"])(?!type\1)[^'"\n]*\1/i.test(literalSource.slice(edit.index + edit[0].length));
-    if (matchExecutableEdits(scriptEdits).some(edit => mayBeSelectedScript(edit[1], edit.index) || mayBeScriptContainer(edit[1], edit.index)) ||
+    if (matchExecutableEdits(scriptEdits).some(edit =>
+      mayBeScriptContainer(edit[1], edit.index) ||
+      (writeCanPrecedeRead(edit.index) && mayBeSelectedScript(edit[1], edit.index))
+    ) ||
       matchExecutableEdits(typeEdits).some(edit => !isNonTypeLiteralAttrEdit(edit) && mayBeCardScript(edit[1], edit.index)) ||
       allOwnerEdits.some(edit =>
         mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit)) ||
@@ -2225,11 +2261,36 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       )) return false;
     return { base: usesValidatedDedent ? dedentedPayload : payload, certifiedLoopOpen };
   };
+  // Verify that `mermaid` resolves to the page's global renderer rather than a locally
+  // declared, assigned, shadowed, or foreign-object property binding.
+  const isUnshadowedGlobalBinding = name => {
+    const esc = name.replace(/\$/g, "\\$");
+    const shadowRe = new RegExp(
+      String.raw`\b(?:var|let|const|function|class)\s+${esc}(?![\w$])|\b(?:function\b[^()]*|catch)\s*\([^)]*\b${esc}(?![\w$])|\([^)]*\b${esc}(?![\w$])[^)]*\)\s*=>|\b${esc}\s*=>|\b(?:const|let|var)\s+[^;\n{}]*[,{[]\s*${esc}(?![\w$])|\bimport\b[^;\n]*\b${esc}(?![\w$])`
+    );
+    if (shadowRe.test(executable) || writeIndexes(name).size > 0) return false;
+    const globalAssignRe = new RegExp(
+      String.raw`\b(?:window|globalThis|self)\s*(?:\.\s*${esc}(?![\w$])|\[\s*(['"])${esc}\1\s*\])\s*=(?!=)`,
+      "g"
+    );
+    for (const m of literalSource.matchAll(globalAssignRe)) {
+      if (executable[m.index] === literalSource[m.index]) return false;
+    }
+    return true;
+  };
   // Strings/comments are already masked. Balance parentheses so later ASI
   // statements cannot supply a suffix that this render call never receives.
   const renderUses = [];
   const suffixFreeCalls = [];
   for (const call of executable.matchAll(/\bmermaid\s*\.\s*render\s*\(/g)) {
+    const beforeCall = executable.slice(0, call.index);
+    const memberAccess = /\.\s*$/.test(beforeCall);
+    if (memberAccess) {
+      const globalOwner = /(?<![\w$.])(window|globalThis|self)\s*\.\s*$/.exec(beforeCall);
+      if (!globalOwner || !isUnshadowedGlobalBinding(globalOwner[1]) || !isUnshadowedGlobalBinding("mermaid")) return null;
+    } else if (!isUnshadowedGlobalBinding("mermaid")) {
+      return null;
+    }
     const start = call.index + call[0].length;
     const arguments_ = [];
     const stack = ["("];
@@ -3290,10 +3351,18 @@ if (process.exitCode === undefined) {
         const unresolvedWithCountMismatch = result.unresolvedMermaidSources.length > 0 && !otherMissing && mermaidCountMismatch;
         const mermaidCountMismatchOnly = !otherMissing && result.unresolvedMermaidSources.length === 0 && mermaidCountMismatch && !result.mermaidSourcesMatch;
         const mermaidMismatchOnly = !otherMissing && result.unresolvedMermaidSources.length === 0 && !mermaidCountMismatch && !result.mermaidSourcesMatch;
-        if (result.unresolvedMermaidSources.length > 0) {
-          console.log(`\n❌ 描画スクリプトの静的解析が未解決（描画スクリプトの特定・図ソース・CLASSDEFS）: ${result.unresolvedMermaidSources.join(", ")}`);
+        const boundaryMarkers = result.unresolvedMermaidSources.filter(marker => marker.startsWith("boundary:"));
+        const rendererMarkers = result.unresolvedMermaidSources.filter(marker => !marker.startsWith("boundary:"));
+        if (boundaryMarkers.length > 0) {
+          console.log(`\n❌ 図カードのマークアップ境界が未解決: ${boundaryMarkers.join(", ")}`);
+          console.log("  対象カードのマークアップ（.diagram-card 周辺の閉じタグ・入れ子構造）を確認すること。");
+        }
+        if (rendererMarkers.length > 0) {
+          console.log(`\n❌ 描画スクリプトの静的解析が未解決（描画スクリプトの特定・図ソース・CLASSDEFS）: ${rendererMarkers.join(", ")}`);
           console.log("  図の内容を転写するのではなく、原本の描画スクリプト（mermaid.render の呼び出しと図ソースの読み取り）を確認すること。");
-          if (!result.mermaidSourcesMatch) console.log("  下記の Mermaid 不一致は、未解決の図が実行時の補完なしで比較されたことによる可能性がある。");
+        }
+        if (result.unresolvedMermaidSources.length > 0 && !result.mermaidSourcesMatch) {
+          console.log("  下記の Mermaid 不一致は、未解決の図が実行時の補完なしで比較されたことによる可能性がある。");
         }
         if (!result.mermaidSourcesMatch) {
           console.log("\n❌ Mermaid ソースが原本と順序・出現回数込みで一致しません:");

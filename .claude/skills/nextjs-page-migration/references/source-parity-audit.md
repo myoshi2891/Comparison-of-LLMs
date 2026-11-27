@@ -80,7 +80,10 @@ mermaidSources       11        11
 
 - **内容の欠落**（見出し・リンク・リスト項目・コード・表・段落・図・SVG・callout の不足）: 原本の文言のまま転写して戻す。ただし、文書化済みの正当な差異は実際の欠落と区別する。たとえば原本の `h2: 目次` はサイドバー目次へ置換するため `page.tsx` 本文に見出しとして存在しない。この見出しだけの不一致は偽陽性として扱い、見出しを復元しない。`references/` の既存例外に従い、PROGRESS.md 等へ「原本 `h2: 目次` はサイドバーに置換」と記録し、出力の欠落一覧が当該見出しのみであることを確認したうえで、その他の欠落が 0 になるまで修正して終了コード 0 の条件を満たす。それ以外の欠落を偽陽性と判断する場合も、理由を明記して記録する。
 - **Mermaid 図ソースの不一致**（欠落はないが `mermaidSourcesMatch` が偽）: ページを直ちに書き換える前に、原本と `page.tsx` の図ソース本文・出現順序・重複回数（`sourceMermaidSources` vs `pageMermaidSources`）を比較し、欠落なのか表記・順序・回数のずれなのかを確認して揃える。
-- **未解決のレンダラー解析**（`--json` の `unresolvedMermaidSources` に `CLASSDEFS:<カードID>` や `renderer:<カードID>` が出る）: page.tsx ではなく**原本側のレンダラー**（`mermaid.render` を呼ぶ script、カードの選択・走査、`CLASSDEFS` の宣言）を確認する。図ソースを静的に確定できない書き方が原因なので、ページへ図を足しても解消しない。
+- **未解決のレンダラー解析・外部スクリプト**（`--json` の `unresolvedMermaidSources` に `CLASSDEFS:<カードID>`、`renderer:<カードID>`、`boundary:<カードID>`、`external-script:<相対パス>` が出る）:
+  - `CLASSDEFS:<カードID>` / `renderer:<カードID>`: page.tsx ではなく**原本側のレンダラー**（`mermaid.render` を呼ぶ script、カードの選択・走査、`CLASSDEFS` の宣言）を確認する。図ソースを静的に確定できない書き方が原因なので、ページへ図を足しても解消しない。
+  - `boundary:<カードID>`: 対象 `.diagram-card` のマークアップ境界（閉じタグ不足や入れ子破損など）を確認する。
+  - `external-script:<相対パス>`: `./ui.js` のようなローカル相対 `<script src="./ui.js">` は、Mermaid 描画とは無関係であっても `external-script:./ui.js` として報告される。Mermaid レンダラーの不具合として扱わず、該当スクリプトが図ソースへ影響しないか確認したうえで原本内容を削除せずにスクリプトマーカーを解決する。
 
 HTMLの図解は `DIAGRAMS` オブジェクトに加え、文字列配列も出現順・重複込みで解析する。
 JavaScriptは実行せず、文字列のエスケープを復号して比較する。通常の引用符付きTSX定数も復号し、
