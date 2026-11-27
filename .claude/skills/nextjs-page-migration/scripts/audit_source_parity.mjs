@@ -2717,9 +2717,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       active.add(fn);
       let invoked = isDirectOrCallbackActivation(fn);
       const rawBeforeFn = executable.slice(0, fn.start).replace(/\basync\s*$/, "");
-      const boundDecl = !fn.name ? /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*$/.exec(rawBeforeFn) : null;
-      const boundName = boundDecl?.[1];
-      const boundNameIndex = boundDecl ? boundDecl.index + boundDecl[0].indexOf(boundName) : -1;
+      const boundDecl = !fn.name ? /\b((?:const|let|var)\s+)([A-Za-z_$][\w$]*)\s*=\s*$/.exec(rawBeforeFn) : null;
+      const boundName = boundDecl?.[2];
+      const boundNameIndex = boundDecl ? boundDecl.index + boundDecl[1].length : -1;
       const callableName = fn.name ?? (boundName && Array.from(writeIndexes(boundName)).every(w => w === boundNameIndex) ? boundName : undefined);
       const callableNameIndex = fn.name ? fn.nameIndex : boundNameIndex;
       if (!invoked && callableName) {

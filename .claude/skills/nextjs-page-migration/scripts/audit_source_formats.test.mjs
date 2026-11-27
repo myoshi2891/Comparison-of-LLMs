@@ -2879,3 +2879,18 @@ test("checks anonymous activation, materialized paragraphs, escaped property key
 	const straightLineGuard = `${card}<script>var ready = false; ready = true; var cards = document.querySelectorAll('.diagram-card'); for (var i = 0; i < cards.length; i++) { if (ready) { var c = cards[i]; var src = c.querySelector('script').textContent; mermaid.render('x', src); } }</script>`;
 	assert.equal(audit(straightLineGuard, page).status, 0);
 });
+
+test("recognizes invoked bound renderer whose name appears inside its declaration keyword", () => {
+	const chart = "flowchart LR\nA --> B";
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const body = "const cardEl = document.querySelector('#c1'); const src = cardEl.querySelector('script').textContent; mermaid.render('x', src);";
+	const drawControl = `${card}<script>const draw = () => { ${body} }; draw();</script>`;
+	const cRenderer = `${card}<script>const c = () => { ${body} }; c();</script>`;
+	const uninvokedCRenderer = `${card}<script>const c = () => { ${body} };</script>`;
+	const drawResult = audit(drawControl, page);
+	const cResult = audit(cRenderer, page);
+	assert.equal(drawResult.status, 0);
+	assert.equal(cResult.status, drawResult.status);
+	assert.equal(audit(uninvokedCRenderer, page).status, 1);
+});
