@@ -2665,6 +2665,16 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       }
       return hasReachableActivation(siteIndex, certifiedLoopOpen, active, seen);
     };
+    const findTimerActivationSite = before => {
+      const timerMatch = /(?<![\w$.])(?:(window|globalThis|self)\s*\.\s*)?(setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.exec(before);
+      if (!timerMatch) return -1;
+      if (timerMatch[1] && !isUnshadowedGlobalBinding(timerMatch[1])) return -1;
+      if (!isUnshadowedGlobalBinding(timerMatch[2])) return -1;
+      const handle = /([A-Za-z_$][\w$]*)\s*=\s*$/.exec(before.slice(0, timerMatch.index))?.[1];
+      const cancelled = handle !== undefined &&
+        new RegExp(String.raw`(?<![\w$])(?:clearTimeout|cancelAnimationFrame)\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
+      return cancelled ? -1 : timerMatch.index;
+    };
     const isDirectOrCallbackActivation = fn => {
       const rawBefore = executable.slice(0, fn.start);
       const beforeFn = rawBefore.replace(/\basync\s*$/, "");
@@ -2696,13 +2706,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (isGroupedIife && isReachableSite(iifeStart)) return true;
       if (isUnaryIife && isReachableSite(unaryIife.index)) return true;
       // Timer callback: setTimeout/requestAnimationFrame/queueMicrotask with unshadowed scheduler.
-      const timerMatch = /(?<![\w$.])(setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.exec(beforeFn);
-      if (timerMatch && isUnshadowedGlobalBinding(timerMatch[1])) {
-        const handle = /([A-Za-z_$][\w$]*)\s*=\s*(?:window\s*\.\s*)?$/.exec(beforeFn.slice(0, timerMatch.index))?.[1];
-        const cancelled = handle !== undefined &&
-          new RegExp(String.raw`(?<![\w$])(?:clearTimeout|cancelAnimationFrame)\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
-        if (!cancelled && isReachableSite(timerMatch.index)) return true;
-      }
+      const timerSite = findTimerActivationSite(beforeFn);
+      if (timerSite >= 0 && isReachableSite(timerSite)) return true;
       // Document load lifecycle callback.
       const eventMatch = /\baddEventListener\s*\(\s*(['"])(?:DOMContentLoaded|load)\1\s*,\s*$/.exec(beforeFnLit);
       if (eventMatch && executable[eventMatch.index] === literalSource[eventMatch.index] && isReachableSite(eventMatch.index)) {
@@ -2733,8 +2738,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           const afterRef = executable.slice(ref.index + ref[0].length);
           const isCall = /^\s*\(/.test(afterRef);
           const isEventCallback = /\baddEventListener\s*\(\s*(['"])(?:DOMContentLoaded|load)\1\s*,\s*$/.test(literalSource.slice(0, ref.index));
-          if (!isCall && !isEventCallback) continue;
-          if (isReachableSite(ref.index)) {
+          const timerSite = /^\s*[,)]/.test(afterRef) ? findTimerActivationSite(executable.slice(0, ref.index)) : -1;
+          if (!isCall && !isEventCallback && timerSite < 0) continue;
+          const siteIndex = isCall || isEventCallback ? ref.index : timerSite;
+          if (isReachableSite(siteIndex)) {
             invoked = true;
             break;
           }

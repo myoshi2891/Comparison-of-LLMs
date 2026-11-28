@@ -2894,3 +2894,47 @@ test("recognizes invoked bound renderer whose name appears inside its declaratio
 	assert.equal(cResult.status, drawResult.status);
 	assert.equal(audit(uninvokedCRenderer, page).status, 1);
 });
+
+test("recognizes qualified global timer schedulers and scheduled function references while rejecting shadowed, custom, cancelled, or unscheduled refs", () => {
+	const chart = "flowchart LR\nA --> B";
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const body = "const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src);";
+
+	// 1. Explicitly qualified global schedulers activate anonymous callbacks when owner & scheduler are unshadowed.
+	for (const call of [
+		`window.setTimeout(() => { ${body} }, 0);`,
+		`globalThis.requestAnimationFrame(() => { ${body} });`,
+		`self.queueMicrotask(() => { ${body} });`,
+	]) {
+		assert.equal(audit(`${card}<script>${call}</script>`, page).status, 0, call);
+	}
+	for (const bad of [
+		`const window = { setTimeout: () => {} }; window.setTimeout(() => { ${body} }, 0);`,
+		`window.setTimeout = () => {}; window.setTimeout(() => { ${body} }, 0);`,
+		`custom.setTimeout(() => { ${body} }, 0);`,
+		`foo.window.setTimeout(() => { ${body} }, 0);`,
+		`const t = window.setTimeout(() => { ${body} }, 0); clearTimeout(t);`,
+	]) {
+		assert.equal(audit(`${card}<script>${bad}</script>`, page).status, 1, bad);
+	}
+
+	// 2. Function references passed to supported timer schedulers activate the renderer, while shadowed, cancelled, or unscheduled references stay unresolved.
+	for (const good of [
+		`function draw() { ${body} } setTimeout(draw, 0);`,
+		`const draw = () => { ${body} }; window.requestAnimationFrame(draw);`,
+		`const draw = () => { ${body} }; globalThis.queueMicrotask(draw);`,
+	]) {
+		assert.equal(audit(`${card}<script>${good}</script>`, page).status, 0, good);
+	}
+	for (const bad of [
+		`function draw() { ${body} } const ref = draw;`,
+		`function draw() { ${body} } custom.setTimeout(draw, 0);`,
+		`const setTimeout = () => {}; function draw() { ${body} } setTimeout(draw, 0);`,
+		`const window = { setTimeout: () => {} }; function draw() { ${body} } window.setTimeout(draw, 0);`,
+		`function draw() { ${body} } const t = window.setTimeout(draw, 0); clearTimeout(t);`,
+		`function draw() { ${body} } setTimeout(draw ? noop : other, 0);`,
+	]) {
+		assert.equal(audit(`${card}<script>${bad}</script>`, page).status, 1, bad);
+	}
+});
