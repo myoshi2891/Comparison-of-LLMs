@@ -432,9 +432,9 @@ fn = next(n for n in ast.parse(code).body if isinstance(n, ast.FunctionDef) and 
 checkpoint, requests, executed = {}, [], []
 tool = {"type": "tool_use", "id": "read-1", "name": "read", "input": {"path": "a.py"}}
 reply = {"stop_reason": "tool_use", "content": [tool]}
-expected = [{"role": "user", "content": "task"},
+expected = copy.deepcopy([{"role": "user", "content": "task"},
     {"role": "assistant", "content": [tool]},
-    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "read-1", "content": "file content"}]}]
+    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "read-1", "content": "file content"}]}])
 done = {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}
 def call(body):
     requests.append(copy.deepcopy(body))
@@ -477,6 +477,16 @@ def tool(n):
 replies = [{"stop_reason": "tool_use", "content": [tool(1)]},
     {"stop_reason": "tool_use", "content": [tool(2), tool(3), tool(4)]},
     {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]}]
+expected_history = copy.deepcopy([
+    {"role": "user", "content": "task"},
+    {"role": "assistant", "content": replies[0]["content"]},
+    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "tool-1", "content": "result-1"}]},
+    {"role": "assistant", "content": replies[1]["content"]},
+    {"role": "user", "content": [
+        {"type": "tool_result", "tool_use_id": "tool-2", "content": "result-2"},
+        {"type": "tool_result", "tool_use_id": "tool-3", "content": "Tool execution failed. Check the tool arguments or try an alternative approach.", "is_error": True},
+        {"type": "tool_result", "tool_use_id": "tool-4", "content": "result-4"}]},
+])
 def call(body):
     requests.append(copy.deepcopy(body))
     return replies[len(requests) - 1]
@@ -493,17 +503,11 @@ except RuntimeError as error:
     assert str(error) == "max_turns に到達しました"
 else:
     raise AssertionError("turn limit must raise after saving the batch")
-history = copy.deepcopy(checkpoint["messages"])
-assert len(history) == 5
-assert history[2]["content"] == [{"type": "tool_result", "tool_use_id": "tool-1", "content": "result-1"}]
-assert history[4]["content"] == [
-    {"type": "tool_result", "tool_use_id": "tool-2", "content": "result-2"},
-    {"type": "tool_result", "tool_use_id": "tool-3", "content": "Tool execution failed. Check the tool arguments or try an alternative approach.", "is_error": True},
-    {"type": "tool_result", "tool_use_id": "tool-4", "content": "result-4"}]
-for assistant, user in zip(history[1::2], history[2::2]):
+assert checkpoint["messages"] == expected_history
+for assistant, user in zip(expected_history[1::2], expected_history[2::2]):
     assert [b["id"] for b in assistant["content"]] == [b["tool_use_id"] for b in user["content"]]
 assert scope["agent_loop"]("task", [], run_tool, max_turns=1, checkpoint=checkpoint) == replies[2]
-assert requests[2]["messages"] == history
+assert requests[2]["messages"] == expected_history
 assert executed == [1, 2, 3, 4]
 `,
     examples()
@@ -1267,27 +1271,54 @@ try:
         exec(compile(ast.Module(body=[fn], type_ignores=[]), "example", "exec"), b_scope)
         cp = {}
         b_scope["agent_loop"]("task", [], tool_fn, max_turns=2, checkpoint=cp, betas=betas)
-        return cp
-    cp_file_ok = run_betas_case(
+        return cp, reqs
+    cp_file_ok, reqs_file_ok = run_betas_case(
         [{"stop_reason": "tool_use", "content": [tool(1), tool(2)]}, {"stop_reason": "end_turn", "content": []}],
         lambda _k, a: [copy.deepcopy(file_img)] if a["n"] == 1 else [copy.deepcopy(file_doc)],
         betas=["files-api-2025-04-14"],
     )
-    assert cp_file_ok["messages"][2]["content"][0]["content"] == [file_img]
-    assert cp_file_ok["messages"][2]["content"][1]["content"] == [file_doc]
-    cp_file_no_beta = run_betas_case(
+    expected_file_ok = [
+        {"type": "tool_result", "tool_use_id": "t1", "content": [file_img]},
+        {"type": "tool_result", "tool_use_id": "t2", "content": [file_doc]},
+    ]
+    assert cp_file_ok["messages"][2]["content"] == expected_file_ok
+    assert len(reqs_file_ok) == 2
+    assert reqs_file_ok[1][1] == ["files-api-2025-04-14"]
+    assert reqs_file_ok[1][0]["messages"][2]["content"] == expected_file_ok
+    cp_file_no_beta, _ = run_betas_case(
         [{"stop_reason": "tool_use", "content": [tool(1), tool(2)]}, {"stop_reason": "end_turn", "content": []}],
         lambda _k, a: [copy.deepcopy(file_img)] if a["n"] == 1 else [copy.deepcopy(file_doc)],
     )
-    for res_nb in cp_file_no_beta["messages"][2]["content"]:
-        assert res_nb["is_error"] is True and res_nb["content"] == fixed_msg
-    cp_file_toolsets = run_betas_case(
+    assert cp_file_no_beta["messages"][2]["content"] == [
+        {"type": "tool_result", "tool_use_id": "t1", "content": fixed_msg, "is_error": True},
+        {"type": "tool_result", "tool_use_id": "t2", "content": fixed_msg, "is_error": True},
+    ]
+    cp_file_toolsets, _ = run_betas_case(
         [{"stop_reason": "tool_use", "content": [tool(1, name="click", toolset="browser"), tool(2, name="click", toolset="computer")]}, {"stop_reason": "end_turn", "content": []}],
         lambda _k, _a: [copy.deepcopy(file_img)],
         betas=["files-api-2025-04-14"],
     )
-    for res_ts in cp_file_toolsets["messages"][2]["content"]:
-        assert res_ts["is_error"] is True and res_ts["content"] == fixed_msg
+    assert cp_file_toolsets["messages"][2]["content"] == [
+        {"type": "tool_result", "tool_use_id": "t1", "toolset_name": "browser", "content": fixed_msg, "is_error": True},
+        {"type": "tool_result", "tool_use_id": "t2", "toolset_name": "computer", "content": fixed_msg, "is_error": True},
+    ]
+
+    # text ソースの document は media_type == "text/plain" のみ受理し、base64 ソースの検証は維持する
+    for doc_block, ok in (
+        ({"type": "document", "source": {"type": "text", "media_type": "text/plain", "data": "hello"}}, True),
+        ({"type": "document", "source": {"type": "text", "media_type": "text/markdown", "data": "# hi"}}, False),
+        ({"type": "document", "source": {"type": "text", "media_type": "text/plain", "data": 123}}, False),
+        ({"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": "JVBERi0="}}, True),
+    ):
+        cp_doc = run_sr_case(
+            [{"stop_reason": "tool_use", "content": [tool(1)]}, {"stop_reason": "end_turn", "content": []}],
+            lambda _k, _a, b=doc_block: [copy.deepcopy(b)],
+        )
+        res_doc = cp_doc["messages"][2]["content"][0]
+        if ok:
+            assert res_doc == {"type": "tool_result", "tool_use_id": "t1", "content": [doc_block]}, (doc_block, res_doc)
+        else:
+            assert res_doc == {"type": "tool_result", "tool_use_id": "t1", "content": fixed_msg, "is_error": True}, (doc_block, res_doc)
 
     # browser_state の tab_opened.tab_id は new_tab 以外の browser 結果でも tabs に存在しなければ拒否する
     bad_opened_state = [{"type": "browser_state", "tabs": [{"tab_id": "tab1", "title": "Example", "url": "https://example.com", "active": True}], "state_changes": [{"type": "tab_opened", "tab_id": "tab_missing"}]}]

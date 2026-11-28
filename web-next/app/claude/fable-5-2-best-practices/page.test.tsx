@@ -431,6 +431,7 @@ function tree(n: Node): unknown {
     if (key === "type" && n.id === "fable52-backdrop") v = null;
     if (v) attrs[key] = v;
   }
+  if (n.hasAttribute("hidden")) attrs.hidden = n.getAttribute("hidden") || "hidden";
   return [
     n.id === "fable52-backdrop" ? "div" : n.localName,
     attrs,

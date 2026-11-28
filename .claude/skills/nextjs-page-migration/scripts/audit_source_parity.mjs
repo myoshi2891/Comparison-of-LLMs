@@ -227,15 +227,59 @@ const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60 *\x60`;
  * @return {boolean} False only for a blanked template key that is not `textContent` or `text`.
  */
 function isTextContentKey(write, rawSource) {
-  if (!write[0].includes("\x60")) return true;
-  const key = /\[\s*\x60((?:[^\x60\\$]|\\[\s\S]|\$(?!\{))*)\x60\s*\]/.exec(rawSource.slice(write.index, write.index + write[0].length));
+  // Comments between tokens are not code: validate syntax with them blanked; keys come from the raw text.
+  const raw = rawSource.slice(write.index, write.index + write[0].length).replace(/\/\*[\s\S]*?\*\/|\/\/[^\r\n]*/g, " ");
+  if (/(?:^|[^\]])\.\s*(?:textContent|text)\b\s*(?:(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=|\+\+|--)?$/.test(raw)) {
+    return true;
+  }
+  const key = /\[\s*(?:'((?:[^'\\\r\n]|\\[\s\S])*)'|"((?:[^"\\\r\n]|\\[\s\S])*)"|\x60((?:[^\x60\\$]|\\[\s\S]|\$(?!\{))*)\x60)\s*\]\s*(?:(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=|\+\+|--)?$/.exec(raw);
   if (!key) return false;
-  const decoded = key[1].replace(/\\(?:u\{([0-9a-fA-F]+)\}|u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2})|([\s\S]))/g, (_all, braced, unicode, hex, simple) => {
-    if (simple !== undefined) return ({ n: "\n", r: "\r", t: "\t", b: "\b", f: "\f", v: "\v", 0: "\0" })[simple] ?? simple;
-    const code = Number.parseInt(braced ?? unicode ?? hex, 16);
-    return code <= 0x10ffff ? String.fromCodePoint(code) : "";
+  const rawKey = key[1] ?? key[2] ?? key[3] ?? "";
+  const decoded = rawKey.replace(/\\(?:u\{([0-9a-fA-F]+)\}|u([0-9a-fA-F]{4})|x([0-9a-fA-F]{2})|(?:\r\n?|\n|\u2028|\u2029)|([\s\S]))/g, (_all, braced, unicode, hex, simple) => {
+    if (braced !== undefined || unicode !== undefined || hex !== undefined) {
+      const code = Number.parseInt(braced ?? unicode ?? hex, 16);
+      return code <= 0x10ffff ? String.fromCodePoint(code) : "";
+    }
+    if (simple === undefined) return "";
+    return ({ n: "\n", r: "\r", t: "\t", b: "\b", f: "\f", v: "\v", 0: "\0" })[simple] ?? simple;
   });
   return decoded === "textContent" || decoded === "text";
+}
+
+/**
+ * Tests whether a scheduler handle is cancelled by the matching cancel API.
+ * @param {string} executable - Comment- and string-masked script source.
+ * @param {string} handle - The identifier holding the scheduler return value.
+ * @param {string} scheduler - The scheduling function name.
+ * @return {boolean} True only for a cancel call that pairs with the scheduler; microtasks are never cancellable.
+ */
+function cancelsSchedulerHandle(executable, handle, scheduler) {
+  const cancel = { setTimeout: "clearTimeout|clearInterval", setInterval: "clearInterval|clearTimeout", requestAnimationFrame: "cancelAnimationFrame" }[scheduler];
+  if (!cancel || handle === undefined) return false;
+  return new RegExp(String.raw`(?<![\w$])(?:${cancel})\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
+}
+
+/**
+ * Removes generated materialized chart elements using a quote-aware tag scan, so markup that
+ * merely appears inside another tag's attribute value is preserved with its surrounding prose.
+ * @param {string} html - Markup that may contain generated chart elements.
+ * @return {string} The markup without the generated chart elements.
+ */
+function removeMaterializedCharts(html) {
+  const tag = /<[A-Za-z][^>"']*(?:(?:"[^"]*"|'[^']*')[^>"']*)*>/g;
+  const chartOpen = /^<div\s+class="mermaid"\s+data-audit-materialized="1"\s*>$/i;
+  let out = "";
+  let last = 0;
+  let match;
+  while ((match = tag.exec(html)) !== null) {
+    if (!chartOpen.test(match[0])) continue;
+    const closeAt = html.slice(tag.lastIndex).search(/<\/div>/i);
+    if (closeAt < 0) continue;
+    out += html.slice(last, match.index);
+    last = tag.lastIndex + closeAt + "</div>".length;
+    tag.lastIndex = last;
+  }
+  return out + html.slice(last);
 }
 
 /**
@@ -371,7 +415,7 @@ function normalizeMermaidSource(raw) {
  */
 function extractTagContents(src, tag) {
   const results = [];
-  const re = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, "gi");
+  const re = new RegExp(`<${tag}\\b(?:[^>"']|"[^"]*"|'[^']*')*>([\\s\\S]*?)<\\/${tag}>`, "gi");
   let match = re.exec(src);
   while (match !== null) {
     results.push({ index: match.index, content: match[1] });
@@ -1536,6 +1580,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     };
     const functions = functionBodies(executable);
     const loops = loopExtents(executable);
+    const editCanPrecedeTarget = (editIndex, targetAt) => {
+      if (editIndex <= targetAt) return true;
+      if (functions.some(fn => fn.body < targetAt && targetAt < fn.end)) return true;
+      if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
+      if (loops.some(loop => loop.start < targetAt && targetAt < loop.end)) return true;
+      return false;
+    };
     const hasForeignDomWriteAt = (at, captureAt = at) => {
       if (foreignDomWrite === true) return true;
       if (!foreignDomWrite) return false;
@@ -1780,7 +1831,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (writes.some(w => w > namePos)) continue;
           const assignPath = pathAt(namePos);
           // Every block enclosing the assignment that does not also enclose the loop must be
-          // a plain block or a `try` block (so the assignment runs on the normal execution path).
+          // a plain block (not `try`, where an earlier throw can skip the assignment before reaching the loop).
           const extraBlocks = assignPath.filter(b => !loopPath.includes(b));
           // A block-scoped `let`/`const` declaration in a nested block is not visible at the guard.
           if ((match[1] === "let" || match[1] === "const") && extraBlocks.length > 0) continue;
@@ -1798,7 +1849,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (shadowedAtGuard) continue;
           const inNormalPath = extraBlocks.every(b => {
             const head = executable.slice(0, b).replace(/\s+$/, "");
-            return head === "" || /[;{}]$/.test(head) || /(?<![\w$.])try$/.test(head);
+            return head === "" || /[;{}]$/.test(head);
           });
           if (!inNormalPath) continue;
           const enclosingStart = assignPath.at(-1) ?? -1;
@@ -1922,8 +1973,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (regStatement === null || /^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(regStatement) || /&&|\|\||\?|=>/.test(regStatement)) return false;
           // A timer whose handle is cancelled in the scope may never run for this iteration.
           const handle = /([A-Za-z_$][\w$]*)\s*=\s*(?:window\s*\.\s*)?$/.exec(head.slice(0, timerCall.index))?.[1];
-          const cancelled = handle !== undefined &&
-            new RegExp(String.raw`(?<![\w$])(?:clearTimeout|cancelAnimationFrame)\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
+          const cancelled = cancelsSchedulerHandle(executable, handle, timerCall[1]);
           if (!cancelled) {
             // A return/throw in the callback (at any brace depth, outside nested functions)
             // before the read or render can end the callback early.
@@ -1977,7 +2027,9 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const soleStringRe = /^\s*(['"])((?:(?!\1)[^\\\r\n]|\\.)*)\1\s*(?:;|$|[\r\n](?!\s*[-+*\/%.,?:&|^=<>([`]))/;
     let certifiedLoopOpen;
     let captureAt = initialBinding.at;
-    const scriptElement = (value, at = before) => {
+    let usesTypedScriptQuery = false;
+    let scriptQueryAt = initialBinding.at;
+    const scriptElement = (value, at = before, recordSelection = false) => {
       const selected = query.exec(value);
       // An unquoted text/plain is an invalid selector (querySelector throws); quotes must match.
       if (!selected || !/^script(?:\[type=(['"])text\/plain\1\])?$/.test(selected[3])) return false;
@@ -1987,13 +2039,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (!selectedScript.availableAt(at)) return false;
       const ownerBinding = bindingAt(selected[1], at);
       const owner = ownerBinding?.value;
-      const editCanPrecede = (editIndex, queryAt) => {
-        if (editIndex <= queryAt) return true;
-        if (functions.some(fn => fn.body < queryAt && queryAt < fn.end)) return true;
-        if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
-        if (loops.some(loop => loop.start < queryAt && queryAt < loop.end)) return true;
-        return false;
-      };
+      const editCanPrecede = editCanPrecedeTarget;
       // Same-scope class/id changes that can run before the query can alter which
       // elements match the card selector; changes provably after the query leave
       // an already-captured element or static NodeList intact.
@@ -2193,6 +2239,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (direct) {
         if (!isUnshadowedDocument() || !selectedScript.cardAvailableAt(ownerBinding.at) || !selectedScript.unique(direct[2]) || !selectorValidAt(direct[2], ownerBinding.at) || !notDetachedAt(ownerBinding.at)) return false;
         captureAt = ownerBinding.at;
+        if (recordSelection) {
+          usesTypedScriptQuery = selected[3] !== "script";
+          scriptQueryAt = at;
+        }
         return true;
       }
       const indexed = owner && /^(\w+)\[(\w+)\]$/.exec(owner);
@@ -2271,6 +2321,10 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
         if ([ownerBinding.at, at, initialBinding.at, before].every(position => runsEveryIteration(position, open, close, indexed[2], selected, ownerBinding.at))) {
           certifiedLoopOpen = open;
           captureAt = collectionBinding.at;
+          if (recordSelection) {
+            usesTypedScriptQuery = selected[3] !== "script";
+            scriptQueryAt = at;
+          }
           return true;
         }
         return false;
@@ -2319,15 +2373,15 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     }
     if (!value.endsWith(".textContent")) return false;
     const element = value.slice(0, -12).trim();
-    const isSelectedScript = (reference, at = before, seen = new Set()) => {
-      if (scriptElement(reference, at)) return true;
+    const isSelectedScript = (reference, at = before, seen = new Set(), recordSelection = false) => {
+      if (scriptElement(reference, at, recordSelection)) return true;
       if (!/^\w+$/.test(reference) || seen.has(reference)) return false;
       seen.add(reference);
       const alias = bindingAt(reference, at);
-      return isSelectedScript(alias?.value ?? "", alias?.at ?? at, seen);
+      return isSelectedScript(alias?.value ?? "", alias?.at ?? at, seen, recordSelection);
     };
     // The src initializer evaluates `element` where it runs, not at the render call.
-    if (!isSelectedScript(element, initialBinding.at)) return false;
+    if (!isSelectedScript(element, initialBinding.at, new Set(), true)) return false;
     // A textContent write in another scope (even one without a renderer) may replace this
     // DOM-backed payload before the read, while ID-only writers affect the capture lookup.
     // A deferred module writer runs after parsing, so only a classic read/capture that completes
@@ -2349,14 +2403,8 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // top-level synchronous capture do not alter the already-captured string).
     // Static computed access (script["textContent"]) writes the same property as dot access.
     // Template keys are blanked in literalSource; match their length and confirm them in rawSource.
-    const writeCanPrecedeRead = writeIndex => {
-      if (writeIndex <= initialBinding.at) return true;
-      if (functions.some(fn => fn.body < initialBinding.at && initialBinding.at < fn.end)) return true;
-      if (functions.some(fn => fn.body < writeIndex && writeIndex < fn.end)) return true;
-      if (loops.some(loop => loop.start < initialBinding.at && initialBinding.at < loop.end)) return true;
-      return false;
-    };
-    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\s*\.\s*(?:textContent|text)\b|\s*\[\s*(?:(['"])(?:textContent|text)\4|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
+    const writeCanPrecedeRead = writeIndex => editCanPrecedeTarget(writeIndex, initialBinding.at);
+    const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\s*\.\s*(?:textContent|text)\b|\s*\[\s*(?:'(?:[^'\\\r\n]|\\[\s\S])*'|"(?:[^"\\\r\n]|\\[\s\S])*"|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
     const prefixWrites = new RegExp(`(?:\\+\\+|--)\\s*${target}`, "g");
     if ([...literalSource.matchAll(writes), ...literalSource.matchAll(prefixWrites)]
@@ -2475,7 +2523,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       mayBeScriptContainer(edit[1], edit.index) ||
       (writeCanPrecedeRead(edit.index) && mayBeSelectedScript(edit[1], edit.index))
     ) ||
-      matchExecutableEdits(typeEdits).some(edit => !isNonTypeLiteralAttrEdit(edit) && mayBeCardScript(edit[1], edit.index)) ||
+      (usesTypedScriptQuery && matchExecutableEdits(typeEdits).some(edit => editCanPrecedeTarget(edit.index, scriptQueryAt) && !isNonTypeLiteralAttrEdit(edit) && mayBeCardScript(edit[1], edit.index))) ||
       allOwnerEdits.some(edit =>
         mayBeScriptContainer(edit[1], edit.index, isSvgOnlyEdit(edit)) ||
         (writeCanPrecedeRead(edit.index) && mayBeSelectedScript(edit[1], edit.index))
@@ -2622,6 +2670,286 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     const stmtPrefix = executable.slice(stmtStart, callIndex);
     return /^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(stmtPrefix) || /&&|\|\||\?/.test(stmtPrefix);
   };
+  const functions = functionBodies(executable);
+  const loops = loopExtents(executable);
+  const blockPathAt = idx => {
+    const path = [];
+    for (let k = 0; k < idx; k++) {
+      if (executable[k] === "{") path.push(k);
+      else if (executable[k] === "}") path.pop();
+    }
+    return path;
+  };
+  const isPathPrefix = (prefix, full) =>
+    prefix.length <= full.length && prefix.every((block, i) => full[i] === block);
+  const hasPriorExit = (start, target) => {
+    const nestedFns = functions.filter(fn => fn.body >= start && fn.body < target);
+    const closedLoops = loops.filter(loop => loop.open >= start && loop.end < target);
+    const re = /(?<![\w$.])(return|throw|break|continue)(?![\w$])/g;
+    re.lastIndex = start;
+    let m;
+    while ((m = re.exec(executable)) !== null && m.index < target) {
+      const idx = m.index;
+      if (nestedFns.some(fn => fn.body < idx && idx < fn.end)) continue;
+      if ((m[1] === "break" || m[1] === "continue") &&
+          closedLoops.some(loop => loop.open < idx && idx < loop.end)) continue;
+      return true;
+    }
+    return false;
+  };
+  const isUnwrittenDocumentAddEventListener = () => {
+    const re = /(?<![\w$.])(?:(?:window|globalThis|self)\s*\.\s*)?document\s*(?:\.\s*addEventListener(?![\w$])|\[\s*(['"])addEventListener\1\s*\])\s*(?:(?:\*\*|&&|\|\||\?\?|<<|>>>?|[-+*/%&|^])?=(?!=)|\+\+|--)/g;
+    for (const m of literalSource.matchAll(re)) {
+      if (executable[m.index] === literalSource[m.index]) return false;
+    }
+    return true;
+  };
+  const findLifecycleActivationSite = (beforeExec, beforeLit) => {
+    const match = /(?<![\w$.])(?:(?:(window|globalThis|self)\s*\.\s*)?(document)\s*\.\s*|(window|globalThis|self)\s*\.\s*)?(addEventListener)\s*\(\s*(['"])(DOMContentLoaded|load)\5\s*,\s*$/.exec(beforeLit);
+    if (!match) return -1;
+    if (beforeExec[match.index] !== beforeLit[match.index]) return -1;
+    const [, docOwner, docName, winOwner, methodName, , eventName] = match;
+    // `load` fires on window/globalThis/self (or bare global addEventListener), not `document`.
+    if (eventName === "load" && docName) return -1;
+    if (docOwner && !isUnshadowedGlobalBinding(docOwner)) return -1;
+    if (docName) {
+      if (!isUnshadowedGlobalBinding(docName) || !isUnwrittenDocumentAddEventListener()) return -1;
+    } else {
+      if (winOwner && !isUnshadowedGlobalBinding(winOwner)) return -1;
+      if (!isUnshadowedGlobalBinding(methodName)) return -1;
+    }
+    return match.index;
+  };
+  const segmentOf = idx => selectedScript.segments.findIndex(seg => seg.start <= idx && idx <= seg.end);
+  // Verify enclosing functions (named or anonymous) are actually activated via a reachable call,
+  // IIFE, timer callback, or DOMContentLoaded/load listener.
+  const hasReachableActivation = (pos, certifiedLoopOpen, active = new Set(), seen = new Set()) => {
+    // A callable-looking block missing from the function inventory cannot be proven activated.
+    if (blockPathAt(pos).some(block => functionHead.test(executable.slice(0, block)) && !functions.some(fn => fn.body === block))) return false;
+    const isReachableSite = siteIndex => {
+      const sitePath = blockPathAt(siteIndex);
+      if (sitePath.some(block => !functionHead.test(executable.slice(0, block)) || !functions.some(fn => fn.body === block))) return false;
+      if (isUnbracedOrShortCircuited(siteIndex, sitePath)) return false;
+      const enclosingStart = sitePath.length > 0 ? sitePath[sitePath.length - 1] + 1 : 0;
+      if (hasPriorExit(enclosingStart, siteIndex)) return false;
+      return hasReachableActivation(siteIndex, certifiedLoopOpen, active, seen);
+    };
+    const findTimerActivationSite = before => {
+      const timerMatch = /(?<![\w$.])(?:(window|globalThis|self)\s*\.\s*)?(setTimeout|requestAnimationFrame|queueMicrotask)\s*\(\s*$/.exec(before);
+      if (!timerMatch) return -1;
+      if (timerMatch[1] && !isUnshadowedGlobalBinding(timerMatch[1])) return -1;
+      if (!isUnshadowedGlobalBinding(timerMatch[2])) return -1;
+      const handle = /([A-Za-z_$][\w$]*)\s*=\s*$/.exec(before.slice(0, timerMatch.index))?.[1];
+      const cancelled = cancelsSchedulerHandle(executable, handle, timerMatch[2]);
+      return cancelled ? -1 : timerMatch.index;
+    };
+    // DOMContentLoaded only reaches a listener registered before dispatch: every enclosing
+    // function of the registration must run synchronously (IIFE); deferred or unproven
+    // registrations (timers, later calls, other listeners) are not certified.
+    const isLifecycleOrderProven = siteIndex => {
+      const eventName = /^(?:[\w$]+\s*\.\s*)*addEventListener\s*\(\s*(['"])(DOMContentLoaded|load)\1/.exec(literalSource.slice(siteIndex))?.[2];
+      if (eventName !== "load" && eventName !== "DOMContentLoaded") return false;
+      return functions.filter(f => f.body < siteIndex && siteIndex < f.end).every(f => isDirectOrCallbackActivation(f, true));
+    };
+    const isDirectOrCallbackActivation = (fn, iifeOnly = false) => {
+      const rawBefore = executable.slice(0, fn.start);
+      const beforeFn = rawBefore.replace(/\basync\s*$/, "");
+      const beforeFnLit = literalSource.slice(0, fn.start).replace(/\basync\s*$/, "");
+      const afterFn = executable.slice(fn.end);
+      // Immediately invoked function expression: (fn)(), (fn()), !fn(), void fn(), etc.
+      // Only parentheses that group an expression count; call-argument parentheses
+      // such as `discard(() => {})()` belong to the outer call, not an IIFE wrapper.
+      const isGroupingParen = openPos => {
+        const beforeOpen = beforeFn.slice(0, openPos).trimEnd();
+        if (beforeOpen === "") return true;
+        if (/[;:,=+\-*/%&|^!~<>?{[(]$/.test(beforeOpen)) return true;
+        return /(?<![\w$.])(?:return|throw|yield|await|typeof|void|delete|in|instanceof|of|new|case|else|do)$/.test(beforeOpen);
+      };
+      let left = beforeFn.length;
+      while (left > 0 && /\s/.test(beforeFn[left - 1])) left--;
+      const groupingOpens = [];
+      let scan = left;
+      while (scan > 0 && beforeFn[scan - 1] === "(") {
+        const openPos = scan - 1;
+        if (!isGroupingParen(openPos)) break;
+        groupingOpens.push(openPos);
+        scan = openPos;
+        while (scan > 0 && /\s/.test(beforeFn[scan - 1])) scan--;
+      }
+      let right = 0;
+      let closeParens = 0;
+      while (closeParens < groupingOpens.length) {
+        const ws = /^\s*\)/.exec(afterFn.slice(right));
+        if (!ws) break;
+        right += ws[0].length;
+        closeParens++;
+      }
+      const isArrowFn = /=>/.test(executable.slice(fn.start, fn.body));
+      const isGroupedIife = groupingOpens.length > 0 &&
+        (closeParens > 0 || !isArrowFn) &&
+        /^\s*\(/.test(afterFn.slice(right));
+      const iifeStart = groupingOpens[Math.max(0, closeParens - 1)] ?? fn.start;
+      const unaryIife = /(?:[!~+-]|\bvoid)\s*$/.exec(beforeFn);
+      const isUnaryIife = unaryIife !== null && !isArrowFn && /^\s*\(/.test(afterFn);
+      if (isGroupedIife && isReachableSite(iifeStart)) return true;
+      if (isUnaryIife && isReachableSite(unaryIife.index)) return true;
+      if (iifeOnly) return false;
+      // Timer callback: setTimeout/requestAnimationFrame/queueMicrotask with unshadowed scheduler.
+      const endsAtArgument = /^\s*[,)]/.test(afterFn);
+      const timerSite = endsAtArgument ? findTimerActivationSite(beforeFn) : -1;
+      if (timerSite >= 0 && isReachableSite(timerSite)) return true;
+      // Document/window load lifecycle callback on a supported, unshadowed receiver.
+      const lifecycleSite = endsAtArgument ? findLifecycleActivationSite(beforeFn, beforeFnLit) : -1;
+      if (lifecycleSite >= 0 && isReachableSite(lifecycleSite) && isLifecycleOrderProven(lifecycleSite)) {
+        return true;
+      }
+      return false;
+    };
+    const resolvesToCallableBinding = (fn, callableName, callableNameIndex, boundDecl, refIndex) => {
+      const refPath = blockPathAt(refIndex);
+      const esc = callableName.replace(/\$/g, "\\$");
+      let declPath;
+      if (fn.name) {
+        const beforeDecl = executable.slice(0, fn.start).replace(/\basync\s*$/, "").trimEnd();
+        const isFnDecl = beforeDecl === "" || /[;{}]$/.test(beforeDecl) || /(?<![\w$.])export(?:\s+default)?$/.test(beforeDecl);
+        if (!isFnDecl) return false;
+        declPath = blockPathAt(fn.start);
+        if (!isPathPrefix(declPath, refPath)) return false;
+        // Reassignment to the function declaration binding makes the resolved target unproven.
+        if (Array.from(writeIndexes(callableName)).some(w => isPathPrefix(declPath, blockPathAt(w)))) return false;
+      } else {
+        const declKind = boundDecl[1].trim();
+        const rawDeclPath = blockPathAt(boundDecl.index);
+        if (declKind === "var") {
+          const enclosingFn = functions.filter(f => f.body < boundDecl.index && boundDecl.index < f.end).at(-1);
+          declPath = enclosingFn ? rawDeclPath.slice(0, rawDeclPath.indexOf(enclosingFn.body) + 1) : [];
+        } else {
+          declPath = rawDeclPath;
+        }
+        if (!isPathPrefix(declPath, refPath)) return false;
+      }
+      // Reject declaration/method names that happen to be followed by `(`.
+      if (/(?:\bfunction(?:\s*\*)?|\b(?:var|let|const|class|import|get|set))\s+$/.test(executable.slice(0, refIndex))) return false;
+      // Reject if any enclosing function narrower than declPath shadows callableName via parameter or name.
+      const nameRe = new RegExp(`(?<![\\w$.])${esc}(?![\\w$])`);
+      for (const enc of functions) {
+        if (enc.body < refIndex && refIndex < enc.end && !declPath.includes(enc.body)) {
+          if (nameRe.test(executable.slice(enc.start, enc.body))) return false;
+        }
+      }
+      // Reject if any enclosing catch or for-header block narrower than declPath shadows callableName.
+      const catchShadowRe = new RegExp(String.raw`\bcatch\s*\([^()]*\b${esc}(?![\w$])[^()]*\)\s*$`);
+      const forShadowRe = new RegExp(String.raw`\bfor\s*\(\s*(?:var|let|const)\b[^)]*\b${esc}(?![\w$])[^)]*\)\s*$`);
+      for (const block of refPath.slice(declPath.length)) {
+        const beforeBlock = executable.slice(0, block);
+        if (catchShadowRe.test(beforeBlock) || forShadowRe.test(beforeBlock)) return false;
+      }
+      // Reject if any other declaration (var/let/const/function/class/import, including destructuring)
+      // in declPath or a narrower enclosing scope shadows or redeclares callableName.
+      const declKeywords = /\b(var|let|const|function(?:\s*\*)?|class|import)\b/g;
+      for (const kw of executable.matchAll(declKeywords)) {
+        const kind = kw[1];
+        const afterKw = kw.index + kw[0].length;
+        if (kind.startsWith("function") || kind === "class") {
+          const idMatch = /^\s+([A-Za-z_$][\w$]*)/.exec(executable.slice(afterKw));
+          if (!idMatch || idMatch[1] !== callableName) continue;
+          const namePos = afterKw + idMatch[0].length - callableName.length;
+          if (namePos === callableNameIndex) continue;
+          const shadowScopePath = blockPathAt(kw.index);
+          if (shadowScopePath.length >= declPath.length && isPathPrefix(shadowScopePath, refPath)) return false;
+          continue;
+        }
+        if (kind === "import") {
+          const semi = executable.indexOf(";", afterKw);
+          const nl = executable.indexOf("\n", afterKw);
+          const endPos = Math.min(semi < 0 ? executable.length : semi, nl < 0 ? executable.length : nl);
+          if (!nameRe.test(executable.slice(afterKw, endPos))) continue;
+          const shadowScopePath = blockPathAt(kw.index);
+          if (shadowScopePath.length >= declPath.length && isPathPrefix(shadowScopePath, refPath)) return false;
+          continue;
+        }
+        let depth = 0;
+        let inInit = false;
+        let k = afterKw;
+        while (k < executable.length) {
+          const ch = executable[k];
+          if (depth === 0 && (ch === ";" || ch === "\n" || ch === "}")) break;
+          if ("([{".includes(ch)) {
+            depth++;
+          } else if (")]}".includes(ch)) {
+            if (depth === 0) break;
+            depth--;
+          } else if (depth === 0 && ch === "=" && executable[k + 1] !== "=" && executable[k + 1] !== ">") {
+            inInit = true;
+          } else if (depth === 0 && ch === ",") {
+            inInit = false;
+          } else if (!inInit && /[A-Za-z_$]/.test(ch) && !/[\w$.]/.test(executable[k - 1] ?? "")) {
+            const idm = /^[A-Za-z_$][\w$]*/.exec(executable.slice(k));
+            const ident = idm[0];
+            const afterIdent = k + ident.length;
+            const isPropKey = depth > 0 && /^\s*:/.test(executable.slice(afterIdent));
+            if (ident === callableName && !isPropKey && k !== callableNameIndex) {
+              const rawShadowPath = blockPathAt(kw.index);
+              let shadowScopePath = rawShadowPath;
+              if (kind === "var") {
+                const encFn = functions.filter(f => f.body < kw.index && kw.index < f.end).at(-1);
+                shadowScopePath = encFn ? rawShadowPath.slice(0, rawShadowPath.indexOf(encFn.body) + 1) : [];
+              }
+              if (shadowScopePath.length >= declPath.length && isPathPrefix(shadowScopePath, refPath)) return false;
+            }
+            k = afterIdent;
+            continue;
+          }
+          k++;
+        }
+      }
+      return true;
+    };
+    for (const fn of functions.filter(fn => fn.body < pos && pos < fn.end)) {
+      if (hasPriorExit(fn.body + 1, pos)) return false;
+      if (certifiedLoopOpen !== undefined && fn.body > certifiedLoopOpen) continue;
+      if (seen.has(fn)) continue;
+      if (active.has(fn)) return false;
+      active.add(fn);
+      const isGenerator = /^function\s*\*/.test(executable.slice(fn.start, fn.body));
+      let invoked = !isGenerator && isDirectOrCallbackActivation(fn);
+      const rawBeforeFn = executable.slice(0, fn.start).replace(/\basync\s*$/, "");
+      const boundDecl = !fn.name ? /\b((?:const|let|var)\s+)([A-Za-z_$][\w$]*)\s*=\s*$/.exec(rawBeforeFn) : null;
+      const boundName = boundDecl?.[2];
+      const boundNameIndex = boundDecl ? boundDecl.index + boundDecl[1].length : -1;
+      const callableName = fn.name ?? (boundName && Array.from(writeIndexes(boundName)).every(w => w === boundNameIndex) ? boundName : undefined);
+      const callableNameIndex = fn.name ? fn.nameIndex : boundNameIndex;
+      if (!invoked && !isGenerator && callableName) {
+        const fnSegment = segmentOf(fn.start);
+        const refs = executable.matchAll(new RegExp(`(?<![\\w$]|\\.\\s*)${callableName.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
+        for (const ref of refs) {
+          if (ref.index === callableNameIndex) continue;
+          if (!fn.name && ref.index < fn.end) continue;
+          const refSegment = segmentOf(ref.index);
+          if (fnSegment >= 0 && refSegment >= 0 && refSegment < fnSegment) continue;
+          const afterRef = executable.slice(ref.index + ref[0].length);
+          const isConstructed = /(?<![\w$.])new\s*$/.test(executable.slice(0, ref.index));
+          const nonConstructible = isGenerator || /=>/.test(executable.slice(fn.start, fn.body));
+          const isCall = /^\s*\(/.test(afterRef) && !(isConstructed && nonConstructible);
+          const lifecycleSite = /^\s*[,)]/.test(afterRef)
+            ? findLifecycleActivationSite(executable.slice(0, ref.index), literalSource.slice(0, ref.index))
+            : -1;
+          const timerSite = /^\s*[,)]/.test(afterRef) ? findTimerActivationSite(executable.slice(0, ref.index)) : -1;
+          if (!isCall && lifecycleSite < 0 && timerSite < 0) continue;
+          if (!resolvesToCallableBinding(fn, callableName, callableNameIndex, boundDecl, ref.index)) continue;
+          const siteIndex = isCall ? ref.index : (lifecycleSite >= 0 ? lifecycleSite : timerSite);
+          if (isReachableSite(siteIndex) && (isCall || lifecycleSite < 0 || isLifecycleOrderProven(lifecycleSite))) {
+            invoked = true;
+            break;
+          }
+        }
+      }
+      active.delete(fn);
+      if (!invoked) return false;
+      seen.add(fn);
+    }
+    return true;
+  };
   if (renderUses.length === 0) {
     if (suffixFreeCalls.length === 0) return undefined;
     const targets = new Set(suffixFreeCalls.map(entry => entry.call));
@@ -2636,65 +2964,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       }
     }
     if (blocks.length > 0) return null;
-    const functions = functionBodies(executable);
-    const segmentOf = idx => selectedScript.segments.findIndex(seg => seg.start <= idx && idx <= seg.end);
     for (const { call: callIndex, certifiedLoopOpen } of suffixFreeCalls) {
       const callPath = paths.get(callIndex);
       const uncertifiedBlocks = certifiedLoopOpen === undefined
         ? callPath
         : callPath.filter(block => block < certifiedLoopOpen);
       if (uncertifiedBlocks.some(block => !functionHead.test(executable.slice(0, block)))) return null;
-      // Verify enclosing named functions are actually activated via a reachable call
-      // (separately from initializer order, which only checks declarations relative to uses).
-      const hasReachableActivation = (pos, active = new Set(), seen = new Set()) => {
-        for (const fn of functions.filter(fn => fn.body < pos && pos < fn.end)) {
-          if (certifiedLoopOpen !== undefined && fn.body > certifiedLoopOpen) continue;
-          if (seen.has(fn)) continue;
-          if (active.has(fn)) return false;
-          if (!fn.name) continue;
-          active.add(fn);
-          const fnSegment = segmentOf(fn.start);
-          const refs = executable.matchAll(new RegExp(`(?<![\\w$.])${fn.name.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
-          let invoked = false;
-          for (const ref of refs) {
-            if (ref.index === fn.nameIndex) continue;
-            const refSegment = segmentOf(ref.index);
-            if (fnSegment >= 0 && refSegment >= 0 && refSegment < fnSegment) continue;
-            const afterRef = executable.slice(ref.index + ref[0].length);
-            const isCall = /^\s*\(/.test(afterRef);
-            const isEventCallback = /\baddEventListener\s*\(\s*(['"])(?:DOMContentLoaded|load)\1\s*,\s*$/.test(literalSource.slice(0, ref.index));
-            if (!isCall && !isEventCallback) continue;
-            const refPath = [];
-            for (let k = 0; k < ref.index; k++) {
-              if (executable[k] === "{") refPath.push(k);
-              else if (executable[k] === "}") refPath.pop();
-            }
-            if (refPath.some(block => !functionHead.test(executable.slice(0, block)))) continue;
-            if (isUnbracedOrShortCircuited(ref.index, refPath)) continue;
-            let refDepth = 0;
-            let exited = false;
-            const enclosingStart = refPath.length > 0 ? refPath[refPath.length - 1] + 1 : 0;
-            for (let k = enclosingStart; k < ref.index; k++) {
-              if (executable[k] === "{") refDepth++;
-              else if (executable[k] === "}") refDepth--;
-              else if (refDepth === 0 && !/[\w$]/.test(executable[k - 1] ?? "")) {
-                exitKeyword.lastIndex = k;
-                if (exitKeyword.test(executable)) { exited = true; break; }
-              }
-            }
-            if (exited) continue;
-            if (hasReachableActivation(ref.index, active, seen)) {
-              invoked = true;
-              break;
-            }
-          }
-          active.delete(fn);
-          if (!invoked) return false;
-          seen.add(fn);
-        }
-        return true;
-      };
-      if (!hasReachableActivation(callIndex)) return null;
+      if (!hasReachableActivation(callIndex, certifiedLoopOpen)) return null;
       let depth = 0;
       for (let i = 0; i < callIndex; i++) {
         if (executable[i] === "{") depth++;
@@ -2758,6 +3034,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       ? callPath.slice(declarationPath.length)
       : callPath.slice(declarationPath.length).filter(block => block < use.certifiedLoopOpen);
     if (uncertifiedBlocks.some(block => !functionHead.test(executable.slice(0, block)))) return null;
+    if (!hasReachableActivation(use.call, use.certifiedLoopOpen)) return null;
     let depth = 0;
     for (let i = initializedAt; i < use.call; i++) {
       if (executable[i] === "{") depth++;
@@ -2944,7 +3221,7 @@ function materializePlainTextCards(src) {
     // Writes to any element's textContent/text (static or computed key) or structural/attribute
     // edits that can alter script selection or remove a queried host across scopes.
     const writesTextContent = /\.\s*(?:textContent|text)\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
-      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])(?:textContent|text)\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
+      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:'(?:[^'\\\r\n]|\\[\s\S])*'|"(?:[^"\\\r\n]|\\[\s\S])*"|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
         .some(write => executable[write.index] === "[" && isTextContentKey(write, rawSource));
     const editsDomStructure = /\.\s*(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text)|removeChild|replaceChild|insertBefore|prepend|append|appendChild|replaceChildren|setAttribute(?:NS|Node|NodeNS)?|removeAttribute(?:NS|Node)?|toggleAttribute)\s*\(|(?:outerHTML|innerHTML|innerText|type|className)\s*=(?!=)|classList\s*\.\s*(?:add|remove|replace|toggle)\s*\()/.test(executable);
     const writesId = /\.\s*id\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
@@ -3233,10 +3510,10 @@ function inventoryHtml(src) {
   }
 
   const listTexts = [];
-  const liRe = /<li\b[^>]*>([\s\S]*?)<\/li>/gi;
+  const liRe = /<li\b(?:[^>"']|"[^"]*"|'[^']*')*>([\s\S]*?)<\/li>/gi;
   let li = liRe.exec(body);
   while (li !== null) {
-    const liContent = li[1].replace(/<div class="mermaid" data-audit-materialized="1">[\s\S]*?<\/div>/gi, "");
+    const liContent = removeMaterializedCharts(li[1]);
     const text = normalize(stripMarkup(liContent, false));
     if (text) listTexts.push(text);
     li = liRe.exec(body);
@@ -3252,9 +3529,14 @@ function inventoryHtml(src) {
   const tableRowTexts = extractTagContents(body, "tr").map(({ content }) =>
     normalizeElementContent(content, false)
   );
-  const paragraphTexts = extractTagContents(body, "p").map(({ content }) =>
-    normalizeElementContent(content, false)
-  );
+  const paragraphTexts = extractTagContents(body, "p")
+    .map(({ content }) =>
+      normalizeElementContent(
+        removeMaterializedCharts(content),
+        false
+      )
+    )
+    .filter(Boolean);
 
   return {
     headings,

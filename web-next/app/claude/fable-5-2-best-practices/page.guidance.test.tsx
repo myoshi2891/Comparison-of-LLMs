@@ -102,14 +102,14 @@ function assertEvalGate(source: string) {
   };
   expect(canReach("FABLE", "DONE")).toBe(true);
   expect(canReach("HYBRID", "DONE")).toBe(true);
-  const withoutEvalPassAndRestart = edges.filter(
+  const withoutEvalPassAndFailure = edges.filter(
     (e) =>
       !(e.from === gate && e.label === "はい" && e.to === "DONE") &&
-      !(e.from === "RETRY" && e.to === "Q1")
+      !(e.from === gate && e.label === "いいえ")
   );
-  expect(canReach("FABLE", "DONE", withoutEvalPassAndRestart)).toBe(false);
-  expect(canReach("HYBRID", "DONE", withoutEvalPassAndRestart)).toBe(false);
-  expect(canReach("START", "DONE", withoutEvalPassAndRestart)).toBe(true);
+  expect(canReach("FABLE", "DONE", withoutEvalPassAndFailure)).toBe(false);
+  expect(canReach("HYBRID", "DONE", withoutEvalPassAndFailure)).toBe(false);
+  expect(canReach("START", "DONE", withoutEvalPassAndFailure)).toBe(true);
   const failedEdges = edges.filter((e) => e.from === gate && e.label === "いいえ");
   expect(failedEdges).toHaveLength(1);
   const failed = failedEdges[0];
@@ -222,7 +222,9 @@ it("API の疎通確認は HTTP 200 だけでなく、正常終了と要求し�
   expect(expectation).toMatch(/認証・通信/);
   expect(expectation).toMatch(/stop_reason が refusal ではなく end_turn/);
   expect(expectation).toMatch(/model が claude-fable-5-2/);
-  expect(expectation).toMatch(/期待値\(391\)/);
+  expect(expectation).toMatch(
+    /text ブロックを抽出して前後空白を除いた本文が期待値\(391\)と完全一致/
+  );
   const curl = Array.from(container.querySelectorAll("pre code"), (e) => e.textContent ?? "").find(
     (c) => c.startsWith("curl https://api.anthropic.com/v1/messages")
   );
@@ -291,6 +293,7 @@ it("図3: low が品質基準を満たしたときは1段下げ確認を経由�
     { from: "DOWN", label: "満たす", to: "G0" },
     { from: "DOWN", label: "満たさない", to: "FIX" },
   ]);
+  expect(edges.filter((e) => e.from === "FIX")).toEqual([]);
 });
 
 it("6.5節: omitted を最安と主張せず、ストリーミング表示と応答後確認を区別する", () => {
@@ -417,10 +420,8 @@ it("図4 プレフィックス比較と図9 コンテキスト超過分岐が最
   const { container } = render(<Page />);
   const { labels, edges } = diagram("図9", container);
   expect(
-    edges.some(
-      (e) => e.from === "C" && e.label === "model_context_window_exceeded" && e.to === "R6C"
-    )
-  ).toBe(true);
+    edges.filter((e) => e.from === "C" && e.label === "model_context_window_exceeded")
+  ).toEqual([{ from: "C", label: "model_context_window_exceeded", to: "R6C" }]);
   expect(labels.get("R6C")).toMatch(/compaction/);
   expect(labels.get("R6B")).toMatch(/コンテキストに余裕がある場合/);
   // 図4: 各思考ブロックを生成時のプレフィックスと比較し、今回 system 未変更でも過去別プレフィックスは不一致。
