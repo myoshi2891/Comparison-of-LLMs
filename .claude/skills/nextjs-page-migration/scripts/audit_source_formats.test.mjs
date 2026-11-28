@@ -2950,16 +2950,16 @@ test("validates grouped IIFEs, lifecycle receivers, callable bindings, and enclo
 
 	// 1. Grouped IIFE requires expression-grouping parens, not call-argument parens like discard(...)().
 	for (const good of [
-		`(() => { ${body} })();`,
-		`((() => { ${body} }))();`,
-		`(function () { ${body} }());`,
-		`discard((() => { ${body} })());`,
+		`const discard = function () { return function () {}; }; (() => { ${body} })();`,
+		`const discard = function () { return function () {}; }; ((() => { ${body} }))();`,
+		`const discard = function () { return function () {}; }; (function () { ${body} }());`,
+		`const discard = function () { return function () {}; }; discard((() => { ${body} })());`,
 	]) {
 		assert.equal(audit(`${card}<script>${good}</script>`, page).status, 0, good);
 	}
 	for (const bad of [
-		`discard(() => { ${body} })();`,
-		`discard((() => { ${body} }))();`,
+		`const discard = function () { return function () {}; }; discard(() => { ${body} })();`,
+		`const discard = function () { return function () {}; }; discard((() => { ${body} }))();`,
 		`obj.discard(() => { ${body} })();`,
 		`getFn()(() => { ${body} })();`,
 	]) {
