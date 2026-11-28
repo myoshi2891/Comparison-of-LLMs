@@ -2938,3 +2938,95 @@ test("recognizes qualified global timer schedulers and scheduled function refere
 		assert.equal(audit(`${card}<script>${bad}</script>`, page).status, 1, bad);
 	}
 });
+
+test("validates grouped IIFEs, lifecycle receivers, callable bindings, and enclosing-function exits", () => {
+	const chart = "flowchart LR\nA --> B";
+	const suffix = "\nclassDef note fill:#eef";
+	const card = `<div id="c1" class="diagram-card"><script type="text/plain">${chart}</script></div>`;
+	const page = `const D = ${JSON.stringify(chart)}; <MermaidDiagram chart={D} />`;
+	const suffixedPage = `const D = ${JSON.stringify(chart + suffix)}; <MermaidDiagram chart={D} />`;
+	const body = "const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src);";
+	const suffixedBody = `const CLASSDEFS = ${JSON.stringify(suffix)}; const c = document.querySelector('#c1'); const src = c.querySelector('script').textContent; mermaid.render('x', src + CLASSDEFS);`;
+
+	// 1. Grouped IIFE requires expression-grouping parens, not call-argument parens like discard(...)().
+	for (const good of [
+		`(() => { ${body} })();`,
+		`((() => { ${body} }))();`,
+		`(function () { ${body} }());`,
+		`discard((() => { ${body} })());`,
+	]) {
+		assert.equal(audit(`${card}<script>${good}</script>`, page).status, 0, good);
+	}
+	for (const bad of [
+		`discard(() => { ${body} })();`,
+		`discard((() => { ${body} }))();`,
+		`obj.discard(() => { ${body} })();`,
+		`getFn()(() => { ${body} })();`,
+	]) {
+		assert.equal(audit(`${card}<script>${bad}</script>`, page).status, 1, bad);
+	}
+
+	// 2. Lifecycle listeners require a supported, unshadowed receiver (both inline and referenced callbacks).
+	for (const good of [
+		`document.addEventListener('DOMContentLoaded', () => { ${body} });`,
+		`window.document.addEventListener('DOMContentLoaded', () => { ${body} });`,
+		`window.addEventListener('load', () => { ${body} });`,
+		`globalThis.addEventListener('DOMContentLoaded', () => { ${body} });`,
+		`addEventListener('load', () => { ${body} });`,
+		`function draw() { ${body} } document.addEventListener('DOMContentLoaded', draw);`,
+		`const draw = () => { ${body} }; window.addEventListener('load', draw);`,
+	]) {
+		assert.equal(audit(`${card}<script>${good}</script>`, page).status, 0, good);
+	}
+	for (const bad of [
+		`customObj.addEventListener('DOMContentLoaded', () => { ${body} });`,
+		`document.addEventListener('load', () => { ${body} });`,
+		`const document = { addEventListener() {} }; document.addEventListener('DOMContentLoaded', () => { ${body} });`,
+		`document.addEventListener = () => {}; document.addEventListener('DOMContentLoaded', () => { ${body} });`,
+		`const window = { addEventListener() {} }; window.addEventListener('load', () => { ${body} });`,
+		`const addEventListener = () => {}; addEventListener('load', () => { ${body} });`,
+		`function draw() { ${body} } customObj.addEventListener('DOMContentLoaded', draw);`,
+		`function draw() { ${body} } document.addEventListener('load', draw);`,
+		`const document = { addEventListener() {} }; function draw() { ${body} } document.addEventListener('DOMContentLoaded', draw);`,
+	]) {
+		assert.equal(audit(`${card}<script>${bad}</script>`, page).status, 1, bad);
+	}
+
+	// 3. Callable-reference activation verifies the call/scheduler reference resolves to the renderer's binding.
+	for (const good of [
+		`function draw() { ${body} } function other(draw) { draw(); } draw();`,
+		`const draw = () => { ${body} }; (() => { setTimeout(draw, 0); })();`,
+	]) {
+		assert.equal(audit(`${card}<script>${good}</script>`, page).status, 0, good);
+	}
+	for (const bad of [
+		`function draw() { ${body} } ((draw) => { draw(); })(() => {});`,
+		`const draw = () => { ${body} }; ((draw) => { draw(); })(() => {});`,
+		`function draw() { ${body} } ((draw) => { setTimeout(draw, 0); })(() => {});`,
+		`function draw() { ${body} } (() => { const draw = () => {}; draw(); })();`,
+		`function draw() { ${body} } (() => { const { draw } = { draw: () => {} }; draw(); })();`,
+		`function draw() { ${body} } (() => { function draw() {} draw(); })();`,
+		`function draw() { ${body} } function draw() {} draw();`,
+		`const noop = function draw() { ${body} }; draw();`,
+	]) {
+		assert.equal(audit(`${card}<script>${bad}</script>`, page).status, 1, bad);
+	}
+
+	// 4. Enclosing-function prior exits reject both suffix-free and CLASSDEFS renders,
+	//    while exits inside nested function declarations remain allowed.
+	for (const [html, expectedPage] of [
+		[`${card}<script>(() => { function helper() { return 1; } ${body} })();</script>`, page],
+		[`${card}<script>(() => { function helper() { return 1; } ${suffixedBody} })();</script>`, suffixedPage],
+	]) {
+		assert.equal(audit(html, expectedPage).status, 0, html);
+	}
+	for (const [html, expectedPage] of [
+		[`${card}<script>(() => { return; ${body} })();</script>`, page],
+		[`${card}<script>(() => { if (skip) { return; } ${body} })();</script>`, page],
+		[`${card}<script>(() => { throw new Error('stop'); ${body} })();</script>`, page],
+		[`${card}<script>(() => { return; ${suffixedBody} })();</script>`, suffixedPage],
+		[`${card}<script>(() => { if (skip) { return; } ${suffixedBody} })();</script>`, suffixedPage],
+	]) {
+		assert.equal(audit(html, expectedPage).status, 1, html);
+	}
+});

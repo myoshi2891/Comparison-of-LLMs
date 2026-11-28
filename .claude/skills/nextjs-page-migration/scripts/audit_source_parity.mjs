@@ -2641,28 +2641,65 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     return /^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(stmtPrefix) || /&&|\|\||\?/.test(stmtPrefix);
   };
   const functions = functionBodies(executable);
+  const loops = loopExtents(executable);
+  const blockPathAt = idx => {
+    const path = [];
+    for (let k = 0; k < idx; k++) {
+      if (executable[k] === "{") path.push(k);
+      else if (executable[k] === "}") path.pop();
+    }
+    return path;
+  };
+  const isPathPrefix = (prefix, full) =>
+    prefix.length <= full.length && prefix.every((block, i) => full[i] === block);
+  const hasPriorExit = (start, target) => {
+    const nestedFns = functions.filter(fn => fn.body >= start && fn.body < target);
+    const closedLoops = loops.filter(loop => loop.open >= start && loop.end < target);
+    const re = /(?<![\w$.])(return|throw|break|continue)(?![\w$])/g;
+    re.lastIndex = start;
+    let m;
+    while ((m = re.exec(executable)) !== null && m.index < target) {
+      const idx = m.index;
+      if (nestedFns.some(fn => fn.body < idx && idx < fn.end)) continue;
+      if ((m[1] === "break" || m[1] === "continue") &&
+          closedLoops.some(loop => loop.open < idx && idx < loop.end)) continue;
+      return true;
+    }
+    return false;
+  };
+  const isUnwrittenDocumentAddEventListener = () => {
+    const re = /(?<![\w$.])(?:(?:window|globalThis|self)\s*\.\s*)?document\s*(?:\.\s*addEventListener(?![\w$])|\[\s*(['"])addEventListener\1\s*\])\s*=(?!=)/g;
+    for (const m of literalSource.matchAll(re)) {
+      if (executable[m.index] === literalSource[m.index]) return false;
+    }
+    return true;
+  };
+  const findLifecycleActivationSite = (beforeExec, beforeLit) => {
+    const match = /(?<![\w$.])(?:(?:(window|globalThis|self)\s*\.\s*)?(document)\s*\.\s*|(window|globalThis|self)\s*\.\s*)?(addEventListener)\s*\(\s*(['"])(DOMContentLoaded|load)\5\s*,\s*$/.exec(beforeLit);
+    if (!match) return -1;
+    if (beforeExec[match.index] !== beforeLit[match.index]) return -1;
+    const [, docOwner, docName, winOwner, methodName, , eventName] = match;
+    // `load` fires on window/globalThis/self (or bare global addEventListener), not `document`.
+    if (eventName === "load" && docName) return -1;
+    if (docOwner && !isUnshadowedGlobalBinding(docOwner)) return -1;
+    if (docName) {
+      if (!isUnshadowedGlobalBinding(docName) || !isUnwrittenDocumentAddEventListener()) return -1;
+    } else {
+      if (winOwner && !isUnshadowedGlobalBinding(winOwner)) return -1;
+      if (!isUnshadowedGlobalBinding(methodName)) return -1;
+    }
+    return match.index;
+  };
   const segmentOf = idx => selectedScript.segments.findIndex(seg => seg.start <= idx && idx <= seg.end);
   // Verify enclosing functions (named or anonymous) are actually activated via a reachable call,
   // IIFE, timer callback, or DOMContentLoaded/load listener.
   const hasReachableActivation = (pos, certifiedLoopOpen, active = new Set(), seen = new Set()) => {
     const isReachableSite = siteIndex => {
-      const sitePath = [];
-      for (let k = 0; k < siteIndex; k++) {
-        if (executable[k] === "{") sitePath.push(k);
-        else if (executable[k] === "}") sitePath.pop();
-      }
+      const sitePath = blockPathAt(siteIndex);
       if (sitePath.some(block => !functionHead.test(executable.slice(0, block)))) return false;
       if (isUnbracedOrShortCircuited(siteIndex, sitePath)) return false;
-      let siteDepth = 0;
       const enclosingStart = sitePath.length > 0 ? sitePath[sitePath.length - 1] + 1 : 0;
-      for (let k = enclosingStart; k < siteIndex; k++) {
-        if (executable[k] === "{") siteDepth++;
-        else if (executable[k] === "}") siteDepth--;
-        else if (siteDepth === 0 && !/[\w$]/.test(executable[k - 1] ?? "")) {
-          exitKeyword.lastIndex = k;
-          if (exitKeyword.test(executable)) return false;
-        }
-      }
+      if (hasPriorExit(enclosingStart, siteIndex)) return false;
       return hasReachableActivation(siteIndex, certifiedLoopOpen, active, seen);
     };
     const findTimerActivationSite = before => {
@@ -2681,41 +2718,154 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const beforeFnLit = literalSource.slice(0, fn.start).replace(/\basync\s*$/, "");
       const afterFn = executable.slice(fn.end);
       // Immediately invoked function expression: (fn)(), (fn()), !fn(), void fn(), etc.
+      // Only parentheses that group an expression count; call-argument parentheses
+      // such as `discard(() => {})()` belong to the outer call, not an IIFE wrapper.
+      const isGroupingParen = openPos => {
+        const beforeOpen = beforeFn.slice(0, openPos).trimEnd();
+        if (beforeOpen === "") return true;
+        if (/[;:,=+\-*/%&|^!~<>?{[(]$/.test(beforeOpen)) return true;
+        return /(?<![\w$.])(?:return|throw|yield|await|typeof|void|delete|in|instanceof|of|new|case|else|do)$/.test(beforeOpen);
+      };
       let left = beforeFn.length;
       while (left > 0 && /\s/.test(beforeFn[left - 1])) left--;
-      let openParens = 0;
-      let iifeStart = fn.start;
+      const groupingOpens = [];
       let scan = left;
       while (scan > 0 && beforeFn[scan - 1] === "(") {
-        openParens++;
-        iifeStart = scan - 1;
-        scan--;
+        const openPos = scan - 1;
+        if (!isGroupingParen(openPos)) break;
+        groupingOpens.push(openPos);
+        scan = openPos;
         while (scan > 0 && /\s/.test(beforeFn[scan - 1])) scan--;
       }
       let right = 0;
       let closeParens = 0;
-      while (closeParens < openParens) {
+      while (closeParens < groupingOpens.length) {
         const ws = /^\s*\)/.exec(afterFn.slice(right));
         if (!ws) break;
         right += ws[0].length;
         closeParens++;
       }
-      const isGroupedIife = openParens > 0 && /^\s*\(/.test(afterFn.slice(right));
+      const isArrowFn = /=>/.test(executable.slice(fn.start, fn.body));
+      const isGroupedIife = groupingOpens.length > 0 &&
+        (closeParens > 0 || !isArrowFn) &&
+        /^\s*\(/.test(afterFn.slice(right));
+      const iifeStart = groupingOpens[Math.max(0, closeParens - 1)] ?? fn.start;
       const unaryIife = /(?:[!~+-]|\bvoid)\s*$/.exec(beforeFn);
-      const isUnaryIife = unaryIife !== null && !/=>/.test(executable.slice(fn.start, fn.body)) && /^\s*\(/.test(afterFn);
+      const isUnaryIife = unaryIife !== null && !isArrowFn && /^\s*\(/.test(afterFn);
       if (isGroupedIife && isReachableSite(iifeStart)) return true;
       if (isUnaryIife && isReachableSite(unaryIife.index)) return true;
       // Timer callback: setTimeout/requestAnimationFrame/queueMicrotask with unshadowed scheduler.
       const timerSite = findTimerActivationSite(beforeFn);
       if (timerSite >= 0 && isReachableSite(timerSite)) return true;
-      // Document load lifecycle callback.
-      const eventMatch = /\baddEventListener\s*\(\s*(['"])(?:DOMContentLoaded|load)\1\s*,\s*$/.exec(beforeFnLit);
-      if (eventMatch && executable[eventMatch.index] === literalSource[eventMatch.index] && isReachableSite(eventMatch.index)) {
+      // Document/window load lifecycle callback on a supported, unshadowed receiver.
+      const lifecycleSite = findLifecycleActivationSite(beforeFn, beforeFnLit);
+      if (lifecycleSite >= 0 && isReachableSite(lifecycleSite)) {
         return true;
       }
       return false;
     };
+    const resolvesToCallableBinding = (fn, callableName, callableNameIndex, boundDecl, refIndex) => {
+      const refPath = blockPathAt(refIndex);
+      const esc = callableName.replace(/\$/g, "\\$");
+      let declPath;
+      if (fn.name) {
+        const beforeDecl = executable.slice(0, fn.start).replace(/\basync\s*$/, "").trimEnd();
+        const isFnDecl = beforeDecl === "" || /[;{}]$/.test(beforeDecl) || /(?<![\w$.])export(?:\s+default)?$/.test(beforeDecl);
+        if (!isFnDecl) return false;
+        declPath = blockPathAt(fn.start);
+        if (!isPathPrefix(declPath, refPath)) return false;
+        // Reassignment to the function declaration binding makes the resolved target unproven.
+        if (Array.from(writeIndexes(callableName)).some(w => isPathPrefix(declPath, blockPathAt(w)))) return false;
+      } else {
+        const declKind = boundDecl[1].trim();
+        const rawDeclPath = blockPathAt(boundDecl.index);
+        if (declKind === "var") {
+          const enclosingFn = functions.filter(f => f.body < boundDecl.index && boundDecl.index < f.end).at(-1);
+          declPath = enclosingFn ? rawDeclPath.slice(0, rawDeclPath.indexOf(enclosingFn.body) + 1) : [];
+        } else {
+          declPath = rawDeclPath;
+        }
+        if (!isPathPrefix(declPath, refPath)) return false;
+      }
+      // Reject declaration/method names that happen to be followed by `(`.
+      if (/(?:\bfunction(?:\s*\*)?|\b(?:var|let|const|class|import|get|set))\s+$/.test(executable.slice(0, refIndex))) return false;
+      // Reject if any enclosing function narrower than declPath shadows callableName via parameter or name.
+      const nameRe = new RegExp(`(?<![\\w$.])${esc}(?![\\w$])`);
+      for (const enc of functions) {
+        if (enc.body < refIndex && refIndex < enc.end && !declPath.includes(enc.body)) {
+          if (nameRe.test(executable.slice(enc.start, enc.body))) return false;
+        }
+      }
+      // Reject if any enclosing catch or for-header block narrower than declPath shadows callableName.
+      const catchShadowRe = new RegExp(String.raw`\bcatch\s*\([^()]*\b${esc}(?![\w$])[^()]*\)\s*$`);
+      const forShadowRe = new RegExp(String.raw`\bfor\s*\(\s*(?:var|let|const)\b[^)]*\b${esc}(?![\w$])[^)]*\)\s*$`);
+      for (const block of refPath.slice(declPath.length)) {
+        const beforeBlock = executable.slice(0, block);
+        if (catchShadowRe.test(beforeBlock) || forShadowRe.test(beforeBlock)) return false;
+      }
+      // Reject if any other declaration (var/let/const/function/class/import, including destructuring)
+      // in declPath or a narrower enclosing scope shadows or redeclares callableName.
+      const declKeywords = /\b(var|let|const|function(?:\s*\*)?|class|import)\b/g;
+      for (const kw of executable.matchAll(declKeywords)) {
+        const kind = kw[1];
+        const afterKw = kw.index + kw[0].length;
+        if (kind.startsWith("function") || kind === "class") {
+          const idMatch = /^\s+([A-Za-z_$][\w$]*)/.exec(executable.slice(afterKw));
+          if (!idMatch || idMatch[1] !== callableName) continue;
+          const namePos = afterKw + idMatch[0].length - callableName.length;
+          if (namePos === callableNameIndex) continue;
+          const shadowScopePath = blockPathAt(kw.index);
+          if (shadowScopePath.length >= declPath.length && isPathPrefix(shadowScopePath, refPath)) return false;
+          continue;
+        }
+        if (kind === "import") {
+          const semi = executable.indexOf(";", afterKw);
+          const nl = executable.indexOf("\n", afterKw);
+          const endPos = Math.min(semi < 0 ? executable.length : semi, nl < 0 ? executable.length : nl);
+          if (!nameRe.test(executable.slice(afterKw, endPos))) continue;
+          const shadowScopePath = blockPathAt(kw.index);
+          if (shadowScopePath.length >= declPath.length && isPathPrefix(shadowScopePath, refPath)) return false;
+          continue;
+        }
+        let depth = 0;
+        let inInit = false;
+        let k = afterKw;
+        while (k < executable.length) {
+          const ch = executable[k];
+          if (depth === 0 && (ch === ";" || ch === "\n" || ch === "}")) break;
+          if ("([{".includes(ch)) {
+            depth++;
+          } else if (")]}".includes(ch)) {
+            if (depth === 0) break;
+            depth--;
+          } else if (depth === 0 && ch === "=" && executable[k + 1] !== "=" && executable[k + 1] !== ">") {
+            inInit = true;
+          } else if (depth === 0 && ch === ",") {
+            inInit = false;
+          } else if (!inInit && /[A-Za-z_$]/.test(ch) && !/[\w$.]/.test(executable[k - 1] ?? "")) {
+            const idm = /^[A-Za-z_$][\w$]*/.exec(executable.slice(k));
+            const ident = idm[0];
+            const afterIdent = k + ident.length;
+            const isPropKey = depth > 0 && /^\s*:/.test(executable.slice(afterIdent));
+            if (ident === callableName && !isPropKey && k !== callableNameIndex) {
+              const rawShadowPath = blockPathAt(kw.index);
+              let shadowScopePath = rawShadowPath;
+              if (kind === "var") {
+                const encFn = functions.filter(f => f.body < kw.index && kw.index < f.end).at(-1);
+                shadowScopePath = encFn ? rawShadowPath.slice(0, rawShadowPath.indexOf(encFn.body) + 1) : [];
+              }
+              if (shadowScopePath.length >= declPath.length && isPathPrefix(shadowScopePath, refPath)) return false;
+            }
+            k = afterIdent;
+            continue;
+          }
+          k++;
+        }
+      }
+      return true;
+    };
     for (const fn of functions.filter(fn => fn.body < pos && pos < fn.end)) {
+      if (hasPriorExit(fn.body + 1, pos)) return false;
       if (certifiedLoopOpen !== undefined && fn.body > certifiedLoopOpen) continue;
       if (seen.has(fn)) continue;
       if (active.has(fn)) return false;
@@ -2737,10 +2887,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (fnSegment >= 0 && refSegment >= 0 && refSegment < fnSegment) continue;
           const afterRef = executable.slice(ref.index + ref[0].length);
           const isCall = /^\s*\(/.test(afterRef);
-          const isEventCallback = /\baddEventListener\s*\(\s*(['"])(?:DOMContentLoaded|load)\1\s*,\s*$/.test(literalSource.slice(0, ref.index));
+          const lifecycleSite = /^\s*[,)]/.test(afterRef)
+            ? findLifecycleActivationSite(executable.slice(0, ref.index), literalSource.slice(0, ref.index))
+            : -1;
           const timerSite = /^\s*[,)]/.test(afterRef) ? findTimerActivationSite(executable.slice(0, ref.index)) : -1;
-          if (!isCall && !isEventCallback && timerSite < 0) continue;
-          const siteIndex = isCall || isEventCallback ? ref.index : timerSite;
+          if (!isCall && lifecycleSite < 0 && timerSite < 0) continue;
+          if (!resolvesToCallableBinding(fn, callableName, callableNameIndex, boundDecl, ref.index)) continue;
+          const siteIndex = isCall ? ref.index : (lifecycleSite >= 0 ? lifecycleSite : timerSite);
           if (isReachableSite(siteIndex)) {
             invoked = true;
             break;
