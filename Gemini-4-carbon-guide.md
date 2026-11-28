@@ -639,11 +639,9 @@ def estimate_cost(usage, rates):
     """
     if usage is None:
         raise ValueError("usage_metadata is None; cannot estimate token cost")
-    prompt_total = getattr(usage, "prompt_token_count", None)
-    if prompt_total is None:
-        raise ValueError("prompt_token_count is unavailable; cannot estimate token cost")
+    prompt_total = getattr(usage, "prompt_token_count", 0) or 0
     cached = getattr(usage, "cached_content_token_count", 0) or 0
-    prompt = prompt_total - cached
+    prompt = max(prompt_total - cached, 0)
     tool_prompt = getattr(usage, "tool_use_prompt_token_count", 0) or 0
     thoughts = getattr(usage, "thoughts_token_count", 0) or 0
     candidates = getattr(usage, "candidates_token_count", 0) or 0
