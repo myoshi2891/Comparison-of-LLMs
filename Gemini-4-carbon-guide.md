@@ -474,7 +474,7 @@ GenerateContentで `MAX_TOKENS` に達した応答に `continuation_token` が�
 | `frequency_penalty` / `presence_penalty` / `candidate_count` | 既存設定に残る場合あり | 両penaltyと `candidate_count > 1` は非対応 | penaltyを削除し、`candidate_count` は省略または1へ調整してから移行 [S7] |
 | 明示的コンテキストキャッシュ | 対応するモデルあり | **Agent Platformでは非対応** | `cached_content` 参照を削除し、4,096トークン以上の共有・静的コンテンツをプロンプト先頭へ置いて暗黙的キャッシュを利用 [S7] |
 | `thought_signature` と会話履歴 | モデルごとの要件に従う | 過去のfunctionCall・最終textを含む署名付きPartを保持。並列呼び出しの署名は最初のfunctionCallだけ | 応答のContentとPartをそのまま再送し、署名を兄弟呼び出しへコピーしない。必要な署名の欠落・重複はHTTP 400の原因 [S7] |
-| 履歴の編集・prefill | 構成による | 署名は会話prefixに結び付く。prefilled modelターンは非対応 | prefillを削除してmodelターン末尾のまま送信しない。履歴圧縮などで会話prefixが変わる場合は、新しい会話・セッションを開始する（新しい会話は以前の履歴を引き継がないため、古い署名はコピーせず、前のタスク文脈を新しいuserターンに要約として引き継ぐ） [S7] |
+| 履歴の編集・prefill | 構成による | 署名は会話prefixに結び付く。prefilled modelターンは非対応 | prefillを削除してmodelターン末尾のまま送信しない。履歴圧縮や編集で会話prefixが変わる場合は、`prefix_mismatch_behavior="DROP"` を指定する（Python `google-genai` での対応可否はインストール済みSDKの型定義で確認）か、新しい会話・セッションを開始する（新しい会話は以前の履歴を引き継がないため、古い署名はコピーせず、前のタスク文脈を新しいuserターンに要約として引き継ぐ） [S7] |
 | トークン課金 | 一部のみ課金 | **全トークン課金**（思考、内部ツール指示を含む） | 予算とアラートを再設計 [S7] |
 | 長い出力 | 上限内 | long decode が必要な場合あり | `v1beta1` を使い、`max_output_tokens` をセグメント上限より大きく設定 [S6] |
 
