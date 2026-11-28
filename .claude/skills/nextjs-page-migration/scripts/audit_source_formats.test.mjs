@@ -2966,28 +2966,29 @@ test("validates grouped IIFEs, lifecycle receivers, callable bindings, and enclo
 		assert.equal(audit(`${card}<script>${bad}</script>`, page).status, 1, bad);
 	}
 
+	const lifeBody = `const src = ${JSON.stringify(chart)}; mermaid.render('x', src);`;
 	// 2. Lifecycle listeners require a supported, unshadowed receiver (both inline and referenced callbacks).
 	for (const good of [
-		`document.addEventListener('DOMContentLoaded', () => { ${body} });`,
-		`window.document.addEventListener('DOMContentLoaded', () => { ${body} });`,
-		`window.addEventListener('load', () => { ${body} });`,
-		`globalThis.addEventListener('DOMContentLoaded', () => { ${body} });`,
-		`addEventListener('load', () => { ${body} });`,
-		`function draw() { ${body} } document.addEventListener('DOMContentLoaded', draw);`,
-		`const draw = () => { ${body} }; window.addEventListener('load', draw);`,
+		`document.addEventListener('DOMContentLoaded', () => { ${lifeBody} });`,
+		`window.document.addEventListener('DOMContentLoaded', () => { ${lifeBody} });`,
+		`window.addEventListener('load', () => { ${lifeBody} });`,
+		`globalThis.addEventListener('DOMContentLoaded', () => { ${lifeBody} });`,
+		`addEventListener('load', () => { ${lifeBody} });`,
+		`function draw() { ${lifeBody} } document.addEventListener('DOMContentLoaded', draw);`,
+		`const draw = () => { ${lifeBody} }; window.addEventListener('load', draw);`,
 	]) {
 		assert.equal(audit(`${card}<script>${good}</script>`, page).status, 0, good);
 	}
 	for (const bad of [
-		`customObj.addEventListener('DOMContentLoaded', () => { ${body} });`,
-		`document.addEventListener('load', () => { ${body} });`,
-		`const document = { addEventListener() {} }; document.addEventListener('DOMContentLoaded', () => { ${body} });`,
-		`document.addEventListener = () => {}; document.addEventListener('DOMContentLoaded', () => { ${body} });`,
-		`const window = { addEventListener() {} }; window.addEventListener('load', () => { ${body} });`,
-		`const addEventListener = () => {}; addEventListener('load', () => { ${body} });`,
-		`function draw() { ${body} } customObj.addEventListener('DOMContentLoaded', draw);`,
-		`function draw() { ${body} } document.addEventListener('load', draw);`,
-		`const document = { addEventListener() {} }; function draw() { ${body} } document.addEventListener('DOMContentLoaded', draw);`,
+		`customObj.addEventListener('DOMContentLoaded', () => { ${lifeBody} });`,
+		`document.addEventListener('load', () => { ${lifeBody} });`,
+		`const document = { addEventListener() {} }; document.addEventListener('DOMContentLoaded', () => { ${lifeBody} });`,
+		`document.addEventListener = () => {}; document.addEventListener('DOMContentLoaded', () => { ${lifeBody} });`,
+		`const window = { addEventListener() {} }; window.addEventListener('load', () => { ${lifeBody} });`,
+		`const addEventListener = () => {}; addEventListener('load', () => { ${lifeBody} });`,
+		`function draw() { ${lifeBody} } customObj.addEventListener('DOMContentLoaded', draw);`,
+		`function draw() { ${lifeBody} } document.addEventListener('load', draw);`,
+		`const document = { addEventListener() {} }; function draw() { ${lifeBody} } document.addEventListener('DOMContentLoaded', draw);`,
 	]) {
 		assert.equal(audit(`${card}<script>${bad}</script>`, page).status, 1, bad);
 	}

@@ -227,7 +227,8 @@ const TEMPLATE_TEXT_CONTENT_KEY = String.raw`\x60 *\x60`;
  * @return {boolean} False only for a blanked template key that is not `textContent` or `text`.
  */
 function isTextContentKey(write, rawSource) {
-  const raw = rawSource.slice(write.index, write.index + write[0].length);
+  // Comments between tokens are not code: validate syntax with them blanked; keys come from the raw text.
+  const raw = rawSource.slice(write.index, write.index + write[0].length).replace(/\/\*[\s\S]*?\*\/|\/\/[^\r\n]*/g, " ");
   if (/(?:^|[^\]])\.\s*(?:textContent|text)\b\s*(?:(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=|\+\+|--)?$/.test(raw)) {
     return true;
   }
@@ -243,6 +244,19 @@ function isTextContentKey(write, rawSource) {
     return ({ n: "\n", r: "\r", t: "\t", b: "\b", f: "\f", v: "\v", 0: "\0" })[simple] ?? simple;
   });
   return decoded === "textContent" || decoded === "text";
+}
+
+/**
+ * Tests whether a scheduler handle is cancelled by the matching cancel API.
+ * @param {string} executable - Comment- and string-masked script source.
+ * @param {string} handle - The identifier holding the scheduler return value.
+ * @param {string} scheduler - The scheduling function name.
+ * @return {boolean} True only for a cancel call that pairs with the scheduler; microtasks are never cancellable.
+ */
+function cancelsSchedulerHandle(executable, handle, scheduler) {
+  const cancel = { setTimeout: "clearTimeout|clearInterval", setInterval: "clearInterval|clearTimeout", requestAnimationFrame: "cancelAnimationFrame" }[scheduler];
+  if (!cancel || handle === undefined) return false;
+  return new RegExp(String.raw`(?<![\w$])(?:${cancel})\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
 }
 
 /**
@@ -401,7 +415,7 @@ function normalizeMermaidSource(raw) {
  */
 function extractTagContents(src, tag) {
   const results = [];
-  const re = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, "gi");
+  const re = new RegExp(`<${tag}\\b(?:[^>"']|"[^"]*"|'[^']*')*>([\\s\\S]*?)<\\/${tag}>`, "gi");
   let match = re.exec(src);
   while (match !== null) {
     results.push({ index: match.index, content: match[1] });
@@ -1566,6 +1580,13 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     };
     const functions = functionBodies(executable);
     const loops = loopExtents(executable);
+    const editCanPrecedeTarget = (editIndex, targetAt) => {
+      if (editIndex <= targetAt) return true;
+      if (functions.some(fn => fn.body < targetAt && targetAt < fn.end)) return true;
+      if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
+      if (loops.some(loop => loop.start < targetAt && targetAt < loop.end)) return true;
+      return false;
+    };
     const hasForeignDomWriteAt = (at, captureAt = at) => {
       if (foreignDomWrite === true) return true;
       if (!foreignDomWrite) return false;
@@ -1952,8 +1973,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
           if (regStatement === null || /^\s*(?:if|else|while|for|do|switch|with)(?![\w$])/.test(regStatement) || /&&|\|\||\?|=>/.test(regStatement)) return false;
           // A timer whose handle is cancelled in the scope may never run for this iteration.
           const handle = /([A-Za-z_$][\w$]*)\s*=\s*(?:window\s*\.\s*)?$/.exec(head.slice(0, timerCall.index))?.[1];
-          const cancelled = handle !== undefined &&
-            new RegExp(String.raw`(?<![\w$])(?:clearTimeout|clearInterval|cancelAnimationFrame)\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
+          const cancelled = cancelsSchedulerHandle(executable, handle, timerCall[1]);
           if (!cancelled) {
             // A return/throw in the callback (at any brace depth, outside nested functions)
             // before the read or render can end the callback early.
@@ -2019,13 +2039,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (!selectedScript.availableAt(at)) return false;
       const ownerBinding = bindingAt(selected[1], at);
       const owner = ownerBinding?.value;
-      const editCanPrecede = (editIndex, queryAt) => {
-        if (editIndex <= queryAt) return true;
-        if (functions.some(fn => fn.body < queryAt && queryAt < fn.end)) return true;
-        if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
-        if (loops.some(loop => loop.start < queryAt && queryAt < loop.end)) return true;
-        return false;
-      };
+      const editCanPrecede = editCanPrecedeTarget;
       // Same-scope class/id changes that can run before the query can alter which
       // elements match the card selector; changes provably after the query leave
       // an already-captured element or static NodeList intact.
@@ -2389,13 +2403,6 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // top-level synchronous capture do not alter the already-captured string).
     // Static computed access (script["textContent"]) writes the same property as dot access.
     // Template keys are blanked in literalSource; match their length and confirm them in rawSource.
-    const editCanPrecedeTarget = (editIndex, targetAt) => {
-      if (editIndex <= targetAt) return true;
-      if (functions.some(fn => fn.body < targetAt && targetAt < fn.end)) return true;
-      if (functions.some(fn => fn.body < editIndex && editIndex < fn.end)) return true;
-      if (loops.some(loop => loop.start < targetAt && targetAt < loop.end)) return true;
-      return false;
-    };
     const writeCanPrecedeRead = writeIndex => editCanPrecedeTarget(writeIndex, initialBinding.at);
     const target = String.raw`(\w+(?:\.querySelector\(\s*(['"])(.*?)\2\s*\))?)(?:\s*\.\s*(?:textContent|text)\b|\s*\[\s*(?:'(?:[^'\\\r\n]|\\[\s\S])*'|"(?:[^"\\\r\n]|\\[\s\S])*"|${TEMPLATE_TEXT_CONTENT_KEY})\s*\])`;
     const writes = new RegExp(`${target}\\s*(?:=(?!=|>)|(?:\\*\\*|&&|\\|\\||\\?\\?|[+\\-*/%&|^])=|\\+\\+|--)`, "g");
@@ -2733,8 +2740,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (timerMatch[1] && !isUnshadowedGlobalBinding(timerMatch[1])) return -1;
       if (!isUnshadowedGlobalBinding(timerMatch[2])) return -1;
       const handle = /([A-Za-z_$][\w$]*)\s*=\s*$/.exec(before.slice(0, timerMatch.index))?.[1];
-      const cancelled = handle !== undefined &&
-        new RegExp(String.raw`(?<![\w$])(?:clearTimeout|clearInterval|cancelAnimationFrame)\s*\(\s*${handle.replace(/\$/g, "\\$")}\s*\)`).test(executable);
+      const cancelled = cancelsSchedulerHandle(executable, handle, timerMatch[2]);
       return cancelled ? -1 : timerMatch.index;
     };
     // DOMContentLoaded only reaches a listener registered before dispatch: every enclosing
@@ -2742,8 +2748,7 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
     // registrations (timers, later calls, other listeners) are not certified.
     const isLifecycleOrderProven = siteIndex => {
       const eventName = /^(?:[\w$]+\s*\.\s*)*addEventListener\s*\(\s*(['"])(DOMContentLoaded|load)\1/.exec(literalSource.slice(siteIndex))?.[2];
-      if (eventName === "load") return true;
-      if (eventName !== "DOMContentLoaded") return false;
+      if (eventName !== "load" && eventName !== "DOMContentLoaded") return false;
       return functions.filter(f => f.body < siteIndex && siteIndex < f.end).every(f => isDirectOrCallbackActivation(f, true));
     };
     const isDirectOrCallbackActivation = (fn, iifeOnly = false) => {
@@ -2790,10 +2795,11 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       if (isUnaryIife && isReachableSite(unaryIife.index)) return true;
       if (iifeOnly) return false;
       // Timer callback: setTimeout/requestAnimationFrame/queueMicrotask with unshadowed scheduler.
-      const timerSite = findTimerActivationSite(beforeFn);
+      const endsAtArgument = /^\s*[,)]/.test(afterFn);
+      const timerSite = endsAtArgument ? findTimerActivationSite(beforeFn) : -1;
       if (timerSite >= 0 && isReachableSite(timerSite)) return true;
       // Document/window load lifecycle callback on a supported, unshadowed receiver.
-      const lifecycleSite = findLifecycleActivationSite(beforeFn, beforeFnLit);
+      const lifecycleSite = endsAtArgument ? findLifecycleActivationSite(beforeFn, beforeFnLit) : -1;
       if (lifecycleSite >= 0 && isReachableSite(lifecycleSite) && isLifecycleOrderProven(lifecycleSite)) {
         return true;
       }
@@ -2915,14 +2921,16 @@ function rendererSuffix(literalSource, rawSource, payload, dedentedPayload, card
       const callableNameIndex = fn.name ? fn.nameIndex : boundNameIndex;
       if (!invoked && !isGenerator && callableName) {
         const fnSegment = segmentOf(fn.start);
-        const refs = executable.matchAll(new RegExp(`(?<![\\w$.])${callableName.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
+        const refs = executable.matchAll(new RegExp(`(?<![\\w$]|\\.\\s*)${callableName.replace(/\$/g, "\\$")}(?![\\w$])`, "g"));
         for (const ref of refs) {
           if (ref.index === callableNameIndex) continue;
           if (!fn.name && ref.index < fn.end) continue;
           const refSegment = segmentOf(ref.index);
           if (fnSegment >= 0 && refSegment >= 0 && refSegment < fnSegment) continue;
           const afterRef = executable.slice(ref.index + ref[0].length);
-          const isCall = /^\s*\(/.test(afterRef);
+          const isConstructed = /(?<![\w$.])new\s*$/.test(executable.slice(0, ref.index));
+          const nonConstructible = isGenerator || /=>/.test(executable.slice(fn.start, fn.body));
+          const isCall = /^\s*\(/.test(afterRef) && !(isConstructed && nonConstructible);
           const lifecycleSite = /^\s*[,)]/.test(afterRef)
             ? findLifecycleActivationSite(executable.slice(0, ref.index), literalSource.slice(0, ref.index))
             : -1;
@@ -3213,7 +3221,7 @@ function materializePlainTextCards(src) {
     // Writes to any element's textContent/text (static or computed key) or structural/attribute
     // edits that can alter script selection or remove a queried host across scopes.
     const writesTextContent = /\.\s*(?:textContent|text)\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
-      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:(['"])(?:[^\\\r\n]|\\[\s\S])*?\1|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
+      Array.from(literalSource.matchAll(new RegExp(String.raw`\[\s*(?:'(?:[^'\\\r\n]|\\[\s\S])*'|"(?:[^"\\\r\n]|\\[\s\S])*"|${TEMPLATE_TEXT_CONTENT_KEY})\s*\]\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)`, "g")))
         .some(write => executable[write.index] === "[" && isTextContentKey(write, rawSource));
     const editsDomStructure = /\.\s*(?:(?:remove|replaceWith|before|after|insertAdjacent(?:HTML|Element|Text)|removeChild|replaceChild|insertBefore|prepend|append|appendChild|replaceChildren|setAttribute(?:NS|Node|NodeNS)?|removeAttribute(?:NS|Node)?|toggleAttribute)\s*\(|(?:outerHTML|innerHTML|innerText|type|className)\s*=(?!=)|classList\s*\.\s*(?:add|remove|replace|toggle)\s*\()/.test(executable);
     const writesId = /\.\s*id\s*(?:[-+*/%&|^]|\*\*|<<|>>>?|&&|\|\||\?\?)?=(?!=)/.test(executable) ||
@@ -3502,7 +3510,7 @@ function inventoryHtml(src) {
   }
 
   const listTexts = [];
-  const liRe = /<li\b[^>]*>([\s\S]*?)<\/li>/gi;
+  const liRe = /<li\b(?:[^>"']|"[^"]*"|'[^']*')*>([\s\S]*?)<\/li>/gi;
   let li = liRe.exec(body);
   while (li !== null) {
     const liContent = removeMaterializedCharts(li[1]);
